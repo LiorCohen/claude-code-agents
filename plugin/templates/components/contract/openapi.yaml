@@ -9,26 +9,9 @@ servers:
     description: API v1
 
 paths:
-  /health:
-    get:
-      summary: Health check endpoint
-      operationId: getHealth  # REQUIRED: Used by backend-dev to name handler (handleGetHealth)
-      tags:
-        - System
-      responses:
-        '200':
-          description: Service is healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
-                  timestamp:
-                    type: string
-                    format: date-time
+  # Add your API endpoints here
+  # NOTE: Health check endpoints (/health, /readiness, /liveness) should NOT be defined here.
+  # They are infrastructure endpoints implemented directly in the controller for Kubernetes probes.
 
 components:
   schemas:
