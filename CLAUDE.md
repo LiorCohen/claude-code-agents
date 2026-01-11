@@ -198,4 +198,27 @@ When using this plugin to initialize projects:
 - To use the plugin: Install it in Claude Code, then run `/project:init-project` in a new directory
 - All agent definitions enforce strict patterns (immutability, 5-layer architecture, type safety)
 - Specs are validated by Python scripts that check for required frontmatter fields
-- ALWAYS UPDATE THE PLUGIN VERSION BEFORE COMMITTING (plugin/.claude-plugin/plugin.json and ./claude-plugin/marketplace.json)
+
+### Version Management (CRITICAL)
+
+When making changes to the plugin, you MUST follow this exact sequence:
+
+1. **Make your code changes** to agents, commands, skills, templates, etc.
+2. **Bump the version** in both:
+   - `plugin/.claude-plugin/plugin.json`
+   - `.claude-plugin/marketplace.json`
+3. **Update CHANGELOG.md** with a new version entry that includes:
+   - Version number and date
+   - Clear description of what changed
+   - Category (Added, Enhanced, Fixed, Removed, etc.)
+4. **Commit all changes together** (code changes + version bump + CHANGELOG update)
+
+**NEVER commit a version bump without a corresponding CHANGELOG entry.**
+
+Example workflow:
+```
+1. Edit plugin/agents/backend-dev.md (add new feature)
+2. Update version 1.1.0 → 1.1.1 in both plugin.json files
+3. Add [1.1.1] entry to plugin/CHANGELOG.md describing the feature
+4. git commit -am "Add feature X, bump to 1.1.1"
+```

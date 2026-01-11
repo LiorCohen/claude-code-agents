@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.2] - 2026-01-11
+
+### Enhanced
+
+- **CLAUDE.md**: Added strict version management workflow
+  - Enforces required sequence: code changes → version bump → CHANGELOG update → commit
+  - Prevents version bumps without corresponding CHANGELOG entries
+  - Includes example workflow for clarity
+  - Makes version management process explicit and mandatory
+
+This ensures all version changes are properly documented before being committed.
+
 ## [1.1.1] - 2026-01-11
 
 ### Enhanced
