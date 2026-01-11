@@ -14,102 +14,19 @@ Use the `testing` skill for patterns and references.
 
 ---
 
-## Test Execution: Testkube
+## Test Execution
 
-All tests except unit tests run in Kubernetes via Testkube.
-
-### Test Hierarchy
-
-| Test Type | Location | Executor | Runs In |
-|-----------|----------|----------|---------|
-| Unit | `components/*/src/**/*.test.ts` | Vitest | CI runner |
-| Component | `components/testing/tests/component/` | Testkube + Vitest | Kubernetes |
-| Integration | `components/testing/tests/integration/` | Testkube + Vitest | Kubernetes |
-| E2E | `components/testing/tests/e2e/` | Testkube + Playwright | Kubernetes |
-
-### Why Testkube?
-
-- Tests run in same network as services
-- No port-forwarding or external exposure needed
-- Test artifacts stored in cluster
-- Parallelization via Testkube
-- Environment parity with production
-
-### Testkube Directory Structure
-
-```
-components/testing/
-├── tests/
-│   ├── integration/
-│   │   └── api-tests.yaml       # Test definitions
-│   ├── component/
-│   │   └── webapp-tests.yaml
-│   └── e2e/
-│       └── playwright-tests.yaml
-└── testsuites/
-    ├── integration-suite.yaml
-    └── e2e-suite.yaml
-```
-
-### Test Definition Example
-
-```yaml
-# components/testing/tests/integration/api-tests.yaml
-apiVersion: tests.testkube.io/v3
-kind: Test
-metadata:
-  name: api-integration-tests
-  namespace: testkube
-spec:
-  type: vitest
-  content:
-    type: git
-    repository:
-      uri: https://github.com/org/repo
-      branch: main
-      path: components/server/src/__tests__/integration
-```
-
-### Running Tests
-
-```bash
-# Run single test
-testkube run test api-integration-tests --watch
-
-# Run test suite
-testkube run testsuite integration-tests --watch
-
-# Get test results
-testkube get execution <id>
-```
+All tests except unit tests run in Kubernetes via Testkube. See the `testing` skill for:
+- Complete Testkube setup and installation instructions
+- Test hierarchy and directory structure
+- Test definition examples
+- Running tests commands
 
 ---
 
 ## Spec and Issue Reference
 
-Every test file must reference its spec and issue:
-
-```typescript
-/**
- * @spec specs/features/user-auth/SPEC.md
- * @issue PROJ-123
- */
-describe('Feature: User Authentication', () => {
-  // AC1: Given valid credentials, when user logs in, then session is created
-  describe('AC1: Valid login', () => {
-    it('creates session for valid credentials', async () => {
-      // Arrange (Given)
-      const credentials = { email: 'test@example.com', password: 'valid' };
-
-      // Act (When)
-      const result = await authService.login(credentials);
-
-      // Assert (Then)
-      expect(result.session).toBeDefined();
-    });
-  });
-});
-```
+Every test file must reference its spec and issue. See the `testing` skill for the standard pattern and examples.
 
 ---
 

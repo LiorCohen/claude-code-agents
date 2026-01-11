@@ -8,6 +8,10 @@ color: "#3B82F6"
 
 You are a senior React/TypeScript frontend developer.
 
+## Skills
+
+Use the `typescript-standards` skill for coding standards (strict typing, immutability, arrow functions, native JS only).
+
 ## Working Directory
 
 `components/webapp/src/`
@@ -97,9 +101,8 @@ export const useUser = (id: string) => {
 ## Rules
 
 - **No implicit globally running code**
-- TypeScript strict mode—no `any`
+- Follow all `typescript-standards` skill requirements (strict mode, immutability, arrow functions, native JS, index.ts rules)
 - **Never hand-write API types**—use generated types from contract
-- **index.ts files**: Must only contain imports and exports, never actual code or logic
 - No business logic in components—use hooks
 - Test behavior, not implementation
 - Prefer `readonly` for props and state types

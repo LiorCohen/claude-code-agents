@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.2.0] - 2026-01-11
+
+### Added
+
+- **typescript-standards skill**: New shared skill for TypeScript coding standards
+  - Consolidates strict TypeScript configuration requirements
+  - Immutability rules (readonly, ReadonlyArray, spread operators)
+  - Arrow functions only rule
+  - Native JavaScript only rule (no lodash, ramda, immer)
+  - index.ts file rules (only imports/exports)
+  - Eliminates ~100 lines of duplication between backend-dev and frontend-dev agents
+
+### Enhanced
+
+- **backend-dev agent**: Now references `typescript-standards` skill instead of duplicating standards
+  - Reduced file size by consolidating TypeScript/immutability rules
+  - Added Skills section pointing to typescript-standards
+- **frontend-dev agent**: Now references `typescript-standards` skill instead of duplicating standards
+  - Added Skills section pointing to typescript-standards
+- **tester agent**: Simplified by referencing `testing` skill for patterns
+  - Removed duplicated spec/issue reference example (kept in testing skill)
+  - Removed duplicated Testkube setup information (consolidated in testing skill)
+  - Cleaner, more maintainable agent definition
+- **testing skill**: Enhanced with comprehensive Testkube information
+  - Added detailed Testkube installation instructions
+  - Added directory structure documentation
+  - Added test definition examples
+  - Consolidated running tests commands
+  - Now serves as single source of truth for all testing patterns
+
+### Impact
+
+This release significantly reduces code duplication and improves maintainability:
+- Created 1 new shared skill (typescript-standards)
+- Eliminated ~150 lines of duplicated content across agent files
+- Centralized TypeScript standards in one location
+- Centralized Testkube documentation in testing skill
+- Improved consistency between backend and frontend development
+
 ## [1.1.2] - 2026-01-11
 
 ### Enhanced

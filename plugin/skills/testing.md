@@ -7,16 +7,82 @@ description: Test patterns and references for spec verification. See tester agen
 
 ## Test Execution
 
-See the `tester` agent for full Testkube setup and execution details.
+All tests except unit tests run in Kubernetes via Testkube for environment parity.
 
-**Quick reference:**
+### Test Hierarchy
 
-| Test Type | Location | Executor |
-|-----------|----------|----------|
-| Unit | `components/*/src/**/*.test.ts` | Vitest (CI) |
-| Component | `components/testing/tests/component/` | Testkube |
-| Integration | `components/testing/tests/integration/` | Testkube |
-| E2E | `components/testing/tests/e2e/` | Testkube |
+| Test Type | Location | Executor | Runs In |
+|-----------|----------|----------|---------|
+| Unit | `components/*/src/**/*.test.ts` | Vitest | CI runner |
+| Component | `components/testing/tests/component/` | Testkube + Vitest | Kubernetes |
+| Integration | `components/testing/tests/integration/` | Testkube + Vitest | Kubernetes |
+| E2E | `components/testing/tests/e2e/` | Testkube + Playwright | Kubernetes |
+
+### Why Testkube?
+
+- Tests run in same network as services
+- No port-forwarding or external exposure needed
+- Test artifacts stored in cluster
+- Parallelization via Testkube
+- Environment parity with production
+
+## Testkube Setup and Usage
+
+### Installation
+
+```bash
+# Install Testkube in cluster
+helm repo add kubeshop https://kubeshop.github.io/helm-charts
+helm install testkube kubeshop/testkube --namespace testkube --create-namespace
+```
+
+### Directory Structure
+
+```
+components/testing/
+├── tests/
+│   ├── integration/
+│   │   └── api-tests.yaml       # Test definitions
+│   ├── component/
+│   │   └── webapp-tests.yaml
+│   └── e2e/
+│       └── playwright-tests.yaml
+└── testsuites/
+    ├── integration-suite.yaml
+    └── e2e-suite.yaml
+```
+
+### Test Definition Example
+
+```yaml
+# components/testing/tests/integration/api-tests.yaml
+apiVersion: tests.testkube.io/v3
+kind: Test
+metadata:
+  name: api-integration-tests
+  namespace: testkube
+spec:
+  type: vitest
+  content:
+    type: git
+    repository:
+      uri: https://github.com/org/repo
+      branch: main
+      path: components/server/src/__tests__/integration
+```
+
+### Running Tests
+
+```bash
+# Run single test
+testkube run test api-integration-tests --watch
+
+# Run test suite
+testkube run testsuite integration-tests --watch
+
+# Get test results
+testkube get execution <id>
+```
 
 ## Spec and Issue Reference
 
@@ -42,19 +108,6 @@ describe('Feature: User Authentication', () => {
     });
   });
 });
-```
-
-## Running Tests
-
-```bash
-# Unit tests (local)
-npm test --workspaces
-
-# Testkube - single test
-testkube run test api-integration-tests --watch
-
-# Testkube - test suite
-testkube run testsuite integration-tests --watch
 ```
 
 ---
