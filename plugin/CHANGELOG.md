@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.6.1] - 2026-01-11
+
+### Enhanced
+
+- **backend-dev agent**: Enforced dotenv usage and prohibited direct environment variable access
+  - **Mandatory dotenv**: Config layer must use `dotenv.config()` at the top of src/config/index.ts
+  - **Config layer ONLY**: `process.env` access is FORBIDDEN outside src/config/
+  - **Type-safe configuration**: All layers receive typed Config object, never raw environment variables
+  - **Updated Layer 2 (Config)**: Added comprehensive dotenv example with validation and error handling
+  - **Updated telemetry/logging**: Logger must receive log level from Config, not process.env
+  - **Dependency injection**: BaseLogger created from Config, passed down to all layers
+  - Added 6 explicit environment variable rules
+  - Added 3 new rules to Rules section
+
+### Updated Files
+
+- **backend-dev agent**:
+  - Layer 2 (Config): Added dotenv.config() requirement and comprehensive example
+  - Added "Environment Variable Rules" section with 6 rules
+  - Updated "Structured Logging" section to use Config instead of process.env
+  - Updated "Logging by Layer" section to show baseLogger dependency injection
+  - Updated "Build Order" step 2 to emphasize dotenv usage
+  - Updated "Rules" section with 3 new rules:
+    - dotenv is mandatory
+    - NO direct process.env access
+    - Type-safe configuration only
+
+### Impact
+
+This enhancement improves configuration management and type safety:
+- **Prevents scattered env access**: All environment variables centralized in Config layer
+- **Type safety**: Config interface provides compile-time guarantees
+- **Validation**: Required env vars validated at startup with clear error messages
+- **Testability**: Config can be mocked/injected for testing
+- **Security**: Clearer control over environment variable access
+- **Best practices**: Follows 12-factor app configuration principles
+
 ## [1.6.0] - 2026-01-11
 
 ### Enhanced

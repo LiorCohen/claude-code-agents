@@ -68,7 +68,15 @@ const createServer = (deps: ServerDependencies): Readonly<{
 
 Environment parsing, validation, type-safe config objects.
 
+**CRITICAL: Use dotenv for ALL environment variable access.** Direct `process.env` access is FORBIDDEN outside the Config layer.
+
 ```typescript
+// src/config/index.ts
+import dotenv from 'dotenv';
+
+// Load .env file FIRST (before accessing any env vars)
+dotenv.config();
+
 readonly interface Config {
   readonly server: Readonly<{
     readonly port: number;
@@ -79,8 +87,33 @@ readonly interface Config {
   }>;
 }
 
-const loadConfig = (): Config => { /* ... */ };
+const loadConfig = (): Config => {
+  // Read from process.env ONLY in this layer
+  const port = parseInt(process.env.PORT ?? '3000', 10);
+  const host = process.env.HOST ?? 'localhost';
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required');
+  }
+
+  return {
+    server: { port, host },
+    database: { url: databaseUrl },
+  };
+};
+
+export { loadConfig };
+export type { Config };
 ```
+
+**Environment Variable Rules:**
+1. **dotenv is mandatory**: Always use `dotenv.config()` at the top of config/index.ts
+2. **Config layer ONLY**: `process.env` access is ONLY allowed in src/config/
+3. **Type-safe access**: All other layers receive typed Config object
+4. **Validation required**: Validate required vars and throw if missing
+5. **Default values**: Provide sensible defaults for optional vars
+6. **NO direct access elsewhere**: NEVER use `process.env` in Server, Controller, Model, or DAL layers
 
 **What it does NOT contain:** Business logic, database queries.
 
@@ -217,22 +250,26 @@ import { loadConfig } from './config/index.js';
 
 ### Structured Logging
 
-Use Pino with OpenTelemetry context injection:
+Use Pino with OpenTelemetry context injection. **NEVER access process.env directly** - receive config from Config layer.
 
 ```typescript
 // src/telemetry/logger.ts
 import pino from 'pino';
 import { context, trace } from '@opentelemetry/api';
+import type { Config } from '../config/index.js';
 
-const baseLogger = pino({
-  level: process.env.LOG_LEVEL ?? 'info',
-  formatters: {
-    level: (label) => ({ level: label }),
-  },
-  timestamp: pino.stdTimeFunctions.isoTime,
-});
+// Logger must receive log level from Config, not process.env
+export const createBaseLogger = (config: Config) => {
+  return pino({
+    level: config.logging.level, // From Config layer, NOT process.env
+    formatters: {
+      level: (label) => ({ level: label }),
+    },
+    timestamp: pino.stdTimeFunctions.isoTime,
+  });
+};
 
-export const createLogger = (component: string) => {
+export const createLogger = (baseLogger: pino.Logger, component: string) => {
   return baseLogger.child({ component });
 };
 
@@ -249,6 +286,26 @@ export const withTraceContext = <T extends Record<string, unknown>>(
     };
   }
   return obj;
+};
+```
+
+**Config example for logging:**
+```typescript
+// In src/config/index.ts
+readonly interface Config {
+  readonly logging: Readonly<{
+    readonly level: 'debug' | 'info' | 'warn' | 'error';
+  }>;
+  // ... other config
+}
+
+const loadConfig = (): Config => {
+  const logLevel = (process.env.LOG_LEVEL ?? 'info') as Config['logging']['level'];
+
+  return {
+    logging: { level: logLevel },
+    // ... other config
+  };
 };
 ```
 
@@ -279,11 +336,24 @@ All logs must include:
 
 ### Logging by Layer
 
+Loggers must be passed down from the Server layer (which receives Config):
+
 ```typescript
-// In any layer
+// In Server layer (receives Config)
+import { createBaseLogger } from '../telemetry/logger.js';
+
+const baseLogger = createBaseLogger(config);
+
+// Pass baseLogger to controller, dal, etc.
+const controller = createController({ baseLogger, ...otherDeps });
+```
+
+```typescript
+// In any layer (receives baseLogger via dependencies)
 import { createLogger, withTraceContext } from '../telemetry/logger.js';
 
-const logger = createLogger('controller');
+// Logger created from passed baseLogger
+const logger = createLogger(deps.baseLogger, 'controller');
 
 // Info log
 logger.info(
@@ -426,7 +496,11 @@ Use OpenTelemetry semantic conventions for attributes:
 When implementing a feature:
 
 1. Define types and interfaces
-2. Build Config (if new env vars needed)
+2. Build Config (if new env vars needed):
+   - **ALWAYS use dotenv.config() at the top**
+   - Add new env vars to Config interface
+   - Validate and parse in loadConfig()
+   - NEVER access process.env outside this layer
 3. Build DAL (data access methods)
 4. Create Model:
    - Add to `definitions/` if new types
@@ -435,7 +509,7 @@ When implementing a feature:
 5. Implement Controller (wire up use-cases)
 6. Wire up Server (new routes)
 7. Add telemetry:
-   - Logs at key decision points
+   - Logs at key decision points (logger from Config)
    - Metrics for operations
    - Spans for business logic
 
@@ -449,5 +523,9 @@ When implementing a feature:
 - Model never imports from outside its module
 - All external needs provided through Dependencies
 - One use-case per file
+- **dotenv is mandatory**: Use `dotenv.config()` in src/config/index.ts
+- **NO direct process.env access**: ONLY allowed in Config layer (src/config/)
+- **Type-safe configuration**: All layers receive typed Config object, never raw env vars
 - **Telemetry is mandatory**: All operations must emit logs, metrics, and spans
 - Follow OpenTelemetry semantic conventions for all telemetry data
+- **Pass config/logger down**: Server layer receives Config, passes baseLogger to other layers
