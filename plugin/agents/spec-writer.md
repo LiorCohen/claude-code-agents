@@ -16,9 +16,15 @@ Use the `spec-writing` skill for templates and validation.
 
 | Type | Location |
 |------|----------|
-| Feature specs | `specs/features/<n>/SPEC.md` |
-| Domain entities | `specs/domain/entities/<n>.md` |
+| Feature specs | `specs/features/YYYY/MM/DD/<feature-name>/SPEC.md` |
+| Implementation plans | `specs/features/YYYY/MM/DD/<feature-name>/PLAN.md` |
+| Domain entities | `specs/domain/entities/<entity-name>.md` |
 | Glossary | `specs/domain/glossary.md` |
+
+**Date Format:**
+- Use the date when the spec was created
+- Format: YYYY/MM/DD (e.g., `2026/01/11`)
+- This provides chronological organization and traceability
 
 ## Required Frontmatter
 

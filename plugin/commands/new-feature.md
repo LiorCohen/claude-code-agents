@@ -22,15 +22,17 @@ Start a new feature.
   - Issue reference (required)
   - Domain
   - Brief description
-- Create `specs/features/<feature-name>/SPEC.md` using template
+- Get current date in YYYY/MM/DD format
+- Create `specs/features/YYYY/MM/DD/<feature-name>/SPEC.md` using template
 - Fill in skeleton with user input
+- Set `created` frontmatter field to current date
 - Present for review and confirmation
 
 ### 2. Create Plan (`planner` agent)
 
 - Analyze the spec
 - Determine components affected (contract, server, webapp, helm, testing)
-- Create `specs/plans/YYYY/MM/DD/<feature-name>/PLAN.md`
+- Create `specs/features/YYYY/MM/DD/<feature-name>/PLAN.md` (same directory as spec)
 - Break down into phases with agent assignments
 - Estimate effort for each phase
 - Present plan for approval

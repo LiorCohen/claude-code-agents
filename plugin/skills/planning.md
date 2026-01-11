@@ -7,7 +7,11 @@ description: Templates for implementation plans.
 
 ## Plan Location
 
-`specs/plans/YYYY/MM/DD/feature-name/PLAN.md`
+Plans are stored alongside their specs:
+
+`specs/features/YYYY/MM/DD/<feature-name>/PLAN.md`
+
+This keeps all feature documentation (spec + plan) together in one location.
 
 ## Phase Sizing
 
@@ -22,7 +26,7 @@ description: Templates for implementation plans.
 ```markdown
 ---
 title: Implementation Plan: [Feature Name]
-spec: specs/features/[feature]/SPEC.md
+spec: ./SPEC.md
 issue: [PROJ-XXX]
 created: YYYY-MM-DD
 ---

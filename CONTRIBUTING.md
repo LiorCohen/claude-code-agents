@@ -22,8 +22,7 @@ Use the provided script to bump versions automatically:
 The script will:
 1. Update `plugin/.claude-plugin/plugin.json`
 2. Update `.claude-plugin/marketplace.json`
-3. Update the version number in `plugin/TODO.md`
-4. Show you the next steps
+3. Show you the next steps
 
 ### Manual Version Bump
 
@@ -31,8 +30,7 @@ If you need to bump versions manually:
 
 1. Edit `plugin/.claude-plugin/plugin.json` - update the `version` field
 2. Edit `.claude-plugin/marketplace.json` - update `plugins[0].version` field
-3. Edit `plugin/TODO.md` - update the "Current version" line
-4. Ensure all three versions match exactly
+3. Ensure all three versions match exactly
 
 ### Semantic Versioning
 

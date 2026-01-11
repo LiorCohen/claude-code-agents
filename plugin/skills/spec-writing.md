@@ -52,9 +52,15 @@ Run `scripts/validate-spec.py <path>` to check:
 
 | Type | Location |
 |------|----------|
-| Feature specs | `specs/features/<n>/SPEC.md` |
-| Domain entities | `specs/domain/entities/<n>.md` |
+| Feature specs | `specs/features/YYYY/MM/DD/<feature-name>/SPEC.md` |
+| Implementation plans | `specs/features/YYYY/MM/DD/<feature-name>/PLAN.md` |
+| Domain entities | `specs/domain/entities/<entity-name>.md` |
 | API contracts | `specs/architecture/api-contracts.md` |
+
+**Date-based organization:**
+- Features are organized by creation date (YYYY/MM/DD)
+- This provides chronological traceability
+- Plans live alongside their specs in the same directory
 
 ## Acceptance Criteria Format
 

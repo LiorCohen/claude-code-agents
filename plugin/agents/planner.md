@@ -14,7 +14,14 @@ Use the `planning` skill for templates.
 
 ## Plan Location
 
-`specs/plans/YYYY/MM/DD/feature-name/PLAN.md`
+Plans are stored alongside their specs:
+
+`specs/features/YYYY/MM/DD/<feature-name>/PLAN.md`
+
+**Important:**
+- Plans live in the same directory as their corresponding SPEC.md
+- Use the same date as the spec (when the feature was created)
+- This keeps related documentation together
 
 ## Component Awareness
 

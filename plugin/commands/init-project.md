@@ -83,8 +83,10 @@ Display a summary of what will be created:
 │   │   ├── glossary.md (with <domain> as primary domain)
 │   │   └── entities/
 │   ├── architecture/
-│   ├── features/
-│   └── plans/
+│   └── features/
+│       └── YYYY/MM/DD/<feature-name>/
+│           ├── SPEC.md
+│           └── PLAN.md
 ├── components/
 │   ├── contract/          # OpenAPI specs
 │   ├── server/            # Node.js backend (if selected)
@@ -128,7 +130,7 @@ Create directories based on selected components:
 
 **Always create:**
 ```bash
-mkdir -p <project-name>/specs/{domain/entities,architecture,features,plans}
+mkdir -p <project-name>/specs/{domain/entities,architecture,features}
 mkdir -p <project-name>/components/contract
 ```
 

@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.4.0] - 2026-01-11
+
+### Changed
+
+- **Directory structure**: Features now use date-based organization
+  - Feature specs: `specs/features/YYYY/MM/DD/<feature-name>/SPEC.md` (was: `specs/features/<feature-name>/SPEC.md`)
+  - Implementation plans: `specs/features/YYYY/MM/DD/<feature-name>/PLAN.md` (was: `specs/plans/YYYY/MM/DD/<feature-name>/PLAN.md`)
+  - Plans now live alongside their specs in the same directory
+  - Removed separate `specs/plans/` directory
+
+### Updated Files
+
+- **spec-writer agent**: Updated location rules with date-based feature paths
+- **planner agent**: Plans now stored alongside specs (not in separate plans/ directory)
+- **planning skill**: Updated plan location and template
+- **spec-writing skill**: Updated spec locations table with date-based organization
+- **new-feature command**: Creates dated feature directories and sets creation date
+- **init-project command**: Removed `specs/plans/` from directory structure
+- **CLAUDE.md**: Updated examples and Important Files table
+
+### Impact
+
+This change provides better organization and traceability:
+- Chronological organization of features by creation date
+- Specs and plans kept together in one location
+- Easier to find features by when they were created
+- Cleaner directory structure (no separate plans directory)
+- Relative paths in plans (./SPEC.md) instead of absolute paths
+
+### Migration Guide
+
+For existing projects using the old structure:
+- Move `specs/features/<feature-name>/SPEC.md` to `specs/features/YYYY/MM/DD/<feature-name>/SPEC.md`
+- Move `specs/plans/YYYY/MM/DD/<feature-name>/PLAN.md` to `specs/features/YYYY/MM/DD/<feature-name>/PLAN.md`
+- Use the `created` date from the spec frontmatter for the YYYY/MM/DD directory
+- Delete empty `specs/plans/` directory
+
 ## [1.3.0] - 2026-01-11
 
 ### Enhanced

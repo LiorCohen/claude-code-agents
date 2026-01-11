@@ -68,7 +68,7 @@ Python utilities for spec management:
 
 ```bash
 # Validate single spec
-python scripts/validate-spec.py specs/features/my-feature/SPEC.md
+python scripts/validate-spec.py specs/features/2026/01/11/my-feature/SPEC.md
 
 # Validate all specs
 python scripts/validate-spec.py --all --specs-dir specs/
@@ -184,11 +184,12 @@ updated: YYYY-MM-DD
 
 When using this plugin to initialize projects:
 
-| File | Purpose |
-|------|---------|
+| File/Directory | Purpose |
+|----------------|---------|
 | `specs/INDEX.md` | Registry of all specifications |
 | `specs/SNAPSHOT.md` | Current product state snapshot |
 | `specs/domain/glossary.md` | Domain terminology definitions |
+| `specs/features/YYYY/MM/DD/<feature-name>/` | Feature specifications and plans (date-organized) |
 | `components/contract/openapi.yaml` | API contract (source of truth for types) |
 
 ## Notes for Claude Code
