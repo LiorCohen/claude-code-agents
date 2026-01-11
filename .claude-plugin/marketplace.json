@@ -1,14 +1,14 @@
 {
-    "name": "local-dev-plugins",
-    "owner": {
-        "name": "SDD Development"
-    },
-    "plugins": [
-        {
-            "name": "sdd",
-            "source": "./plugin",
-            "description": "Spec-driven development methodology for full-stack teams",
-            "version": "1.0.4"
-        }
-    ]
+  "name": "local-dev-plugins",
+  "owner": {
+    "name": "SDD Development"
+  },
+  "plugins": [
+    {
+      "name": "sdd",
+      "source": "./plugin",
+      "description": "Spec-driven development methodology for full-stack teams",
+      "version": "1.1.0"
+    }
+  ]
 }
