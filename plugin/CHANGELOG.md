@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.6.0] - 2026-01-11
+
+### Enhanced
+
+- **/project:implement-plan command**: Added mandatory domain documentation update phase
+  - **New Step 2: Update Domain Documentation** - Required before any code implementation
+  - Must update domain docs based on feature spec before writing code:
+    1. **Glossary updates** (`specs/domain/glossary.md`): Add/update domain terms and concepts
+    2. **Entity documentation** (`specs/domain/entities/`): Create/update entity spec files
+    3. **Architecture documentation** (`specs/architecture/`): Update architectural patterns and integration points
+  - Includes verification checklist to confirm all documentation areas are addressed
+  - Explicitly requires noting when no updates are needed (prevents skipping)
+  - Renumbered subsequent steps (Execute Phases → 3, Track Progress → 4, Final Verification → 5)
+
+### Updated Files
+
+- **implement-plan command**:
+  - Added comprehensive "Step 2: Update Domain Documentation" with three sub-sections
+  - Each sub-section includes specific tasks and verification requirements
+  - Added verification checklist with 5 checkboxes
+  - Added "Important Notes" section explaining why domain docs must come first
+  - Updated example to show domain documentation update workflow
+  - Renumbered existing steps (2 → 3, 3 → 4, 4 → 5)
+
+### Impact
+
+This enhancement ensures domain knowledge is properly documented:
+- **Prevents implementation drift**: Code cannot be written until domain is documented
+- **Centralized knowledge**: Glossary, entities, and architecture serve as single source of truth
+- **Improved traceability**: Clear path from spec → domain docs → implementation
+- **Better onboarding**: New team members can understand domain through centralized docs
+- **Enforces best practices**: Domain-driven design principles built into workflow
+- **No shortcuts**: Explicit verification prevents skipping documentation step
+
 ## [1.5.1] - 2026-01-11
 
 ### Enhanced

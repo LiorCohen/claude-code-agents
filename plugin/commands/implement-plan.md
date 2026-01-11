@@ -34,7 +34,41 @@ Example:
 
 **DO NOT proceed to Phase 2 until you fully understand the complete scope.**
 
-### 2. Execute Phases
+### 2. Update Domain Documentation (REQUIRED BEFORE IMPLEMENTATION)
+
+**CRITICAL**: Before implementing ANY code, you MUST update the domain documentation to reflect the feature's impact:
+
+1. **Glossary Updates** (`specs/domain/glossary.md`):
+   - Read the spec's "Domain Concepts" section
+   - Identify any new terms, entities, or concepts introduced
+   - Add or update definitions in the glossary
+   - Ensure all domain-specific terminology is properly documented
+   - If no new concepts: explicitly note "No glossary updates needed"
+
+2. **Entity Documentation** (`specs/domain/entities/`):
+   - Identify new entities introduced by the feature
+   - Create entity spec files for new domain entities (e.g., `specs/domain/entities/user.md`)
+   - Update existing entity specs if properties/relationships change
+   - Document entity properties, relationships, business rules, and lifecycle
+   - If no entity changes: explicitly note "No entity updates needed"
+
+3. **Architecture Documentation** (`specs/architecture/`):
+   - Review if the feature introduces new architectural patterns
+   - Update `specs/architecture/overview.md` if components are affected
+   - Document new integration points or service dependencies
+   - Update API contracts documentation if endpoints change
+   - If no architecture changes: explicitly note "No architecture updates needed"
+
+**Verification checklist:**
+- [ ] Read spec's "Domain Concepts" section
+- [ ] Updated `specs/domain/glossary.md` with new terms
+- [ ] Created/updated entity specs in `specs/domain/entities/`
+- [ ] Updated architecture docs if needed
+- [ ] Confirmed all domain changes from spec are documented
+
+**DO NOT proceed to Phase 3 until domain documentation is complete and verified.**
+
+### 3. Execute Implementation Phases
 
 For each phase in the plan:
 
@@ -79,13 +113,13 @@ For each phase in the plan:
 - Invoke `db-advisor` if database changes present
 - Report findings
 
-### 3. Track Progress
+### 4. Track Progress
 
 - Mark each phase as complete when done
 - Report any blockers or issues
 - Update PLAN.md with actual progress
 
-### 4. Final Verification (MANDATORY - DO NOT SKIP)
+### 5. Final Verification (MANDATORY - DO NOT SKIP)
 
 Before declaring implementation complete, you MUST:
 
@@ -129,7 +163,54 @@ Before declaring implementation complete, you MUST:
 
 **CRITICAL**: Do NOT declare implementation complete until ALL of the above steps are finished and ALL tests pass. If you encounter ANY issues, resolve them before finishing.
 
+## Important Notes
+
+- **Domain docs first**: Domain documentation (glossary, entities, architecture) MUST be updated before writing any code
+- **Mandatory step**: Phase 2 (Update Domain Documentation) cannot be skipped, even if changes seem minor
+- **Verification required**: Explicitly confirm each documentation area (glossary, entities, architecture) is updated or doesn't need updates
+- **Traceability**: Domain documentation serves as the bridge between specs and implementation
+- **Single source of truth**: Ensures domain knowledge is centralized and accessible to all team members
+
 ## Example
 
 ```
 User: /project:implement-plan specs/features/2026/01/11/user-auth/PLAN.md
+
+Agent: Step 1: Loading spec and plan...
+Agent: ✓ Read PLAN.md
+Agent: ✓ Read SPEC.md
+Agent: [Displays comprehensive summary of work]
+
+Agent: Step 2: Updating domain documentation...
+Agent: Reading spec's "Domain Concepts" section...
+Agent: Found new concepts: User, Session, AuthToken
+Agent:
+Agent: Updating specs/domain/glossary.md:
+Agent: - Added "User" definition
+Agent: - Added "Session" definition
+Agent: - Added "AuthToken" definition
+Agent: ✓ Glossary updated
+Agent:
+Agent: Creating entity specs:
+Agent: - Created specs/domain/entities/user.md
+Agent: - Created specs/domain/entities/session.md
+Agent: ✓ Entity specs created
+Agent:
+Agent: Reviewing architecture impact:
+Agent: - Feature adds new authentication service
+Agent: - Updated specs/architecture/overview.md with auth service
+Agent: ✓ Architecture docs updated
+Agent:
+Agent: Domain documentation verification:
+Agent: ✓ Read spec's "Domain Concepts" section
+Agent: ✓ Updated specs/domain/glossary.md with new terms
+Agent: ✓ Created entity specs in specs/domain/entities/
+Agent: ✓ Updated architecture docs
+Agent: ✓ All domain changes from spec are documented
+Agent:
+Agent: Step 3: Beginning implementation phases...
+Agent: Phase: API Contract
+Agent: [Invokes api-designer agent...]
+
+[Implementation continues...]
+```
