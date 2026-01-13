@@ -13,16 +13,6 @@ claude-code-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json           # Marketplace manifest
 ├── full-stack-spec-driven-dev/    # SDD plugin (v1.9.0)
-│   ├── .claude-plugin/
-│   │   └── plugin.json            # Plugin manifest
-│   ├── agents/                    # 10 specialized agents
-│   ├── commands/                  # 5 slash commands
-│   ├── skills/                    # 4 reusable skills
-│   ├── templates/                 # Project scaffolding
-│   ├── scripts/                   # Python validation utilities
-│   ├── README.md                  # Plugin documentation
-│   ├── QUICKSTART.md             # Getting started guide
-│   └── CHANGELOG.md              # Version history
 ├── README.md                      # Marketplace overview
 └── CLAUDE.md                      # This file
 ```
