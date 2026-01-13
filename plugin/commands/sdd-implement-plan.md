@@ -1,9 +1,9 @@
 ---
-name: implement-plan
+name: sdd-implement-plan
 description: Implement a feature by executing its implementation plan.
 ---
 
-# /project:implement-plan
+# /sdd-implement-plan
 
 Implement a feature by executing its implementation plan.
 

@@ -1,9 +1,9 @@
 ---
-name: new-feature
+name: sdd-new-feature
 description: Start a new feature by creating a spec and implementation plan.
 ---
 
-# /project:new-feature
+# /sdd-new-feature
 
 Start a new feature.
 

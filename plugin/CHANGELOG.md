@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.9.0] - 2026-01-13
+
+### Changed
+
+- **All commands renamed**: Removed `project:` namespace, added `sdd-` prefix to all command names
+  - `/project:init` → `/sdd-init`
+  - `/project:new-feature` → `/sdd-new-feature`
+  - `/project:implement-plan` → `/sdd-implement-plan`
+  - `/project:verify-spec` → `/sdd-verify-spec`
+  - `/project:generate-snapshot` → `/sdd-generate-snapshot`
+  - Command files renamed with `sdd-` prefix (e.g., `init.md` → `sdd-init.md`)
+  - Frontmatter `name` field updated in all command files
+  - Heading updated in all command files (e.g., `# /project:init` → `# /sdd-init`)
+
+### Updated Files
+
+- `commands/sdd-init.md`: Renamed from `init.md`, updated name and heading
+- `commands/sdd-new-feature.md`: Renamed from `new-feature.md`, updated name and heading
+- `commands/sdd-implement-plan.md`: Renamed from `implement-plan.md`, updated name and heading
+- `commands/sdd-verify-spec.md`: Renamed from `verify-spec.md`, updated name and heading
+- `commands/sdd-generate-snapshot.md`: Renamed from `generate-snapshot.md`, updated name and heading
+- `plugin/.claude-plugin/plugin.json`: Updated commands array, bumped to 1.9.0
+- `.claude-plugin/marketplace.json`: Bumped to 1.9.0
+
+### Impact
+
+This change simplifies command naming and removes the redundant namespace:
+- **Shorter commands**: Removed `project:` namespace (was redundant with plugin name)
+- **Clearer naming**: `sdd-` prefix clearly identifies commands as part of SDD plugin
+- **Consistency**: Command file names now match command names exactly
+- **Better discoverability**: Commands are more intuitive with plugin-specific prefix
+
+**Migration**: Users should update any scripts or documentation that reference the old command names:
+- Old: `/project:init`, `/project:new-feature`, etc.
+- New: `/sdd-init`, `/sdd-new-feature`, etc.
+
+**Rationale**: The `project:` namespace was redundant since the plugin is already namespaced as "sdd". Using `sdd-` prefix follows common CLI tool patterns (like `git-`, `npm-`) and makes commands more concise.
+
 ## [1.8.3] - 2026-01-13
 
 ### Added

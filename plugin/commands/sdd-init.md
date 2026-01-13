@@ -1,9 +1,9 @@
 ---
-name: init
+name: sdd-init
 description: Initialize a new project from the spec-driven template, optionally from an external spec.
 ---
 
-# /project:init
+# /sdd-init
 
 Initialize a new spec-driven project, optionally from an existing external specification.
 

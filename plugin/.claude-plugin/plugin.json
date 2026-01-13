@@ -1,15 +1,15 @@
 {
     "name": "sdd",
-    "version": "1.8.3",
+    "version": "1.9.0",
     "description": "Spec-driven development methodology for full-stack teams",
     "author": {
         "name": "Lior Cohen"
     },
     "commands": [
-        "./commands/init.md",
-        "./commands/new-feature.md",
-        "./commands/implement-plan.md",
-        "./commands/verify-spec.md",
-        "./commands/generate-snapshot.md"
+        "./commands/sdd-init.md",
+        "./commands/sdd-new-feature.md",
+        "./commands/sdd-implement-plan.md",
+        "./commands/sdd-verify-spec.md",
+        "./commands/sdd-generate-snapshot.md"
     ]
 }

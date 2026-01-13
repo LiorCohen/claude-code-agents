@@ -1,9 +1,9 @@
 ---
-name: verify-spec
+name: sdd-verify-spec
 description: Verify implementation matches specification.
 ---
 
-# /project:verify-spec
+# /sdd-verify-spec
 
 Verify implementation matches spec.
 

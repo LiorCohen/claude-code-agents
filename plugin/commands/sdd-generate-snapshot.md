@@ -1,9 +1,9 @@
 ---
-name: generate-snapshot
+name: sdd-generate-snapshot
 description: Regenerate the product snapshot from active specs.
 ---
 
-# /project:generate-snapshot
+# /sdd-generate-snapshot
 
 Regenerate product snapshot.
 
