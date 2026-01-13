@@ -1,65 +1,39 @@
 # Claude Code Plugin Marketplace
 
-This repository contains a collection of plugins for [Claude Code](https://claude.com/code), organized as a local plugin marketplace.
+A collection of Claude Code plugins for spec-driven development and full-stack engineering workflows.
 
 ## What is Claude Code?
 
-Claude Code is an AI-powered coding assistant that helps developers with software engineering tasks. It supports a plugin system that allows extending its capabilities with custom commands, agents, and workflows.
+[Claude Code](https://claude.com/code) is an AI-powered coding assistant that helps developers with software engineering tasks. It supports a plugin system that extends its capabilities with custom commands, agents, and workflows.
 
-## What is a Plugin Marketplace?
+## Available Plugins
 
-A plugin marketplace is a directory structure that organizes multiple Claude Code plugins in one location. Claude Code can discover and load plugins from marketplace directories, making it easy to manage and distribute collections of related plugins.
-
-## Structure
-
-```
-.
-├── .claude-plugin/
-│   └── marketplace.json                # Marketplace manifest
-└── full-stack-spec-driven-dev/         # Individual plugin directory
-    ├── .claude-plugin/
-    │   └── plugin.json                 # Plugin manifest
-    ├── agents/                         # Specialized agents
-    ├── commands/                       # Slash commands
-    ├── skills/                         # Reusable knowledge modules
-    ├── templates/                      # Project scaffolding
-    ├── scripts/                        # Utility scripts
-    ├── README.md                       # Plugin documentation
-    ├── QUICKSTART.md                  # Getting started guide
-    └── CHANGELOG.md                   # Version history
-```
-
-## Plugins in this Marketplace
-
-### SDD (Spec-Driven Development)
+### [Spec-Driven Development (SDD)](./full-stack-spec-driven-dev/)
 
 **Version:** 1.9.0
 
-A comprehensive plugin for spec-driven development methodology, designed for full-stack TypeScript/React teams.
+A comprehensive plugin for spec-driven development with React, Node.js, and TypeScript.
 
 **Key Features:**
 - 10 specialized agents (spec-writer, planner, backend-dev, frontend-dev, etc.)
 - 5 slash commands for project lifecycle management
-- Contract-first API development with OpenAPI
 - 5-layer backend architecture with strict patterns
 - MVVM frontend architecture with TanStack ecosystem
+- Contract-first API development with OpenAPI
 - Built-in observability with OpenTelemetry
 
 **Commands:**
-- `/sdd-init` - Initialize new project from template
+- `/sdd-init` - Initialize new project
 - `/sdd-new-feature` - Create feature spec and plan
 - `/sdd-implement-plan` - Execute implementation plan
 - `/sdd-verify-spec` - Verify implementation matches spec
 - `/sdd-generate-snapshot` - Regenerate product snapshot
 
-**Documentation:**
-- [Plugin README](./full-stack-spec-driven-dev/README.md) - Complete feature overview
-- [Quick Start Guide](./full-stack-spec-driven-dev/QUICKSTART.md) - Getting started tutorial
-- [Changelog](./full-stack-spec-driven-dev/CHANGELOG.md) - Version history and updates
+**[Read full documentation →](./full-stack-spec-driven-dev/README.md)**
 
 ## Installation
 
-### Local Installation
+### Local Marketplace
 
 1. Clone this repository:
    ```bash
@@ -70,36 +44,44 @@ A comprehensive plugin for spec-driven development methodology, designed for ful
 2. Configure Claude Code to use this marketplace:
    - Open Claude Code settings
    - Add this directory as a plugin marketplace source
-   - The plugins will be automatically discovered and available
+   - Plugins will be automatically discovered
 
 ### Direct Plugin Installation
 
 You can also install individual plugins by copying the plugin directory to your Claude Code plugins folder.
 
-## Usage
+## Plugin Structure
 
-Once installed, plugins provide:
-
-- **Slash commands** - Execute workflows with `/command-name` in chat
-- **Agents** - Specialized AI agents for specific tasks
-- **Skills** - Reusable knowledge modules agents can reference
-- **Templates** - Project scaffolding and boilerplate code
-
-Example usage:
 ```
-# Initialize a new project
-/sdd-init my-app
-
-# Start a new feature
-/sdd-new-feature user-authentication
-
-# Implement a feature plan
-/sdd-implement-plan specs/features/2026/01/13/user-auth/PLAN.md
+.
+├── .claude-plugin/
+│   └── marketplace.json           # Marketplace manifest
+└── full-stack-spec-driven-dev/    # SDD plugin directory
+    ├── .claude-plugin/
+    │   └── plugin.json            # Plugin manifest
+    ├── agents/                    # Specialized agents
+    ├── commands/                  # Slash commands
+    ├── skills/                    # Reusable patterns
+    ├── templates/                 # Project scaffolding
+    ├── scripts/                   # Utility scripts
+    ├── README.md                  # Plugin documentation
+    ├── QUICKSTART.md             # Getting started
+    └── CHANGELOG.md              # Version history
 ```
+
+## Contributing
+
+To add a new plugin to this marketplace:
+
+1. Create a new directory under the root: `./your-plugin-name/`
+2. Add required plugin structure (agents, commands, etc.)
+3. Create `plugin.json` manifest in `.claude-plugin/` subdirectory
+4. Update root `marketplace.json` to include your plugin
+5. Submit a pull request
 
 ## Plugin Development
 
-Each plugin in this marketplace follows Claude Code's plugin specification:
+Each plugin follows Claude Code's plugin specification:
 
 ### Plugin Manifest (`plugin.json`)
 ```json
@@ -135,29 +117,12 @@ Each plugin in this marketplace follows Claude Code's plugin specification:
 }
 ```
 
-## Contributing
-
-To add a new plugin to this marketplace:
-
-1. Create a new directory under the root: `./your-plugin-name/`
-2. Add required plugin structure (agents, commands, etc.)
-3. Create `plugin.json` manifest in `.claude-plugin/` subdirectory
-4. Update root `marketplace.json` to include your plugin
-5. Submit a pull request
-
-## License
-
-See individual plugin directories for licensing information.
-
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs/claude-code)
 - [Plugin Development Guide](https://docs.anthropic.com/claude/docs/claude-code-plugins)
 - [Claude Agent SDK](https://github.com/anthropics/anthropic-sdk-typescript)
 
-## Support
+## License
 
-For issues or questions:
-- Open an issue in this repository
-- Check plugin-specific README files for detailed documentation
-- Consult the Claude Code documentation
+See individual plugin directories for licensing information.
