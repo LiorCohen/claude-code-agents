@@ -60,11 +60,21 @@ Initialize a new spec-driven project, optionally from an existing external speci
 
 When invoked, prompt the user for the following information (use extracted values from external spec as defaults if available):
 
-1. **Project Name** (if not provided as argument)
+1. **Project Name and Directory Check** (if not provided as argument)
    - If external spec provided: Use extracted project name as default
    - Must be valid directory name (lowercase, hyphens allowed)
    - Prompt: "Project name [<default-if-any>]: "
    - Example: "my-saas-app"
+
+   **CRITICAL: Check for existing directory match:**
+   - Get the current working directory basename (e.g., if pwd is `/path/to/my-app`, basename is `my-app`)
+   - If the current directory basename matches the project name:
+     - Check if the directory is empty (no files except hidden files like .git, .DS_Store)
+     - If empty: Ask user "You're already in an empty directory named '<project-name>'. Initialize here? (yes/no)"
+     - If yes: Set target directory to current directory (`.`)
+     - If no: Ask for a different project name
+     - If directory is not empty: Show warning "Current directory is not empty. Will create subdirectory '<project-name>/' instead."
+   - If basename doesn't match: Will create new subdirectory `<project-name>/`
 
 2. **Project Description**
    - If external spec provided: Use extracted description as default
@@ -106,6 +116,7 @@ Display a summary of what will be created:
 ## Project Configuration Summary
 
 **Name:** <project-name>
+**Location:** <current-directory> OR <current-directory>/<project-name>/
 **Description:** <description>
 **Primary Domain:** <domain>
 
@@ -118,7 +129,7 @@ Display a summary of what will be created:
 - ✓ CI/CD workflows
 
 **Directory Structure:**
-<project-name>/
+./
 ├── README.md
 ├── CLAUDE.md
 ├── specs/
@@ -159,9 +170,20 @@ If the user says no, ask what they'd like to change and return to Phase 1.
 
 Once approved, execute ALL steps below. Do not stop until every single step is finished.
 
-### Step 1: Create root .gitignore first
+### Step 1: Determine target directory
 
-Create `<project-name>/.gitignore`:
+Based on the directory check in Phase 1:
+- If initializing in current directory: `TARGET_DIR="."`
+- If creating subdirectory: `TARGET_DIR="<project-name>"`
+
+If `TARGET_DIR` is not current directory (`.`):
+```bash
+mkdir <project-name>
+```
+
+### Step 2: Create root .gitignore first
+
+Create `${TARGET_DIR}/.gitignore`:
 ```
 node_modules/
 .env
@@ -170,42 +192,42 @@ dist/
 *.log
 ```
 
-### Step 2: Create the complete directory structure
+### Step 3: Create the complete directory structure
 
 Create directories based on selected components:
 
 **Always create:**
 ```bash
-mkdir -p <project-name>/specs/{domain/entities,architecture,features,external}
-mkdir -p <project-name>/components/contract
+mkdir -p ${TARGET_DIR}/specs/{domain/entities,architecture,features,external}
+mkdir -p ${TARGET_DIR}/components/contract
 ```
 
 **If Server selected:**
 ```bash
-mkdir -p <project-name>/components/server/src/{server,config,controller,model/{definitions,use-cases},dal,telemetry}
+mkdir -p ${TARGET_DIR}/components/server/src/{server,config,controller,model/{definitions,use-cases},dal,telemetry}
 ```
 
 **If Webapp selected:**
 ```bash
-mkdir -p <project-name>/components/webapp/src
+mkdir -p ${TARGET_DIR}/components/webapp/src
 ```
 
 **If Helm selected:**
 ```bash
-mkdir -p <project-name>/components/helm
+mkdir -p ${TARGET_DIR}/components/helm
 ```
 
 **If Testing selected:**
 ```bash
-mkdir -p <project-name>/components/testing/{tests/{integration,component,e2e},testsuites}
+mkdir -p ${TARGET_DIR}/components/testing/{tests/{integration,component,e2e},testsuites}
 ```
 
-**If CI/CD selected:**
+**If CI/CD workflows selected:**
 ```bash
-mkdir -p <project-name>/.github/workflows
+mkdir -p ${TARGET_DIR}/.github/workflows
 ```
 
-### Step 3: Copy template files with customization
+### Step 4: Copy template files with customization
 
 Copy template files with variable substitution using gathered information.
 
@@ -215,19 +237,19 @@ Copy template files with variable substitution using gathered information.
 - `{{PRIMARY_DOMAIN}}` → User-provided primary domain
 
 **Root files (always create):**
-- Copy `templates/project/README.md` → `<project-name>/README.md`
+- Copy `templates/project/README.md` → `${TARGET_DIR}/README.md`
   - Replace `{{PROJECT_NAME}}` and `{{PROJECT_DESCRIPTION}}`
-- Copy `templates/project/CLAUDE.md` → `<project-name>/CLAUDE.md`
+- Copy `templates/project/CLAUDE.md` → `${TARGET_DIR}/CLAUDE.md`
   - Replace `{{PROJECT_NAME}}`
-- Copy `templates/project/package.json` → `<project-name>/package.json`
+- Copy `templates/project/package.json` → `${TARGET_DIR}/package.json`
   - Replace `{{PROJECT_NAME}}` and `{{PROJECT_DESCRIPTION}}`
 
 **Spec files (always create):**
-- Copy `templates/specs/INDEX.md` → `<project-name>/specs/INDEX.md`
-- Copy `templates/specs/SNAPSHOT.md` → `<project-name>/specs/SNAPSHOT.md`
-- Copy `templates/specs/glossary.md` → `<project-name>/specs/domain/glossary.md`
+- Copy `templates/specs/INDEX.md` → `${TARGET_DIR}/specs/INDEX.md`
+- Copy `templates/specs/SNAPSHOT.md` → `${TARGET_DIR}/specs/SNAPSHOT.md`
+- Copy `templates/specs/glossary.md` → `${TARGET_DIR}/specs/domain/glossary.md`
   - Add `{{PRIMARY_DOMAIN}}` as the first domain entry
-- Create `<project-name>/specs/architecture/overview.md` with:
+- Create `${TARGET_DIR}/specs/architecture/overview.md` with:
   ```markdown
   # Architecture Overview
 
@@ -239,50 +261,50 @@ Copy template files with variable substitution using gathered information.
   ```
 
 **Contract component (always create):**
-- Copy `templates/components/contract/package.json` → `<project-name>/components/contract/package.json`
+- Copy `templates/components/contract/package.json` → `${TARGET_DIR}/components/contract/package.json`
   - Replace `{{PROJECT_NAME}}`
-- Copy `templates/components/contract/openapi.yaml` → `<project-name>/components/contract/openapi.yaml`
+- Copy `templates/components/contract/openapi.yaml` → `${TARGET_DIR}/components/contract/openapi.yaml`
   - Replace `{{PROJECT_NAME}}` and `{{PROJECT_DESCRIPTION}}`
-- Create `<project-name>/components/contract/.gitignore`:
+- Create `${TARGET_DIR}/components/contract/.gitignore`:
   ```
   node_modules/
   generated/
   ```
 
 **Server component (if selected):**
-- Copy `templates/components/server/package.json` → `<project-name>/components/server/package.json`
+- Copy `templates/components/server/package.json` → `${TARGET_DIR}/components/server/package.json`
   - Replace `{{PROJECT_NAME}}`
-- Copy `templates/components/server/tsconfig.json` → `<project-name>/components/server/tsconfig.json`
-- Create `<project-name>/components/server/.gitignore`:
+- Copy `templates/components/server/tsconfig.json` → `${TARGET_DIR}/components/server/tsconfig.json`
+- Create `${TARGET_DIR}/components/server/.gitignore`:
   ```
   node_modules/
   dist/
   .env
   ```
-- Create `<project-name>/components/server/src/index.ts` with minimal entry point
+- Create `${TARGET_DIR}/components/server/src/index.ts` with minimal entry point
 
 **Webapp component (if selected):**
-- Copy `templates/components/webapp/package.json` → `<project-name>/components/webapp/package.json`
+- Copy `templates/components/webapp/package.json` → `${TARGET_DIR}/components/webapp/package.json`
   - Replace `{{PROJECT_NAME}}`
-- Copy `templates/components/webapp/tsconfig.json` → `<project-name>/components/webapp/tsconfig.json`
-- Create `<project-name>/components/webapp/.gitignore`:
+- Copy `templates/components/webapp/tsconfig.json` → `${TARGET_DIR}/components/webapp/tsconfig.json`
+- Create `${TARGET_DIR}/components/webapp/.gitignore`:
   ```
   node_modules/
   dist/
   .env
   ```
-- Create `<project-name>/components/webapp/src/App.tsx` with minimal React app
-- Create `<project-name>/components/webapp/index.html` with basic HTML template
-- Create `<project-name>/components/webapp/vite.config.ts` with basic Vite config
+- Create `${TARGET_DIR}/components/webapp/src/App.tsx` with minimal React app
+- Create `${TARGET_DIR}/components/webapp/index.html` with basic HTML template
+- Create `${TARGET_DIR}/components/webapp/vite.config.ts` with basic Vite config
 
 **Helm charts (if selected):**
-- Create basic Helm chart structure in `<project-name>/components/helm/`
+- Create basic Helm chart structure in `${TARGET_DIR}/components/helm/`
 
 **Testing setup (if selected):**
-- Create example Testkube test definitions in `<project-name>/components/testing/`
+- Create example Testkube test definitions in `${TARGET_DIR}/components/testing/`
 
 **CI/CD workflows (if selected):**
-- Create basic GitHub Actions workflow in `<project-name>/.github/workflows/ci.yaml`
+- Create basic GitHub Actions workflow in `${TARGET_DIR}/.github/workflows/ci.yaml`
 
 **External spec integration (if provided):**
 
@@ -360,19 +382,25 @@ If an external spec was provided via `--spec` argument:
    Next step: Review the generated plan and run /sdd-implement-plan specs/features/YYYY/MM/DD/initial-spec/PLAN.md
    ```
 
-### Step 4: Initialize git repository
+### Step 5: Initialize git repository
 
+If not already in a git repository:
 ```bash
-cd <project-name> && git init && git add . && git commit -m "Initial project setup from spec-driven template"
+cd ${TARGET_DIR} && git init && git add . && git commit -m "Initial project setup from spec-driven template"
 ```
 
-### Step 5: Verify completion and report
+If already in a git repository (current directory case):
+```bash
+git add . && git commit -m "Initial project setup from spec-driven template"
+```
+
+### Step 6: Verify completion and report
 
 After ALL steps are done:
 
 1. List the created structure:
    ```bash
-   tree <project-name> -L 3 -I node_modules
+   tree ${TARGET_DIR} -L 3 -I node_modules
    ```
 
 2. Display completion message with customized next steps:
@@ -380,6 +408,7 @@ After ALL steps are done:
    **If external spec was provided:**
    ```
    ✓ Project initialized: <project-name>
+   ✓ Location: <absolute-path-to-target-dir>
    ✓ Description: <project-description>
    ✓ Primary Domain: <primary-domain>
    ✓ Components created: <list of selected components>
@@ -387,8 +416,11 @@ After ALL steps are done:
    ✓ External spec integrated: specs/features/YYYY/MM/DD/initial-spec/SPEC.md
 
    Next steps:
+   [If TARGET_DIR is not current directory]
    1. cd <project-name>
    2. npm install --workspaces
+   [If TARGET_DIR is current directory]
+   1. npm install --workspaces
    3. Review the imported spec and generated plan:
       - specs/external/<original-filename> (original external spec, preserved for reference)
       - specs/features/YYYY/MM/DD/initial-spec/SPEC.md (imported with SDD frontmatter)
@@ -401,13 +433,17 @@ After ALL steps are done:
    **If standard initialization (no external spec):**
    ```
    ✓ Project initialized: <project-name>
+   ✓ Location: <absolute-path-to-target-dir>
    ✓ Description: <project-description>
    ✓ Primary Domain: <primary-domain>
    ✓ Components created: <list of selected components>
 
    Next steps:
+   [If TARGET_DIR is not current directory]
    1. cd <project-name>
    2. npm install --workspaces
+   [If TARGET_DIR is current directory]
+   1. npm install --workspaces
    3. cd components/contract && npm run generate:types
    4. Review and customize:
       - specs/domain/glossary.md (add your domain terms)

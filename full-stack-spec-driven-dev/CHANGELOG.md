@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.9.3] - 2026-01-13
+
+### Fixed
+
+- **sdd-init command smart directory handling**: Prevent redundant nested directories
+  - Checks if current directory basename matches the project name
+  - If in an empty directory with matching name, asks to initialize in place
+  - Avoids creating `test-app/test-app/*` when already in `test-app/`
+  - Uses `TARGET_DIR` variable throughout to handle both cases (current dir or subdirectory)
+  - Updates completion messages to show actual location
+  - Adjusts `cd` instructions based on whether a subdirectory was created
+  - Git initialization checks if already in a repository
+
+### Rationale
+
+Smart directory detection provides:
+- **Better UX**: No redundant nested directories when already in the right place
+- **Flexibility**: Supports both "create subdirectory" and "initialize here" workflows
+- **Safety**: Checks if directory is empty before initializing in place
+- **Clarity**: Always shows absolute path in completion message
+
 ## [1.9.2] - 2026-01-13
 
 ### Enhanced
