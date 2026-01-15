@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.10.1] - 2026-01-15
+
+### Changed
+
+- **backend-dev agent**: Replaced repository pattern with data access functions in DAL layer
+  - One function per file, named after the function (e.g., `find_user_by_id.ts`)
+  - Each function receives its dependencies as the first argument
+  - No classes, repository interfaces, or abstraction layers
+  - Direct database queries with proper parameterization
+  - `index.ts` re-exports all functions
+  - No assumed grouping - subdirectories only if explicitly instructed
+
+### Rationale
+
+Data access functions provide:
+- **Simplicity**: Direct, focused functions without abstraction overhead
+- **Flexibility**: Functions can query across multiple tables without entity-based constraints
+- **Clarity**: Each file does one thing, named after what it does
+- **No assumptions**: Developer controls structure, no forced entity grouping
+
 ## [1.10.0] - 2026-01-14
 
 ### Added

@@ -207,18 +207,48 @@ export type { CreateUserArgs, CreateUserResult };
 
 ### Layer 5: DAL
 
-Data access, queries, mapping DB ↔ domain objects.
+Data access functions that directly handle database queries. **No repository pattern** - use simple, focused functions instead.
 
-```typescript
-interface DAL {
-  readonly findUserById: (id: string) => Promise<User | null>;
-  readonly insertUser: (user: UserData) => Promise<User>;
-}
-
-const createDAL = (deps: DALDependencies): DAL => { /* ... */ };
+```
+src/dal/
+├── find_user_by_id.ts
+├── insert_user.ts
+└── index.ts
 ```
 
-**What it does NOT contain:** Business logic, HTTP handling.
+**Data Access Function Pattern:**
+
+```typescript
+// src/dal/find_user_by_id.ts
+import type { User } from '../types/generated';
+
+type FindUserByIdDeps = {
+  readonly db: DatabaseClient;
+};
+
+const findUserById = async (
+  deps: FindUserByIdDeps,
+  id: string
+): Promise<User | null> => {
+  const result = await deps.db.query(
+    'SELECT id, email, name FROM users WHERE id = $1',
+    [id]
+  );
+  return result.rows[0] ?? null;
+};
+
+export { findUserById };
+```
+
+**DAL Rules:**
+- One function per file, named after the function (e.g., `find_user_by_id.ts`)
+- Each function receives its dependencies as the first argument
+- No classes, no repository interfaces, no abstraction layers
+- Direct database queries with proper parameterization
+- `index.ts` re-exports all functions
+- No assumed grouping - add subdirectories only if explicitly instructed
+
+**What it does NOT contain:** Business logic, HTTP handling, repository abstractions.
 
 ---
 

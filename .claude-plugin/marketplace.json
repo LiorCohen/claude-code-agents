@@ -8,7 +8,7 @@
             "name": "sdd",
             "source": "./full-stack-spec-driven-dev",
             "description": "Spec-driven development methodology for full-stack teams",
-            "version": "1.10.0"
+            "version": "1.10.1"
         }
     ]
 }
