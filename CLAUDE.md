@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Skills
+
+Use the `commit-standards` skill for ALL commits. See `skills/commit-standards.md`.
+
 ## Repository Overview
 
 This is a **Claude Code plugin marketplace** that contains a collection of plugins for spec-driven development and full-stack engineering workflows. The marketplace organizes and distributes Claude Code plugins.
