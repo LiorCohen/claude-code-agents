@@ -232,6 +232,11 @@ mkdir -p ${TARGET_DIR}/.github/workflows
 
 Copy template files with variable substitution using gathered information.
 
+**CRITICAL:** All generated code MUST follow the standards defined in:
+- `typescript-standards` skill - For all TypeScript code (strict typing, immutability, arrow functions, no classes)
+- `backend-dev` agent - For server component (5-layer architecture, entry point rules, dotenv)
+- `frontend-dev` agent - For webapp component (MVVM, TanStack ecosystem, TailwindCSS)
+
 **Variables to replace:**
 - `{{PROJECT_NAME}}` → User-provided project name
 - `{{PROJECT_DESCRIPTION}}` → User-provided description
@@ -273,6 +278,9 @@ Copy template files with variable substitution using gathered information.
   ```
 
 **Server component (if selected):**
+
+**CRITICAL:** Follow the `backend-dev` agent and `typescript-standards` skill when creating server files.
+
 - Copy `templates/components/server/package.json` → `${TARGET_DIR}/components/server/package.json`
   - Replace `{{PROJECT_NAME}}`
 - Copy `templates/components/server/tsconfig.json` → `${TARGET_DIR}/components/server/tsconfig.json`
@@ -282,9 +290,79 @@ Copy template files with variable substitution using gathered information.
   dist/
   .env
   ```
-- Create `${TARGET_DIR}/components/server/src/index.ts` with minimal entry point
+- Create `${TARGET_DIR}/components/server/src/index.ts` with minimal entry point:
+  ```typescript
+  // src/index.ts - THE ONLY FILE WITH SIDE EFFECTS
+  import { createServer } from './server';
+  import { loadConfig } from './config';
+
+  const main = async (): Promise<void> => {
+    const config = loadConfig();
+    const server = createServer({ config });
+    await server.start();
+  };
+
+  main().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+  ```
+- Create `${TARGET_DIR}/components/server/src/config/index.ts` with config loader:
+  ```typescript
+  import dotenv from 'dotenv';
+
+  dotenv.config();
+
+  interface Config {
+    readonly port: number;
+    readonly nodeEnv: string;
+    readonly logLevel: string;
+  }
+
+  export const loadConfig = (): Config => {
+    const port = parseInt(process.env.PORT ?? '3000', 10);
+    const nodeEnv = process.env.NODE_ENV ?? 'development';
+    const logLevel = process.env.LOG_LEVEL ?? 'info';
+
+    return { port, nodeEnv, logLevel };
+  };
+
+  export type { Config };
+  ```
+- Create `${TARGET_DIR}/components/server/src/server/index.ts` with server factory:
+  ```typescript
+  import type { Config } from '../config';
+
+  interface ServerDependencies {
+    readonly config: Config;
+  }
+
+  interface Server {
+    readonly start: () => Promise<void>;
+    readonly stop: () => Promise<void>;
+  }
+
+  export const createServer = (deps: ServerDependencies): Server => {
+    const { config } = deps;
+
+    const start = async (): Promise<void> => {
+      console.log(`Server starting on port ${config.port}...`);
+      // TODO: Initialize Express app, middleware, routes
+    };
+
+    const stop = async (): Promise<void> => {
+      console.log('Server stopping...');
+      // TODO: Graceful shutdown
+    };
+
+    return { start, stop };
+  };
+  ```
 
 **Webapp component (if selected):**
+
+**CRITICAL:** Follow the `frontend-dev` agent and `typescript-standards` skill when creating webapp files.
+
 - Copy `templates/components/webapp/package.json` → `${TARGET_DIR}/components/webapp/package.json`
   - Replace `{{PROJECT_NAME}}`
 - Copy `templates/components/webapp/tsconfig.json` → `${TARGET_DIR}/components/webapp/tsconfig.json`
@@ -294,9 +372,47 @@ Copy template files with variable substitution using gathered information.
   dist/
   .env
   ```
-- Create `${TARGET_DIR}/components/webapp/src/App.tsx` with minimal React app
+- Create MVVM directory structure:
+  ```bash
+  mkdir -p ${TARGET_DIR}/components/webapp/src/{pages,components,viewmodels,models,services,stores,types,utils}
+  ```
+- Create `${TARGET_DIR}/components/webapp/src/main.tsx` (entry point):
+  ```typescript
+  import { StrictMode } from 'react';
+  import { createRoot } from 'react-dom/client';
+  import { App } from './App';
+  import './index.css';
+
+  const root = document.getElementById('root');
+  if (!root) throw new Error('Root element not found');
+
+  createRoot(root).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+  ```
+- Create `${TARGET_DIR}/components/webapp/src/App.tsx` with minimal React app:
+  ```typescript
+  export const App = (): JSX.Element => {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <h1 className="text-2xl font-bold text-gray-800">
+          {{PROJECT_NAME}}
+        </h1>
+      </div>
+    );
+  };
+  ```
+- Create `${TARGET_DIR}/components/webapp/src/index.css` with Tailwind setup:
+  ```css
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  ```
 - Create `${TARGET_DIR}/components/webapp/index.html` with basic HTML template
 - Create `${TARGET_DIR}/components/webapp/vite.config.ts` with basic Vite config
+- Create `${TARGET_DIR}/components/webapp/tailwind.config.js` with Tailwind config
 
 **Helm charts (if selected):**
 - Create basic Helm chart structure in `${TARGET_DIR}/components/helm/`

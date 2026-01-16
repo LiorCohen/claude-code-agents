@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.10.9] - 2026-01-16
+
+### Enhanced
+
+- **sdd-init command**: Now follows `backend-dev` agent and `typescript-standards` skill when generating code
+  - Added CRITICAL note requiring all generated code to follow agent/skill standards
+  - Server component: Generates proper 5-layer architecture scaffolding
+    - Minimal `src/index.ts` entry point (only file with side effects)
+    - `src/config/index.ts` with dotenv and type-safe config
+    - `src/server/index.ts` with server factory pattern
+  - Webapp component: Generates MVVM architecture scaffolding
+    - Creates full MVVM directory structure (`pages/`, `components/`, `viewmodels/`, `models/`, `services/`, `stores/`, `types/`, `utils/`)
+    - `src/main.tsx` entry point
+    - `src/App.tsx` with TailwindCSS
+    - `src/index.css` with Tailwind directives
+    - Tailwind config file
+  - All generated TypeScript follows `typescript-standards` (readonly, arrow functions, named exports)
+
+### Rationale
+
+Ensuring sdd-init follows the same standards as implementation:
+- **Consistency**: Initial scaffolding matches what implementation phases produce
+- **No refactoring needed**: Developers don't need to restructure after init
+- **Learning**: New developers see correct patterns from the start
+- **Standards enforcement**: Agent/skill rules apply from day one
+
 ## [1.10.8] - 2026-01-16
 
 ### Added
