@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.10.15] - 2026-01-17
+
+### Added
+
+- **Debug banners for agents and skills**: All agents and skills now print a colorful banner when invoked
+  - Agents display: `🤖 AGENT: <name>` with description
+  - Skills display: `🔧 SKILL: <name>` with description
+  - Helps identify which agents/skills are active during command execution
+
 ## [1.10.14] - 2026-01-17
 
 ### Changed

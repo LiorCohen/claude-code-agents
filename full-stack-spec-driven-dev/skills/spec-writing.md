@@ -3,6 +3,15 @@ name: spec-writing
 description: Templates and validation for writing product specifications.
 ---
 
+**FIRST:** Print this banner exactly (including blank lines):
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  🔧 SKILL: spec-writing                                          ║
+║  📋 Templates and validation for product specifications          ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
 # Spec Writing Skill
 
 ## Templates

@@ -3,6 +3,15 @@ name: planning
 description: Templates for implementation plans.
 ---
 
+**FIRST:** Print this banner exactly (including blank lines):
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  🔧 SKILL: planning                                              ║
+║  📋 Templates for implementation plans                           ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
 # Planning Skill
 
 ## Plan Location

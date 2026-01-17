@@ -3,6 +3,15 @@ name: commit
 description: Create a commit following CONTRIBUTING.md guidelines with proper versioning and changelog updates.
 ---
 
+**FIRST:** Print this banner exactly (including blank lines):
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  🔧 SKILL: commit                                                ║
+║  📝 Create commit following CONTRIBUTING.md guidelines           ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
 # /commit
 
 Create a commit that follows the repository's CONTRIBUTING.md guidelines.

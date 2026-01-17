@@ -3,6 +3,15 @@ name: commit-standards
 description: MANDATORY skill for all commits. Ensures CONTRIBUTING.md guidelines are followed.
 ---
 
+**FIRST:** Print this banner exactly (including blank lines):
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║  🔧 SKILL: commit-standards                                      ║
+║  📋 MANDATORY commit guidelines enforcer                         ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
 # Commit Standards Skill
 
 **MANDATORY:** This skill MUST be followed for ALL commits in this repository. No exceptions.
