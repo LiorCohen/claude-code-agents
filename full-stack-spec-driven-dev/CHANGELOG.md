@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.23] - 2026-01-18
+
+### Changed
+
+- **Restored backend-dev.md explanatory content**: Reverted over-consolidation that removed essential guidance
+  - Restored detailed layer explanations with code examples
+  - Restored Definitions Rules (TypeScript types only, no Zod)
+  - Restored Use Case Pattern and DAL Function Pattern examples
+  - Restored complete Telemetry section (logging, metrics, spans)
+  - Added template references to each layer section while preserving explanations
+  - File now 680 lines with full guidance + template references
+
 ## [1.10.22] - 2026-01-18
 
 ### Changed
