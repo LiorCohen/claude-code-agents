@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.10.20] - 2026-01-18
+
+### Removed
+
+- **Debug banners**: Removed banner printing instructions from all agents and skills
+  - Removed from 10 agents: api-designer, backend-dev, ci-dev, db-advisor, devops, frontend-dev, planner, reviewer, spec-writer, tester
+  - Removed from 5 SDD skills: planning, spec-index, spec-writing, testing, typescript-standards
+  - Removed from marketplace commit skill
+
 ## [1.10.19] - 2026-01-17
 
 ### Changed

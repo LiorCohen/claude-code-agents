@@ -3,14 +3,6 @@ name: testing
 description: Test patterns and references for spec verification. See tester agent for Testkube execution details.
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🔧 SKILL: testing                                               ║
-║  📋 Test patterns and references for spec verification           ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 # Testing Skill
 

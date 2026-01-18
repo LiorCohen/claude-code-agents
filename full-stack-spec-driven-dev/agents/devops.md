@@ -6,14 +6,6 @@ model: sonnet
 color: "#6366F1"
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🤖 AGENT: devops                                                ║
-║  🎯 Kubernetes, Helm charts, Testkube, container config          ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 You are a DevOps engineer specializing in Kubernetes.
 

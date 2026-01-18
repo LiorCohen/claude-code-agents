@@ -6,14 +6,6 @@ model: sonnet
 color: "#06B6D4"
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🤖 AGENT: api-designer                                          ║
-║  🎯 Designs OpenAPI contracts, generates types for server/webapp ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 You are an API design expert. You own the API contract that both frontend and backend consume.
 

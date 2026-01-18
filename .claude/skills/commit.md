@@ -3,14 +3,6 @@ name: commit
 description: Create a commit following repository guidelines with proper versioning and changelog updates.
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🔧 SKILL: commit                                                ║
-║  📝 Create commit following repository guidelines                ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 # Commit Skill
 

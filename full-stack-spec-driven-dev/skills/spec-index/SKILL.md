@@ -3,14 +3,6 @@ name: spec-index
 description: Manage spec registry and generate snapshots.
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🔧 SKILL: spec-index                                            ║
-║  📋 Manage spec registry and generate snapshots                  ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 # Spec Index Skill
 

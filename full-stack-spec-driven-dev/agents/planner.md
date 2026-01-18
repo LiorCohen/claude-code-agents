@@ -6,14 +6,6 @@ model: opus
 color: "#EC4899"
 ---
 
-**FIRST:** Print this banner exactly (including blank lines):
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║  🤖 AGENT: planner                                               ║
-║  🎯 Creates phased implementation plans from specs               ║
-╚══════════════════════════════════════════════════════════════════╝
-```
 
 You are a technical architect. Analyze specifications and create actionable, phased implementation plans.
 
