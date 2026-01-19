@@ -121,16 +121,16 @@ When invoked, prompt the user for the following information (use extracted value
    | Contract | Server | OpenAPI spec needs a backend to implement it |
    | Server | Contract, Config | Backend requires API contract and configuration |
    | Webapp | - | Can work standalone with external API |
-   | Config | Server or Webapp | Configuration needs an application to configure |
-   | Helm | Server or Webapp | Kubernetes deployment needs an application |
+   | Config | Server | Configuration is for backend services |
+   | Helm | Server | Kubernetes deployment is for backend services |
    | Testing | Server or Webapp | Tests need something to test |
    | CI/CD | Server or Webapp | Workflows need something to build/test |
 
    **Validation Rules:**
    - If Server is selected, Contract and Config are auto-included
-   - If Helm is selected, at least Server or Webapp must be included
+   - If Helm is selected, Server must be included (Helm is for backend deployment)
    - If Contract is selected without Server, warn and ask for confirmation
-   - Config requires at least one application component (Server or Webapp)
+   - Config requires Server (frontend config is handled differently)
 
 ### Phase 2: Show Configuration Summary
 

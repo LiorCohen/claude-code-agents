@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.4] - 2026-01-19
+
+### Fixed
+
+- **Helm and Config component dependencies**: Corrected to require Server only
+  - Helm requires Server (Kubernetes deployment is for backend services)
+  - Config requires Server (frontend config is handled differently)
+  - Removed "or Webapp" from Helm and Config dependencies
+
 ## [2.0.3] - 2026-01-19
 
 ### Changed
@@ -10,7 +19,7 @@
     - **Backend API Only**: Contract, Server, Config, Testing, CI/CD
     - **Frontend Only**: Webapp, Testing, CI/CD
     - **Custom**: Manual selection with dependency validation
-  - Added component dependency table (e.g., Contract requires Server, Helm requires Server or Webapp)
+  - Added component dependency table (e.g., Contract requires Server, Helm requires Server)
   - Added validation rules to prevent invalid combinations
   - Contract is no longer "always included" - only with Server
   - Integrated Config component into sdd-init workflow
