@@ -26,7 +26,7 @@ Consume generated types from contract via `import type { User, CreateUserRequest
 ## Architecture: 5 Layers
 
 ```
-Server → Controller → Model Use Cases
+App → Controller → Model Use Cases
    ↓         ↓            ↑
 Config → [All layers] → Dependencies (injected by Controller)
                            ↓
@@ -38,7 +38,7 @@ Config → [All layers] → Dependencies (injected by Controller)
 | Layer | Path | Template | Responsibility |
 |-------|------|----------|----------------|
 | **Entry Point** | `src/index.ts` | `templates/components/server/src/index.ts` | Bootstrap only (ONLY file with side effects) |
-| **Server** | `src/server/` | `templates/components/server/src/server/` | HTTP lifecycle, middleware, routes, graceful shutdown |
+| **App** | `src/app/` | `templates/components/server/src/app/` | HTTP lifecycle, middleware, routes, graceful shutdown |
 | **Config** | `src/config/` | `templates/components/server/src/config/` | Environment parsing, validation, type-safe config |
 | **Controller** | `src/controller/` | `templates/components/server/src/controller/` | Request/response handling, creates Dependencies for Model |
 | **Model** | `src/model/` | `templates/components/server/src/model/` | Business logic (definitions + use-cases), receives Dependencies |
@@ -55,18 +55,18 @@ Config → [All layers] → Dependencies (injected by Controller)
 - `src/index.ts` is the ONLY file that runs code on import (exception to the "index.ts exports only" rule for application entry points)
 - Telemetry must be imported FIRST before any other imports
 - All other files export functions/types with NO side effects when imported
-- NO logic beyond importing and starting the server
+- NO logic beyond importing and starting the app
 - NO configuration loading, validation, or setup logic
 
 ---
 
-### Layer 1: Server
+### Layer 1: App
 
-**Template:** `templates/components/server/src/server/`
+**Template:** `templates/components/server/src/app/`
 
 HTTP lifecycle, middleware, routes, graceful shutdown, database connection management.
 
-**Database Connections:** The Server layer owns database connection lifecycle:
+**Database Connections:** The App layer owns database connection lifecycle:
 - Creates connection pool on startup using Config values
 - Passes database client to Controller (which passes to DAL via Dependencies)
 - Closes connections on graceful shutdown
@@ -89,7 +89,7 @@ Environment parsing, validation, type-safe config objects.
 3. **Type-safe access**: All other layers receive typed Config object
 4. **Validation required**: Validate required vars and throw if missing
 5. **Default values**: Provide sensible defaults for optional vars
-6. **NO direct access elsewhere**: NEVER use `process.env` in Server, Controller, Model, or DAL layers
+6. **NO direct access elsewhere**: NEVER use `process.env` in App, Controller, Model, or DAL layers
 
 **What it does NOT contain:** Business logic, database queries.
 
@@ -140,7 +140,7 @@ src/model/
 **Definitions Rules:**
 - Use **TypeScript types only** (`type` or `interface`)
 - **NO Zod, Yup, io-ts, or similar validation libraries**
-- Validation belongs in the Controller layer (input) or Server layer (middleware)
+- Validation belongs in the Controller layer (input) or App layer (middleware)
 - Definitions are compile-time constructs, not runtime validators
 
 **Use Case Rules:**
@@ -221,7 +221,7 @@ Log **before** and **after** every domain action or permanent state change:
 |-------|----------|-------------|
 | `level` | Yes | Log level (debug, info, warn, error) |
 | `time` | Yes | ISO 8601 timestamp |
-| `component` | Yes | Source component (server, controller, dal) |
+| `component` | Yes | Source component (app, controller, dal) |
 | `msg` | Yes | Human-readable message |
 | `traceId` | Auto | OpenTelemetry trace ID |
 | `spanId` | Auto | OpenTelemetry span ID |
@@ -229,7 +229,7 @@ Log **before** and **after** every domain action or permanent state change:
 | `requestId` | Context | Request correlation ID |
 | `error` | On error | Error object with stack |
 
-**Logging by Layer:** Loggers must be passed down from the Server layer (which receives Config). Each layer creates a child logger with its component name.
+**Logging by Layer:** Loggers must be passed down from the App layer (which receives Config). Each layer creates a child logger with its component name.
 
 **Security Rule:** Never log sensitive data (passwords, tokens, credit cards, PII beyond IDs).
 
@@ -239,8 +239,8 @@ Log **before** and **after** every domain action or permanent state change:
 
 | Metric | Type | Labels | Layer |
 |--------|------|--------|-------|
-| `http.server.request.duration` | Histogram | method, route, status | Server |
-| `http.server.request.count` | Counter | method, route, status | Server |
+| `http.server.request.duration` | Histogram | method, route, status | App |
+| `http.server.request.count` | Counter | method, route, status | App |
 | `db.client.operation.duration` | Histogram | operation, table | DAL |
 | `db.client.connection.pool.usage` | UpDownCounter | state (active/idle) | DAL |
 | `business.operation.count` | Counter | operation, result | Model |
@@ -296,7 +296,7 @@ All implementation follows strict Test-Driven Development. **Never write product
 | **Model (use-cases)** | `src/model/use-cases/__tests__/` | Business logic, edge cases, error handling |
 | **DAL** | `src/dal/__tests__/` | Query correctness, null handling, data mapping |
 | **Controller** | `src/controller/__tests__/` | Request parsing, response formatting, status codes |
-| **Server** | `src/server/__tests__/` | Middleware, routing, integration |
+| **App** | `src/app/__tests__/` | Middleware, routing, integration |
 
 ### TDD Rules
 
@@ -338,7 +338,7 @@ When implementing a feature (TDD-driven):
    - Implement use-case in `use-cases/`
 7. **RED**: Write failing test for Controller handler
 8. **GREEN**: Implement Controller (wire up use-cases)
-9. Wire up Server (new routes)
+9. Wire up App (new routes)
 10. **REFACTOR**: Clean up while keeping all tests green
 11. Add telemetry:
     - Logs at key decision points (logger from Config)
@@ -364,4 +364,4 @@ When implementing a feature (TDD-driven):
 - **Type-safe configuration**: All layers receive typed Config object, never raw env vars
 - **Telemetry is mandatory**: All operations must emit logs, metrics, and spans
 - Follow OpenTelemetry semantic conventions for all telemetry data
-- **Pass config/logger down**: Server layer receives Config, passes baseLogger to other layers
+- **Pass config/logger down**: App layer receives Config, passes baseLogger to other layers

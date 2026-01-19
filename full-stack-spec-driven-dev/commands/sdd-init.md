@@ -196,7 +196,7 @@ mkdir -p ${TARGET_DIR}/components/contract
 
 **If Server selected:**
 ```bash
-mkdir -p ${TARGET_DIR}/components/server/src/{server,config,controller,model/{definitions,use-cases},dal,telemetry}
+mkdir -p ${TARGET_DIR}/components/server/src/{app,config,controller,model/{definitions,use-cases},dal,telemetry}
 ```
 
 **If Webapp selected:**
@@ -279,8 +279,8 @@ Copy template files with variable substitution using gathered information.
 - Copy `templates/components/server/src/index.ts` → `${TARGET_DIR}/components/server/src/index.ts`
 - Copy `templates/components/server/src/config/load_config.ts` → `${TARGET_DIR}/components/server/src/config/load_config.ts`
 - Copy `templates/components/server/src/config/index.ts` → `${TARGET_DIR}/components/server/src/config/index.ts`
-- Copy `templates/components/server/src/server/create_server.ts` → `${TARGET_DIR}/components/server/src/server/create_server.ts`
-- Copy `templates/components/server/src/server/index.ts` → `${TARGET_DIR}/components/server/src/server/index.ts`
+- Copy `templates/components/server/src/app/create_app.ts` → `${TARGET_DIR}/components/server/src/app/create_app.ts`
+- Copy `templates/components/server/src/app/index.ts` → `${TARGET_DIR}/components/server/src/app/index.ts`
 
 **Webapp component (if selected):**
 

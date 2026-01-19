@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.0.0] - 2026-01-19
+
+### Breaking Changes
+
+- **Renamed Server layer to App layer** in backend 5-layer architecture
+  - `src/server/` directory → `src/app/`
+  - `createServer` function → `createApp`
+  - `Server` type → `App` type
+  - Updated all references in backend-dev agent
+  - Updated sdd-init command directory creation and file copy paths
+  - Updated template files with new naming
+
+### Migration Guide
+
+For existing projects using the 1.x structure:
+1. Rename `src/server/` directory to `src/app/`
+2. Rename `create_server.ts` to `create_app.ts`
+3. Update function name `createServer` → `createApp`
+4. Update type names `Server` → `App`, `ServerDependencies` → `AppDependencies`
+5. Update imports in `src/index.ts`: `import { createApp } from './app'`
+
+### Rationale
+
+The "Server" layer name was confusing because it conflicted with the "server" component name (`components/server`). Renaming to "App" provides:
+- **Clarity**: Clear distinction between the component (`components/server`) and the layer (`src/app/`)
+- **Consistency**: App layer creates and manages the application lifecycle
+- **Semantic accuracy**: The layer handles more than just HTTP server concerns (middleware, routes, graceful shutdown, database connections)
+
 ## [1.10.29] - 2026-01-18
 
 ### Added

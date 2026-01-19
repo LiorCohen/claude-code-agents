@@ -1,24 +1,24 @@
 import type { Config } from '../config';
 
-type ServerDependencies = Readonly<{
+type AppDependencies = Readonly<{
   readonly config: Config;
 }>;
 
-type Server = Readonly<{
+type App = Readonly<{
   readonly start: () => Promise<void>;
   readonly stop: () => Promise<void>;
 }>;
 
-export const createServer = (deps: ServerDependencies): Server => {
+export const createApp = (deps: AppDependencies): App => {
   const { config } = deps;
 
   const start = async (): Promise<void> => {
-    console.log(`Server starting on port ${config.port}...`);
+    console.log(`App starting on port ${config.port}...`);
     // TODO: Initialize Express app, middleware, routes
   };
 
   const stop = async (): Promise<void> => {
-    console.log('Server stopping...');
+    console.log('App stopping...');
     // TODO: Graceful shutdown
   };
 
