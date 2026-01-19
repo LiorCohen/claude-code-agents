@@ -279,9 +279,49 @@ Wrap business operations with spans using `@opentelemetry/api`.
 
 ---
 
+## TDD: Red-Green-Refactor
+
+All implementation follows strict Test-Driven Development. **Never write production code without a failing test first.**
+
+### The Cycle
+
+1. **RED**: Write a failing test that describes the expected behavior
+2. **GREEN**: Write the minimum code to make the test pass
+3. **REFACTOR**: Clean up the code while keeping tests green
+
+### TDD by Layer
+
+| Layer | Test Location | What to Test |
+|-------|---------------|--------------|
+| **Model (use-cases)** | `src/model/use-cases/__tests__/` | Business logic, edge cases, error handling |
+| **DAL** | `src/dal/__tests__/` | Query correctness, null handling, data mapping |
+| **Controller** | `src/controller/__tests__/` | Request parsing, response formatting, status codes |
+| **Server** | `src/server/__tests__/` | Middleware, routing, integration |
+
+### TDD Rules
+
+1. **Test file naming**: `{function_name}.test.ts` (e.g., `create_user.test.ts`)
+2. **One test file per source file**: Mirrors the source structure
+3. **Mock Dependencies**: Use fake implementations, not mocking libraries
+4. **Test behavior, not implementation**: Tests should survive refactoring
+5. **Descriptive test names**: `it('returns error when email already exists')`
+
+### Red-Green Workflow
+
+```
+1. Write test describing expected behavior → TEST FAILS (RED)
+2. Write simplest code to pass → TEST PASSES (GREEN)
+3. Refactor if needed → TESTS STILL PASS (GREEN)
+4. Repeat for next behavior
+```
+
+**CRITICAL**: Resist the urge to write more code than needed to pass the current test. Let failing tests drive the implementation forward.
+
+---
+
 ## Build Order
 
-When implementing a feature:
+When implementing a feature (TDD-driven):
 
 1. Define types and interfaces
 2. Build Config (if new env vars needed):
@@ -289,17 +329,21 @@ When implementing a feature:
    - Add new env vars to Config interface
    - Validate and parse in loadConfig()
    - NEVER access process.env outside this layer
-3. Build DAL (data access methods)
-4. Create Model:
+3. **RED**: Write failing test for DAL function
+4. **GREEN**: Build DAL (data access methods) to pass test
+5. **RED**: Write failing test for Model use-case
+6. **GREEN**: Create Model to pass test:
    - Add to `definitions/` if new types
    - Define needs in `dependencies.ts`
    - Implement use-case in `use-cases/`
-5. Implement Controller (wire up use-cases)
-6. Wire up Server (new routes)
-7. Add telemetry:
-   - Logs at key decision points (logger from Config)
-   - Metrics for operations
-   - Spans for business logic
+7. **RED**: Write failing test for Controller handler
+8. **GREEN**: Implement Controller (wire up use-cases)
+9. Wire up Server (new routes)
+10. **REFACTOR**: Clean up while keeping all tests green
+11. Add telemetry:
+    - Logs at key decision points (logger from Config)
+    - Metrics for operations
+    - Spans for business logic
 
 ---
 

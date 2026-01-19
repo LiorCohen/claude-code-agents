@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.10.29] - 2026-01-18
+
+### Added
+
+- **TDD Red-Green-Refactor methodology** to backend-dev agent
+  - The Cycle: RED (failing test) → GREEN (minimal code) → REFACTOR
+  - TDD by Layer table: test locations for Model, DAL, Controller, Server
+  - TDD Rules: file naming, fake dependencies, behavior-focused tests
+  - Updated Build Order to integrate RED/GREEN steps
+
 ## [1.10.28] - 2026-01-18
 
 ### Fixed
