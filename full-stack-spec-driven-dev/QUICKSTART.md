@@ -2,16 +2,32 @@
 
 ## Installation
 
-Install the plugin using the Claude CLI:
+### Step 1: Install the Marketplace
+
+First, install the marketplace that contains this plugin:
 
 ```bash
-claude-code plugin install https://github.com/LiorCohen/claude-code-plugins
+claude mcp add-json lior-cc-plugins '{"command":"npx","-y":["github:LiorCohen/claude-code-plugins"]}'
 ```
 
 Or inside Claude Code:
 
 ```
-/plugin install https://github.com/LiorCohen/claude-code-plugins
+/mcp add-json lior-cc-plugins '{"command":"npx","-y":["github:LiorCohen/claude-code-plugins"]}'
+```
+
+### Step 2: Install the SDD Plugin
+
+Once the marketplace is installed, install the SDD plugin:
+
+```bash
+claude plugin install sdd --marketplace lior-cc-plugins
+```
+
+Or inside Claude Code:
+
+```
+/plugin install sdd --marketplace lior-cc-plugins
 ```
 
 The plugin will be automatically loaded and all commands will be available.

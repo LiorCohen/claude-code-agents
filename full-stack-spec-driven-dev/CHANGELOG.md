@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.27] - 2026-01-18
+
+### Changed
+
+- **QUICKSTART.md installation steps**: Split into two clear steps
+  - Step 1: Install the marketplace (`claude mcp add-json`)
+  - Step 2: Install the SDD plugin from marketplace (`claude plugin install sdd --marketplace`)
+
 ## [1.10.26] - 2026-01-18
 
 ### Changed
