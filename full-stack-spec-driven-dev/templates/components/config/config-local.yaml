@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=./schemas/schema.json
+# Local development configuration
+
+ops:
+  server:
+    port: 3000
+    host: "127.0.0.1"
+
+  database:
+    host: "localhost"
+    port: 5432
+    name: "{{PROJECT_NAME}}_dev"
+    pool:
+      min: 1
+      max: 5
+    ssl: false
+
+  logging:
+    level: "debug"
+    format: "pretty"
+
+  telemetry:
+    enabled: false
+
+app:
+  features: {}

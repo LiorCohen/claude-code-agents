@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=./schemas/schema.json
+# Production environment configuration
+# IMPORTANT: Sensitive values should be injected via environment variables or secrets management
+
+ops:
+  server:
+    port: 8080
+    host: "0.0.0.0"
+
+  database:
+    host: "${DATABASE_HOST}"
+    port: 5432
+    name: "{{PROJECT_NAME}}"
+    pool:
+      min: 5
+      max: 20
+    ssl: true
+
+  logging:
+    level: "info"
+    format: "json"
+
+  telemetry:
+    enabled: true
+    serviceName: "{{PROJECT_NAME}}"
+    exporterEndpoint: "${OTEL_EXPORTER_ENDPOINT}"
+
+app:
+  features: {}

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ops-schema.json",
+  "title": "Ops Configuration Schema",
+  "description": "Infrastructure and environment-specific configuration",
+  "type": "object",
+  "properties": {
+    "server": {
+      "type": "object",
+      "description": "HTTP server configuration",
+      "properties": {
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 3000,
+          "description": "Port the server listens on"
+        },
+        "host": {
+          "type": "string",
+          "default": "0.0.0.0",
+          "description": "Host the server binds to"
+        }
+      },
+      "required": ["port"]
+    },
+    "database": {
+      "type": "object",
+      "description": "Database connection configuration",
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Database host"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Database port"
+        },
+        "name": {
+          "type": "string",
+          "description": "Database name"
+        },
+        "pool": {
+          "type": "object",
+          "description": "Connection pool settings",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 2,
+              "description": "Minimum pool size"
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10,
+              "description": "Maximum pool size"
+            }
+          }
+        },
+        "ssl": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable SSL connection"
+        }
+      },
+      "required": ["host", "port", "name"]
+    },
+    "logging": {
+      "type": "object",
+      "description": "Logging configuration",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info",
+          "description": "Log level"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["json", "pretty"],
+          "default": "json",
+          "description": "Log output format"
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "description": "OpenTelemetry configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable telemetry collection"
+        },
+        "serviceName": {
+          "type": "string",
+          "description": "Service name for tracing"
+        },
+        "exporterEndpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "OTLP exporter endpoint"
+        }
+      }
+    }
+  },
+  "required": ["server"]
+}

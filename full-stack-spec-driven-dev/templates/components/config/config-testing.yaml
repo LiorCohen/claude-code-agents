@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=./schemas/schema.json
+# Testing environment configuration
+
+ops:
+  server:
+    port: 3001
+    host: "0.0.0.0"
+
+  database:
+    host: "localhost"
+    port: 5432
+    name: "{{PROJECT_NAME}}_test"
+    pool:
+      min: 1
+      max: 3
+    ssl: false
+
+  logging:
+    level: "warn"
+    format: "json"
+
+  telemetry:
+    enabled: false
+
+app:
+  features: {}

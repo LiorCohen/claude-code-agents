@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema.json",
+  "title": "Configuration Schema",
+  "description": "Complete configuration schema combining ops and app configuration",
+  "type": "object",
+  "properties": {
+    "ops": {
+      "$ref": "ops-schema.json"
+    },
+    "app": {
+      "$ref": "app-schema.json"
+    }
+  },
+  "required": ["ops"]
+}

@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.1] - 2026-01-19
+
+### Added
+
+- **Config component template** (`templates/components/config/`)
+  - JSON Schema for configuration validation (`schemas/schema.json`)
+  - Separate schemas for ops config (`ops-schema.json`) and app config (`app-schema.json`)
+  - Environment-specific YAML configs: `config.yaml` (base), `config-local.yaml`, `config-testing.yaml`, `config-production.yaml`
+  - Ops config covers: server, database, logging, telemetry
+  - App config is extensible per project (no predefined semantics)
+
+**Note:** This component is not yet active. Missing:
+- Agent for config management
+- Skill for config validation
+- Integration with sdd-init command
+
 ## [2.0.0] - 2026-01-19
 
 ### Breaking Changes

@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=./schemas/schema.json
+# Base configuration
+# Environment-specific files inherit from this and override as needed
+
+ops:
+  server:
+    port: 3000
+    host: "0.0.0.0"
+
+  database:
+    host: "localhost"
+    port: 5432
+    name: "{{PROJECT_NAME}}"
+    pool:
+      min: 2
+      max: 10
+    ssl: false
+
+  logging:
+    level: "info"
+    format: "json"
+
+  telemetry:
+    enabled: true
+    serviceName: "{{PROJECT_NAME}}"
+
+app:
+  features: {}

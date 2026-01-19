@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "app-schema.json",
+  "title": "App Configuration Schema",
+  "description": "Application-specific configuration (customize per project)",
+  "type": "object",
+  "properties": {
+    "features": {
+      "type": "object",
+      "description": "Feature flags",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    }
+  },
+  "additionalProperties": true
+}
