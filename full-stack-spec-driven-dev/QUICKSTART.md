@@ -43,12 +43,14 @@ sdd/
 │   ├── tester.md
 │   └── reviewer.md
 ├── skills/                     # Reusable skills
-│   ├── spec-writing/
-│   ├── planning/
-│   ├── testing/
-│   ├── spec-index/
 │   ├── change-creation/
-│   └── spec-decomposer/
+│   ├── planning/
+│   ├── scaffold/
+│   ├── spec-decomposer/
+│   ├── spec-index/
+│   ├── spec-writing/
+│   ├── testing/
+│   └── typescript-standards/
 ├── commands/                   # 5 slash commands
 │   ├── sdd-init.md
 │   ├── sdd-new-change.md
