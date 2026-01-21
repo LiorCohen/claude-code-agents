@@ -341,9 +341,11 @@ Copy template files with variable substitution using gathered information.
 - Copy `templates/components/webapp/src/app.tsx` → `${TARGET_DIR}/components/webapp/src/app.tsx`
   - Replace `{{PROJECT_NAME}}`
 - Copy `templates/components/webapp/src/index.css` → `${TARGET_DIR}/components/webapp/src/index.css`
-- Create `${TARGET_DIR}/components/webapp/index.html` with basic HTML template
-- Create `${TARGET_DIR}/components/webapp/vite.config.ts` with basic Vite config
-- Create `${TARGET_DIR}/components/webapp/tailwind.config.js` with Tailwind config
+- Copy `templates/components/webapp/index.html` → `${TARGET_DIR}/components/webapp/index.html`
+  - Replace `{{PROJECT_NAME}}`
+- Copy `templates/components/webapp/vite.config.ts` → `${TARGET_DIR}/components/webapp/vite.config.ts`
+- Copy `templates/components/webapp/tailwind.config.js` → `${TARGET_DIR}/components/webapp/tailwind.config.js`
+- Copy `templates/components/webapp/postcss.config.js` → `${TARGET_DIR}/components/webapp/postcss.config.js`
 
 **Config component (always created):**
 - Copy `templates/components/config/schemas/schema.json` → `${TARGET_DIR}/components/config/schemas/schema.json`

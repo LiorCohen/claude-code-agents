@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.6] - 2026-01-21
+
+### Added
+
+- **Runnable hello world templates**
+  - Server: Working Express server with `/health` endpoint
+  - Server: Added `dotenv` dependency
+  - Webapp: Added `index.html` entry point
+  - Webapp: Added `vite.config.ts` with React plugin and API proxy
+  - Webapp: Added `tailwind.config.js` and `postcss.config.js`
+  - Webapp: Added Tailwind CSS dependencies (`tailwindcss`, `postcss`, `autoprefixer`)
+  - Updated `sdd-init.md` to copy new template files
+
 ## [2.0.5] - 2026-01-19
 
 ### Changed
