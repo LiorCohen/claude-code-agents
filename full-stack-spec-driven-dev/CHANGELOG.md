@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.1.0] - 2026-01-21
+
+### Added
+
+- **project-settings skill**: New skill to manage `sdd-settings.yaml` for persisting project configuration
+  - Operations: `create`, `read`, `update`
+  - Stores plugin version, project metadata, and component selections
+  - Git-tracked file in project root
+
+### Changed
+
+- **sdd-init command**: Now uses `project-settings` skill to persist configuration
+  - Creates `sdd-settings.yaml` before scaffolding (Step 4.1)
+  - Settings available for use by other commands and workflows
+
 ## [3.0.1] - 2026-01-21
 
 ### Changed

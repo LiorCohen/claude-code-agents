@@ -207,7 +207,34 @@ If the user says no, ask what they'd like to change and return to Phase 1.
 
 ### Phase 4: Project Creation (Only After Approval)
 
-Once approved, use the `scaffolding` skill to create the project structure.
+#### Step 4.1: Create Project Settings
+
+First, use the `project-settings` skill to create `sdd-settings.yaml` with the project configuration.
+
+**Use the `project-settings` skill with operation `create`:**
+
+```
+Input:
+  plugin_version: <read from plugin's .claude-plugin/plugin.json>
+  project_name: <from Phase 1>
+  project_description: <from Phase 1>
+  project_domain: <from Phase 1>
+  project_type: <"fullstack" | "backend" | "frontend" | "custom" based on selected option>
+  components:
+    contract: <true if selected>
+    server: <true if selected>
+    webapp: <true if selected>
+    config: <true if selected>
+    helm: <true if selected>
+    testing: <true if selected>
+    cicd: <true if selected>
+```
+
+This creates `sdd-settings.yaml` in the project root, which persists the project configuration for use by other commands and workflows.
+
+#### Step 4.2: Scaffold Project Structure
+
+Use the `scaffolding` skill to create the project structure.
 
 **See the `scaffolding` skill for detailed instructions.** Pass the following from Phase 1:
 - `project_name`, `project_description`, `primary_domain`
