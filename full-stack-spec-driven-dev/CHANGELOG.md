@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.1] - 2026-01-21
+
+### Changed
+
+- **sdd-init deduplication**: Removed redundant scaffold instructions, now references scaffold skill for details. Fixed step numbering.
+
 ## [2.2.0] - 2026-01-21
 
 ### Added

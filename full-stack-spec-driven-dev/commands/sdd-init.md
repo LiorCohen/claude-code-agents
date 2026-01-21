@@ -198,57 +198,14 @@ If the user says no, ask what they'd like to change and return to Phase 1.
 
 ### Phase 4: Project Creation (Only After Approval)
 
-Once approved, use the `scaffold` skill to create the project structure quickly.
+Once approved, use the `scaffold` skill to create the project structure.
 
-**IMPORTANT:** Use the Python scaffold script instead of creating files one by one. This reduces creation time from ~5 minutes to ~5 seconds.
+**See the `scaffold` skill for detailed instructions.** Pass the following from Phase 1:
+- `project_name`, `project_description`, `primary_domain`
+- `target_dir`: Current directory or subdirectory based on Phase 1 directory check
+- `components`: Based on selected project type (Full-Stack, Backend API, Frontend, or Custom)
 
-### Step 1: Determine paths
-
-1. **Find the plugin directory:**
-   - The plugin is loaded via `--add-dir`, so look for the `templates/` directory
-   - Use: `PLUGIN_DIR=$(dirname $(find . -path "*sdd*/templates" -type d 2>/dev/null | head -1) 2>/dev/null || echo "")`
-   - If not found locally, check common plugin locations or use the Glob tool to find `**/full-stack-spec-driven-dev/templates`
-
-2. **Determine target directory:**
-   - If initializing in current directory: `TARGET_DIR="$(pwd)"`
-   - If creating subdirectory: `TARGET_DIR="$(pwd)/<project-name>"`
-
-### Step 2: Map components to scaffold format
-
-Convert the selected project type to component list:
-
-| Project Type | Components |
-|--------------|------------|
-| Full-Stack Application | `["contract", "server", "webapp", "config", "testing", "cicd"]` |
-| Backend API Only | `["contract", "server", "config", "testing", "cicd"]` |
-| Frontend Only | `["webapp", "config", "testing", "cicd"]` |
-| Custom | User's selection + "config" (always included) |
-
-### Step 3: Run the scaffold script
-
-```bash
-# Create config file
-cat > /tmp/sdd-scaffold-config.json << 'EOF'
-{
-    "project_name": "<PROJECT_NAME>",
-    "project_description": "<PROJECT_DESCRIPTION>",
-    "primary_domain": "<PRIMARY_DOMAIN>",
-    "target_dir": "<TARGET_DIR>",
-    "components": [<COMPONENT_LIST>],
-    "template_dir": "<PLUGIN_DIR>/templates"
-}
-EOF
-
-# Run scaffold
-python3 <PLUGIN_DIR>/skills/scaffold/scaffold.py --config /tmp/sdd-scaffold-config.json
-
-# Clean up
-rm /tmp/sdd-scaffold-config.json
-```
-
-Replace the placeholders with actual values from Phase 1.
-
-### Step 4: External spec integration (if provided)
+### Step 5: External spec integration (if provided)
 
 If an external spec was provided via `--spec` argument:
 
@@ -326,7 +283,7 @@ If an external spec was provided via `--spec` argument:
    Next step: Review the generated plan and run /sdd-implement-plan specs/features/YYYY/MM/DD/initial-spec/PLAN.md
    ```
 
-### Step 5: Initialize git repository
+### Step 6: Initialize git repository
 
 If not already in a git repository:
 ```bash
@@ -338,7 +295,7 @@ If already in a git repository (current directory case):
 git add . && git commit -m "Initial project setup from spec-driven template"
 ```
 
-### Step 6: Verify completion and report
+### Step 7: Verify completion and report
 
 After ALL steps are done:
 
