@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.1] - 2026-01-21
+
+### Changed
+
+- **Skill directory renames for consistency**
+  - `skills/scaffold/` → `skills/scaffolding/`
+  - `skills/spec-decomposer/` → `skills/spec-decomposition/`
+  - `scaffold.py` → `scaffolding.py`
+  - `scaffold.md` → `SKILL.md` (consistent with other skills)
+
+- **Updated all references** in sdd-init.md, QUICKSTART.md, and skill files
+
 ## [3.0.0] - 2026-01-21
 
 ### Breaking Changes
