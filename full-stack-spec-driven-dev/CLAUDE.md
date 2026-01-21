@@ -6,8 +6,6 @@ This file provides guidance to Claude Code when working with the Spec-Driven Dev
 
 This is the **Spec-Driven Development (SDD) plugin** for Claude Code. It provides specialized agents, commands, and templates for full-stack TypeScript/React development with strict architectural patterns.
 
-**Version:** 3.0.0
-
 ## Core Methodology
 
 This plugin implements a **specification-driven workflow**:
@@ -220,9 +218,9 @@ When making changes to this plugin, you MUST follow this exact sequence:
 Example workflow:
 ```
 1. Edit agents/backend-dev.md (add new feature)
-2. Update version 3.0.0 → 3.0.1 in both plugin.json and marketplace.json
-3. Add [3.0.1] entry to CHANGELOG.md describing the feature
-4. git commit -am "Add feature X, bump to 3.0.1"
+2. Update version in both plugin.json and marketplace.json
+3. Add new entry to CHANGELOG.md describing the feature
+4. git commit -am "Add feature X, bump to X.Y.Z"
 ```
 
 ## Notes for Claude Code
