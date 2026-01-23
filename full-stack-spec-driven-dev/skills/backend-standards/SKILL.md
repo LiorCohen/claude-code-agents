@@ -86,6 +86,7 @@ Provides raw I/O capabilities and orchestrates application lifecycle. **NO domai
 - Manages lifecycle via state machine (IDLE → STARTING → RUNNING → STOPPING → STOPPED)
 - Manages HTTP server for API endpoints
 - Manages lifecycle probes on separate port (health/readiness for Kubernetes)
+- Handles Unix signals for graceful shutdown (SIGTERM, SIGINT, SIGHUP)
 - Initializes telemetry (logger, metrics) before other modules
 
 **What Operator Does NOT Do:**
@@ -99,6 +100,20 @@ IDLE → STARTING:PROBES → STARTING:DATABASE → STARTING:HTTP_SERVER → RUNN
                                                                         ↓
 STOPPED ← STOPPING:PROBES ← STOPPING:DATABASE ← STOPPING:HTTP_SERVER ←─┘
 ```
+
+**Unix Signal Handling:**
+
+| Signal | Source | Action |
+|--------|--------|--------|
+| `SIGTERM` | Kubernetes pod termination, `kill` command | Graceful shutdown |
+| `SIGINT` | Ctrl+C from terminal | Graceful shutdown |
+| `SIGHUP` | Terminal hangup | Graceful shutdown |
+
+When a signal is received:
+1. Log the signal with info level
+2. Initiate graceful shutdown via `stop()`
+3. Wait for all connections to drain
+4. Exit with code 0 (success) or 1 (error)
 
 **Structure:**
 ```
@@ -350,6 +365,7 @@ Before committing backend code, verify:
 
 - [ ] Entry point (`src/index.ts`) only imports and starts operator
 - [ ] Operator provides raw I/O only - no domain knowledge
+- [ ] Operator handles Unix signals (SIGTERM, SIGINT, SIGHUP) for graceful shutdown
 - [ ] Config is the only layer accessing `process.env`
 - [ ] Controller combines I/O + config for domain operations
 - [ ] Model receives Dependencies, never imports external modules

@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.5.2] - 2026-01-23
+
+### Added
+
+- **Unix signal handling**: Operator now handles signals for graceful shutdown
+  - `SIGTERM` - Kubernetes pod termination (preStop hook, scaling down)
+  - `SIGINT` - Ctrl+C from terminal (local development)
+  - `SIGHUP` - Terminal hangup
+  - Signals trigger graceful shutdown with proper connection draining
+  - Logs signal received and shutdown completion
+
+### Changed
+
+- **backend-standards skill**: Added signal handling documentation
+  - Signal table with sources and actions
+  - Updated summary checklist
+
 ## [3.5.1] - 2026-01-23
 
 ### Added

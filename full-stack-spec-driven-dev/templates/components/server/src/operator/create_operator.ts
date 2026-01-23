@@ -20,6 +20,9 @@ type Operator = Readonly<{
     readonly stop: () => Promise<void>;
 }>;
 
+// Unix signals handled by the operator
+type UnixSignal = "SIGTERM" | "SIGINT" | "SIGHUP";
+
 // Operator lifecycle states (substates use colon convention: "PARENT:SUBSTATE")
 type OperatorState =
     | "IDLE"
@@ -169,6 +172,31 @@ export const createOperator = (deps: OperatorDependencies): Operator => {
             throw err;
         }
     };
+
+    // Signal handler for graceful shutdown
+    const handleSignal = (signal: UnixSignal): void => {
+        logger.info({ signal }, "Received signal, initiating graceful shutdown");
+        stop()
+            .then(() => {
+                logger.info({ signal }, "Graceful shutdown complete");
+                process.exit(0);
+            })
+            .catch((err) => {
+                logger.error({ signal, err }, "Error during graceful shutdown");
+                process.exit(1);
+            });
+    };
+
+    // Register signal handlers
+    // SIGTERM: Kubernetes sends this for graceful shutdown (preStop hook, pod termination)
+    // SIGINT: Ctrl+C from terminal (local development)
+    // SIGHUP: Terminal hangup (optional, used for graceful restart in some systems)
+    const signals: ReadonlyArray<UnixSignal> = ["SIGTERM", "SIGINT", "SIGHUP"];
+    signals.forEach((signal) => {
+        process.on(signal, () => handleSignal(signal));
+    });
+
+    logger.debug({ signals }, "Signal handlers registered");
 
     return { start, stop };
 };
