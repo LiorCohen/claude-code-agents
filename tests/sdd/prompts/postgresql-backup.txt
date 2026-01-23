@@ -1,0 +1,21 @@
+Using the postgresql skill, create a backup script for the database.
+
+Requirements:
+- Create a shell script that backs up the database using pg_dump
+- Use custom format (-Fc) for the backup
+- Include a timestamp in the backup filename
+- Store backups in a ./backups directory
+- Add basic error handling
+
+Create the script at: scripts/backup.sh
+
+Database connection info for reference:
+- Host: localhost
+- Port: 5432
+- User: app_user
+- Database: myapp
+
+IMPORTANT:
+- Follow the postgresql skill's deployment reference for pg_dump usage
+- Make the script executable-ready (proper shebang, etc.)
+- Include comments explaining what each section does

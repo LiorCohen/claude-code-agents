@@ -1,0 +1,15 @@
+Using the postgresql skill, create database roles and users with appropriate permissions.
+
+Create the following:
+1. A role named "app_readonly" with SELECT permissions
+2. A role named "app_readwrite" with SELECT, INSERT, UPDATE, DELETE permissions
+3. A user named "app_service" with password 'service_pass' that has the app_readwrite role
+4. Set default privileges so future tables automatically grant to these roles
+
+Create the SQL file at: db/permissions/setup_roles.sql
+
+IMPORTANT:
+- Follow the postgresql skill's permissions-setup reference
+- Use proper GRANT statements
+- Include ALTER DEFAULT PRIVILEGES for future objects
+- The SQL must be executable via psql

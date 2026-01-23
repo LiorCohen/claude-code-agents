@@ -1,0 +1,17 @@
+Using the postgresql skill, create a Docker Compose configuration for local PostgreSQL development.
+
+Requirements:
+- PostgreSQL 16 image
+- Database name: myapp
+- User: app_user
+- Password: dev_password
+- Expose port 5432
+- Persistent volume for data
+- Health check using pg_isready
+
+Create the docker-compose.yml file in the current directory.
+
+IMPORTANT:
+- Use the postgresql skill's deployment reference for best practices
+- Include health check configuration
+- Make it suitable for local development

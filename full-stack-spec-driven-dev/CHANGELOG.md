@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.8.0] - 2026-01-23
+
+### Added
+
+- **postgresql skill**: New SQL-native PostgreSQL database skill
+  - SKILL.md with quick reference for common operations
+  - 8 reference files covering all major PostgreSQL topics:
+    - `deployment.md`: Docker, Docker Compose, Kubernetes deployment
+    - `schema-management.md`: Tables, indexes, migrations, partitioning
+    - `seed-data.md`: INSERT, COPY, generate_series, test data
+    - `permissions-setup.md`: Roles, grants, row-level security
+    - `system-views.md`: pg_stat_* monitoring views
+    - `introspection-queries.md`: Schema exploration queries
+    - `performance-tuning.md`: EXPLAIN, index strategy, configuration
+    - `common-errors.md`: Error messages and solutions
+  - Version compatibility notes (PostgreSQL 12+)
+  - Safety guidelines for production use
+
+- **postgresql tests**: Real usage scenario tests with Docker
+  - Deploy PostgreSQL via Docker Compose
+  - Create and execute schema migrations
+  - Set up roles and permissions
+  - Seed data generation
+  - Query performance analysis with EXPLAIN
+  - Schema introspection
+  - Backup script generation
+
 ## [3.7.1] - 2026-01-23
 
 ### Fixed

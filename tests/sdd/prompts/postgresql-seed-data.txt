@@ -1,0 +1,17 @@
+Using the postgresql skill, create seed data for the users table.
+
+The users table has columns: id, email, name, created_at, updated_at
+
+Requirements:
+- Insert 10 sample users with realistic data
+- Use generate_series or similar for efficient bulk insert
+- Make the seed idempotent using ON CONFLICT
+- Include varied timestamps for created_at
+
+Create the SQL file at: db/seeds/seed_users.sql
+
+IMPORTANT:
+- Follow the postgresql skill's seed-data reference
+- Use ON CONFLICT DO NOTHING or DO UPDATE for idempotency
+- The SQL must be executable via psql
+- Do not use external data files, generate data in SQL

@@ -1,0 +1,21 @@
+Using the postgresql skill, analyze query performance on the orders table.
+
+The orders table exists with columns: id, user_id, total, created_at
+It has approximately 1000 rows of data.
+
+Tasks:
+1. Run EXPLAIN ANALYZE on a query that finds orders for a specific user_id
+2. Identify if the query is doing a sequential scan
+3. Suggest an index to improve performance
+4. Show what the query plan would look like with the index
+
+Connect to the database using:
+- Container: sdd-postgres-test
+- User: testuser
+- Database: testdb
+- Use: docker exec sdd-postgres-test psql -U testuser -d testdb -c "..."
+
+IMPORTANT:
+- Follow the postgresql skill's performance-tuning reference
+- Use EXPLAIN (ANALYZE, BUFFERS) for detailed output
+- Show the actual execution time in results

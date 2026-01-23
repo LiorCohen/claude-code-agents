@@ -1,0 +1,16 @@
+Using the postgresql skill, create a migration to add a phone column to the users table.
+
+The users table already exists with columns: id, email, name, created_at, updated_at
+
+Migration requirements:
+- Add a new column: phone VARCHAR(20), nullable
+- Add an index on the phone column (use CONCURRENTLY if possible)
+- Follow safe migration patterns from the postgresql skill
+
+Create the migration file at: db/migrations/002_add_user_phone.sql
+
+IMPORTANT:
+- Follow the postgresql skill's schema-management reference for safe migrations
+- Add column as nullable first (this is safe and fast)
+- Use CREATE INDEX CONCURRENTLY if the migration supports it
+- The SQL must be executable via psql

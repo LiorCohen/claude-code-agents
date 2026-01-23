@@ -1,0 +1,19 @@
+Using the postgresql skill, create a database schema for a users table.
+
+Requirements:
+- Table name: users
+- Columns:
+  - id: auto-incrementing primary key (use IDENTITY)
+  - email: unique, not null, varchar(255)
+  - name: not null, varchar(100)
+  - created_at: timestamptz, not null, default now()
+  - updated_at: timestamptz, not null, default now()
+- Add an index on email column
+- Follow postgresql skill best practices for table creation
+
+Create the SQL file at: db/migrations/001_create_users.sql
+
+IMPORTANT:
+- Use BIGINT GENERATED ALWAYS AS IDENTITY for the primary key
+- Include all appropriate constraints
+- The SQL must be executable via psql

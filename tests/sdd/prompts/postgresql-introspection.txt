@@ -1,0 +1,18 @@
+Using the postgresql skill, explore the existing database schema.
+
+Connect to the database using:
+- Container: sdd-postgres-test
+- User: testuser
+- Database: testdb
+- Use: docker exec sdd-postgres-test psql -U testuser -d testdb -c "..."
+
+Tasks:
+1. List all tables in the public schema
+2. Show the columns and types for each table found
+3. List any indexes that exist
+4. Show any foreign key relationships
+
+IMPORTANT:
+- Follow the postgresql skill's introspection-queries reference
+- Use information_schema or pg_catalog queries
+- Report what tables, columns, and indexes exist in the database
