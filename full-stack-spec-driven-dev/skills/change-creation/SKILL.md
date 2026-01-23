@@ -323,14 +323,14 @@ Complete implementation of the following changes before starting:
 ## Implementation Phases
 
 ### Phase 0: Domain Documentation
-**Agent:** `domain-expert`
+**Agent:** `spec-writer`
 
 - [ ] Review and update domain glossary
 - [ ] Document any new domain concepts
 - [ ] Ensure ubiquitous language is consistent
 
 ### Phase 1: API Contract
-**Agent:** `contract-author`
+**Agent:** `api-designer`
 
 - [ ] Define OpenAPI paths and operations
 - [ ] Define request/response schemas
@@ -338,7 +338,7 @@ Complete implementation of the following changes before starting:
 - [ ] Review contract with team
 
 ### Phase 2: Backend Implementation
-**Agent:** `backend-developer`
+**Agent:** `backend-dev`
 
 - [ ] Implement database models/migrations
 - [ ] Implement service layer
@@ -347,7 +347,7 @@ Complete implementation of the following changes before starting:
 - [ ] Add error handling
 
 ### Phase 3: Frontend Implementation
-**Agent:** `frontend-developer`
+**Agent:** `frontend-dev`
 
 - [ ] Create UI components
 - [ ] Implement state management
@@ -356,7 +356,7 @@ Complete implementation of the following changes before starting:
 - [ ] Implement form validation
 
 ### Phase 4: Testing
-**Agent:** `test-engineer`
+**Agent:** `tester`
 
 - [ ] Write unit tests for services
 - [ ] Write integration tests for API
@@ -397,21 +397,21 @@ Complete implementation of the following changes before starting:
 ## Implementation Phases
 
 ### Phase 1: Investigation
-**Agent:** `backend-developer` or `frontend-developer`
+**Agent:** `backend-dev` or `frontend-dev`
 
 - [ ] Reproduce the bug locally
 - [ ] Identify root cause
 - [ ] Document findings in SPEC.md
 
 ### Phase 2: Implementation
-**Agent:** `backend-developer` or `frontend-developer`
+**Agent:** `backend-dev` or `frontend-dev`
 
 - [ ] Implement the fix
 - [ ] Update any affected API contracts (if needed)
 - [ ] Add input validation (if applicable)
 
 ### Phase 3: Testing
-**Agent:** `test-engineer`
+**Agent:** `tester`
 
 - [ ] Add regression test for this bug
 - [ ] Verify fix resolves the issue
@@ -451,21 +451,21 @@ Complete implementation of the following changes before starting:
 ## Implementation Phases
 
 ### Phase 1: Preparation
-**Agent:** `backend-developer` or `frontend-developer`
+**Agent:** `backend-dev` or `frontend-dev`
 
 - [ ] Ensure comprehensive test coverage exists
 - [ ] Document current behavior
 - [ ] Identify all affected areas
 
 ### Phase 2: Implementation
-**Agent:** `backend-developer` or `frontend-developer`
+**Agent:** `backend-dev` or `frontend-dev`
 
 - [ ] Implement refactoring changes
 - [ ] Update any affected API contracts (if needed)
 - [ ] Maintain backward compatibility (if required)
 
 ### Phase 3: Testing
-**Agent:** `test-engineer`
+**Agent:** `tester`
 
 - [ ] Run existing test suite
 - [ ] Verify no behavior changes

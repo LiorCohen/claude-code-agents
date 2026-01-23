@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.7.1] - 2026-01-23
+
+### Fixed
+
+- **change-creation skill**: Corrected invalid agent names in plan templates
+  - `domain-expert` → `spec-writer`
+  - `contract-author` → `api-designer`
+  - `backend-developer` → `backend-dev`
+  - `frontend-developer` → `frontend-dev`
+  - `test-engineer` → `tester`
+
 ## [3.7.0] - 2026-01-23
 
 ### Added
