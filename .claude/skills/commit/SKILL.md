@@ -35,13 +35,16 @@ For each affected plugin, check if version bump is needed:
 | `full-stack-spec-driven-dev/scripts/` | All script files |
 | `full-stack-spec-driven-dev/.claude-plugin/` | Plugin manifest |
 
-**Files That Do NOT Require Version Bump:**
+**Files That Do NOT Require Version Bump (Marketplace-Level):**
 
 - Root `README.md`
 - Root `CLAUDE.md`
 - Root `CONTRIBUTING.md`
+- Root `CHANGELOG.md` (marketplace changelog)
 - `.claude/skills/` (marketplace-level skills)
 - `.gitignore`
+- `.claudeignore`
+- `full-stack-spec-driven-dev/tests/` (test files)
 
 If version bump is needed, prompt for type:
 - **PATCH** (x.x.Z): Bug fixes, small improvements
@@ -54,7 +57,20 @@ Update BOTH files:
 
 ### Step 3: Changelog Check
 
-If version was bumped, ensure CHANGELOG.md has an entry:
+**Two separate changelogs exist:**
+
+1. **Plugin CHANGELOG** (`full-stack-spec-driven-dev/CHANGELOG.md`):
+   - Updated when plugin files change (agents, commands, skills, templates, scripts)
+   - Tied to plugin version numbers
+   - Format: `## [x.y.z] - YYYY-MM-DD`
+
+2. **Marketplace CHANGELOG** (`CHANGELOG.md` at root):
+   - Updated when marketplace infrastructure changes
+   - No version numbers (date-based entries)
+   - Covers: root docs, ignore files, marketplace skills, test infrastructure
+   - Format: `## YYYY-MM-DD`
+
+If plugin version was bumped, ensure plugin CHANGELOG.md has an entry:
 
 ```markdown
 ## [x.y.z] - YYYY-MM-DD
@@ -184,17 +200,19 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 ## Quick Reference
 
 ```
-Plugin file changed? → Bump version → Update CHANGELOG → Stage all → Commit
+Plugin file changed? → Bump version → Update plugin CHANGELOG → Stage all → Commit
+Marketplace file changed? → Update marketplace CHANGELOG → Stage all → Commit
 ```
 
 ## Common Mistakes to Avoid
 
 1. **Forgetting version bump** - Always bump version for plugin file changes
 2. **Mismatched versions** - plugin.json and marketplace.json must match
-3. **Missing CHANGELOG** - Every version bump needs a CHANGELOG entry
-4. **Wrong commit format** - Must include Co-Authored-By
-5. **Staging incomplete** - Must include all version files in same commit
-6. **Wrong date in CHANGELOG** - Use today's date
+3. **Missing CHANGELOG** - Every change needs a CHANGELOG entry (plugin or marketplace)
+4. **Wrong CHANGELOG** - Plugin changes go to plugin CHANGELOG, marketplace changes go to root CHANGELOG
+5. **Wrong commit format** - Must include Co-Authored-By
+6. **Staging incomplete** - Must include all version files in same commit
+7. **Wrong date in CHANGELOG** - Use today's date
 
 ## Verification Commands
 

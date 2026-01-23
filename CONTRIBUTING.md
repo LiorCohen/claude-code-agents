@@ -10,7 +10,9 @@ This is a marketplace, not a single plugin:
 claude-code-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json              # Marketplace manifest
-├── full-stack-spec-driven-dev/       # SDD plugin (v1.9.0)
+├── .claude/
+│   └── skills/                       # Marketplace-level skills (e.g., commit)
+├── full-stack-spec-driven-dev/       # SDD plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json               # Plugin manifest
 │   ├── agents/                       # Plugin agents
@@ -18,13 +20,17 @@ claude-code-plugins/
 │   ├── skills/                       # Plugin skills
 │   ├── templates/                    # Plugin templates
 │   ├── scripts/                      # Plugin utilities
+│   ├── tests/                        # Plugin tests
 │   ├── README.md                     # Plugin documentation
-│   ├── QUICKSTART.md                # Plugin getting started
-│   ├── CHANGELOG.md                 # Plugin version history
-│   └── CLAUDE.md                    # Plugin-specific guidance
+│   ├── QUICKSTART.md                 # Plugin getting started
+│   ├── CHANGELOG.md                  # Plugin version history
+│   └── CLAUDE.md                     # Plugin-specific guidance
 ├── README.md                         # Marketplace overview
 ├── CLAUDE.md                         # Marketplace guidance
-└── CONTRIBUTING.md                   # This file
+├── CHANGELOG.md                      # Marketplace changelog (infrastructure)
+├── CONTRIBUTING.md                   # This file
+├── .gitignore
+└── .claudeignore
 ```
 
 ## Contributing to Existing Plugins
@@ -211,7 +217,21 @@ git push origin your-branch-name
   1. Plugin's own `plugin.json`
   2. Marketplace's `marketplace.json`
 - Both versions must match exactly
-- Every version bump requires a CHANGELOG entry
+- Every plugin version bump requires a plugin CHANGELOG entry
+
+### Changelog Management
+
+**Two separate changelogs:**
+
+1. **Plugin CHANGELOG** (`full-stack-spec-driven-dev/CHANGELOG.md`):
+   - Updated when plugin functionality changes
+   - Tied to semantic version numbers
+   - Covers: agents, commands, skills, templates, scripts
+
+2. **Marketplace CHANGELOG** (`CHANGELOG.md` at root):
+   - Updated when marketplace infrastructure changes
+   - Date-based entries (no version numbers)
+   - Covers: root docs, ignore files, marketplace skills, test infrastructure
 
 ### File Organization
 
@@ -229,8 +249,10 @@ git push origin your-branch-name
 ### Documentation
 
 - **Root README**: Marketplace overview and plugin listing
-- **Plugin README**: Comprehensive plugin documentation
+- **Root CHANGELOG**: Marketplace infrastructure changes
 - **Root CLAUDE.md**: Marketplace structure guidance
+- **Plugin README**: Comprehensive plugin documentation
+- **Plugin CHANGELOG**: Plugin version history
 - **Plugin CLAUDE.md**: Plugin-specific guidance for Claude Code
 
 ### Testing
