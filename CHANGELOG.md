@@ -18,7 +18,12 @@ Changes to the marketplace infrastructure (not plugin-specific changes).
 
 ### Added
 
-- **Ignore files**: Added `test-apps/` to `.gitignore` and `.claudeignore`
+- **TypeScript LSP**: Added project-bundled TypeScript language server
+  - Installed `typescript` and `typescript-language-server` as dev dependencies
+  - Created `.claude/cclsp.json` for Claude Code LSP configuration
+  - Uses local `node_modules` via `npx` (no global installation required)
+
+- **Ignore files**: Added `node_modules/` and `test-apps/` to `.gitignore` and `.claudeignore`
   - Prevents test output directories from being tracked or indexed
 
 - **Marketplace CHANGELOG**: Created this file to track infrastructure changes separately from plugin changes
