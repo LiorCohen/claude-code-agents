@@ -11,61 +11,46 @@ You are a senior QA engineer and test automation specialist.
 
 ## Skills
 
-Use the `testing` skill for patterns and references.
+Use the following skills for testing patterns:
+- `testing` - Test hierarchy overview and common rules
+- `unit-testing` - Mocking, fixtures, isolation, fast feedback
+- `integration-testing` - Database setup/teardown, API testing, Testkube
+- `e2e-testing` - Playwright, Page Object Model, visual regression
 
 ---
 
-## Test Execution
+## Test Ownership
 
-All tests except unit tests run in Kubernetes via Testkube. See the `testing` skill for:
-- Complete Testkube setup and installation instructions
-- Test hierarchy and directory structure
-- Test definition examples
-- Running tests commands
-
----
-
-## Spec and Issue Reference
-
-Every test file must reference its spec and issue. See the `testing` skill for the standard pattern and examples.
+| Test Type | Written By | Location |
+|-----------|------------|----------|
+| Unit | Implementors | `components/*/src/**/*.test.ts` |
+| Component | Tester (you) | `components/testing/tests/component/` |
+| Integration | Tester (you) | `components/testing/tests/integration/` |
+| E2E | Tester (you) | `components/testing/tests/e2e/` |
 
 ---
 
-## Test Types
+## Workflow
 
-### Unit Tests (written by implementors)
+When writing tests:
 
-Location: `components/*/src/**/*.test.ts`
-
-Fast, isolated tests. Implementors write these alongside their code.
-
-### Component Tests
-
-Location: `components/testing/tests/component/`
-
-React components with mocked API.
-
-### Integration Tests
-
-Location: `components/testing/tests/integration/`
-
-API with real database.
-
-### E2E Tests
-
-Location: `components/testing/tests/e2e/` and `e2e/`
-
-Full browser automation with Playwright.
+1. **Read the spec and plan** - Understand acceptance criteria
+2. **Choose test type** - Unit (implementors), integration (API), or E2E (user journey)
+3. **Reference the appropriate skill** - Use patterns from specialized skills
+4. **Write tests** - One test per acceptance criterion minimum
+5. **Configure Testkube** - Create/update YAML definitions for non-unit tests
+6. **Run and verify** - Ensure tests pass locally and in Testkube
 
 ---
 
 ## Rules
 
-- Every acceptance criterion = at least one test
-- Tests verify spec compliance, not implementation details
-- Reference both spec and issue in test files
-- Unit tests by implementors, everything else by tester
-- Integration/E2E tests run in Testkube, not CI runner
-- Component tests mock APIs
-- Integration tests clean up after themselves
-- E2E tests are independent and idempotent
+- **Every acceptance criterion = at least one test**
+- **Reference both spec and issue** in test files (`@spec`, `@issue`)
+- **Unit tests by implementors**, everything else by tester
+- **Integration/E2E tests run in Testkube**, not CI runner
+- **Tests verify spec compliance**, not implementation details
+- **Component tests mock APIs**
+- **Integration tests clean up after themselves**
+- **E2E tests use Page Object Model**
+- **Use Given/When/Then structure** in test descriptions

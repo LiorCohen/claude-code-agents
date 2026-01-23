@@ -1,5 +1,55 @@
 # Changelog
 
+## [3.6.0] - 2026-01-23
+
+### Added
+
+- **unit-testing skill**: New specialized skill for unit testing patterns
+  - Mocking strategies (dependency injection, vi.fn, vi.mock)
+  - Fixtures and factory functions
+  - Test isolation and state management
+  - Async testing patterns
+  - Discriminated union testing
+  - Coverage guidelines and targets
+
+- **integration-testing skill**: New specialized skill for integration testing
+  - Database setup and teardown strategies
+  - Cleanup patterns (transaction rollback, truncate, surgical delete)
+  - API client setup and authentication helpers
+  - Seed data management
+  - Contract testing
+  - Testkube configuration
+
+- **e2e-testing skill**: New specialized skill for end-to-end testing
+  - Playwright configuration
+  - Page Object Model patterns
+  - Test data management via API
+  - Visual regression testing
+  - Async operation handling
+  - Test attributes (`data-testid`)
+
+### Changed
+
+- **testing skill**: Simplified to overview that references specialized skills
+  - Now serves as entry point to testing hierarchy
+  - References unit-testing, integration-testing, e2e-testing skills
+  - Retains common rules and spec reference patterns
+
+- **tester agent**: Updated to reference all four testing skills
+  - Clear workflow for writing different test types
+  - Condensed rules summary
+  - Clarified focus on integration and E2E tests (not unit tests)
+
+- **backend-dev agent**: Added `unit-testing` skill reference
+  - Clarified that backend-dev writes unit tests (not tester agent)
+
+- **frontend-dev agent**: Added full TDD workflow
+  - Added TDD Red-Green-Refactor section with frontend-specific examples
+  - Added TDD by Layer table (Model, ViewModel, Components)
+  - Added `unit-testing` skill reference
+  - Updated build order to be TDD-driven
+  - Clarified that frontend-dev writes unit tests (not tester agent)
+
 ## [3.5.3] - 2026-01-23
 
 ### Added

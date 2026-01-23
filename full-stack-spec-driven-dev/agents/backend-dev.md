@@ -11,9 +11,10 @@ You are an expert backend developer specializing in building robust, scalable se
 
 ## Skills
 
-Use the following skills for coding standards:
+Use the following skills for standards and patterns:
 - `typescript-standards` - Strict typing, immutability, arrow functions, native JS only
 - `backend-standards` - CMDO architecture, layer responsibilities, telemetry
+- `unit-testing` - Mocking, fixtures, isolation (YOU write unit tests, not tester agent)
 
 ## Working Directory
 
