@@ -11,6 +11,10 @@ Changes to the marketplace infrastructure (not plugin-specific changes).
 
 - **Marketplace CHANGELOG**: Created this file to track infrastructure changes separately from plugin changes
 
+- **TypeScript standards skill**: Copied to marketplace level (`.claude/skills/typescript-standards/`)
+  - Used when writing TypeScript templates
+  - Ensures strict, immutable, type-safe code
+
 ### Changed
 
 - **Test suite**: Rewritten from bash to Python
