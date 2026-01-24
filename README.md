@@ -33,20 +33,20 @@ A comprehensive plugin for spec-driven development with React, Node.js, and Type
 
 ### Using Claude CLI
 
-Install the SDD plugin directly from the marketplace:
+Add the marketplace and install the SDD plugin:
 
 ```bash
-claude-code plugin install https://github.com/LiorCohen/claude-code-plugins
+claude plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
+claude plugin install sdd
 ```
-
-This will automatically discover and load the SDD plugin.
 
 ### Inside Claude Code
 
-You can also install plugins using the `/plugin` command:
+You can also use the `/plugin` command:
 
 ```
-/plugin install https://github.com/LiorCohen/claude-code-plugins
+/plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
+/plugin install sdd
 ```
 
 Once installed, all commands, agents, and skills will be available immediately.

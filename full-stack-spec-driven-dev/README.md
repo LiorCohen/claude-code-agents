@@ -94,19 +94,21 @@ Project lifecycle automation:
 
 ### Installation
 
-Install the plugin using the Claude CLI:
+Add the marketplace and install the SDD plugin using the Claude CLI:
 
 ```bash
-claude-code plugin install https://github.com/LiorCohen/claude-code-plugins
+claude plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
+claude plugin install sdd
 ```
 
 Or inside Claude Code:
 
 ```
-/plugin install https://github.com/LiorCohen/claude-code-plugins
+/plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
+/plugin install sdd
 ```
 
-The plugin will be automatically loaded and all commands will be available.
+Once installed, all commands, agents, and skills will be available immediately.
 
 ### Usage
 
