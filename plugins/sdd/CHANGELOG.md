@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.2.0] - 2026-01-24
+
+### Changed
+
+- **sdd-verify-spec command**: Renamed to `/sdd-verify-change`
+  - Better naming consistency with the change-centric workflow
+  - Updated all references in documentation (README, CLAUDE.md)
+  - Updated project scaffolding templates
+
 ## [4.1.2] - 2026-01-24
 
 ### Changed

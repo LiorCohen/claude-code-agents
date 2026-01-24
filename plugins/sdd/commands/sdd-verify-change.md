@@ -1,16 +1,16 @@
 ---
-name: sdd-verify-spec
+name: sdd-verify-change
 description: Verify implementation matches specification.
 ---
 
-# /sdd-verify-spec
+# /sdd-verify-change
 
 Verify implementation matches spec.
 
 ## Usage
 
 ```
-/sdd-verify-spec [path-to-spec]
+/sdd-verify-change [path-to-spec]
 ```
 
 ## Flow
@@ -103,4 +103,4 @@ Generate verification report:
 ## Example
 
 ```
-User: /sdd-verify-spec specs/changes/2026/01/11/user-auth/SPEC.md
+User: /sdd-verify-change specs/changes/2026/01/11/user-auth/SPEC.md

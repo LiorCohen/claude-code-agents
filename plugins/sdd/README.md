@@ -78,7 +78,7 @@ Specs → Plans → Implementation → Tests → Validation
 | `/sdd-init --name [name]` | Initialize new project from template |
 | `/sdd-new-change --type [type] --name [name]` | Create change spec and plan (feature, bugfix, or refactor) |
 | `/sdd-implement-change [path]` | Execute implementation plan |
-| `/sdd-verify-spec [path]` | Verify implementation matches spec |
+| `/sdd-verify-change [path]` | Verify implementation matches spec |
 | `/sdd-generate-snapshot` | Regenerate product snapshot |
 
 ### Architectural Patterns
@@ -130,7 +130,7 @@ Once installed, all commands, agents, and skills will be available immediately.
 └────────┬────────┘
          ↓
 ┌─────────────────┐
-│ 4. Verify       │  /sdd-verify-spec specs/changes/.../SPEC.md
+│ 4. Verify       │  /sdd-verify-change specs/changes/.../SPEC.md
 └─────────────────┘
 ```
 
@@ -154,7 +154,7 @@ You can also create multiple backend or frontend instances:
 **Implement and verify:**
 ```bash
 /sdd-implement-change specs/changes/2026/01/21/user-authentication/PLAN.md
-/sdd-verify-spec specs/changes/2026/01/21/user-authentication/SPEC.md
+/sdd-verify-change specs/changes/2026/01/21/user-authentication/SPEC.md
 ```
 
 ## Project Structure
@@ -293,7 +293,7 @@ src/
 6. Implement frontend with `frontend-dev` agent (consume generated types)
 7. Add tests with `tester` agent (Testkube)
 8. Review with `reviewer` and `db-advisor` agents
-9. Validate spec compliance with `/sdd-verify-spec`
+9. Validate spec compliance with `/sdd-verify-change`
 
 ## Validation Scripts
 
@@ -354,7 +354,7 @@ full-stack-spec-driven-dev/
 │   ├── sdd-init.md
 │   ├── sdd-new-change.md
 │   ├── sdd-implement-change.md
-│   ├── sdd-verify-spec.md
+│   ├── sdd-verify-change.md
 │   └── sdd-generate-snapshot.md
 ├── skills/                     # Reusable skills with colocated templates
 │   ├── backend-scaffolding/

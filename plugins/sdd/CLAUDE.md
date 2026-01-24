@@ -45,7 +45,7 @@ This plugin implements a **specification-driven workflow**:
 - `/sdd-init --name [name]` - Initialize new project structure
 - `/sdd-new-change --type [type] --name [name]` - Create spec and plan for new change
 - `/sdd-implement-change [path]` - Orchestrate implementation across agents
-- `/sdd-verify-spec [path]` - Verify implementation matches spec
+- `/sdd-verify-change [path]` - Verify implementation matches spec
 - `/sdd-generate-snapshot` - Regenerate product state snapshot
 
 ### Change Types
@@ -205,7 +205,7 @@ updated: YYYY-MM-DD
 6. Implement frontend with `frontend-dev` agent (consume generated types)
 7. Add tests with `tester` agent (Testkube)
 8. Review with `reviewer` and `db-advisor` agents
-9. Validate spec compliance with `/sdd-verify-spec`
+9. Validate spec compliance with `/sdd-verify-change`
 
 ## Important Files (For Generated Projects)
 

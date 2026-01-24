@@ -24,7 +24,7 @@ A comprehensive plugin for spec-driven development with React, Node.js, and Type
 - `/sdd-init` - Initialize new project
 - `/sdd-new-change` - Create change spec and plan
 - `/sdd-implement-change` - Execute implementation plan
-- `/sdd-verify-spec` - Verify implementation matches spec
+- `/sdd-verify-change` - Verify implementation matches spec
 - `/sdd-generate-snapshot` - Regenerate product snapshot
 
 **[Read full documentation →](./plugins/sdd/README.md)**
