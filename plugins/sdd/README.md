@@ -75,7 +75,7 @@ Agents are invoked by asking Claude to use them (e.g., "Use the planner agent to
 | tester | sonnet | Test automation via Testkube |
 | reviewer | opus | Code review and spec compliance |
 
-### 5 Slash Commands
+### 4 Slash Commands
 
 | Command | Purpose |
 |---------|---------|
@@ -83,20 +83,13 @@ Agents are invoked by asking Claude to use them (e.g., "Use the planner agent to
 | `/sdd-new-change --type [type] --name [name]` | Create change spec and plan (feature, bugfix, or refactor) |
 | `/sdd-implement-change [path]` | Execute implementation plan |
 | `/sdd-verify-change [path]` | Verify implementation matches spec |
-| `/sdd-generate-snapshot` | Regenerate product snapshot |
 
 ### Architectural Patterns
 - **CMDO Backend Architecture** - "Commando" (Controller Model DAL Operator) with strict infrastructure/domain separation
 - **MVVM Frontend Architecture** - Model-View-ViewModel with TanStack ecosystem
 - **Contract-First API Design** - OpenAPI specs generate TypeScript types for both frontend and backend
 - **Immutability Enforced** - `readonly` everywhere, no mutations, native JavaScript only
-- **OpenTelemetry by Default** - Full observability with structured logs, metrics, and traces
-
-### Built-in Observability
-- Structured logging with Pino + OpenTelemetry context injection
-- Standard metrics: HTTP request duration/count, DB operations, business operations
-- Custom spans for business operations with semantic attributes
-- Trace context propagation across services
+- **OpenTelemetry by Default** - Structured logging (Pino), standard metrics, custom spans, trace propagation
 
 ## Quick Start
 
@@ -166,14 +159,11 @@ your-project/
 └── .github/workflows/            # CI/CD pipelines
 ```
 
-## Core Principles
+## Technical Principles
 
-1. **Specifications are truth** - Every change lives in a SPEC.md before implementation
-2. **Issue tracking required** - Every spec must reference a tracking issue (JIRA, GitHub, etc.)
-3. **Git as state machine** - PR = draft spec, merged to main = active spec
-4. **Contract-first API** - OpenAPI specs generate TypeScript types for both frontend and backend
-5. **Test in Kubernetes** - Testkube for environment parity (integration/E2E tests run in K8s)
-6. **Observable by default** - OpenTelemetry for all services from day one
+1. **Contract-first API** - OpenAPI specs generate TypeScript types for both frontend and backend
+2. **Test in Kubernetes** - Testkube for environment parity (integration/E2E tests run in K8s)
+3. **Observable by default** - OpenTelemetry for all services from day one
 
 ## Backend Architecture: CMDO ("Commando")
 

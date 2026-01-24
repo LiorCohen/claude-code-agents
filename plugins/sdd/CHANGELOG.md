@@ -1,5 +1,31 @@
 # Changelog
 
+## [4.2.7] - 2026-01-24
+
+### Removed
+
+- **sdd-generate-snapshot command**: Removed standalone command
+  - INDEX.md is already updated by `sdd-new-change` when changes are created
+  - SNAPSHOT.md is updated by `sdd-init` during initialization
+  - For ongoing updates, users can ask Claude to regenerate SNAPSHOT.md directly
+
+## [4.2.6] - 2026-01-24
+
+### Changed
+
+- **README.md**: Consolidated "Built-in Observability" section into "Architectural Patterns"
+  - Removed redundant section; observability details now in OpenTelemetry bullet point
+  - Keeps README more concise
+
+## [4.2.5] - 2026-01-24
+
+### Changed
+
+- **README.md**: Consolidated overlapping "Core Methodology" and "Core Principles" sections
+  - Renamed "Core Principles" to "Technical Principles"
+  - Removed duplicate items already covered in "Core Methodology" (specs are truth, issue tracking, git as state machine)
+  - Kept unique technical principles (contract-first API, test in K8s, observable by default)
+
 ## [4.2.4] - 2026-01-24
 
 ### Fixed
