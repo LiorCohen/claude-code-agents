@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.2.3] - 2026-01-24
+
+### Changed
+
+- **README.md**: Moved installation instructions to marketplace README
+  - Plugin README now focuses on usage and features
+  - Installation lives at the marketplace level
+
 ## [4.2.2] - 2026-01-24
 
 ### Fixed

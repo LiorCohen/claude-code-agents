@@ -100,26 +100,6 @@ Agents are invoked by asking Claude to use them (e.g., "Use the planner agent to
 
 ## Quick Start
 
-### Installation
-
-Add the marketplace and install the SDD plugin using the Claude CLI:
-
-```bash
-claude plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
-claude plugin install sdd
-```
-
-Or inside Claude Code:
-
-```
-/plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
-/plugin install sdd
-```
-
-Once installed, all commands, agents, and skills will be available immediately.
-
-### Usage
-
 ```
 ┌─────────────────┐
 │ 1. Write Spec   │  /sdd-new-change --type feature --name user-auth

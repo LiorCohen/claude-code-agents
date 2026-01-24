@@ -12,10 +12,21 @@ Spec-driven development methodology for full-stack TypeScript/React teams.
 
 ## Installation
 
+Add the marketplace and install plugins using the Claude CLI:
+
 ```bash
 claude plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
 claude plugin install sdd
 ```
+
+Or inside Claude Code:
+
+```
+/plugin marketplace add https://github.com/LiorCohen/claude-code-plugins
+/plugin install sdd
+```
+
+Once installed, all commands, agents, and skills will be available immediately.
 
 ## Contributing
 
