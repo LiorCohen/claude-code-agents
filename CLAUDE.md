@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working with this repository.
 
 ## Git Rules
 
-- **NEVER push to remote** without explicit user approval (e.g., "push", "push it", "go ahead and push")
+- **NEVER push to remote** without explicit user approval
 - **NEVER commit** without first updating version and CHANGELOG when modifying plugin files
 - After making changes, STOP and report what was done - wait for user to request commit/push
 
@@ -12,161 +12,45 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Use the `commit` skill for ALL commits.
 
-## Repository Overview
-
-This is a **Claude Code plugin marketplace** that contains a collection of plugins for spec-driven development and full-stack engineering workflows. The marketplace organizes and distributes Claude Code plugins.
-
-## Marketplace Structure
+## Repository Structure
 
 ```
 claude-code-plugins/
 ├── .claude/
 │   └── skills/
-│       ├── commit/
-│       │   └── SKILL.md           # Commit workflow with version/changelog
-│       └── typescript-standards/
-│           └── SKILL.md           # TypeScript coding standards
+│       ├── commit/                   # Commit workflow with version/changelog
+│       └── typescript-standards/     # TypeScript coding standards
 ├── .claude-plugin/
-│   └── marketplace.json           # Marketplace manifest
+│   └── marketplace.json              # Marketplace manifest
 ├── plugins/
-│   └── sdd/                       # SDD plugin
-├── README.md                      # Marketplace overview
-├── CLAUDE.md                      # This file
-├── CHANGELOG.md                   # Marketplace changelog (infrastructure)
-└── CONTRIBUTING.md                # Contribution guidelines
+│   └── sdd/                          # SDD plugin (see plugins/sdd/README.md)
+├── tests/sdd/                        # Plugin tests
+├── README.md                         # Overview
+├── CLAUDE.md                         # This file
+├── CHANGELOG.md                      # Marketplace changelog
+└── CONTRIBUTING.md                   # Contribution guidelines
 ```
 
-## What is a Marketplace?
+## Plugin Documentation
 
-A Claude Code marketplace is a directory structure that:
-- Contains multiple plugins organized in subdirectories
-- Has a `marketplace.json` manifest listing all plugins
-- Allows Claude Code to discover and load plugins automatically
-- Provides a centralized location for related plugins
-
-## Available Plugins
-
-### Spec-Driven Development (SDD)
-**Directory:** `plugins/sdd/`
-**Description:** Comprehensive plugin for spec-driven development with React, Node.js, and TypeScript
-
-**For detailed information about this plugin, see:**
+For SDD plugin details, see:
 - [Plugin README](./plugins/sdd/README.md) - Complete documentation
+- [Plugin CLAUDE.md](./plugins/sdd/CLAUDE.md) - Plugin-specific guidance
 - [Plugin CHANGELOG](./plugins/sdd/CHANGELOG.md) - Version history
 
-## Working with This Marketplace
+## Commit Workflow
 
-### Adding a New Plugin
+**CRITICAL:** Before making ANY commit, follow the `commit` skill at `.claude/skills/commit/SKILL.md`.
 
-When adding a new plugin to this marketplace:
-
-1. **Create plugin directory** under `plugins/`:
-   ```
-   mkdir plugins/your-plugin-name
-   ```
-
-2. **Create plugin structure**:
-   ```
-   plugins/your-plugin-name/
-   ├── .claude-plugin/
-   │   └── plugin.json       # Required manifest
-   ├── agents/               # Optional: agent definitions
-   ├── commands/             # Optional: slash commands
-   ├── skills/               # Optional: reusable patterns
-   ├── README.md            # Required: plugin documentation
-   └── CHANGELOG.md         # Required: version history
-   ```
-
-3. **Update marketplace.json**:
-   ```json
-   {
-     "name": "lior-cohen-cc-plugins",
-     "owner": {
-       "name": "Lior Cohen"
-     },
-     "plugins": [
-       {
-         "name": "sdd",
-         "source": "./plugins/sdd",
-         "description": "...",
-         "version": "x.y.z"
-       },
-       {
-         "name": "your-plugin-name",
-         "source": "./plugins/your-plugin-name",
-         "description": "Brief description",
-         "version": "x.y.z"
-       }
-     ]
-   }
-   ```
-
-4. **Update root README.md** to list the new plugin
-
-5. **Commit all changes together**
-
-### Plugin Version Management
-
-Each plugin manages its own version independently:
-- Plugin version is stored in its `plugin.json` and the marketplace `marketplace.json`
-- Each plugin should maintain its own `CHANGELOG.md`
-- Version bumps should include corresponding changelog entries
-
-**Important:** Root marketplace files (like this CLAUDE.md) should NOT contain plugin-specific implementation details. Those belong in the plugin's own directory.
-
-### File Organization Rules
-
-**Root Level (Marketplace):**
-- `README.md` - Marketplace overview, plugin listing
-- `CLAUDE.md` - This file, marketplace structure guidance
-- `.claude-plugin/marketplace.json` - Marketplace manifest
-- Plugin directories (one per plugin)
-
-**Plugin Level:**
-- Each plugin directory contains all plugin-specific files
-- Plugin README.md contains comprehensive plugin documentation
-- Plugin CHANGELOG.md tracks plugin version history
-- Plugin CLAUDE.md (optional) can provide plugin-specific guidance
-
-## Mandatory Skills
-
-### Commit (ALWAYS USE)
-
-**CRITICAL:** Before making ANY commit, you MUST follow the `commit` skill located at `.claude/skills/commit/SKILL.md`.
-
-This skill ensures:
-- Version bumps in both `plugin.json` and `marketplace.json`
-- CHANGELOG entries for all version changes
-- Proper commit message format with Co-Authored-By
-
-**Quick reference:**
+Quick reference:
 ```
 Plugin file changed? → Bump version → Update CHANGELOG → Stage all → Commit
 ```
 
-See `commit` skill for the complete workflow.
-
-## Notes for Claude Code
-
-- This repository contains a **marketplace**, not individual plugins
-- When referencing a specific plugin, always look in its directory
-- Each plugin is independent and self-contained
-- Marketplace-level files should remain generic and not contain plugin implementation details
-- Plugin-specific documentation lives in plugin directories
-- **ALWAYS follow `commit` skill when committing**
+Version must be updated in BOTH:
+- `plugins/sdd/.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
 
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs/claude-code)
-- [Plugin Development Guide](https://docs.anthropic.com/claude/docs/claude-code-plugins)
-- [Claude Agent SDK](https://github.com/anthropics/anthropic-sdk-typescript)
-
-## Contributing
-
-When contributing to this marketplace:
-1. Follow the "Adding a New Plugin" section above
-2. Ensure plugin-specific content stays in plugin directories
-3. Keep root files focused on marketplace organization
-4. Update all relevant documentation (marketplace + plugin)
-5. Test plugin discovery and loading
-6. Submit pull request with clear description

@@ -1,41 +1,35 @@
-# Contributing to Claude Code Plugin Marketplace
+# Contributing to SDD Plugin
 
-This repository is a **Claude Code plugin marketplace** containing multiple plugins. Follow these guidelines when contributing.
+Guidelines for contributing to the Spec-Driven Development plugin.
 
 ## Repository Structure
-
-This is a marketplace, not a single plugin:
 
 ```
 claude-code-plugins/
 ├── .claude-plugin/
-│   └── marketplace.json              # Marketplace manifest
+│   └── marketplace.json          # Marketplace manifest
 ├── .claude/
-│   └── skills/                       # Marketplace-level skills (e.g., commit)
+│   └── skills/                   # Marketplace-level skills
+│       ├── commit/               # Commit workflow
+│       └── typescript-standards/ # TypeScript coding standards
 ├── plugins/
-│   └── sdd/                          # SDD plugin
+│   └── sdd/                      # SDD plugin
 │       ├── .claude-plugin/
-│       │   └── plugin.json           # Plugin manifest
-│       ├── agents/                   # Plugin agents
-│       ├── commands/                 # Plugin commands
-│       ├── skills/                   # Plugin skills
-│       ├── scripts/                  # Plugin utilities
-│       ├── README.md                 # Plugin documentation
-│       ├── CHANGELOG.md              # Plugin version history
-│       └── CLAUDE.md                 # Plugin-specific guidance
-├── README.md                         # Marketplace overview
-├── CLAUDE.md                         # Marketplace guidance
-├── CHANGELOG.md                      # Marketplace changelog (infrastructure)
-├── CONTRIBUTING.md                   # This file
-├── .gitignore
-└── .claudeignore
+│       │   └── plugin.json       # Plugin manifest
+│       ├── agents/               # Specialized agents
+│       ├── commands/             # Slash commands
+│       ├── skills/               # Reusable patterns
+│       ├── scripts/              # Utility scripts
+│       ├── README.md             # Plugin documentation
+│       ├── CHANGELOG.md          # Version history
+│       └── CLAUDE.md             # Plugin guidance
+├── tests/sdd/                    # Plugin tests
+├── README.md                     # Marketplace overview
+├── CLAUDE.md                     # Development guidance
+└── CHANGELOG.md                  # Marketplace changelog
 ```
 
-## Contributing to Existing Plugins
-
-### Working on the SDD Plugin
-
-When making changes to the `plugins/sdd` plugin:
+## Making Changes
 
 1. **Make your changes** to plugin files (agents, commands, skills, etc.)
 
@@ -53,17 +47,9 @@ When making changes to the `plugins/sdd` plugin:
    - Test affected commands/agents
    - Verify version numbers match
 
-5. **Commit all changes together**:
-   ```bash
-   git add plugins/sdd/ .claude-plugin/marketplace.json
-   git commit -m "Descriptive message about changes
+5. **Commit all changes together** using the `/commit` skill
 
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
-   ```
-
-### Semantic Versioning
+## Semantic Versioning
 
 We follow [Semantic Versioning](https://semver.org/):
 
@@ -71,153 +57,7 @@ We follow [Semantic Versioning](https://semver.org/):
 - **MINOR** (1.0.x → 1.1.0): New features, backwards compatible
 - **PATCH** (1.0.0 → 1.0.1): Bug fixes, documentation updates, small improvements
 
-### Example Workflow
-
-```bash
-# 1. Make your changes
-vim plugins/sdd/agents/backend-dev.md
-
-# 2. Update version in both locations
-# - plugins/sdd/.claude-plugin/plugin.json: 1.9.0 → 1.9.1
-# - .claude-plugin/marketplace.json: 1.9.0 → 1.9.1
-
-# 3. Update CHANGELOG.md
-vim plugins/sdd/CHANGELOG.md
-# Add [1.9.1] entry with description
-
-# 4. Test changes
-# Reload plugin in Claude Code and test
-
-# 5. Commit everything together
-git add plugins/sdd/ .claude-plugin/marketplace.json
-git commit -m "Enhance backend-dev agent with X feature, bump to 1.9.1
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
-```
-
-## Adding a New Plugin
-
-To add a new plugin to this marketplace:
-
-### 1. Create Plugin Directory
-
-```bash
-mkdir plugins/your-plugin-name
-cd plugins/your-plugin-name
-```
-
-### 2. Create Plugin Structure
-
-Required files:
-```
-plugins/your-plugin-name/
-├── .claude-plugin/
-│   └── plugin.json          # Required: plugin manifest
-├── README.md               # Required: plugin documentation
-├── CHANGELOG.md            # Required: version history
-└── CLAUDE.md               # Optional: plugin-specific guidance
-```
-
-Optional directories (as needed):
-```
-plugins/your-plugin-name/
-├── agents/                 # Specialized agents
-├── commands/               # Slash commands
-├── skills/                 # Reusable patterns
-├── templates/              # Project scaffolding
-└── scripts/                # Utility scripts
-```
-
-### 3. Create Plugin Manifest
-
-Create `.claude-plugin/plugin.json`:
-
-```json
-{
-  "name": "your-plugin-name",
-  "version": "1.0.0",
-  "description": "Brief description of your plugin",
-  "author": {
-    "name": "Your Name"
-  },
-  "commands": [
-    "./commands/command1.md",
-    "./commands/command2.md"
-  ]
-}
-```
-
-### 4. Update Marketplace Manifest
-
-Add your plugin to `.claude-plugin/marketplace.json`:
-
-```json
-{
-  "name": "lior-cohen-cc-plugins",
-  "owner": {
-    "name": "Lior Cohen"
-  },
-  "plugins": [
-    {
-      "name": "sdd",
-      "source": "./plugins/sdd",
-      "description": "Spec-driven development methodology for full-stack teams",
-      "version": "4.1.1"
-    },
-    {
-      "name": "your-plugin-name",
-      "source": "./plugins/your-plugin-name",
-      "description": "Brief description of your plugin",
-      "version": "1.0.0"
-    }
-  ]
-}
-```
-
-### 5. Update Marketplace README
-
-Add your plugin to the root `README.md` under "Available Plugins":
-
-```markdown
-### [Your Plugin Name](./plugins/your-plugin-name/)
-
-**Version:** 1.0.0
-
-Brief description and key features.
-
-**[Read full documentation →](./plugins/your-plugin-name/README.md)**
-```
-
-### 6. Commit and Submit
-
-```bash
-git add .
-git commit -m "Add your-plugin-name plugin v1.0.0
-
-Description of what the plugin does.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Your Name <your-email>"
-
-# Push and create pull request
-git push origin your-branch-name
-```
-
-## Guidelines
-
-### Version Management
-
-- **Each plugin manages its own version** independently
-- Plugin version must be updated in TWO places:
-  1. Plugin's own `plugin.json`
-  2. Marketplace's `marketplace.json`
-- Both versions must match exactly
-- Every plugin version bump requires a plugin CHANGELOG entry
-
-### Changelog Management
+## Changelogs
 
 **Two separate changelogs:**
 
@@ -231,29 +71,7 @@ git push origin your-branch-name
    - Date-based entries (no version numbers)
    - Covers: root docs, ignore files, marketplace skills, test infrastructure
 
-### File Organization
-
-**Root Level (Marketplace):**
-- Only marketplace-wide files (README, CLAUDE.md, marketplace.json)
-- No plugin-specific implementation details
-- Focus on marketplace organization and plugin discovery
-
-**Plugin Level:**
-- All plugin-specific content in plugin directory
-- Each plugin is self-contained
-- Plugin README contains comprehensive documentation
-- Plugin CHANGELOG tracks version history
-
-### Documentation
-
-- **Root README**: Marketplace overview and plugin listing
-- **Root CHANGELOG**: Marketplace infrastructure changes
-- **Root CLAUDE.md**: Marketplace structure guidance
-- **Plugin README**: Comprehensive plugin documentation
-- **Plugin CHANGELOG**: Plugin version history
-- **Plugin CLAUDE.md**: Plugin-specific guidance for Claude Code
-
-### Testing
+## Testing
 
 Before committing:
 1. Test plugin functionality in Claude Code
@@ -261,36 +79,7 @@ Before committing:
 3. Check version numbers match across files
 4. Ensure CHANGELOG entry is complete
 
-### Commit Messages
-
-Use descriptive commit messages:
-
-```
-[Action] [Component]: [Description]
-
-Detailed explanation if needed.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: [Name] <[email]>
-```
-
-Examples:
-- `Enhance backend-dev agent: Add dotenv support, bump to 1.9.1`
-- `Add new-plugin: Initial implementation v1.0.0`
-- `Fix api-designer agent: Correct operationId generation, bump to 1.9.2`
-- `Update marketplace README: Add installation instructions`
-
-## Getting Help
-
-- Check plugin-specific `README.md` for plugin documentation
-- Check `CLAUDE.md` files for guidance (root and plugin-level)
-- Review existing plugins for examples
-- Open an issue for questions or problems
-
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs/claude-code)
-- [Plugin Development Guide](https://docs.anthropic.com/claude/docs/claude-code-plugins)
-- [Claude Agent SDK](https://github.com/anthropics/anthropic-sdk-typescript)
 - [Semantic Versioning](https://semver.org/)

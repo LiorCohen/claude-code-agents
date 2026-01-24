@@ -6,12 +6,15 @@ Changes to the marketplace infrastructure (not plugin-specific changes).
 
 ### Changed
 
+- **Documentation**: Simplified for single-plugin repository
+  - Removed multi-plugin documentation from CONTRIBUTING.md and CLAUDE.md
+  - This marketplace contains only the SDD plugin
+
 - **Root README**: Simplified to remove redundancy with plugin README
   - Removed duplicate features, commands, and structure sections
   - Now links to plugin README for full documentation
 
 - **Directory structure**: Moved plugin from `full-stack-spec-driven-dev/` to `plugins/sdd/`
-  - Establishes cleaner multi-plugin marketplace structure
   - Updated all path references in marketplace files, commit skill, and test infrastructure
 
 - **Commit skill**: Moved `scripts/bump-version.sh` to `.claude/skills/commit/`
