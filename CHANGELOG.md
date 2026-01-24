@@ -10,6 +10,10 @@ Changes to the marketplace infrastructure (not plugin-specific changes).
   - Establishes cleaner multi-plugin marketplace structure
   - Updated all path references in marketplace files, commit skill, and test infrastructure
 
+- **Commit skill**: Moved `scripts/bump-version.sh` to `.claude/skills/commit/`
+  - Consolidates version management tooling with commit workflow
+  - Updated script paths to use `plugins/sdd/` structure
+
 ---
 
 ## 2026-01-24 (earlier)

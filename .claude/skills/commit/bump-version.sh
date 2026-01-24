@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # File paths
-PLUGIN_JSON="plugin/.claude-plugin/plugin.json"
+PLUGIN_JSON="plugins/sdd/.claude-plugin/plugin.json"
 MARKETPLACE_JSON=".claude-plugin/marketplace.json"
 
 # Check if files exist
@@ -65,8 +65,8 @@ echo -e "${GREEN}✓ Updated $PLUGIN_JSON${NC}"
 jq ".plugins[0].version = \"$NEW_VERSION\"" "$MARKETPLACE_JSON" > "$MARKETPLACE_JSON.tmp" && mv "$MARKETPLACE_JSON.tmp" "$MARKETPLACE_JSON"
 echo -e "${GREEN}✓ Updated $MARKETPLACE_JSON${NC}"
 
-# Update TODO.md with current version
-TODO_FILE="plugin/TODO.md"
+# Update TODO.md with current version (if exists)
+TODO_FILE="plugins/sdd/TODO.md"
 if [[ -f "$TODO_FILE" ]]; then
     sed -i.bak "s/Current version: .*/Current version: $NEW_VERSION/" "$TODO_FILE"
     rm -f "$TODO_FILE.bak"
