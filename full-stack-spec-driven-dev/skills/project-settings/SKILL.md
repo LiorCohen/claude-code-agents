@@ -31,6 +31,7 @@ components:
   # Single-instance components (boolean)
   contract: true
   config: true
+  database: true
   helm: false
   testing: true
   cicd: true
@@ -58,6 +59,7 @@ These components only support one instance:
 |-----------|--------|---------|
 | `contract` | `true/false` | `contract: true` |
 | `config` | `true/false` | `config: true` |
+| `database` | `true/false` | `database: true` |
 | `helm` | `true/false` | `helm: false` |
 | `testing` | `true/false` | `testing: true` |
 | `cicd` | `true/false` | `cicd: true` |
@@ -132,6 +134,7 @@ Initialize a new settings file.
      contract: <components.contract or false>
      server: <components.server or false>      # Can be true, false, or list
      webapp: <components.webapp or false>      # Can be true, false, or list
+     database: <components.database or false>
      config: <components.config or false>
      helm: <components.helm or false>
      testing: <components.testing or false>
@@ -159,6 +162,7 @@ Input:
     contract: true
     server: true
     webapp: true
+    database: false
     config: true
     helm: false
     testing: true
@@ -314,6 +318,7 @@ None (reads from settings)
 directories:
   contract: "components/contract"           # or null if disabled
   config: "components/config"               # always present
+  database: "components/database"           # or null if disabled
   server:                                   # list of server directories
     - "components/server"                   # if server: true
     # OR
@@ -357,6 +362,7 @@ Valid values for `project.type`:
 **Single-instance components** (boolean only):
 - `contract` - OpenAPI specification
 - `config` - YAML configuration
+- `database` - PostgreSQL migrations and seeds
 - `helm` - Kubernetes Helm charts
 - `testing` - Test setup (Testkube)
 - `cicd` - GitHub Actions workflows

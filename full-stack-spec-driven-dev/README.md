@@ -157,6 +157,7 @@ your-project/
 │   ├── contract/                 # OpenAPI specs (types generated here)
 │   ├── server/                   # Node.js backend (CMDO architecture)
 │   ├── webapp/                   # React frontend (MVVM architecture)
+│   ├── database/                 # PostgreSQL migrations, seeds, scripts
 │   ├── helm/                     # Kubernetes deployment charts
 │   └── testing/                  # Testkube test definitions
 └── .github/workflows/            # CI/CD pipelines

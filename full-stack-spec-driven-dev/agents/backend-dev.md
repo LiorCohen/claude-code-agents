@@ -22,6 +22,22 @@ Default: `components/server/src/`
 
 For multi-instance projects, check `sdd-settings.yaml` for the actual server component names (e.g., `server-api/`, `server-worker/`).
 
+## Database Component
+
+If the project includes `components/database/`:
+
+| Directory | Purpose |
+|-----------|---------|
+| `migrations/` | Sequential SQL migration files (001_initial.sql, 002_add_users.sql) |
+| `seeds/` | Idempotent seed data using ON CONFLICT |
+| `scripts/` | Management scripts (migrate.sh, seed.sh, reset.sh) |
+
+When implementing features that need database changes:
+1. Create migration file in `components/database/migrations/`
+2. Add seed data if needed in `components/database/seeds/`
+3. Implement DAL layer in server component
+4. See `postgresql` skill for SQL patterns and best practices
+
 ## Type Consumption
 
 Consume generated types from contract via `import type { User, CreateUserRequest } from '../types/generated';`

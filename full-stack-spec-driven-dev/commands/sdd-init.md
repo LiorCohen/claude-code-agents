@@ -117,13 +117,21 @@ Prompt the user for the following information (use extracted values from externa
    - Testing (Testkube setup)
    - CI/CD (GitHub Actions)
 
-   **Option C: Frontend Only** (requires external API)
+   **Option C: Backend with Database**
+   - Contract (OpenAPI spec)
+   - Server (Node.js backend)
+   - Database (PostgreSQL)
+   - Config (YAML configuration)
+   - Testing (Testkube setup)
+   - CI/CD (GitHub Actions)
+
+   **Option D: Frontend Only** (requires external API)
    - Webapp (React frontend)
    - Config (YAML configuration)
    - Testing (Testkube setup)
    - CI/CD (GitHub Actions)
 
-   **Option D: Custom** (manual selection with dependency validation)
+   **Option E: Custom** (manual selection with dependency validation)
 
    **Component Dependencies:**
    | Component | Requires | Notes |
@@ -131,6 +139,7 @@ Prompt the user for the following information (use extracted values from externa
    | Contract | Server | OpenAPI spec needs a backend to implement it |
    | Server | Contract | Backend requires API contract |
    | Webapp | - | Can work standalone with external API |
+   | Database | Server | PostgreSQL database for backend data persistence |
    | Config | - | Always required for all project types |
    | Helm | Server | Kubernetes deployment is for backend services |
    | Testing | Server or Webapp | Tests need something to test |
@@ -210,6 +219,7 @@ Display a summary of what will be created:
 │   ├── contract/          # OpenAPI specs (if selected)
 │   ├── server/            # Node.js backend (if selected)
 │   ├── webapp/            # React frontend (if selected)
+│   ├── database/          # PostgreSQL migrations/seeds (if selected)
 │   ├── config/            # YAML configuration (if selected)
 │   ├── helm/              # Kubernetes deployment (if selected)
 │   └── testing/           # Testkube tests (if selected)
@@ -248,6 +258,7 @@ Input:
     contract: <true if selected>
     server: <true if selected>
     webapp: <true if selected>
+    database: <true if selected>
     config: <true if selected>
     helm: <true if selected>
     testing: <true if selected>
@@ -524,5 +535,6 @@ Templates are colocated with their scaffolding skills:
 | `backend-scaffolding` | `skills/backend-scaffolding/templates/` | Server component (CMDO) |
 | `frontend-scaffolding` | `skills/frontend-scaffolding/templates/` | Webapp component (MVVM) |
 | `contract-scaffolding` | `skills/contract-scaffolding/templates/` | OpenAPI contract |
+| `database-scaffolding` | `skills/database-scaffolding/templates/` | PostgreSQL database |
 
 The main `scaffolding` skill orchestrates these component skills.

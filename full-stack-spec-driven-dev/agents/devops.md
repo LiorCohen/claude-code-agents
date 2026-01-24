@@ -36,6 +36,7 @@ components/helm/your-app/
 └── templates/
     ├── deployment-server.yaml      # One per server instance
     ├── deployment-webapp.yaml      # One per webapp instance
+    ├── deployment-database.yaml    # PostgreSQL StatefulSet (if database component)
     ├── service.yaml
     ├── ingress.yaml
     ├── configmap.yaml
@@ -81,6 +82,22 @@ spec:
 Projects may have multiple server and webapp instances (e.g., `server-api`, `server-worker`, `webapp-admin`). Check `sdd-settings.yaml` for actual component names. Each instance needs:
 - Its own Dockerfile
 - Its own deployment template in Helm
+
+## Database Component
+
+If the project includes `components/database/`:
+
+| Directory | Purpose |
+|-----------|---------|
+| `components/database/migrations/` | Sequential SQL migration files |
+| `components/database/seeds/` | Idempotent seed data |
+| `components/database/scripts/` | Management scripts (migrate, seed, reset) |
+
+For Kubernetes deployments with database:
+- Use PostgreSQL StatefulSet or external managed database
+- Run migrations as init containers or Jobs
+- Store database credentials in sealed-secrets
+- See `postgresql` skill for SQL patterns
 
 ## Responsibilities
 

@@ -6,3 +6,10 @@ node_modules/
 
 # Test outputs
 test-apps/
+scripts/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

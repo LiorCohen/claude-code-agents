@@ -50,6 +50,7 @@ This is a multi-component monorepo. Check `sdd-settings.yaml` for actual compone
 | Contract | `components/contract/` | OpenAPI spec | `api-designer` |
 | Server | `components/server/` | Backend (CMDO) | `backend-dev` |
 | Webapp | `components/webapp/` | React frontend | `frontend-dev` |
+| Database | `components/database/` | PostgreSQL migrations/seeds | `backend-dev` |
 | Helm | `components/helm/` | Kubernetes deployment | `devops` |
 | Testing | `components/testing/` | Testkube test definitions | `tester` |
 

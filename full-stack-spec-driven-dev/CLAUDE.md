@@ -76,6 +76,15 @@ python scripts/generate-index.py --specs-dir specs/
 python scripts/generate-snapshot.py --specs-dir specs/
 ```
 
+## Core Architectural Patterns
+
+| Pattern | Component | Description |
+|---------|-----------|-------------|
+| **CMDO** | Server | Controller Model DAL Operator - strict infrastructure/domain separation |
+| **MVVM** | Webapp | Model-View-ViewModel with TanStack ecosystem |
+| **Database** | Database | PostgreSQL migrations, seeds, management scripts |
+| **Contract-First** | Contract | OpenAPI specs generate TypeScript types |
+
 ## Backend Architecture: CMDO ("Commando")
 
 The `backend-dev` agent enforces strict **C**ontroller **M**odel **D**AL **O**perator architecture:

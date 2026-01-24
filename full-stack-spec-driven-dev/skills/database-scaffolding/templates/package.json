@@ -1,0 +1,9 @@
+{
+  "name": "{{PROJECT_NAME}}-database",
+  "private": true,
+  "scripts": {
+    "migrate": "./scripts/migrate.sh",
+    "seed": "./scripts/seed.sh",
+    "reset": "./scripts/reset.sh"
+  }
+}

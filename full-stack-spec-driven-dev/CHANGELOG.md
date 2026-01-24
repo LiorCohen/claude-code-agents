@@ -1,5 +1,42 @@
 # Changelog
 
+## [3.9.0] - 2026-01-24
+
+### Added
+
+- **database-scaffolding skill**: New component type for PostgreSQL database scaffolding
+  - Creates `components/database/` with migrations, seeds, and scripts directories
+  - Includes `package.json` with npm scripts for migrate, seed, and reset
+  - `migrations/001_initial_schema.sql` template with transaction support
+  - `seeds/001_seed_data.sql` template demonstrating idempotent patterns
+  - Shell scripts: `migrate.sh`, `seed.sh`, `reset.sh` with safety checks
+  - `README.md` with usage documentation
+
+- **sdd-init command**: Added "Backend with Database" project type (Option C)
+  - Scaffolds contract, server, database, config, testing, and cicd components
+  - Database component listed in component dependencies table
+
+- **database component tests**: 30 unit tests covering database scaffolding
+  - Skill structure validation
+  - Template content verification
+  - Scaffolding script integration tests
+  - Documentation consistency checks
+
+### Changed
+
+- **scaffolding skill**: Updated to support database component
+  - Added database-scaffolding to architecture table
+  - Added to available components and presets
+  - Updated scaffolding order documentation
+
+- **project-settings skill**: Added database to settings schema
+  - Single-instance boolean component (like config, helm)
+  - Added to component format documentation
+
+- **planner agent**: Added Database to standard components table
+- **backend-dev agent**: Added database component awareness and workflow guidance
+- **devops agent**: Added database deployment patterns for Kubernetes
+
 ## [3.8.0] - 2026-01-23
 
 ### Added

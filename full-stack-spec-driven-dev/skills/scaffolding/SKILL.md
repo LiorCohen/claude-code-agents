@@ -17,6 +17,7 @@ This skill coordinates multiple component scaffolding skills:
 | `backend-scaffolding` | Server components (CMDO) | `skills/backend-scaffolding/templates/` |
 | `frontend-scaffolding` | Webapp components (MVVM) | `skills/frontend-scaffolding/templates/` |
 | `contract-scaffolding` | OpenAPI contract | `skills/contract-scaffolding/templates/` |
+| `database-scaffolding` | PostgreSQL database | `skills/database-scaffolding/templates/` |
 
 ## When to Use
 
@@ -93,6 +94,7 @@ Creates: `components/server-api/`, `components/server-worker/`, `components/weba
 | `contract` | `contract-scaffolding` | No |
 | `server` | `backend-scaffolding` | Yes |
 | `webapp` | `frontend-scaffolding` | Yes |
+| `database` | `database-scaffolding` | No |
 | `config` | `project-scaffolding` | No (always included) |
 | `helm` | (inline) | No |
 | `testing` | (inline) | No |
@@ -125,6 +127,11 @@ Creates: `components/server-api/`, `components/server-worker/`, `components/weba
 ["contract", "server", "webapp:admin", "webapp:public", "config", "testing", "cicd"]
 ```
 
+**Backend with Database:**
+```json
+["contract", "server", "database", "config", "testing", "cicd"]
+```
+
 ## Scaffolding Order
 
 The script executes in this order:
@@ -133,7 +140,8 @@ The script executes in this order:
 2. **Contract scaffolding** - OpenAPI spec (if selected)
 3. **Backend scaffolding** - Server components (for each instance)
 4. **Frontend scaffolding** - Webapp components (for each instance)
-5. **Infrastructure** - Helm, testing, CI/CD (inline, if selected)
+5. **Database scaffolding** - Migrations, seeds, scripts (if selected)
+6. **Infrastructure** - Helm, testing, CI/CD (inline, if selected)
 
 ## Template Locations
 
@@ -156,6 +164,9 @@ skills/
 ├── contract-scaffolding/
 │   ├── SKILL.md
 │   └── templates/            # openapi.yaml, package.json
+├── database-scaffolding/
+│   ├── SKILL.md
+│   └── templates/            # migrations/, seeds/, scripts/
 └── scaffolding/
     ├── SKILL.md              # This file (orchestrator)
     └── scaffolding.py        # Python script

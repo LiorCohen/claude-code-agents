@@ -129,6 +129,7 @@ def scaffold_project(config: Config) -> dict:
     backend_templates = skills_dir / "backend-scaffolding" / "templates"
     frontend_templates = skills_dir / "frontend-scaffolding" / "templates"
     contract_templates = skills_dir / "contract-scaffolding" / "templates"
+    database_templates = skills_dir / "database-scaffolding" / "templates"
 
     # Parse all components
     parsed_components = [parse_component(c) for c in components_raw]
@@ -253,6 +254,17 @@ dist/
         create_directory(target / ".github/workflows", config)
         created_dirs.append(".github/workflows")
 
+    if "database" in component_types:
+        database_dirs = [
+            "components/database",
+            "components/database/migrations",
+            "components/database/seeds",
+            "components/database/scripts",
+        ]
+        for d in database_dirs:
+            create_directory(target / d, config)
+            created_dirs.append(d)
+
     # -------------------------------------------------------------------------
     # Step 3: Copy and customize template files
     # -------------------------------------------------------------------------
@@ -294,12 +306,13 @@ This document describes the architecture of {config['project_name']}.
     static_descriptions = {
         "contract": "- **Contract** (`components/contract/`): OpenAPI specifications and type generation",
         "config": "- **Config** (`components/config/`): YAML-based configuration management",
+        "database": "- **Database** (`components/database/`): PostgreSQL migrations, seeds, and management scripts",
         "helm": "- **Helm** (`components/helm/`): Kubernetes deployment charts",
         "testing": "- **Testing** (`components/testing/`): Testkube test definitions",
     }
 
     # Add static components
-    for comp_type in ["contract", "config", "helm", "testing"]:
+    for comp_type in ["contract", "config", "database", "helm", "testing"]:
         if comp_type in component_types:
             arch_content += static_descriptions[comp_type] + "\n"
 
@@ -378,6 +391,17 @@ This document describes the architecture of {config['project_name']}.
                     dest_file = target / f"components/{dir_name}" / rel_path
                     copy_template_file(src_file, dest_file, config)
                     created_files.append(f"components/{dir_name}/{rel_path}")
+
+    # Database component (from database-scaffolding skill)
+    if "database" in component_types:
+        if database_templates.exists():
+            # Walk through all database template files
+            for src_file in database_templates.rglob("*"):
+                if src_file.is_file():
+                    rel_path = src_file.relative_to(database_templates)
+                    dest_file = target / "components/database" / rel_path
+                    copy_template_file(src_file, dest_file, config)
+                    created_files.append(f"components/database/{rel_path}")
 
     # CI/CD workflows
     if "cicd" in component_types:

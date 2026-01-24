@@ -1,0 +1,17 @@
+Run /sdd-init to create a new Backend with Database project.
+
+Configuration:
+- Project name: test-backend-db-project
+- Description: A test project with backend and database components
+- Domain: Testing
+- Type: Backend with Database (Option C)
+
+THIS IS AN AUTOMATED TEST. You MUST:
+1. Skip ALL questions and use the values above
+2. Skip Phase 3 approval - consider it PRE-APPROVED
+3. Proceed DIRECTLY to Phase 4 (file creation)
+4. Create the project as a subdirectory: ./test-backend-db-project/
+5. Execute ALL steps through completion
+6. Do NOT stop for user input at any point
+
+The user has already approved. Execute the full sdd-init workflow now.
