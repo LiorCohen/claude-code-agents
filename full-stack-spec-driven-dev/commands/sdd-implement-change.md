@@ -1,21 +1,21 @@
 ---
-name: sdd-implement-plan
+name: sdd-implement-change
 description: Implement a change by executing its implementation plan.
 ---
 
-# /sdd-implement-plan
+# /sdd-implement-change
 
 Implement a change by executing its implementation plan.
 
 ## Usage
 
 ```
-/sdd-implement-plan [path-to-plan]
+/sdd-implement-change [path-to-plan]
 ```
 
 Example:
 ```
-/sdd-implement-plan specs/changes/2026/01/11/user-auth/PLAN.md
+/sdd-implement-change specs/changes/2026/01/11/user-auth/PLAN.md
 ```
 
 ## Flow
@@ -174,7 +174,7 @@ Before declaring implementation complete, you MUST:
 ## Example
 
 ```
-User: /sdd-implement-plan specs/changes/2026/01/11/user-auth/PLAN.md
+User: /sdd-implement-change specs/changes/2026/01/11/user-auth/PLAN.md
 
 Agent: Step 1: Loading spec and plan...
 Agent: ✓ Read PLAN.md

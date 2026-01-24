@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.1.0] - 2026-01-24
+
+### Changed
+
+- **sdd-implement-plan command**: Renamed to `/sdd-implement-change`
+  - Better naming consistency with the change-centric workflow
+  - Updated all references in documentation (README, QUICKSTART, CLAUDE.md)
+  - Updated project scaffolding templates
+  - Updated sdd-init command output messages
+
 ## [4.0.0] - 2026-01-24
 
 ### Changed

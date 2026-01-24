@@ -64,7 +64,7 @@ sdd/
 ├── commands/                   # 5 slash commands
 │   ├── sdd-init.md
 │   ├── sdd-new-change.md
-│   ├── sdd-implement-plan.md
+│   ├── sdd-implement-change.md
 │   ├── sdd-verify-spec.md
 │   └── sdd-generate-snapshot.md
 └── scripts/                    # Utility scripts
@@ -94,7 +94,7 @@ This plugin is designed to work with Claude Code. Once loaded, you'll have acces
 **Commands:**
 - `/sdd-init --name [name]` - Initialize new project
 - `/sdd-new-change --type [type] --name [name]` - Start new change (feature, bugfix, refactor)
-- `/sdd-implement-plan [path]` - Implement a plan
+- `/sdd-implement-change [path]` - Implement a plan
 - `/sdd-verify-spec [path]` - Verify implementation
 - `/sdd-generate-snapshot` - Regenerate product snapshot
 
@@ -153,7 +153,7 @@ This will:
 
 ```bash
 # In Claude Code
-/sdd-implement-plan specs/changes/YYYY/MM/DD/user-authentication/PLAN.md
+/sdd-implement-change specs/changes/YYYY/MM/DD/user-authentication/PLAN.md
 ```
 
 This orchestrates all agents to:

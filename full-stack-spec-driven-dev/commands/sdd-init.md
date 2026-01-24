@@ -619,7 +619,7 @@ Note: INDEX.md is updated by the `change-creation` skill for each change. This s
 Suggested implementation order: change-1 → change-2 → ...
 
 Next step: Start with the first change:
-  /sdd-implement-plan specs/changes/YYYY/MM/DD/change-1/PLAN.md
+  /sdd-implement-change specs/changes/YYYY/MM/DD/change-1/PLAN.md
 ```
 
 ### Step 7: Initialize git repository
@@ -671,7 +671,7 @@ After ALL steps are done:
       - specs/INDEX.md (lists all changes with links)
       - specs/domain/glossary.md (extracted domain terms)
    4. Start implementing the first change:
-      /sdd-implement-plan specs/changes/YYYY/MM/DD/<first-change>/PLAN.md
+      /sdd-implement-change specs/changes/YYYY/MM/DD/<first-change>/PLAN.md
    5. After completing each change, proceed to the next in order.
    ```
 

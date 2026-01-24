@@ -73,7 +73,7 @@ Agents handle different aspects of the development lifecycle:
 Project lifecycle automation:
 - `/sdd-init` - Initialize new project from template
 - `/sdd-new-change` - Create change spec and plan (feature, bugfix, or refactor)
-- `/sdd-implement-plan` - Execute implementation plan
+- `/sdd-implement-change` - Execute implementation plan
 - `/sdd-verify-spec` - Verify implementation matches spec
 - `/sdd-generate-snapshot` - Regenerate product snapshot
 
@@ -129,7 +129,7 @@ Once installed, all commands, agents, and skills will be available immediately.
 
 4. **Review the generated spec and plan**, then implement:
    ```
-   /sdd-implement-plan specs/changes/2026/01/21/user-authentication/PLAN.md
+   /sdd-implement-change specs/changes/2026/01/21/user-authentication/PLAN.md
    ```
 
 5. **Verify implementation matches spec**:

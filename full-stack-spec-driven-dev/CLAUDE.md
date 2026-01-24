@@ -44,7 +44,7 @@ This plugin implements a **specification-driven workflow**:
 
 - `/sdd-init --name [name]` - Initialize new project structure
 - `/sdd-new-change --type [type] --name [name]` - Create spec and plan for new change
-- `/sdd-implement-plan [path]` - Orchestrate implementation across agents
+- `/sdd-implement-change [path]` - Orchestrate implementation across agents
 - `/sdd-verify-spec [path]` - Verify implementation matches spec
 - `/sdd-generate-snapshot` - Regenerate product state snapshot
 

@@ -49,7 +49,7 @@ cd components/webapp && npm run dev
 |---------|---------|
 | `/sdd-init --name [name]` | Initialize new project |
 | `/sdd-new-change --type [type] --name [name]` | Start new change (feature, bugfix, refactor) |
-| `/sdd-implement-plan [path]` | Implement a plan |
+| `/sdd-implement-change [path]` | Implement a plan |
 | `/sdd-verify-spec [path]` | Verify implementation |
 | `/sdd-generate-snapshot` | Regenerate snapshot |
 
