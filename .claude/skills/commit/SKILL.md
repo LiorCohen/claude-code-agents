@@ -43,7 +43,7 @@ For each affected plugin, check if version bump is needed:
 - Root `README.md`
 - Root `CLAUDE.md`
 - Root `CONTRIBUTING.md`
-- Root `CHANGELOG.md` (marketplace changelog)
+- Root `CHANGELOG.md` (infrastructure entries only - versioned entries need version bump)
 - `.claude/skills/` (marketplace-level skills)
 - `.gitignore`
 - `.claudeignore`
@@ -60,20 +60,12 @@ Update BOTH files:
 
 ### Step 3: Changelog Check
 
-**Two separate changelogs exist:**
+**Single consolidated CHANGELOG** (`CHANGELOG.md` at root):
 
-1. **Plugin CHANGELOG** (`plugins/sdd/CHANGELOG.md`):
-   - Updated when plugin files change (agents, commands, skills, templates, scripts)
-   - Tied to plugin version numbers
-   - Format: `## [x.y.z] - YYYY-MM-DD`
+- **Plugin changes**: Format `## [x.y.z] - YYYY-MM-DD` (versioned releases)
+- **Infrastructure changes**: Format `## Infrastructure - YYYY-MM-DD` (date-based)
 
-2. **Marketplace CHANGELOG** (`CHANGELOG.md` at root):
-   - Updated when marketplace infrastructure changes
-   - No version numbers (date-based entries)
-   - Covers: root docs, ignore files, marketplace skills, test infrastructure
-   - Format: `## YYYY-MM-DD`
-
-If plugin version was bumped, ensure plugin CHANGELOG.md has an entry:
+If plugin version was bumped, ensure CHANGELOG.md has a versioned entry:
 
 ```markdown
 ## [x.y.z] - YYYY-MM-DD
@@ -188,7 +180,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 Files to commit:
 - plugins/sdd/agents/backend-dev.md
 - plugins/sdd/.claude-plugin/plugin.json
-- plugins/sdd/CHANGELOG.md
+- CHANGELOG.md
 - .claude-plugin/marketplace.json
 
 Proceed with commit? (yes/edit/no)
@@ -203,16 +195,16 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 ## Quick Reference
 
 ```
-Plugin file changed? → Bump version → Update plugin CHANGELOG → Stage all → Commit
-Marketplace file changed? → Update marketplace CHANGELOG → Stage all → Commit
+Plugin file changed? → Bump version → Add versioned entry to CHANGELOG.md → Stage all → Commit
+Infrastructure file changed? → Add Infrastructure entry to CHANGELOG.md → Stage all → Commit
 ```
 
 ## Common Mistakes to Avoid
 
 1. **Forgetting version bump** - Always bump version for plugin file changes
 2. **Mismatched versions** - plugin.json and marketplace.json must match
-3. **Missing CHANGELOG** - Every change needs a CHANGELOG entry (plugin or marketplace)
-4. **Wrong CHANGELOG** - Plugin changes go to plugin CHANGELOG, marketplace changes go to root CHANGELOG
+3. **Missing CHANGELOG** - Every change needs a CHANGELOG entry (versioned or Infrastructure)
+4. **Wrong entry format** - Plugin changes use `## [x.y.z] - YYYY-MM-DD`, infrastructure uses `## Infrastructure - YYYY-MM-DD`
 5. **Wrong commit format** - Must include Co-Authored-By
 6. **Staging incomplete** - Must include all version files in same commit
 7. **Wrong date in CHANGELOG** - Use today's date
@@ -230,7 +222,7 @@ echo "Marketplace version:"
 cat .claude-plugin/marketplace.json | grep version
 
 # Check CHANGELOG has entry for new version
-head -20 plugins/sdd/CHANGELOG.md
+head -20 CHANGELOG.md
 
 # Check staged files
 git status
