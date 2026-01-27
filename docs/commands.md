@@ -34,14 +34,14 @@ Initialize a new SDD project.
 
 ## /sdd-new-change
 
-Start a new feature, bugfix, or refactor.
+Start a new feature, bugfix, refactor, or epic.
 
 ```
 /sdd-new-change --type <type> --name <name>
 ```
 
 **Arguments:**
-- `--type` (required) - One of: `feature`, `bugfix`, `refactor`
+- `--type` (required) - One of: `feature`, `bugfix`, `refactor`, `epic`
 - `--name` (required) - Short identifier for the change
 
 **What it does:**

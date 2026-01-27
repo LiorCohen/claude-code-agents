@@ -8,6 +8,18 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## [4.3.0] - 2026-01-27
+
+### Added
+
+- **epic change type**: Add `epic` as a fourth change type alongside feature, bugfix, and refactor
+  - Epics group multiple feature-type changes under a single goal
+  - Child changes live in a `changes/` subdirectory with their own SPEC.md and PLAN.md
+  - Updated skills: spec-writing, planning, epic-planning, change-creation, spec-decomposition
+  - Updated agents: spec-writer, planner
+  - Updated commands: sdd-new-change, sdd-implement-change, sdd-verify-change
+  - Updated docs: README, workflows, commands
+
 ## Infrastructure - 2026-01-26
 
 ### Added

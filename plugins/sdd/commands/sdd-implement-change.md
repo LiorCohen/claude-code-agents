@@ -113,6 +113,19 @@ For each phase in the plan:
 - Invoke `db-advisor` if database changes present
 - Report findings
 
+### 3b. Epic Implementation (type: epic)
+
+If the change directory contains a `changes/` subdirectory, this is an epic:
+
+1. **Read epic PLAN.md** to determine change order and dependencies
+2. **For each child change** (in dependency order from the epic plan):
+   a. Create branch: `epic/<epic-name>/<change-name>`
+   b. Implement the child change following its own PLAN.md (standard feature implementation flow)
+   c. Ensure all tests pass
+   d. Create PR for the child change
+   e. After merge, update the epic PLAN.md progress tracking
+3. **After all child changes are complete**, verify epic-level acceptance criteria
+
 ### 4. Track Progress
 
 - Mark each phase as complete when done

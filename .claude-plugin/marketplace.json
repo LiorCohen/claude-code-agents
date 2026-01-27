@@ -8,7 +8,7 @@
             "name": "sdd",
             "source": "./plugins/sdd",
             "description": "Spec-driven development methodology for full-stack teams",
-            "version": "4.2.13"
+            "version": "4.3.0"
         }
     ]
 }

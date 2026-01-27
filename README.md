@@ -40,13 +40,14 @@ specs/changes/2026/01/15/user-auth/
 
 Specs include frontmatter metadata, acceptance criteria in Given/When/Then format, and references to domain concepts.
 
-### Three Change Types
+### Four Change Types
 
-| Type | Purpose | Phases |
-|------|---------|--------|
+| Type | Purpose | Structure |
+|------|---------|-----------|
 | **feature** | New functionality | 6 phases |
 | **bugfix** | Fix existing behavior | 4 phases |
 | **refactor** | Restructure without changing behavior | 4 phases |
+| **epic** | Multiple features grouped under one goal | Child changes in `changes/` subdirectory |
 
 ### Specialized Agents
 

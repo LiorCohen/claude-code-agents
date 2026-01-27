@@ -27,6 +27,7 @@ Use the `spec-writing` skill for templates and validation.
 - `feature` - New functionality
 - `bugfix` - Fix existing behavior
 - `refactor` - Code restructuring
+- `epic` - Multiple feature changes grouped under a single goal
 
 **Date Format:**
 - Use the date when the spec was created
@@ -40,7 +41,7 @@ Every spec must include:
 ```yaml
 ---
 title: Change Name
-type: feature | bugfix | refactor
+type: feature | bugfix | refactor | epic
 status: active | deprecated | superseded | archived
 domain: Identity | Billing | Core | ...
 issue: PROJ-1234                    # Required: tracking issue

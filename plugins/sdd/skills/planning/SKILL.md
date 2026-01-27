@@ -35,14 +35,9 @@ Each phase should result in a reviewable PR:
 2. Each sub-phase gets its own PR
 3. Document splits in plan
 
-## When to Escalate to Epic
+## Epic Plans
 
-If the total change exceeds:
-- 10 acceptance criteria
-- 3+ components
-- 800 estimated lines
-
-Use the `epic-planning` skill instead. See that skill for epic structure.
+For `type: epic` changes, use the `epic-planning` skill. Epics contain multiple feature-type changes in a `changes/` subdirectory, each with its own SPEC.md and PLAN.md.
 
 ---
 

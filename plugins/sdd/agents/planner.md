@@ -15,18 +15,9 @@ Use the following skills:
 - `planning` - Templates for standard implementation plans
 - `epic-planning` - Templates for epic-level planning with phase-based PRs
 
-## When to Use Epic Planning
+## Epic Plans
 
-Escalate to epic-level planning when:
-
-| Signal | Threshold |
-|--------|-----------|
-| Acceptance criteria | > 10 ACs |
-| Components affected | 3+ components |
-| Estimated lines | > 800 lines total |
-| Multiple domains | 2+ business domains |
-
-For epics, create `EPIC.md` instead of `PLAN.md`, with separate phase directories.
+For `type: epic` changes, use the `epic-planning` skill. Epics contain multiple feature-type child changes in a `changes/` subdirectory, each with its own SPEC.md and PLAN.md.
 
 ## Plan Location
 
@@ -74,6 +65,7 @@ Plans vary based on the change type in the SPEC.md frontmatter:
 | `feature` | New functionality | Full 6-phase structure |
 | `bugfix` | Fix existing behavior | Investigation → Implementation → Testing → Review |
 | `refactor` | Code restructuring | Preparation → Implementation → Testing → Review |
+| `epic` | Multiple features grouped under one goal | Child changes in `changes/` subdirectory |
 
 ## Typical Phase Order (Features)
 

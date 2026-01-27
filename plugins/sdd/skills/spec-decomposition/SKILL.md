@@ -113,7 +113,7 @@ Independence Score =
 - **EPIC**: > 10 acceptance criteria, > 5 endpoints, 3+ components
 
 **Epic Flag:**
-If a change scores as EPIC, add `requires_epic: true` to the DecomposedChange and include a warning: "Change 'X' should use epic-level planning (see `epic-planning` skill)"
+If a change scores as EPIC, set `type: epic` and `requires_epic: true` on the DecomposedChange. The change should be created as an `epic` type containing feature-type child changes in a `changes/` subdirectory (see `epic-planning` skill).
 
 ## Heuristics
 
@@ -149,7 +149,7 @@ These patterns indicate cross-cutting concerns:
 id: string              # e.g., "c1", "c2"
 name: string            # e.g., "user-authentication"
 title: string           # display: "User Authentication"
-type: string            # "feature" | "bugfix" | "refactor"
+type: string            # "feature" | "bugfix" | "refactor" | "epic"
 description: string     # 1-2 sentence summary
 domain: string          # "Identity", "Billing", "Core"
 source_sections: list   # section names from original spec
@@ -234,7 +234,7 @@ Update change name:
 ### Change Type
 
 Update the change type:
-- Valid types: `feature`, `bugfix`, `refactor`
+- Valid types: `feature`, `bugfix`, `refactor`, `epic`
 - Update the type field
 - Note: Type defaults to `feature` for most decomposed specs
 

@@ -1,6 +1,6 @@
 ---
 name: sdd-new-change
-description: Start a new change (feature, bugfix, or refactor) by creating a spec and implementation plan.
+description: Start a new change (feature, bugfix, refactor, or epic) by creating a spec and implementation plan.
 ---
 
 # /sdd-new-change
@@ -10,11 +10,11 @@ Start a new change with a typed specification and implementation plan.
 ## Usage
 
 ```
-/sdd-new-change --type <feature|bugfix|refactor> --name <change-name>
+/sdd-new-change --type <feature|bugfix|refactor|epic> --name <change-name>
 ```
 
 **Arguments:**
-- `--type` (required): Type of change - `feature`, `bugfix`, or `refactor`
+- `--type` (required): Type of change - `feature`, `bugfix`, `refactor`, or `epic`
 - `--name` (required): Name for the change (lowercase, hyphens allowed)
 
 **Examples:**
@@ -27,6 +27,9 @@ Start a new change with a typed specification and implementation plan.
 
 # Refactor
 /sdd-new-change --type refactor --name extract-validation-layer
+
+# Epic (multiple features)
+/sdd-new-change --type epic --name checkout-system
 ```
 
 ## Flow
@@ -37,10 +40,10 @@ Start a new change with a typed specification and implementation plan.
 
 1. **If no arguments provided**, display usage and exit:
    ```
-   Usage: /sdd-new-change --type <feature|bugfix|refactor> --name <change-name>
+   Usage: /sdd-new-change --type <feature|bugfix|refactor|epic> --name <change-name>
 
    Arguments:
-     --type <type>  Type of change: feature, bugfix, or refactor (required)
+     --type <type>  Type of change: feature, bugfix, refactor, or epic (required)
      --name <name>  Name for the change directory (required)
 
    Examples:
@@ -51,7 +54,7 @@ Start a new change with a typed specification and implementation plan.
    **Do not proceed without both arguments.**
 
 2. **Validate `--type`:**
-   - Must be one of: `feature`, `bugfix`, `refactor`
+   - Must be one of: `feature`, `bugfix`, `refactor`, `epic`
    - If invalid, show error: "Invalid type '<type>'. Must be one of: feature, bugfix, refactor"
 
 3. **Validate `--name`:**
@@ -101,6 +104,11 @@ Prompt for additional details based on change type:
 - "What are the main goals of this refactor?"
 - "Which files/modules are primarily affected?"
 
+**For `epic`:**
+- "What is the overall goal of this epic?"
+- "What child changes (features) should this epic contain?" (collect names and brief descriptions)
+- "Are there dependencies between the child changes?"
+
 ### 4. Create Change Spec and Plan
 
 Use the `change-creation` skill to create the change. Invoke the skill with:
@@ -141,7 +149,8 @@ See `skills/change-creation/SKILL.md` for detailed specification.
 - **Both arguments required**: The command will ALWAYS require `--type` and `--name` before proceeding
 - **Branch check is mandatory**: After validating arguments, the command checks the current git branch
 - **Feature branches recommended**: Working on `main`/`master` is discouraged
-- **Suggested naming**: `<type>/<change-name>` follows common git workflow conventions
+- **Suggested naming**: `<type>/<change-name>` follows common git workflow conventions (epics use `epic/<name>`)
+- **Epic flow**: For epics, after creating the parent spec/plan, child change directories are created under `changes/`
 - **Type-specific templates**: Each change type gets appropriate spec sections and plan phases
 - **User control**: Users can override the branch suggestion and proceed on main/master if they explicitly confirm
 
@@ -277,10 +286,10 @@ Agent: ✓ Updated INDEX.md
 ```
 User: /sdd-new-change
 
-Agent: Usage: /sdd-new-change --type <feature|bugfix|refactor> --name <change-name>
+Agent: Usage: /sdd-new-change --type <feature|bugfix|refactor|epic> --name <change-name>
 
 Arguments:
-  --type <type>  Type of change: feature, bugfix, or refactor (required)
+  --type <type>  Type of change: feature, bugfix, refactor, or epic (required)
   --name <name>  Name for the change directory (required)
 
 Examples:

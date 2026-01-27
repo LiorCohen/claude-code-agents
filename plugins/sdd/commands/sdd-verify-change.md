@@ -49,6 +49,14 @@ testkube run testsuite e2e-tests --watch
 - Verify frontend components exist and consume correct types
 - Check database schema matches domain definitions
 
+### 4b. Epic Verification
+
+If the change directory contains a `changes/` subdirectory, this is an epic:
+
+1. **Verify each child change** individually (run steps 1-4 for each child in `changes/`)
+2. **Verify epic-level ACs** - check that the combined child changes satisfy all acceptance criteria in the epic's SPEC.md
+3. **Check cross-cutting concerns** - verify items listed in the epic spec's "Cross-Cutting Concerns" section
+
 ### 5. Report
 
 Generate verification report:

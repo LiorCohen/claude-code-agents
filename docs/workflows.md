@@ -5,7 +5,7 @@ This file is maintained by the docs-writer agent.
 To update, invoke the docs-writer agent with your changes.
 -->
 
-> How to use SDD for features, bugfixes, and refactors.
+> How to use SDD for features, bugfixes, refactors, and epics.
 
 ## The Core Loop
 
@@ -88,6 +88,39 @@ Refactor specs require:
 - Reason for the change
 
 The plan emphasizes maintaining behavior while changing structure.
+
+## Epic Workflow
+
+Use this when a goal requires multiple features working together.
+
+```
+/sdd-new-change --type epic --name checkout-system
+```
+
+Epic specs require:
+- Overall goal and acceptance criteria
+- List of child changes (features) with descriptions
+- Dependencies between child changes
+
+The command creates an epic directory with a parent SPEC.md and PLAN.md, plus a `changes/` subdirectory containing child feature changes, each with their own SPEC.md and PLAN.md.
+
+### Implementation
+
+Each child change is implemented as an independent PR:
+
+```
+/sdd-implement-change specs/changes/2026/01/27/checkout-system
+```
+
+The command reads the epic PLAN.md for dependency order and implements child changes sequentially, creating a branch per child change (`epic/checkout-system/shopping-cart`, etc.).
+
+### Verification
+
+```
+/sdd-verify-change specs/changes/2026/01/27/checkout-system
+```
+
+Verifies each child change individually, then checks that the combined implementation satisfies all epic-level acceptance criteria.
 
 ## Tips
 

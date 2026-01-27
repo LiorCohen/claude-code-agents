@@ -1,6 +1,6 @@
 ---
 name: epic-planning
-description: Templates and guidelines for epic-level planning with phase-based PRs.
+description: Templates and guidelines for epic-level planning with multiple feature changes.
 ---
 
 
@@ -8,62 +8,27 @@ description: Templates and guidelines for epic-level planning with phase-based P
 
 ## Purpose
 
-Epics are large changes that span multiple implementation phases, where each phase is delivered as a separate PR. This skill provides structure for planning and tracking epics.
-
-## When to Use Epics
-
-Use epic-level planning when:
-
-| Signal | Description |
-|--------|-------------|
-| Multi-component | Change touches 3+ components (contract, server, webapp, etc.) |
-| Multi-domain | Change spans multiple business domains |
-| Large scope | More than 10 acceptance criteria |
-| Multiple PRs | Implementation naturally splits into 2+ independent deliverables |
-| Team coordination | Multiple developers will work on different parts |
-
-**Do NOT use epics for:**
-- Single-component changes
-- Bug fixes (use bugfix template)
-- Refactors with limited scope
-- Changes with < 5 acceptance criteria
+Epics are a change type that groups multiple feature-type changes under a single goal. Each child change is a full feature with its own SPEC.md and PLAN.md.
 
 ## Epic Structure
 
 ```
 specs/changes/YYYY/MM/DD/<epic-name>/
-├── SPEC.md           # Epic specification (parent)
-├── EPIC.md           # Epic plan with phase breakdown
-└── phases/
-    ├── 01-contract/
-    │   ├── SPEC.md   # Phase spec (subset of epic ACs)
-    │   └── PLAN.md   # Phase implementation plan
-    ├── 02-backend/
-    │   ├── SPEC.md
-    │   └── PLAN.md
-    └── 03-frontend/
+├── SPEC.md                    # Epic specification (overall goals, all ACs)
+├── PLAN.md                    # Epic plan (change ordering, dependencies)
+└── changes/
+    ├── <change-name>/
+    │   ├── SPEC.md            # Feature spec
+    │   └── PLAN.md            # Feature plan
+    └── <change-name>/
         ├── SPEC.md
         └── PLAN.md
 ```
 
-## Phase Naming Convention
-
-Phases are numbered and named by their primary focus:
-
-| Number | Name | Agent | Typical Content |
-|--------|------|-------|-----------------|
-| 01 | contract | api-designer | OpenAPI updates, type generation |
-| 02 | backend | backend-dev | Server implementation |
-| 03 | frontend | frontend-dev | UI implementation |
-| 04 | infrastructure | devops | Helm, config changes |
-| 05 | testing | tester | Integration/E2E tests |
-
-Not all phases are required. Skip phases that don't apply.
-
 ## PR Strategy
 
-**One PR per phase.** Each phase:
-- Has its own branch: `epic/<epic-name>/phase-<NN>-<name>`
+**One PR per child change.** Each child change:
+- Has its own branch: `epic/<epic-name>/<change-name>`
 - Has its own PR with clear scope
 - Can be reviewed and merged independently
 - Must pass all tests before merge
@@ -71,33 +36,30 @@ Not all phases are required. Skip phases that don't apply.
 **PR Size Guidelines:**
 - Target: < 400 lines changed
 - Maximum: 800 lines changed
-- If phase exceeds limit, split into sub-phases (e.g., `02a-backend-models`, `02b-backend-api`)
+- If a child change exceeds limits, split it into smaller changes
 
-## Dependencies Between Phases
+## Dependencies Between Changes
 
-Phases are sequential by default:
-```
-01-contract → 02-backend → 03-frontend → 04-infrastructure → 05-testing
-```
-
-Document any exceptions in the EPIC.md.
+Changes may depend on each other. Document dependencies in:
+1. The epic PLAN.md (change ordering)
+2. Each child SPEC.md's `parent_epic` frontmatter field
 
 ---
 
-## Template: EPIC.md
+## Template: Epic PLAN.md
 
 ```markdown
 ---
-title: "Epic: [Epic Name]"
-epic: [epic-name]
+title: [Epic Name] - Implementation Plan
+change: [epic-name]
 type: epic
 spec: ./SPEC.md
-issue: [PROJ-XXX]
+status: draft
 created: YYYY-MM-DD
 sdd_version: [X.Y.Z]
 ---
 
-# Epic: [Epic Name]
+# [Epic Name] - Implementation Plan
 
 ## Overview
 
@@ -106,234 +68,159 @@ sdd_version: [X.Y.Z]
 
 [1-2 sentence summary of the epic's goal]
 
-## Phases
+## Change Order
 
-| # | Phase | Agent | Status | PR | Description |
-|---|-------|-------|--------|----|----|
-| 01 | contract | api-designer | pending | — | [Brief description] |
-| 02 | backend | backend-dev | pending | — | [Brief description] |
-| 03 | frontend | frontend-dev | pending | — | [Brief description] |
+Implement child changes in this order:
 
-## Acceptance Criteria Allocation
+| # | Change | Description | Dependencies | Status |
+|---|--------|-------------|--------------|--------|
+| 1 | [change-name] | [Brief description] | None | pending |
+| 2 | [change-name] | [Brief description] | [change-name] | pending |
+| 3 | [change-name] | [Brief description] | [change-name] | pending |
 
-Map each acceptance criterion from the parent SPEC.md to a phase:
-
-| AC | Description | Phase |
-|----|-------------|-------|
-| AC1 | [Short description] | 02-backend |
-| AC2 | [Short description] | 02-backend |
-| AC3 | [Short description] | 03-frontend |
-
-## Phase Dependencies
+## Dependency Graph
 
 ```
-01-contract
+change-1
     ↓
-02-backend (requires: contract types)
+change-2 (requires: change-1)
     ↓
-03-frontend (requires: backend API)
+change-3 (requires: change-2)
 ```
+
+## PR Strategy
+
+One PR per child change. Branch naming: `epic/<epic-name>/<change-name>`
 
 ## Cross-Cutting Concerns
 
-Items that span multiple phases:
+Items that span multiple changes:
 
-- **Error handling**: Defined in contract, implemented in backend, displayed in frontend
-- **Validation**: Schema in contract, enforced in backend, shown in frontend
+- **[Concern]**: [How it's handled across changes]
 
 ## Risks
 
-| Risk | Impact | Mitigation | Phase Affected |
-|------|--------|------------|----------------|
-| [Risk] | [H/M/L] | [Mitigation] | [Phase] |
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| [Risk] | [H/M/L] | [Mitigation] |
 
 ## Progress Tracking
 
-Updated as phases complete:
-
-- [ ] Phase 01: Contract
-- [ ] Phase 02: Backend
-- [ ] Phase 03: Frontend
-
-## Notes
-
-[Any additional context, decisions, or considerations]
+- [ ] Change 1: [change-name]
+- [ ] Change 2: [change-name]
+- [ ] Change 3: [change-name]
 ```
 
 ---
 
-## Template: Phase SPEC.md
+## Template: Child Change SPEC.md
 
-Each phase has its own mini-spec derived from the parent epic SPEC.md:
+Each child change uses the standard feature spec template with `parent_epic` in frontmatter:
 
 ```markdown
 ---
-title: "[Epic Name] - Phase [NN]: [Phase Name]"
+title: [Feature Name]
 type: feature
 parent_epic: ../SPEC.md
-phase: [NN]-[name]
+status: active
+domain: [Domain Name]
 issue: [PROJ-XXX]
 created: YYYY-MM-DD
+updated: YYYY-MM-DD
 sdd_version: [X.Y.Z]
 ---
 
-# [Epic Name] - Phase [NN]: [Phase Name]
+# Feature: [Feature Name]
 
 ## Overview
 
 **Parent Epic:** [../SPEC.md](../SPEC.md)
-**Phase Focus:** [What this phase delivers]
+
+[What this change delivers as part of the epic]
 
 ## Acceptance Criteria
 
-Subset of parent epic's ACs that this phase implements:
+Subset of parent epic's ACs that this change implements:
 
 - [ ] **AC1:** Given [precondition], when [action], then [result]
-- [ ] **AC2:** Given [precondition], when [action], then [result]
 
 ## Dependencies
 
-**Requires (from previous phases):**
-- [Types/APIs from phase 01]
+**Requires (from previous changes):**
+- [APIs/types from earlier changes]
 
-**Provides (for next phases):**
-- [APIs/components this phase exposes]
+**Provides (for later changes):**
+- [APIs/components this change exposes]
 
-## Out of Scope
-
-The following parent ACs are NOT part of this phase:
-- AC3: [Handled in phase 03]
+[Remainder follows standard feature spec template]
 ```
 
 ---
 
 ## Workflow: Creating an Epic
 
-### Step 1: Identify Epic Candidates
+### Step 1: Create Epic Directory and SPEC.md
 
-During spec-decomposition, flag changes that meet epic criteria:
-- Complexity score > 0.7
-- More than 10 acceptance criteria
-- Touches 3+ components
+Write the epic-level spec with all acceptance criteria for the entire epic.
 
-### Step 2: Create Epic Structure
+### Step 2: Identify Child Changes
 
-```bash
-# Create epic directory
-specs/changes/2026/01/23/user-authentication/
+Break the epic into independent feature-type changes:
+- Each change should be independently implementable and reviewable
+- Target < 800 lines per change
+- Document dependencies between changes
 
-# Create phase subdirectories
-specs/changes/2026/01/23/user-authentication/phases/01-contract/
-specs/changes/2026/01/23/user-authentication/phases/02-backend/
-specs/changes/2026/01/23/user-authentication/phases/03-frontend/
-```
+### Step 3: Create Epic PLAN.md
 
-### Step 3: Write Epic SPEC.md
+Document change ordering and dependencies using the template above.
 
-Standard spec with all acceptance criteria for the entire epic.
+### Step 4: Create Child Changes
 
-### Step 4: Create EPIC.md
+For each child change in `changes/`:
+1. Create the directory: `changes/<change-name>/`
+2. Write SPEC.md with `parent_epic: ../SPEC.md`
+3. Write PLAN.md using the standard feature plan template
 
-Use the template above. Map each AC to a phase.
+### Step 5: Review
 
-### Step 5: Create Phase Specs
-
-For each phase, create a SPEC.md with only that phase's ACs.
-
-### Step 6: Create Phase Plans
-
-Use standard planning templates within each phase directory.
+Present the complete epic structure to the user for review before implementation.
 
 ---
 
 ## Workflow: Implementing an Epic
 
-### For Each Phase:
+### For Each Child Change (in dependency order):
 
-1. **Branch**: `git checkout -b epic/<epic-name>/phase-<NN>-<name>`
-2. **Implement**: Follow the phase's PLAN.md
-3. **Test**: Ensure phase-specific tests pass
-4. **PR**: Create PR with phase scope
+1. **Branch**: `git checkout -b epic/<epic-name>/<change-name>`
+2. **Implement**: Follow the child change's PLAN.md (standard feature implementation)
+3. **Test**: Ensure all tests pass
+4. **PR**: Create PR with change scope
 5. **Review**: Get approval
 6. **Merge**: Merge to main
-7. **Update**: Mark phase complete in EPIC.md
+7. **Update**: Mark change complete in epic PLAN.md
 
-### Handling Phase Failures
+### Handling Failures
 
-If a phase fails review:
-1. Address feedback on the phase branch
-2. Do NOT modify other phase branches
+If a child change fails review:
+1. Address feedback on the change branch
+2. Do NOT modify other change branches
 3. Re-submit for review
 
 If requirements change mid-epic:
 1. Update parent SPEC.md
-2. Update affected phase SPECs
-3. Re-plan affected phases
-4. Document changes in EPIC.md
-
----
-
-## PR Size Enforcement
-
-### Measuring PR Size
-
-Count lines changed (additions + deletions) in:
-- Source files (`.ts`, `.tsx`, `.yaml`, etc.)
-- Exclude: tests, generated files, package-lock.json
-
-### Handling Oversized Phases
-
-If a phase exceeds 800 lines:
-
-1. **Split by layer** (backend):
-   - `02a-backend-models`: Domain models and use-cases
-   - `02b-backend-api`: Controllers and routes
-
-2. **Split by feature** (frontend):
-   - `03a-frontend-components`: UI components
-   - `03b-frontend-integration`: API integration
-
-3. **Update EPIC.md** with new phase structure
-
-### Example Split
-
-Before:
-```
-02-backend (estimated: 1200 lines)
-```
-
-After:
-```
-02a-backend-models (estimated: 500 lines)
-02b-backend-api (estimated: 400 lines)
-02c-backend-dal (estimated: 300 lines)
-```
-
----
-
-## Converting Change to Epic
-
-If during planning a change is identified as needing epic structure:
-
-1. Rename existing SPEC.md to SPEC.md (keep in place)
-2. Create EPIC.md using template
-3. Create phases/ subdirectory
-4. Split ACs into phase specs
-5. Update parent frontmatter to `type: epic`
+2. Update affected child SPECs
+3. Re-plan affected changes
+4. Document changes in epic PLAN.md
 
 ---
 
 ## Quick Reference
 
 ```
-Epic = Large change with multiple independently-mergeable phases
-Phase = One PR worth of work (< 800 lines)
-EPIC.md = Tracks phases, maps ACs, shows progress
-Phase SPEC.md = Subset of parent ACs for one phase
+Epic = Change type containing multiple feature changes
+Child Change = Standard feature change inside changes/ subdirectory
+SPEC.md (epic) = Overall goals and all ACs
+PLAN.md (epic) = Change ordering and dependencies
+SPEC.md (child) = Feature spec with parent_epic field
+PLAN.md (child) = Standard feature plan
 ```
-
-**Signals to escalate to epic:**
-- 10+ acceptance criteria
-- 3+ components affected
-- Estimated > 800 lines total
-- Multiple domains involved

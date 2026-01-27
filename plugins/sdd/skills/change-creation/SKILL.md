@@ -1,6 +1,6 @@
 ---
 name: change-creation
-description: Create change specification and implementation plan with proper structure and frontmatter. Supports feature, bugfix, and refactor types.
+description: Create change specification and implementation plan with proper structure and frontmatter. Supports feature, bugfix, refactor, and epic types.
 ---
 
 # Change Creation Skill
@@ -18,7 +18,7 @@ Create a complete change specification package consisting of:
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | `name` | Yes | Directory name (lowercase, hyphens) |
-| `type` | Yes | Change type: `feature`, `bugfix`, or `refactor` |
+| `type` | Yes | Change type: `feature`, `bugfix`, `refactor`, or `epic` |
 | `title` | Yes | Display title for the change |
 | `description` | Yes | Brief description (1-2 sentences) |
 | `domain` | Yes | Primary domain (e.g., "Identity", "Billing") |
@@ -32,6 +32,8 @@ Create a complete change specification package consisting of:
 | `affected_files` | No | List of files affected (bugfix/refactor types) |
 | `root_cause` | No | Root cause description (bugfix type only) |
 | `refactor_goals` | No | List of refactoring goals (refactor type only) |
+| `child_changes` | No | List of child change names (epic type only) |
+| `epic_goal` | No | Overall epic goal (epic type only) |
 
 ## Output
 
@@ -49,7 +51,7 @@ Returns a result with:
    - No spaces or special characters
    - Not empty
 
-2. Validate `type` is one of: `feature`, `bugfix`, `refactor`
+2. Validate `type` is one of: `feature`, `bugfix`, `refactor`, `epic`
 
 3. Ensure required parameters are provided:
    - `name`, `type`, `title`, `description`, `domain`
@@ -281,6 +283,60 @@ This specification was imported from an external document: `<external_source>`
 - Item 2
 ```
 
+**For `type: epic`:**
+
+```markdown
+## Overview
+
+<description>
+
+## Changes
+
+| Change | Description | Dependencies |
+|--------|-------------|--------------|
+| [change-name] | [Brief description] | None |
+
+> Include if `child_changes` provided, otherwise use template rows
+
+## Acceptance Criteria
+
+> Include if `acceptance_criteria` provided, otherwise use template
+
+- [ ] **AC1:** Given [precondition], when [action], then [result]
+
+## Cross-Cutting Concerns
+
+> Items that span multiple child changes
+
+- **[Concern]**: [How it's handled across changes]
+
+## Out of Scope
+
+> Explicitly list what this epic does NOT include
+
+- Item 1
+- Item 2
+```
+
+**Epic Directory Structure:**
+
+After creating the epic's own SPEC.md and PLAN.md, create child change directories:
+
+```
+specs/changes/YYYY/MM/DD/<epic-name>/
+├── SPEC.md
+├── PLAN.md
+└── changes/
+    ├── <child-change-1>/
+    │   ├── SPEC.md
+    │   └── PLAN.md
+    └── <child-change-2>/
+        ├── SPEC.md
+        └── PLAN.md
+```
+
+Each child change uses the standard feature spec template with `parent_epic: ../SPEC.md` in frontmatter.
+
 ### Step 6: Create PLAN.md
 
 Create `specs/changes/YYYY/MM/DD/<name>/PLAN.md`:
@@ -486,6 +542,44 @@ Complete implementation of the following changes before starting:
 - Update this plan as implementation progresses
 ```
 
+**For `type: epic`:** (uses epic-planning skill)
+
+```markdown
+## Overview
+
+Implementation plan for epic: <title>
+
+Specification: [SPEC.md](./SPEC.md)
+
+## Change Order
+
+Implement child changes in this order:
+
+| # | Change | Description | Dependencies | Status |
+|---|--------|-------------|--------------|--------|
+| 1 | [change-name] | [Brief description] | None | pending |
+| 2 | [change-name] | [Brief description] | [change-name] | pending |
+
+## Dependency Graph
+
+```
+change-1
+    ↓
+change-2 (requires: change-1)
+```
+
+## PR Strategy
+
+One PR per child change. Branch naming: `epic/<epic-name>/<change-name>`
+
+## Progress Tracking
+
+- [ ] Change 1: [change-name]
+- [ ] Change 2: [change-name]
+```
+
+After creating the epic PLAN.md, create child change directories under `changes/` with their own SPEC.md and PLAN.md (standard feature structure with `parent_epic: ../SPEC.md`).
+
 ### Step 7: Update INDEX.md
 
 Add entry to `specs/INDEX.md`:
@@ -567,6 +661,34 @@ Output:
   spec_path: specs/changes/2026/01/21/extract-validation-layer/SPEC.md
   plan_path: specs/changes/2026/01/21/extract-validation-layer/PLAN.md
   index_updated: true
+```
+
+### Epic Example
+
+```
+Input:
+  name: checkout-system
+  type: epic
+  title: Checkout System
+  description: Complete checkout flow with cart, payment, and order management
+  domain: Commerce
+  issue: PROJ-500
+  child_changes:
+    - shopping-cart
+    - payment-processing
+    - order-management
+
+Output:
+  spec_path: specs/changes/2026/01/27/checkout-system/SPEC.md
+  plan_path: specs/changes/2026/01/27/checkout-system/PLAN.md
+  index_updated: true
+  # Also creates:
+  # specs/changes/2026/01/27/checkout-system/changes/shopping-cart/SPEC.md
+  # specs/changes/2026/01/27/checkout-system/changes/shopping-cart/PLAN.md
+  # specs/changes/2026/01/27/checkout-system/changes/payment-processing/SPEC.md
+  # specs/changes/2026/01/27/checkout-system/changes/payment-processing/PLAN.md
+  # specs/changes/2026/01/27/checkout-system/changes/order-management/SPEC.md
+  # specs/changes/2026/01/27/checkout-system/changes/order-management/PLAN.md
 ```
 
 ## Error Handling
