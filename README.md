@@ -83,6 +83,7 @@ Instead of one general-purpose AI, SDD uses 10 specialized agents:
 - **[Workflows](./docs/workflows.md)** - Feature, bugfix, and refactor workflows
 - **[Commands](./docs/commands.md)** - Full command reference
 - **[Agents](./docs/agents.md)** - What each agent does
+- **[Components](./docs/components.md)** - Component types reference
 
 ---
 
@@ -101,12 +102,13 @@ your-project/
 │   ├── architecture/         # Architecture decisions
 │   └── changes/              # Change specifications
 ├── components/
-│   ├── contract/             # OpenAPI specs (generates types)
+│   ├── contract/             # OpenAPI specs (workspace package)
 │   ├── server/               # Node.js backend
 │   ├── webapp/               # React frontend
 │   ├── database/             # PostgreSQL migrations
 │   ├── helm/                 # Kubernetes charts
 │   └── testing/              # Testkube definitions
+├── config/                   # YAML configuration
 └── .github/workflows/        # CI/CD pipelines
 ```
 

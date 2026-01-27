@@ -8,6 +8,16 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## Infrastructure - 2026-01-27
+
+### Fixed
+
+- **Docs**: Synced documentation with v4.4.0 and v4.5.0 plugin changes
+  - Added workspace package details and `depends_on` field to `docs/components.md`
+  - Added `config/` directory and components doc link to `README.md`
+  - Added `SNAPSHOT.md` to `docs/getting-started.md` structure listing
+  - Updated `CONTRIBUTING.md` repo structure (added `docs/`, `.claude/agents/`, removed stale `plugins/sdd/README.md` reference)
+
 ## [4.5.0] - 2026-01-27
 
 ### Changed

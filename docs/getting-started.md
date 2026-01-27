@@ -37,6 +37,7 @@ After initialization, you'll have:
 my-app/
 ├── specs/                    # All specifications live here
 │   ├── INDEX.md             # Registry of all specs
+│   ├── SNAPSHOT.md          # Current product state
 │   ├── domain/              # Business terminology and definitions
 │   └── architecture/        # Architecture decisions
 ├── components/              # Your application code

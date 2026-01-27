@@ -9,8 +9,11 @@ claude-code-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json          # Marketplace manifest
 ├── .claude/
+│   ├── agents/                   # Marketplace-level agents
+│   │   └── docs-writer.md       # Documentation maintenance agent
 │   └── skills/                   # Marketplace-level skills
 │       ├── commit/               # Commit workflow
+│       ├── plugin-testing-standards/ # Plugin testing methodology
 │       └── typescript-standards/ # TypeScript coding standards
 ├── plugins/
 │   └── sdd/                      # SDD plugin
@@ -20,9 +23,9 @@ claude-code-plugins/
 │       ├── commands/             # Slash commands
 │       ├── skills/               # Reusable patterns
 │       ├── scripts/              # Utility scripts
-│       ├── README.md             # Plugin documentation
 │       ├── CHANGELOG.md          # Version history
 │       └── CLAUDE.md             # Plugin guidance
+├── docs/                         # User-facing documentation
 ├── tests/sdd/                    # Plugin tests
 ├── README.md                     # Marketplace overview
 ├── CLAUDE.md                     # Development guidance

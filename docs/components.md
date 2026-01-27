@@ -29,9 +29,15 @@ All component types support multiple instances. See [Multi-Instance Components](
 
 ### Contract
 
-API-first design using OpenAPI specifications. Defines the shared interface between server and client components. Generated TypeScript types ensure type safety across the stack.
+API-first design using OpenAPI specifications. Defines the shared interface between server and client components. Generated TypeScript types are published as npm workspace packages, consumed by server and webapp components via `"workspace:*"` dependencies.
 
 **Directory:** `components/<name>/` (e.g., `components/contract/`, `components/contract-task-api/`)
+
+**Workspace package:** Each contract exports `generated/types.ts` via its `package.json` `exports` field. Consumers import types from the package:
+
+```typescript
+import type { components } from '@project-name/contract';
+```
 
 ### Server
 
@@ -84,15 +90,19 @@ All component types support multiple instances. Each component is listed in `sdd
 
 ## Dependencies
 
-| Component | Requires |
-|-----------|----------|
-| Contract | Server |
-| Server | Contract |
-| Webapp | - |
+Components declare dependencies using the `depends_on` field in `sdd-settings.yaml`. This enables multi-contract architectures where each server or webapp specifies which contract it consumes.
+
+| Component | Depends On |
+|-----------|------------|
+| Contract | - |
+| Server | Contract (via `depends_on`) |
+| Webapp | Contract (via `depends_on`) |
 | Database | Server |
 | Helm | Server |
 | Testing | Server or Webapp |
 | CI/CD | Server or Webapp |
+
+The scaffolding engine resolves `depends_on` to set the `{{CONTRACT_PACKAGE}}` template variable, ensuring generated imports point to the correct contract workspace package.
 
 ## Next Steps
 
