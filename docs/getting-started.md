@@ -42,7 +42,12 @@ my-app/
 ├── components/              # Your application code
 │   ├── contract/            # API definitions (OpenAPI)
 │   ├── server/              # Backend code
-│   └── webapp/              # Frontend code
+│   ├── webapp/              # Frontend code
+│   ├── database/            # Database migrations and seeds
+│   ├── config/              # YAML configuration
+│   ├── helm/                # Kubernetes Helm charts
+│   ├── testing/             # Test setup and definitions
+│   └── cicd/                # CI/CD workflows
 └── sdd-settings.yaml        # Project configuration
 ```
 
