@@ -1,0 +1,69 @@
+{
+  "_description": "Optional static permissions for SDD plugin. The plugin includes an automatic hook for smart file approval, but you can add these static patterns to .claude/settings.local.json for additional coverage.",
+  "_version": "1.0.0",
+  "_docs": "See plugin/docs/permissions.md for setup instructions",
+  "_note": "The hook in hooks/hooks.json is registered automatically when the plugin is installed.",
+
+  "permissions": {
+    "allow": [
+      "Write(specs/**)",
+      "Write(components/**)",
+      "Write(config/**)",
+      "Write(.github/workflows/**)",
+      "Write(README.md)",
+      "Write(CLAUDE.md)",
+      "Write(package.json)",
+      "Write(.gitignore)",
+      "Write(sdd-settings.yaml)",
+
+      "Edit(specs/**)",
+      "Edit(components/**)",
+      "Edit(config/**)",
+      "Edit(.github/workflows/**)",
+      "Edit(README.md)",
+      "Edit(CLAUDE.md)",
+      "Edit(package.json)",
+      "Edit(.gitignore)",
+      "Edit(sdd-settings.yaml)",
+
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+
+      "Bash(npm test:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsc:*)",
+
+      "Bash(mkdir -p:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)"
+    ],
+    "deny": [
+      "Write(.env*)",
+      "Write(**/.env*)",
+      "Write(**/secrets/**)",
+      "Write(**/.git/**)",
+      "Write(**/node_modules/**)",
+
+      "Edit(.env*)",
+      "Edit(**/.env*)",
+      "Edit(**/secrets/**)",
+      "Edit(**/.git/**)",
+      "Edit(**/node_modules/**)",
+
+      "Bash(rm -rf *)",
+      "Bash(curl * | bash*)",
+      "Bash(wget * | bash*)",
+      "Bash(curl * | sh*)",
+      "Bash(wget * | sh*)"
+    ]
+  }
+}

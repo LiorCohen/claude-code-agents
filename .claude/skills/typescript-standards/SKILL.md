@@ -1,9 +1,3 @@
----
-name: typescript-standards
-description: Shared TypeScript coding standards for strict, immutable, type-safe code.
----
-
-
 # TypeScript Standards Skill
 
 Shared standards for all TypeScript code in this methodology (backend and frontend).

@@ -77,6 +77,34 @@ Instead of one general-purpose AI, SDD uses 10 specialized agents:
 
 ---
 
+## Reducing Permission Prompts
+
+SDD commands create many files. To reduce permission prompts, add this to your `.claude/settings.local.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Write(specs/**)",
+      "Write(components/**)",
+      "Write(config/**)",
+      "Edit(specs/**)",
+      "Edit(components/**)",
+      "Bash(git *)",
+      "Bash(npm *)"
+    ],
+    "deny": [
+      "Write(.env*)",
+      "Edit(.env*)"
+    ]
+  }
+}
+```
+
+See **[Permissions Setup](./plugin/docs/permissions.md)** for full configuration options.
+
+---
+
 ## Documentation
 
 - **[Getting Started](./docs/getting-started.md)** - First project tutorial
@@ -84,6 +112,7 @@ Instead of one general-purpose AI, SDD uses 10 specialized agents:
 - **[Commands](./docs/commands.md)** - Full command reference
 - **[Agents](./docs/agents.md)** - What each agent does
 - **[Components](./docs/components.md)** - Component types reference
+- **[Permissions Setup](./plugin/docs/permissions.md)** - Reduce permission prompts
 
 ---
 

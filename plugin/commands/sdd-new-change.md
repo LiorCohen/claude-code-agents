@@ -34,6 +34,8 @@ Start a new change with a typed specification and implementation plan.
 
 ## Flow
 
+**Permission Note**: This command creates 2-3 files (SPEC.md, PLAN.md, updates INDEX.md). If the user experiences many approval prompts, mention they can configure permissions per `plugin/docs/permissions.md`.
+
 ### 1. Parse Arguments (CRITICAL - DO FIRST)
 
 **First, parse and validate the arguments:**

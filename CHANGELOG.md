@@ -8,6 +8,33 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## [4.7.0] - 2026-01-28
+
+### Added
+
+- **Permission hook for auto-approval**: Plugin now includes a PreToolUse hook that automatically approves writes to safe SDD directories
+  - Auto-approves: `specs/`, `components/`, `config/`, `docs/`, `tests/`, `.github/workflows/`
+  - Blocks sensitive paths: `.env*`, `secrets/`, `.git/`, `node_modules/`, private keys
+  - Hook is auto-registered when plugin is installed (no manual configuration needed)
+  - Requires `jq` to be installed
+
+- **Permissions documentation**: New `plugin/docs/permissions.md` with setup guide
+  - Explains automatic hook behavior
+  - Provides optional static permission patterns for additional coverage
+  - Troubleshooting section
+
+- **Recommended permissions config**: New `plugin/config/recommended-permissions.json`
+  - Copy-paste JSON for users who want static permission patterns
+  - Covers all SDD directories and common operations
+
+### Changed
+
+- **sdd-init command**: Added permission note about ~50+ files created
+- **sdd-new-change command**: Added permission note about 2-3 files created
+- **README.md**: Added "Reducing Permission Prompts" section with quick setup
+
+---
+
 ## [4.6.0] - 2026-01-28
 
 ### Added
