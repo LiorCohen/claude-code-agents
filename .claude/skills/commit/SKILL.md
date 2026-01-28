@@ -88,7 +88,30 @@ Why this change was made (for significant changes).
 - `Fixed` - Bug fixes
 - `Removed` - Removed features
 
-### Step 4: Tasks & Plans Check
+### Step 4: Documentation Check
+
+**When to run:** If changes affect plugin functionality (commands, agents, skills, directory structure, workflows).
+
+**What to check:**
+1. Invoke the `docs-writer` agent to audit documentation against current plugin state
+2. Review any inconsistencies found
+3. Fix documentation issues before proceeding to commit
+
+**Documentation files to verify:**
+- `README.md` - Quick start, project structure, permissions
+- `docs/getting-started.md` - Tutorial and structure diagrams
+- `docs/commands.md` - Command references and examples
+- `docs/workflows.md` - Workflow examples
+- `docs/agents.md` - Agent descriptions
+- `docs/components.md` - Component types
+
+**Skip conditions:**
+- Changes only affect test files
+- Changes only affect marketplace-level skills (`.claude/skills/`)
+- Changes only affect task management (`tasks/`)
+- Trivial changes (typos, formatting)
+
+### Step 5: Tasks & Plans Check
 
 **IMPORTANT:** Before committing, verify that tasks and plans are up to date.
 
@@ -127,7 +150,7 @@ Why this change was made (for significant changes).
 - Update them BEFORE proceeding to commit
 - Include `tasks/TASKS.md` and/or `tasks/plans/*.md` in the staged files
 
-### Step 5: Generate Commit Message
+### Step 6: Generate Commit Message
 
 Format:
 ```
@@ -147,7 +170,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 - **Docs**: Documentation only
 - **Tasks**: Task management changes (adding, completing, updating tasks in `tasks/`)
 
-### Step 6: Review and Confirm
+### Step 7: Review and Confirm
 
 Present to the user:
 - Summary of files to be committed
@@ -158,7 +181,7 @@ Present to the user:
 
 **Wait for user confirmation before proceeding.**
 
-### Step 7: Execute Commit
+### Step 8: Execute Commit
 
 After confirmation:
 1. Stage all related files (code + version files + CHANGELOG)
@@ -236,7 +259,7 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 ## Quick Reference
 
 ```
-Plugin file changed? → Bump version → CHANGELOG → Check tasks/ → Stage all → Commit
+Plugin file changed? → Bump version → CHANGELOG → Check docs → Check tasks/ → Stage all → Commit
 Infrastructure file changed? → CHANGELOG → Check tasks/ → Stage all → Commit
 Completing a task? → Update tasks/TASKS.md → Update plan status → Stage all → Commit
 ```
@@ -255,6 +278,7 @@ Completing a task? → Update tasks/TASKS.md → Update plan status → Stage al
 10. **Forgetting to update tasks/TASKS.md** - When completing a task, move it to Completed section before committing
 11. **Stale plan status** - Update plan status to COMPLETED when work is done
 12. **Untracked work** - Significant work should have a corresponding task for traceability
+13. **Outdated documentation** - Plugin changes may require docs updates; run docs-writer agent to check
 
 ## One Commit = One Changelog Entry
 
