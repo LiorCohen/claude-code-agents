@@ -172,9 +172,34 @@ User: merge task 28 into 27
 
 **Workflow:**
 1. Find both tasks
-2. Move the merged task (28) to ## Merged section
-3. Update format to: `### 28. Task title → merged into #27`
-4. Optionally update target task (27) to include merged context
+2. **Preserve original content in Merged section:** Move task 28 to ## Merged section with ALL its original content intact, adding the merge reference
+3. Update format to: `### 28. Task title → merged into #27` followed by the original task content
+4. **Copy merged content into target task:** Update target task (27) to include the full context from task 28
+
+**IMPORTANT:** Never delete the original contents of a merged task. The full description and any details must be preserved in BOTH locations:
+- In the Merged section (for historical reference)
+- In the target task (so all context is in one place)
+
+Format for merged task entry:
+```markdown
+### 28. Task title → merged into #27
+
+_Original content preserved below:_
+
+Original description and all details from task 28...
+```
+
+Format for target task update:
+```markdown
+### 27. Task title
+
+Original description of task 27...
+
+---
+**Merged from #28:** Task 28 title
+
+Original description from task 28...
+```
 
 ### Change Priority
 
@@ -348,6 +373,46 @@ Creating plan at tasks/plans/planned/PLAN-task-19-task-management-skill.md
 - Integrate with tasks/TASKS.md and tasks/plans/
 
 View the plan? (yes/no)
+```
+
+### Merging Tasks
+
+```
+User: /tasks merge 36 into 35
+
+Agent: Found task #36: Add drift detection for specs
+Found task #35: Add checksumming for spec change detection
+
+Merging #36 into #35...
+
+✓ Task #36 moved to Merged section (original content preserved)
+✓ Task #35 updated with merged content from #36
+
+Updated task #35:
+### 35. Add checksumming for spec change detection
+Add checksums to track when specs have been modified since last generation.
+- Store hash of spec content
+- Compare on regeneration to detect drift
+
+---
+**Merged from #36:** Add drift detection for specs
+
+Detect when generated code has drifted from the spec.
+- Compare current implementation against spec
+- Warn user when drift is detected
+- Suggest regeneration or spec update
+
+---
+
+Task #36 entry in Merged section:
+### 36. Add drift detection for specs → merged into #35
+
+_Original content preserved below:_
+
+Detect when generated code has drifted from the spec.
+- Compare current implementation against spec
+- Warn user when drift is detected
+- Suggest regeneration or spec update
 ```
 
 ---
