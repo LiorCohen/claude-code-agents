@@ -26,6 +26,7 @@ When a user provides an external specification via `--spec`:
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | `spec_path` | Yes | Absolute path to the external specification file |
+| `spec_outline` | Yes | Pre-extracted outline from Phase 0 (sections with line ranges) |
 | `target_dir` | Yes | Absolute path to the project directory |
 | `primary_domain` | Yes | Primary domain for the project |
 
@@ -49,88 +50,172 @@ shared_concepts_added: ["User", "Session", "Token"]
 
 ### Step 1: Copy External Spec to Archive
 
+**If spec is a single file:**
 1. Determine the original filename from the spec path
 2. Copy to: `specs/external/<original-filename>`
-3. Display: "Copied external spec to: specs/external/<filename>"
+3. Store: `archived_spec_path = {target_dir}/specs/external/<filename>`
+4. Display: "Copied external spec to: specs/external/<filename>"
 
-### Step 2: Analyze Spec for Decomposition
+**If spec is a directory:**
+1. Determine the directory name from the spec path
+2. Copy entire directory to: `specs/external/<directory-name>/`
+3. Store: `archived_spec_dir = {target_dir}/specs/external/<directory-name>/`
+4. Display: "Copied external spec directory to: specs/external/<directory-name>/ ({N} files)"
 
-Use the `spec-decomposition` skill to analyze the external spec:
+**Important:** All subsequent section reads use the archived path, not the original `spec_path`.
 
+### Step 2: Present Outline to User
+
+The `spec_outline` is already extracted (passed from sdd-init Phase 0). Present it to the user for confirmation.
+
+**If `spec_outline.has_headers` is true:**
+
+Display the structure with indentation based on header level.
+
+**For single file:**
 ```
-INVOKE spec-decomposition skill with:
-  spec_content: <content of the external spec>
-  spec_path: <original path>
-  default_domain: <primary_domain>
-```
+I found the following structure in this spec:
 
-The skill returns a `DecompositionResult` with:
-- `is_decomposable`: Whether the spec can be split
-- `changes`: List of identified changes with metadata
-- `shared_concepts`: Domain concepts used across changes
-- `suggested_order`: Recommended implementation sequence
-- `warnings`: Any issues detected
+## User Authentication (lines 10-50)
+   ### Login Flow (lines 15-30)
+   ### Registration (lines 31-50)
+## Dashboard (lines 51-120)
+   ### Analytics (lines 55-80)
+   ### Settings (lines 81-120)
 
-### Step 3: Handle Decomposition Result
-
-**If `is_decomposable` is false:**
-- Display any warnings
-- Display: "This spec will be implemented as a single change."
-- Proceed to Step 4 with single change
-
-**If `is_decomposable` is true:**
-
-Present the decomposition to the user:
-
-```
-I've identified N changes in this specification:
-
-[c1] change-name (Domain) - feature - COMPLEXITY
-     Brief description (1 line)
-     Sections: "Section A", "Section B"
-     Endpoints: METHOD /path, METHOD /path
-     Dependencies: none
-
-[c2] another-change (Domain) - feature - COMPLEXITY
-     Brief description
-     Sections: "Section C"
-     Endpoints: METHOD /path
-     Dependencies: c1
-
-...
-
-Shared concepts (will be added to domain glossary):
-  - Concept1, Concept2, Concept3
-
-Suggested implementation order: c1 → c2 → c3 → ...
+I'll create a change for each H2 section.
+Total: 2 changes (User Authentication, Dashboard)
 
 Options:
   [A] Accept this breakdown
-  [M] Merge changes (e.g., "merge c2 c3")
-  [S] Split a change (e.g., "split c4")
+  [L] Use different level (H1 or H3 as change boundaries)
+  [S] Single change (don't split)
+  [C] Cancel
+```
+
+**For directory (multiple files):**
+```
+I found the following structure in this spec directory (3 files):
+
+📄 README.md
+   # Product Overview (lines 1-50)
+
+📄 auth/authentication.md
+   # User Authentication (lines 1-60)
+      ## Login Flow (lines 10-40)
+      ## Registration (lines 41-60)
+
+📄 dashboard/overview.md
+   # Dashboard (lines 1-80)
+      ## Analytics (lines 20-50)
+      ## Settings (lines 51-80)
+
+I'll create a change for each H1 section (one per file's main topic).
+Total: 3 changes (Product Overview, User Authentication, Dashboard)
+
+Options:
+  [A] Accept this breakdown
+  [L] Use different level (H2 as change boundaries)
+  [F] Use files as boundaries (one change per file)
+  [S] Single change (don't split)
+  [C] Cancel
+```
+
+**If `spec_outline.has_headers` is false:**
+
+```
+This spec has no markdown headers. I'll treat it as a single change.
+
+Options:
+  [A] Accept
+  [C] Cancel
+```
+
+### Step 3: Handle User Level Choice
+
+**If user chooses `[L]`**, ask which level to use:
+
+```
+Which header level should define change boundaries?
+  [1] H1 headers (# Title)
+  [2] H2 headers (## Title) - default
+  [3] H3 headers (### Title)
+```
+
+Re-display the outline with the new boundary level highlighted.
+
+**If user chooses `[F]` (directory specs only)**, use each file as a change boundary:
+- One change per markdown file
+- Use the file's first H1 header as the change name, or filename if no headers
+- Re-display showing file-based grouping
+
+### Step 4: Analyze Each Section
+
+For each section at the chosen boundary level:
+
+1. **Read section content** from the archived location:
+   - **Single file:** Read from `archived_spec_path` using `start_line` to `end_line`
+   - **Directory:** Read from `archived_spec_dir/<section.source_file>` using `start_line` to `end_line`
+2. **Analyze the section:**
+   ```
+   INVOKE spec-decomposition skill with:
+     mode: "section"
+     spec_content: <content of this section only>
+     section_header: <e.g., "## User Authentication">
+     default_domain: <primary_domain>
+   ```
+3. **Collect** the `DecomposedChange` result
+4. **Display progress:** "Analyzing: User Authentication (1/2)..."
+
+### Step 5: Present Combined Decomposition
+
+Combine all section analyses into a unified view:
+
+```
+Analysis complete. Here are the identified changes:
+
+[c1] user-authentication (Identity) - feature - MEDIUM
+     Login and session management
+     Sections: "User Authentication"
+     Endpoints: POST /auth/login, DELETE /auth/logout
+     Dependencies: none
+
+[c2] dashboard (Core) - feature - MEDIUM
+     User dashboard with analytics
+     Sections: "Dashboard"
+     Endpoints: GET /dashboard, GET /analytics
+     Dependencies: c1
+
+Shared concepts (will be added to glossary):
+  - User, Session, Analytics
+
+Suggested implementation order: c1 → c2
+
+Options:
+  [A] Accept this breakdown
+  [M] Merge changes (e.g., "merge c1 c2")
   [R] Rename a change (e.g., "rename c1 new-name")
   [T] Change type (e.g., "type c2 bugfix")
   [K] Keep as single spec (skip decomposition)
   [C] Cancel
 ```
 
-### Step 4: Handle User Adjustments
+### Step 6: Handle User Adjustments
 
 Process user adjustments in a loop:
 
 | Option | Action |
 |--------|--------|
-| **[A] Accept** | Proceed to Step 5 with accepted changes |
-| **[M] Merge** | Use merge operation from spec-decomposition, re-display |
-| **[S] Split** | Ask for split criteria, use split operation, re-display |
-| **[R] Rename** | Use rename operation, re-display |
+| **[A] Accept** | Proceed to Step 7 with accepted changes |
+| **[M] Merge** | Combine selected changes, re-display |
+| **[R] Rename** | Update change name, re-display |
 | **[T] Change type** | Update change type (feature/bugfix/refactor), re-display |
 | **[K] Keep as single** | Create single change containing all content |
 | **[C] Cancel** | Return with cancelled status |
 
 Continue until user accepts or cancels.
 
-### Step 5: Create Change Specifications
+### Step 7: Create Change Specifications
 
 For each accepted change, invoke the `change-creation` skill:
 
@@ -150,7 +235,7 @@ INVOKE change-creation skill with:
   prerequisites: <prerequisite change names> (if dependencies)
 ```
 
-### Step 6: Update Shared Files
+### Step 8: Update Shared Files
 
 **Update INDEX.md with External Specifications table:**
 
@@ -166,7 +251,7 @@ INVOKE change-creation skill with:
 
 Add extracted shared concepts from decomposition to `specs/domain/glossary.md`.
 
-### Step 7: Return Summary
+### Step 9: Return Summary
 
 Display completion summary:
 

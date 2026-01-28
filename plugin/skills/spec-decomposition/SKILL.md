@@ -16,6 +16,138 @@ Analyze a specification document to identify natural change boundaries and retur
 | `spec_content` | Yes | The markdown content of the specification to analyze |
 | `spec_path` | No | Original path to the spec file (for reference tracking) |
 | `default_domain` | No | Default domain to use if not detected |
+| `mode` | No | `"outline"` to extract structure only, `"section"` to analyze one section, or omit for full analysis |
+| `section_header` | If mode=section | Header text of the section being analyzed (e.g., `"## User Auth"`) |
+| `spec_is_directory` | No | If true, spec is a directory with multiple files |
+| `spec_files` | If spec_is_directory | List of markdown files in the spec directory |
+
+---
+
+## Chunked Outline Extraction
+
+**Always** extract the spec outline before full analysis. This prevents context overflow for large specs.
+
+### Mode: "outline"
+
+Extract markdown headers without processing prose content. This is a pure parsing operation (no LLM reasoning needed).
+
+**Algorithm (Single File):**
+
+1. Read spec content (can be done in chunks for very large files)
+2. Use regex to find headers: `/^(#{1,6})\s+(.+)$/gm`
+3. Track line numbers for each header
+4. Calculate `end_line` for each header (next header's start_line - 1, or total lines)
+5. Return flat list of sections with line ranges
+
+**Algorithm (Directory with Multiple Files):**
+
+1. For each file in `spec_files`:
+   - Read file content
+   - Extract headers with line numbers
+   - Prefix each section with `source_file` field
+2. Combine all sections into unified outline
+3. Each section includes which file it came from
+
+**Output (OutlineResult) - Single File:**
+
+```yaml
+mode: "outline"
+is_directory: false
+sections:
+  - level: 1
+    header: "Product Requirements"
+    start_line: 1
+    end_line: 9
+  - level: 2
+    header: "User Authentication"
+    start_line: 10
+    end_line: 50
+  - level: 3
+    header: "Login Flow"
+    start_line: 15
+    end_line: 30
+  - level: 3
+    header: "Registration"
+    start_line: 31
+    end_line: 50
+  - level: 2
+    header: "Dashboard"
+    start_line: 51
+    end_line: 120
+total_lines: 120
+has_headers: true
+```
+
+**Output (OutlineResult) - Directory:**
+
+```yaml
+mode: "outline"
+is_directory: true
+files:
+  - path: "README.md"
+    total_lines: 50
+  - path: "auth/authentication.md"
+    total_lines: 120
+  - path: "dashboard/overview.md"
+    total_lines: 80
+sections:
+  - level: 1
+    header: "Product Overview"
+    source_file: "README.md"
+    start_line: 1
+    end_line: 50
+  - level: 1
+    header: "User Authentication"
+    source_file: "auth/authentication.md"
+    start_line: 1
+    end_line: 60
+  - level: 2
+    header: "Login Flow"
+    source_file: "auth/authentication.md"
+    start_line: 10
+    end_line: 40
+  - level: 1
+    header: "Dashboard"
+    source_file: "dashboard/overview.md"
+    start_line: 1
+    end_line: 80
+total_files: 3
+has_headers: true
+```
+
+If no headers found:
+
+```yaml
+mode: "outline"
+sections: []
+total_lines: 500
+has_headers: false
+```
+
+### Mode: "section"
+
+Analyze a single section's content. Use this after outline extraction to process one section at a time.
+
+**Input:**
+
+```yaml
+mode: "section"
+spec_content: <content of ONE section only>
+section_header: "## User Authentication"
+default_domain: "Identity"
+```
+
+**Output:**
+
+Returns a single `DecomposedChange` for that section, using the standard algorithm (Phase 1-5 below) applied to the section content only.
+
+### Default Mode (Full Analysis)
+
+If `mode` is omitted, perform full analysis on the entire `spec_content`. This is the legacy behavior, suitable only for small specs that fit in context.
+
+**Warning:** For specs > ~50KB, always use outline mode first, then section mode per-section.
+
+---
 
 ## Output
 

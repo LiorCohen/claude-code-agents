@@ -28,7 +28,8 @@ Extract structured product information through adaptive questioning:
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | `project_name` | Yes | Name of the project |
-| `external_spec_content` | No | Pre-loaded external spec to confirm instead of asking from scratch |
+| `spec_outline` | No | Pre-extracted outline with sections and line ranges (from Phase 0) |
+| `spec_path` | No | Path to external spec file (for reading intro section) |
 
 ## Output
 
@@ -58,10 +59,24 @@ scope: "mvp"  # "mvp" or "full"
 
 ### Step 1: Opening Question
 
-**If external spec was provided:**
-- Parse the spec to extract initial understanding
-- Present what was extracted and ask for confirmation/additions:
-  > "Based on the spec you provided, here's what I understood: [summary]. Is this accurate, or would you like to add/correct anything?"
+**If external spec was provided (`spec_outline` and `spec_path` are set):**
+
+The outline is already extracted. Read only the **intro section** for discovery:
+
+1. Identify the intro section:
+   - **Single file:**
+     - If outline has headers: content before the first header, or first H1/H2 content
+     - If no headers: first ~2000 characters of the spec
+   - **Directory:**
+     - Look for entry point: `README.md`, `index.md`, or first file alphabetically
+     - Read that file's intro (before first header, or first H1/H2 content)
+2. Read only that section content from `spec_path` (the original location - spec will be copied to project later in Phase 7)
+3. Parse the intro for: problem statement, user types, domain concepts
+4. Present what was extracted and ask for confirmation/additions:
+   > "Based on the spec you provided, here's what I understood: [summary]. Is this accurate, or would you like to add/correct anything?"
+
+Add note about detailed breakdown:
+> "The full spec will be broken down into changes after project setup."
 
 **If no external spec:**
 - Ask the opening discovery question:

@@ -8,6 +8,43 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## [4.6.0] - 2026-01-28
+
+### Added
+
+- **Chunked outline extraction for large specs**: External specs are now processed using a two-phase approach that prevents context overflow
+  - Phase 1: Extract headers/outline without LLM (pure regex parsing)
+  - Phase 2: Analyze each section individually using the outline's line ranges
+  - Works for specs of any size - small specs just have fewer chunks
+
+- **Spec directory support**: `--spec` argument now accepts directories containing multiple markdown files
+  - Looks for entry points: `README.md`, `SPEC.md`, `index.md`, `spec.md`
+  - Falls back to collecting all `.md` files if no entry point found
+  - User can choose boundary level: H1, H2, H3, or file-based
+
+### Changed
+
+- **spec-decomposition skill**: New `mode` parameter (`"outline"` or `"section"`) for chunked processing
+  - `outline` mode extracts headers with line ranges (no LLM needed)
+  - `section` mode analyzes a single section's content
+  - Directory specs include `source_file` field per section
+
+- **external-spec-integration skill**: Outline-first workflow
+  - Receives pre-extracted outline from sdd-init Phase 0
+  - Presents outline to user for boundary level selection before analysis
+  - Reads sections from archived copy (spec copied to project before analysis)
+
+- **product-discovery skill**: Uses outline for intro extraction
+  - Reads only the intro section (first ~2000 chars or content before first header)
+  - For directories, uses entry point file for discovery
+
+- **sdd-init command**: Extracts outline in Phase 0
+  - Outline extracted immediately when spec is loaded
+  - Only outline and path stored (never full spec content)
+  - Spec copied to project in Phase 7 before decomposition
+
+---
+
 ## Infrastructure - 2026-01-28
 
 ### Changed

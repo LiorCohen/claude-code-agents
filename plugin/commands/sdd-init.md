@@ -70,10 +70,30 @@ This command orchestrates multiple skills to complete initialization:
    - Extract spec path (if provided)
 
 3. **If external spec is provided:**
-   - Read the external spec file
-   - Validate file exists and is readable
-   - Display: "Loaded external spec from: <path>"
-   - Store content for use in Phase 1
+   - Validate path exists
+   - **Determine spec type:**
+     - **If path is a file:** Use that file directly
+     - **If path is a directory:**
+       1. Look for entry point file in order: `README.md`, `SPEC.md`, `index.md`, `spec.md`
+       2. If no entry point found, collect all `.md` files in the directory
+       3. Store: `spec_is_directory: true`, `spec_files: [list of .md files]`
+       4. Display: "Loaded spec directory: <path> ({N} markdown files found)"
+
+   - **Extract outline** (chunked, no LLM needed):
+     - For single file: Extract headers from that file
+     - For directory: Extract headers from all files, prefixed with filename
+     ```
+     INVOKE spec-decomposition skill with:
+       mode: "outline"
+       spec_content: <file content or concatenated content>
+       spec_is_directory: <true if directory>
+       spec_files: <list of files if directory>
+     ```
+   - Store: `spec_outline` (sections with line ranges and source file)
+   - Store: `spec_path` (absolute path to original spec file or directory)
+   - Display: "Loaded external spec from: <path> ({N} sections found)"
+
+   Note: The spec remains at its original location until Phase 7, when it's copied into the project.
 
 4. **Directory check:**
    - Validate project name (lowercase, hyphens allowed)
@@ -90,8 +110,11 @@ This command orchestrates multiple skills to complete initialization:
 
 ```yaml
 project_name: <from Phase 0>
-external_spec_content: <if --spec provided, else null>
+spec_outline: <if --spec provided, else null>
+spec_path: <if --spec provided, else null>
 ```
+
+Note: The skill will read only the intro section using the outline's line ranges.
 
 The skill conducts interactive discovery and returns:
 
@@ -283,16 +306,18 @@ domain_entities: <from Phase 1>
 
 ```yaml
 spec_path: <absolute path to external spec>
+spec_outline: <from Phase 0>
 target_dir: <absolute path to project>
 primary_domain: <from Phase 1>
 ```
 
 The skill:
 1. Copies external spec to `specs/external/`
-2. Analyzes for multi-change decomposition
-3. Presents breakdown to user for adjustment
-4. Creates change specifications
-5. Updates INDEX.md and glossary
+2. Presents outline to user for boundary level selection
+3. Analyzes each section individually (using outline line ranges)
+4. Presents combined decomposition for user adjustment
+5. Creates change specifications
+6. Updates INDEX.md and glossary
 
 ---
 
