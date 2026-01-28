@@ -226,6 +226,13 @@ Missing a way to manage local development environments:
 
 ## Low Priority
 
+### 48. Organize plugin skills directory by cohesion
+The `.claude/skills/` directory contains skills that could be better organized by grouping related skills together. Need to:
+- Analyze existing skills and identify cohesive groups (e.g., git/commit-related, testing-related, coding-standards)
+- Create subdirectories for skill groups if appropriate
+- Update any references to skill paths
+- Improve discoverability and maintainability of the skills collection
+
 ### 3. Docs missing: CMDO Guide
 Documentation needs a guide explaining CMDO (Component-Module-Domain-Organization?) that covers:
 - Design decisions and rationale
