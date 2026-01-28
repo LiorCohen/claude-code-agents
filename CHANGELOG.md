@@ -17,6 +17,11 @@ All notable changes to the SDD plugin and marketplace infrastructure.
   - Manage backlog, track progress, create implementation plans
   - Reorganized task data into `tasks/` directory (TASKS.md + plans/)
 
+- **Task 9 plan**: Comprehensive plan for ready-to-work components
+  - Merge Task #42 (restructure specs directory) into Task #9
+  - 9 files to delete, 6 to create, 39 to modify
+  - Remove greetings example, use PostgreSQL via k8s, restructure specs directory
+
 ### Changed
 
 - **Commit skill**: Added Step 4 "Tasks & Plans Check" to verify tasks and plans are updated before committing

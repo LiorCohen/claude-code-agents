@@ -2,441 +2,601 @@
 
 ## Executive Summary
 
-"Ready-to-work" doesn't mean "has code." It means:
-1. Developer can run commands and see something working
-2. Developer understands what they're looking at
-3. Developer knows what to do next
-4. The example follows the same methodology they'll use for their own code
+"Ready-to-work" means:
+1. Developer understands what they're looking at
+2. Developer knows what to do next
+3. Clean slate follows the SDD methodology (no orphaned code)
 
-**Current state: 0 of 4 criteria are met.**
-
----
-
-## The Real Problems (Not Just Missing READMEs)
-
-### Problem 1: The Greetings Example is an Orphan
-
-The templates include a complete "greetings" example across all layers:
-- **Contract**: `openapi.yaml` with `/greetings` endpoints and `Greeting` schema
-- **Backend**: `create_greeting.ts`, `get_greeting.ts` use-cases, DAL functions, HTTP handlers
-- **Frontend**: `greeter.tsx` page, `use-greetings.ts` hook, `greetings.ts` API client
-
-**But the greetings example exists NOWHERE in specs:**
-- No `Greeting` entity in `specs/domain/definitions/`
-- No `create-greeting` use-case in `specs/domain/use-cases/`
-- No entry in `specs/domain/glossary.md`
-- No change specification that created it
-
-**This violates the core SDD principle: "Specs are truth."** The first thing a developer sees is code that contradicts the methodology.
-
-### Problem 2: Hidden In-Memory Database
-
-The backend has a clever in-memory database stub in `create_database.ts`:
-```typescript
-// In-memory store for development/testing
-// Replace with actual database client in production
-```
-
-This means the backend WILL work without PostgreSQL. But:
-- This is undocumented
-- Developer might not realize PostgreSQL isn't needed for initial testing
-- Developer might try to set up k8s/PostgreSQL unnecessarily
-- The "TODO: Replace with actual database client" comment suggests it's incomplete
-
-### Problem 3: The Project README Lies
-
-The project README says:
-```bash
-# Start local Kubernetes cluster
-minikube start
-
-# Deploy locally
-helm upgrade --install {{PROJECT_NAME}} ./components/<helm-component>/...
-```
-
-But:
-- Helm templates don't exist (helm scaffolding is "(inline)" with no templates)
-- This complexity is unnecessary for first run
-- Developer will fail and not understand why
-
-### Problem 4: Type Generation Timing is Unclear
-
-The backend and frontend both import from `'{{CONTRACT_PACKAGE}}'`:
-```typescript
-import type { components } from '{{CONTRACT_PACKAGE}}';
-```
-
-This package doesn't have types until `npm run generate` is run on the contract component. But:
-- When should this be run?
-- The root `package.json` has scripts but they use placeholder paths
-- TypeScript will fail on first compile without generated types
-
-### Problem 5: The "Next Steps" are Wrong
-
-After `sdd-init`, the completion report says:
-```
-Next steps:
-  1. cd <project-name>
-  2. npm install --workspaces
-  3. cd components/<contract-component> && npm run generate:types
-  4. Review: specs/domain/glossary.md, components/<contract-component>/openapi.yaml
-  5. Create first change: /sdd-new-change --type feature --name <name>
-```
-
-Problems:
-- Step 4 (review glossary) - glossary only has "User", not "Greeting" which is in the code
-- Step 5 (create first change) - but there's already a greetings feature! Should they create another? Delete greetings first?
-- No step to actually RUN the code and see if it works
-
-### Problem 6: No Verification That It Works
-
-There's no "smoke test" or verification that the scaffolded project actually runs. A developer should be able to:
-1. Run the backend
-2. Run the frontend
-3. See the greeter page
-4. Create a greeting and see it work
-
-Currently, this path is:
-1. Undocumented
-2. Requires knowing the in-memory DB exists
-3. Has no clear commands
+**Decision**: Remove greetings example entirely. Generate a clean skeleton with no business logic. User's first feature IS the example.
 
 ---
 
-## The Core Insight: Example Must Follow the Methodology
+## Problems Being Solved
 
-The greetings example should demonstrate SDD, not contradict it. Two options:
+### Problem 1: Greetings Example Violates SDD
 
-### Option A: Remove the Example Entirely (Minimal)
+The templates include a complete "greetings" example across all layers, but this code exists NOWHERE in specs. This violates the core SDD principle: "Specs are truth."
 
-Generate a skeleton with no greetings:
-- OpenAPI with just health endpoints
-- Backend with CMDO structure but no business logic
-- Frontend with app shell but no pages
-- Empty specs ready to fill in
-- Message: "Run `/sdd-new-change --type feature --name <first-feature>` to add your first feature"
+### Problem 2: In-Memory Database Hack
 
-**Pros**: Clean, follows methodology, no confusion
-**Cons**: Nothing to learn from, cold start, harder to understand patterns
+The backend has an in-memory database stub that pretends to be a database. This masks the real requirement (PostgreSQL) and creates confusion.
 
-### Option B: Make the Example a Proper Change (Recommended)
+### Problem 3: Unclear Next Steps
 
-Generate the greetings example AS IF it were created by `/sdd-new-change`:
-- Create `specs/changes/example/greetings/SPEC.md` with full specification
-- Create `specs/changes/example/greetings/PLAN.md` with implementation plan
-- Add `Greeting` to `specs/domain/definitions/greeting.md`
-- Add `CreateGreeting` to `specs/domain/use-cases/create-greeting.md`
-- Add `Greeting` to `specs/domain/glossary.md`
-- Keep the same implementation code
-- Mark the change as `status: active` (already implemented)
+After `sdd-init`, developers don't know what to do next. The completion report is misleading.
 
-**Pros**: Teaches full SDD workflow, everything consistent, developer sees real example
-**Cons**: More files, more complex scaffolding
+### Problem 4: specs/ Directory Structure is Confusing
 
-### Recommendation: Option B
-
-The whole point of SDD is that specs come first. The example should demonstrate this. A developer should be able to:
-1. Read `specs/changes/example/greetings/SPEC.md` and understand the feature
-2. See how SPEC.md maps to PLAN.md
-3. See how PLAN.md maps to the implementation
-4. Use this as a template for their own changes
+Currently `specs/changes/` and `specs/external/` are inside specs. Changes and external specs should be at project root.
 
 ---
 
 ## Implementation Plan
 
-### Phase 1: Fix the Immediate Pain (Can Run The Code)
-
-**Goal**: After `sdd-init`, developer can run `npm run dev` and see something working.
-
-#### 1.1 Create Bootstrap Script
-
-Add to root `package.json`:
-```json
-{
-  "scripts": {
-    "bootstrap": "npm install && npm run generate && npm run dev"
-  }
-}
-```
-
-But `npm run generate` needs to work first.
-
-#### 1.2 Fix Type Generation in Root package.json
-
-Current template at `plugin/skills/project-scaffolding/templates/project/package.json` needs proper meta-scripts that work without placeholder paths.
+### Phase 1: Update scaffolding.ts Directory Structure
 
 **File**: `plugin/skills/scaffolding/scaffolding.ts`
 
-The scaffolding script already generates the root package.json with component-specific scripts. Verify that:
-- `npm run generate` runs type generation for all contracts
-- Scripts use actual component directory names, not placeholders
-- Dependencies are ordered correctly (contract generates before server/webapp)
+#### 1.1 Update specsDirs (lines 226-234)
 
-#### 1.3 Document the In-Memory Database
-
-The in-memory database in `create_database.ts` is actually a feature, not a bug. Document it:
-
-**File**: `plugin/skills/backend-scaffolding/templates/README.md` (new)
-
-```markdown
-## Development Mode
-
-The backend includes an **in-memory database** for development and testing.
-No PostgreSQL setup is required for initial development.
-
-The in-memory store persists data for the duration of the process.
-It supports basic INSERT/SELECT operations for the greetings example.
-
-To use a real PostgreSQL database, update `src/operator/create_database.ts`
-and set the `DATABASE_URL` environment variable.
+Change from:
+```typescript
+const specsDirs = [
+  'specs',
+  'specs/domain',
+  'specs/domain/definitions',
+  'specs/domain/use-cases',
+  'specs/architecture',
+  'specs/changes',
+  'specs/external',
+];
 ```
 
-#### 1.4 Simplify the Project README
+To:
+```typescript
+const specsDirs = [
+  'specs',
+  'specs/domain',
+  'specs/domain/definitions',
+  'specs/domain/use-cases',
+  'specs/architecture',
+];
 
-**File**: `plugin/skills/project-scaffolding/templates/project/README.md`
-
-Replace the complex k8s instructions with a simple quick start:
-
-```markdown
-## Quick Start
-
-# Install dependencies and generate types
-npm run bootstrap
-
-# Or step by step:
-npm install
-npm run generate    # Generate TypeScript types from OpenAPI
-npm run dev         # Start backend + frontend
-
-Visit http://localhost:5173 to see the app.
+// Separate directories at project root
+const rootDirs = [
+  'changes',   // Change specs (not inside specs/)
+  'archive',   // External specs (audit only, never read again)
+];
 ```
 
-Move the k8s/helm instructions to a separate "Production Deployment" section.
+Add loop for `rootDirs` after the specsDirs loop.
 
-### Phase 2: Align Specs with Code (Greetings as Proper Change)
+#### 1.2 Add .gitkeep Files for Empty Directories
 
-**Goal**: The greetings example follows SDD methodology.
+Empty directories won't be committed to git. Add `.gitkeep` placeholder files:
 
-#### 2.1 Create Greeting Entity Spec
+```typescript
+// Create .gitkeep files for empty directories that need to exist
+const emptyDirs = [
+  'specs/domain/definitions',
+  'specs/domain/use-cases',
+  'specs/architecture',
+  'changes',
+  'archive',
+];
 
-**File**: `plugin/skills/project-scaffolding/templates/specs/domain/definitions/greeting.md` (new)
-
-```markdown
----
-name: Greeting
-domain: Example
-status: active
----
-
-# Greeting
-
-## Description
-
-A personalized greeting message created for a specific person.
-This is an example entity demonstrating the SDD spec-to-code workflow.
-
-## Attributes
-
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | uuid | Yes | Unique identifier |
-| name | string | Yes | Name of the person being greeted |
-| message | string | Yes | The greeting message (generated) |
-| createdAt | timestamp | Yes | When the greeting was created |
-
-## Relationships
-
-- None (standalone example entity)
-
-## Notes
-
-This entity is part of the scaffolded example. Feel free to:
-- Study it to understand spec structure
-- Modify it to learn the workflow
-- Delete it when ready to build your own features
+for (const dir of emptyDirs) {
+  const gitkeepPath = path.join(target, dir, '.gitkeep');
+  await fsp.writeFile(gitkeepPath, '# This file ensures the directory is tracked by git\n');
+  createdFiles.push(`${dir}/.gitkeep`);
+  console.log(`  Created: ${dir}/.gitkeep`);
+}
 ```
 
-#### 2.2 Create Greeting Use-Case Specs
+#### 1.3 Add .claudeignore Creation
 
-**File**: `plugin/skills/project-scaffolding/templates/specs/domain/use-cases/create-greeting.md` (new)
-
-```markdown
----
-name: Create Greeting
-domain: Example
-actors: User
-status: active
----
-
-# Create Greeting
-
-## Summary
-
-Allows a user to create a personalized greeting message by providing their name.
-
-## Actors
-
-- User (anyone accessing the application)
-
-## Preconditions
-
-- None
-
-## Main Flow
-
-1. User submits their name via the greeting form
-2. System validates the name (1-100 characters)
-3. System generates a greeting message: "Hello, {name}!"
-4. System persists the greeting with a unique ID
-5. System returns the created greeting to the user
-
-## Postconditions
-
-- A new Greeting entity exists in the system
-- The greeting is retrievable by its ID
-
-## Error Cases
-
-- **Invalid name**: Name is empty or exceeds 100 characters → Return 400 Bad Request
+After creating directories, add:
+```typescript
+// Create .claudeignore with archive/ ignored
+const claudeignore = path.join(target, '.claudeignore');
+await fsp.writeFile(claudeignore, 'archive/\n');
+createdFiles.push('.claudeignore');
+console.log('  Created: .claudeignore');
 ```
 
-#### 2.3 Add Greeting to Glossary
+---
 
-**File**: `plugin/skills/project-scaffolding/templates/specs/glossary.md`
+### Phase 2: Remove Greetings from Backend Templates
 
-Update to include the Greeting term:
+**Base path**: `plugin/skills/backend-scaffolding/templates/`
+
+#### 2.1 Files to DELETE
+
+| File | Contents |
+|------|----------|
+| `src/controller/http_handlers/greetings.ts` | HTTP POST/GET handlers |
+| `src/model/definitions/greeting.ts` | Greeting type definition |
+| `src/model/use-cases/create_greeting.ts` | Create greeting business logic |
+| `src/model/use-cases/get_greeting.ts` | Get greeting business logic |
+| `src/dal/find_greeting_by_id.ts` | Database query function |
+| `src/dal/insert_greeting.ts` | Database insert function |
+
+#### 2.2 Files to REPLACE (empty barrel exports)
+
+**`src/controller/http_handlers/index.ts`** - Replace with:
+```typescript
+// HTTP handlers index
+// Add router exports here as features are implemented
+// Example: export { createUsersRouter } from './users';
+```
+
+**`src/model/definitions/index.ts`** - Replace with:
+```typescript
+// Model Definitions: Domain types
+// Add type exports here as entities are defined
+// Example: export type { User, CreateUserInput } from './user';
+```
+
+**`src/model/use-cases/index.ts`** - Replace with:
+```typescript
+// Use cases index
+// Add use case exports here as features are implemented
+// Example: export { createUser } from './create_user';
+```
+
+**`src/dal/index.ts`** - Replace with:
+```typescript
+// DAL index
+// Add DAL function exports here as data access is implemented
+// Example: export { findUserById } from './find_user_by_id';
+```
+
+**`src/model/index.ts`** - Replace with:
+```typescript
+// Model index
+export type { Dependencies } from './dependencies';
+// Add type and use case exports here as features are implemented
+```
+
+#### 2.3 Files to MODIFY
+
+**`src/controller/create_controller.ts`** - Replace entirely with:
+```typescript
+// Controller: Assembles routers and creates Dependencies for Model
+import type { Router } from 'express';
+import { Router as createRouter } from 'express';
+
+export type ControllerDependencies = {
+  // Add DAL dependencies here as features are implemented
+  // Example:
+  // readonly dal: {
+  //   readonly findUserById: Dependencies['findUserById'];
+  // };
+};
+
+export type Controller = {
+  readonly router: Router;
+};
+
+export const createController = (_deps: ControllerDependencies): Controller => {
+  const router = createRouter();
+
+  // Mount feature routers here
+  // Example:
+  // const usersRouter = createUsersRouter({ modelDeps });
+  // router.use('/users', usersRouter);
+
+  return { router };
+};
+```
+
+**`src/model/dependencies.ts`** - Replace entirely with:
+```typescript
+// Model Dependencies: Interface defining what use-cases need from DAL
+// The Controller wires these when creating use-cases
+
+export type Dependencies = {
+  // Add DAL function signatures here as features are implemented
+  // Example:
+  // readonly findUserById: (id: string) => Promise<User | null>;
+  // readonly insertUser: (input: InsertUserInput) => Promise<User>;
+};
+```
+
+#### 2.4 Add PostgreSQL Dependencies
+
+**`package.json`** - Add `pg` to dependencies and `@types/pg` to devDependencies:
+
+```json
+"dependencies": {
+  "pg": "^8.11.3",
+  ...existing dependencies...
+},
+"devDependencies": {
+  "@types/pg": "^8.10.9",
+  ...existing devDependencies...
+}
+```
+
+**`src/config/load_config.ts`** - Add `databaseUrl` to config:
+
+```typescript
+import dotenv from 'dotenv';
+
+export type Config = Readonly<{
+  readonly port: number;
+  readonly probesPort: number;
+  readonly nodeEnv: string;
+  readonly logLevel: string;
+  readonly databaseUrl: string;
+}>;
+
+export const loadConfig = (): Config => {
+  dotenv.config();
+
+  const port = parseInt(process.env.PORT ?? '3000', 10);
+  const probesPort = parseInt(process.env.PROBES_PORT ?? '9090', 10);
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  const logLevel = process.env.LOG_LEVEL ?? 'info';
+  const databaseUrl = process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/{{PROJECT_NAME}}';
+
+  return { port, probesPort, nodeEnv, logLevel, databaseUrl };
+};
+```
+
+#### 2.5 Remove In-Memory Database Hack
+
+**`src/operator/create_database.ts`** - Replace the in-memory implementation with PostgreSQL stub:
+
+```typescript
+// Database: Connection factory using PostgreSQL
+import { Pool, type PoolConfig } from 'pg';
+import type pino from 'pino';
+
+import type { Config } from '../config';
+
+export type Database = {
+  readonly connect: () => Promise<void>;
+  readonly query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[] }>;
+  readonly close: () => Promise<void>;
+};
+
+type DatabaseDependencies = Readonly<{
+  readonly config: Config;
+  readonly logger: pino.Logger;
+}>;
+
+export const createDatabase = (deps: DatabaseDependencies): Database => {
+  const logger = deps.logger.child({ component: 'database' });
+
+  // PostgreSQL connection pool
+  // Configure via DATABASE_URL environment variable
+  const poolConfig: PoolConfig = {
+    connectionString: deps.config.databaseUrl,
+  };
+
+  const pool = new Pool(poolConfig);
+
+  return {
+    connect: async () => {
+      // Test connection
+      const client = await pool.connect();
+      client.release();
+      logger.info('Database connected');
+    },
+    query: async <T>(sql: string, params?: unknown[]): Promise<{ rows: T[] }> => {
+      const result = await pool.query(sql, params);
+      return { rows: result.rows as T[] };
+    },
+    close: async () => {
+      await pool.end();
+      logger.info('Database connection closed');
+    },
+  };
+};
+```
+
+---
+
+### Phase 3: Remove Greetings from Frontend Templates
+
+**Base path**: `plugin/skills/frontend-scaffolding/templates/`
+
+#### 3.1 Files to DELETE
+
+| File | Contents |
+|------|----------|
+| `src/pages/greeter.tsx` | Greeter page component |
+| `src/hooks/use-greetings.ts` | React Query hooks for greetings |
+| `src/api/greetings.ts` | API client for greetings |
+
+#### 3.2 Files to REPLACE (empty barrel exports)
+
+**`src/pages/index.ts`** - Replace with:
+```typescript
+// Pages index
+export { HomePage } from './home';
+// Add page exports here as features are implemented
+// Example: export { UsersPage } from './users';
+```
+
+**`src/api/index.ts`** - Replace with:
+```typescript
+// API index
+// Add API client exports here as features are implemented
+// Example: export { usersApi } from './users';
+```
+
+**`src/hooks/index.ts`** - Replace with:
+```typescript
+// Hooks index
+// Add hook exports here as features are implemented
+// Example: export { useUser, useCreateUser } from './use-users';
+```
+
+#### 3.3 Files to MODIFY
+
+**`src/app.tsx`** - Replace entirely with:
+```typescript
+import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Sidebar } from './components';
+import { HomePage } from './pages';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
+
+const PageRouter = ({ currentPage }: { currentPage: string }): JSX.Element => {
+  switch (currentPage) {
+    case 'home':
+    default:
+      return <HomePage />;
+  }
+};
+
+export const App = (): JSX.Element => {
+  const [currentPage, setCurrentPage] = useState('home');
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen bg-gray-100 flex">
+        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+        <main className="flex-1">
+          <PageRouter currentPage={currentPage} />
+        </main>
+      </div>
+    </QueryClientProvider>
+  );
+};
+```
+
+**`src/components/sidebar.tsx`** - Replace `navItems` array:
+```typescript
+const navItems: readonly NavItem[] = [
+  { id: 'home', label: 'Home', icon: '🏠' },
+  // Add navigation items here as pages are implemented
+  // Example: { id: 'users', label: 'Users', icon: '👥' },
+];
+```
+
+---
+
+### Phase 4: Remove Greetings from Contract Templates
+
+**Base path**: `plugin/skills/contract-scaffolding/templates/`
+
+#### 4.1 Files to MODIFY
+
+**`openapi.yaml`** - Replace entirely with base structure only:
+
+```yaml
+openapi: 3.0.3
+info:
+  title: {{PROJECT_NAME}} API
+  version: 1.0.0
+  description: API specification for {{PROJECT_NAME}}
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+paths:
+  # NOTE: Health check endpoints (/health, /readiness, /liveness) are NOT defined here.
+  # They are infrastructure endpoints implemented directly in the controller.
+  #
+  # Add your API endpoints here as features are implemented.
+  # Example:
+  # /users:
+  #   post:
+  #     operationId: createUser
+  #     ...
+
+components:
+  schemas:
+    # Add your domain schemas here as entities are defined.
+    # Example:
+    # User:
+    #   type: object
+    #   required:
+    #     - id
+    #     - email
+    #   properties:
+    #     id:
+    #       type: string
+    #     email:
+    #       type: string
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                $ref: '#/components/schemas/Error'
+```
+
+---
+
+### Phase 5: Update Project Templates
+
+**Base path**: `plugin/skills/project-scaffolding/templates/`
+
+#### 5.1 Empty Glossary
+
+**`specs/glossary.md`** - Replace entirely with:
+
 ```markdown
+# Domain Glossary
+
+Canonical terminology for {{PROJECT_NAME}}.
+
+## Terms
+
 | Term | Definition |
 |------|------------|
-| Greeting | A personalized message created for a specific person (example entity) |
-| User | A registered account in the system |
+
+## Conventions
+
+- Use singular nouns for definitions (User, not Users)
+- Use past tense for events (UserCreated, not CreateUser)
+- Be consistent with terminology across all specs
 ```
 
-#### 2.4 Create Example Change Spec
+#### 5.2 Local Database via Kubernetes
 
-**File**: `plugin/skills/project-scaffolding/templates/specs/changes/example/greetings/SPEC.md` (new)
+Local PostgreSQL runs via Kubernetes (using the database component's k8s manifests). No docker-compose file needed.
+
+The database component already includes:
+- `scripts/setup.sh` - Creates k8s namespace and deploys PostgreSQL
+- `scripts/teardown.sh` - Removes k8s resources
+- `scripts/port-forward.sh` - Forwards PostgreSQL port to localhost
+
+These are wired to npm scripts in the root package.json by scaffolding.ts:
+- `npm run <db-component>:setup`
+- `npm run <db-component>:teardown`
+- `npm run <db-component>:port-forward`
+
+#### 5.3 Simplify Project README
+
+**`project/README.md`** - Update quick start section to:
 
 ```markdown
----
-title: Greetings Feature (Example)
-type: feature
-status: active
-created: {{DATE}}
----
+# {{PROJECT_NAME}}
 
-# Greetings Feature
+{{PROJECT_DESCRIPTION}}
 
-This is an **example feature** demonstrating the SDD workflow. It is pre-implemented
-in the scaffolded project to show how specs map to code.
+## Getting Started
 
-## Overview
+This project was scaffolded with SDD. To add your first feature:
 
-A simple greeting system where users can create and retrieve personalized greetings.
-
-## Requirements
-
-### Functional
-
-1. Users can create a greeting by providing their name
-2. System generates a greeting message: "Hello, {name}!"
-3. Users can retrieve a greeting by its ID
-
-### Non-Functional
-
-1. Greeting names must be 1-100 characters
-2. Greetings persist for the duration of the server process (in-memory)
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /api/v1/greetings | Create a new greeting |
-| GET | /api/v1/greetings/{id} | Get greeting by ID |
-
-## Domain Entities
-
-- **Greeting**: See `specs/domain/definitions/greeting.md`
-
-## Implementation Notes
-
-This feature demonstrates:
-- OpenAPI contract → TypeScript types
-- CMDO architecture (Controller → Model → DAL → Operator)
-- React hooks with TanStack Query
-- In-memory database for development
-
-## Learning Path
-
-1. Read this spec to understand requirements
-2. Review `PLAN.md` to see implementation phases
-3. Trace the code: `openapi.yaml` → handlers → use-cases → DAL
-4. Modify the greeting message format as an exercise
-5. Add a "list all greetings" endpoint to practice the workflow
+```bash
+/sdd-new-change --type feature --name <your-first-feature>
 ```
 
-#### 2.5 Create Example Change Plan
+This will guide you through:
+1. Creating a specification for your feature
+2. Planning the implementation
+3. Building it step by step
 
-**File**: `plugin/skills/project-scaffolding/templates/specs/changes/example/greetings/PLAN.md` (new)
+## Development
 
-```markdown
----
-title: Greetings Feature Implementation Plan
-status: completed
----
+Once you have features implemented:
 
-# Implementation Plan: Greetings Feature
+```bash
+# Start local database (requires local Kubernetes cluster)
+npm run database:setup
+npm run database:port-forward
 
-## Phases
+# Install dependencies and generate types
+npm install
+npm run generate
 
-### Phase 1: Contract Definition ✓
-
-- Define Greeting schema in OpenAPI
-- Define CreateGreetingInput schema
-- Define POST /greetings endpoint
-- Define GET /greetings/{id} endpoint
-- Generate TypeScript types
-
-### Phase 2: Backend Implementation ✓
-
-- Create Greeting type in model/definitions
-- Implement insertGreeting DAL function
-- Implement findGreetingById DAL function
-- Implement createGreeting use-case
-- Implement getGreeting use-case
-- Create HTTP handlers
-- Wire up routes in controller
-
-### Phase 3: Frontend Implementation ✓
-
-- Create greetingsApi client
-- Implement useCreateGreeting hook
-- Implement useGreeting hook
-- Create Greeter page component
-- Add route to app
-
-### Phase 4: Testing ✓
-
-- Backend use-cases work with in-memory database
-- Frontend renders greeter page
-- Create greeting flow works end-to-end
-
-## Verification
-
-Run `npm run dev` and visit http://localhost:5173/greeter to verify.
+# Start development servers
+npm run dev
 ```
 
-### Phase 3: Fix Completion Report and Next Steps
+## Project Structure
 
-**Goal**: After sdd-init, developer knows exactly what to do.
+```
+├── specs/                 # Static specifications
+│   ├── domain/            # Domain definitions and use cases
+│   ├── architecture/      # Architecture decisions
+│   └── glossary.md        # Domain terminology
+├── changes/               # Change specifications (features, fixes)
+├── archive/               # Archived external specs (audit only)
+├── components/            # Application components
+│   ├── contract/          # OpenAPI specification
+│   ├── server/            # Backend (CMDO architecture)
+│   └── webapp/            # Frontend (React + Vite)
+└── config/                # Configuration files
+```
+```
 
-#### 3.1 Update sdd-init Completion Report
+---
+
+### Phase 6: Update sdd-init Command
 
 **File**: `plugin/commands/sdd-init.md`
 
-Update Phase 9 completion report:
+Update the completion report output based on whether external spec was provided:
 
-```markdown
+**Without external spec:**
+```
 ═══════════════════════════════════════════════════════════════
  PROJECT INITIALIZED: <project-name>
 ═══════════════════════════════════════════════════════════════
@@ -444,158 +604,190 @@ Update Phase 9 completion report:
 Location: <absolute-path>
 Domain: <primary-domain>
 
-┌─────────────────────────────────────────────────────────────┐
-│ QUICK START                                                  │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│   npm run bootstrap                                          │
-│                                                              │
-│   Then visit: http://localhost:5173                          │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-
 WHAT'S INCLUDED:
 
-  ✓ Greetings example feature (fully spec'd and implemented)
-    → specs/changes/example/greetings/SPEC.md
-    → Demonstrates the complete SDD workflow
+  ✓ Full project structure (backend, frontend, contract)
+  ✓ CMDO architecture ready for your features
+  ✓ Empty specs directory (ready for your first feature)
 
-  ✓ Domain specs pre-populated
-    → specs/domain/glossary.md (Greeting entity)
-    → specs/domain/definitions/greeting.md
-    → specs/domain/use-cases/create-greeting.md
+NEXT STEP:
 
-RECOMMENDED LEARNING PATH:
+  /sdd-new-change --type feature --name <your-first-feature>
 
-  1. Run `npm run bootstrap` and verify the app works
-  2. Read specs/changes/example/greetings/SPEC.md
-  3. Trace: SPEC.md → PLAN.md → Code
-  4. Try modifying the greeting format as an exercise
-
-READY TO BUILD YOUR OWN FEATURE:
-
-  /sdd-new-change --type feature --name <your-feature>
-
-  This will create a new change spec for you to fill in,
-  then guide you through planning and implementation.
+  This will guide you through:
+  1. Creating a specification for your feature
+  2. Planning the implementation
+  3. Building it step by step
 ```
 
-### Phase 4: Component-Level Documentation
-
-**Goal**: Each component directory explains itself.
-
-#### 4.1 Backend README
-
-**File**: `plugin/skills/backend-scaffolding/templates/README.md` (new)
-
-Full README explaining:
-- CMDO architecture with diagram
-- Directory structure
-- How to add a new endpoint (step by step)
-- How to add a new use-case
-- How to add a new DAL function
-- In-memory vs PostgreSQL database
-- Configuration
-- Testing
-
-#### 4.2 Frontend README
-
-**File**: `plugin/skills/frontend-scaffolding/templates/README.md` (new)
-
-Full README explaining:
-- MVVM pattern with hooks as ViewModels
-- Directory structure
-- How to add a new page
-- How to add a new API call
-- TanStack Query patterns
-- Tailwind CSS
-- Vite configuration
-
-#### 4.3 Contract README
-
-**File**: `plugin/skills/contract-scaffolding/templates/README.md` (new)
-
-Full README explaining:
-- OpenAPI 3.0 structure
-- How to add a new endpoint
-- How to add a new schema
-- Type generation (when and how)
-- Validation
-
-### Phase 5: Infrastructure Templates (Deferred)
-
-The helm, testing, and cicd scaffolding skills can be deferred. They're not blocking the "ready-to-work" goal since:
-- Helm isn't needed for local development
-- Testing structure exists (vitest configured)
-- CI/CD is post-MVP
-
-Create placeholder READMEs explaining these are coming:
-
-**File**: `plugin/skills/project-scaffolding/templates/components/helm/README.md` (if helm selected)
-```markdown
-# Helm Charts
-
-Helm chart scaffolding is coming soon.
-
-For now, you can manually create Helm charts in this directory
-or use `helm create <chart-name>` to generate a starter chart.
+**With external spec:**
 ```
+═══════════════════════════════════════════════════════════════
+ PROJECT INITIALIZED: <project-name>
+═══════════════════════════════════════════════════════════════
+
+Location: <absolute-path>
+Domain: <primary-domain>
+
+CHANGES CREATED FROM EXTERNAL SPEC:
+
+  [List of changes created from external spec]
+
+NEXT STEPS:
+
+  1. Review the generated change specs in changes/
+  2. Run /sdd-implement-change to begin implementation
+```
+
+---
+
+### Phase 7: Update SKILL.md Documentation
+
+Update the SKILL.md files to reflect the clean skeleton without greeting examples.
+
+**Files to update:**
+- `plugin/skills/backend-scaffolding/SKILL.md` - Remove greeting references from examples
+- `plugin/skills/frontend-scaffolding/SKILL.md` - Remove greeting references from examples
+- `plugin/skills/contract-scaffolding/SKILL.md` - Remove greeting references from examples
+
+---
+
+### Phase 8: Update Path References Across Plugin
+
+**18 files** reference the old `specs/changes/` or `specs/external/` paths. These must be updated to use the new paths:
+- `specs/changes/` → `changes/`
+- `specs/external/` → `archive/`
+
+#### Files to Update
+
+**Commands:**
+| File | Changes |
+|------|---------|
+| `plugin/commands/sdd-init.md` | Update all path references |
+| `plugin/commands/sdd-new-change.md` | Update path references |
+| `plugin/commands/sdd-implement-change.md` | Update path references |
+| `plugin/commands/sdd-verify-change.md` | Update path references |
+
+**Agents:**
+| File | Changes |
+|------|---------|
+| `plugin/agents/planner.md` | Update `specs/changes/` to `changes/` |
+| `plugin/agents/spec-writer.md` | Update `specs/changes/` to `changes/` |
+| `plugin/agents/tester.md` | Update `specs/changes/` to `changes/` |
+
+**Skills:**
+| File | Changes |
+|------|---------|
+| `plugin/skills/change-creation/SKILL.md` | Update path references |
+| `plugin/skills/epic-planning/SKILL.md` | Update path references |
+| `plugin/skills/external-spec-integration/SKILL.md` | Update `specs/external/` to `archive/` |
+| `plugin/skills/integration-testing/SKILL.md` | Update path references |
+| `plugin/skills/e2e-testing/SKILL.md` | Update path references |
+| `plugin/skills/unit-testing/SKILL.md` | Update path references |
+| `plugin/skills/planning/SKILL.md` | Update path references |
+| `plugin/skills/spec-index/SKILL.md` | Update path references |
+| `plugin/skills/spec-writing/SKILL.md` | Update path references |
+
+**Templates:**
+| File | Changes |
+|------|---------|
+| `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update path references |
+
+---
+
+### Phase 9: Add Component READMEs (Deferred)
+
+This phase can be implemented later. The clean skeleton is functional without READMEs.
 
 ---
 
 ## File Changes Summary
 
-### New Files
+### Files to DELETE (9 files)
 
-| File | Phase | Purpose |
-|------|-------|---------|
-| `templates/specs/domain/definitions/greeting.md` | 2.1 | Greeting entity spec |
-| `templates/specs/domain/use-cases/create-greeting.md` | 2.2 | Create greeting use-case spec |
-| `templates/specs/changes/example/greetings/SPEC.md` | 2.4 | Example change specification |
-| `templates/specs/changes/example/greetings/PLAN.md` | 2.5 | Example implementation plan |
-| `templates/backend/README.md` | 4.1 | Backend documentation |
-| `templates/frontend/README.md` | 4.2 | Frontend documentation |
-| `templates/contract/README.md` | 4.3 | Contract documentation |
+| File | Reason |
+|------|--------|
+| `backend-scaffolding/templates/src/controller/http_handlers/greetings.ts` | Greeting handler |
+| `backend-scaffolding/templates/src/model/definitions/greeting.ts` | Greeting type |
+| `backend-scaffolding/templates/src/model/use-cases/create_greeting.ts` | Greeting logic |
+| `backend-scaffolding/templates/src/model/use-cases/get_greeting.ts` | Greeting logic |
+| `backend-scaffolding/templates/src/dal/find_greeting_by_id.ts` | Greeting DAL |
+| `backend-scaffolding/templates/src/dal/insert_greeting.ts` | Greeting DAL |
+| `frontend-scaffolding/templates/src/pages/greeter.tsx` | Greeter page |
+| `frontend-scaffolding/templates/src/hooks/use-greetings.ts` | Greeting hooks |
+| `frontend-scaffolding/templates/src/api/greetings.ts` | Greeting API |
 
-### Modified Files
+### Files to CREATE (6 files, via scaffolding.ts)
 
-| File | Phase | Changes |
-|------|-------|---------|
-| `templates/project/package.json` | 1.1 | Add bootstrap script |
-| `templates/project/README.md` | 1.4 | Simplify quick start |
-| `templates/specs/glossary.md` | 2.3 | Add Greeting term |
-| `plugin/commands/sdd-init.md` | 3.1 | Update completion report |
-| `scaffolding.ts` | 1.2 | Verify script generation |
+| File | Purpose |
+|------|---------|
+| `.claudeignore` | Ignore archive/ directory |
+| `specs/domain/definitions/.gitkeep` | Placeholder for empty directory |
+| `specs/domain/use-cases/.gitkeep` | Placeholder for empty directory |
+| `specs/architecture/.gitkeep` | Placeholder for empty directory |
+| `changes/.gitkeep` | Placeholder for empty directory |
+| `archive/.gitkeep` | Placeholder for empty directory |
 
-### Template Directories to Create
+### Files to MODIFY (39 files)
 
-```
-templates/specs/
-├── domain/
-│   ├── definitions/
-│   │   └── greeting.md          # NEW
-│   └── use-cases/
-│       └── create-greeting.md   # NEW
-└── changes/
-    └── example/
-        └── greetings/
-            ├── SPEC.md          # NEW
-            └── PLAN.md          # NEW
-```
+**Templates (23 files):**
 
----
+| File | Changes |
+|------|---------|
+| `scaffolding/scaffolding.ts` | Update directory structure, add .claudeignore, .gitkeep |
+| `backend-scaffolding/templates/package.json` | Add `pg` dependency |
+| `backend-scaffolding/templates/src/config/load_config.ts` | Add `databaseUrl` config |
+| `backend-scaffolding/templates/src/controller/create_controller.ts` | Empty controller |
+| `backend-scaffolding/templates/src/controller/http_handlers/index.ts` | Empty barrel |
+| `backend-scaffolding/templates/src/model/index.ts` | Empty barrel |
+| `backend-scaffolding/templates/src/model/definitions/index.ts` | Empty barrel |
+| `backend-scaffolding/templates/src/model/use-cases/index.ts` | Empty barrel |
+| `backend-scaffolding/templates/src/model/dependencies.ts` | Empty interface |
+| `backend-scaffolding/templates/src/dal/index.ts` | Empty barrel |
+| `backend-scaffolding/templates/src/operator/create_database.ts` | PostgreSQL connection |
+| `frontend-scaffolding/templates/src/app.tsx` | Remove greeter |
+| `frontend-scaffolding/templates/src/pages/index.ts` | Empty barrel |
+| `frontend-scaffolding/templates/src/api/index.ts` | Empty barrel |
+| `frontend-scaffolding/templates/src/hooks/index.ts` | Empty barrel |
+| `frontend-scaffolding/templates/src/components/sidebar.tsx` | Remove greeter nav |
+| `contract-scaffolding/templates/openapi.yaml` | Base structure only |
+| `project-scaffolding/templates/specs/glossary.md` | Empty table |
+| `project-scaffolding/templates/project/README.md` | Simplified quick start |
+| `project-scaffolding/templates/project/CLAUDE.md` | Update path references |
+| `backend-scaffolding/SKILL.md` | Remove greeting references |
+| `frontend-scaffolding/SKILL.md` | Remove greeting references |
+| `contract-scaffolding/SKILL.md` | Remove greeting references |
 
-## Success Criteria
+**Commands (4 files):**
 
-After implementation, a developer should be able to:
+| File | Changes |
+|------|---------|
+| `commands/sdd-init.md` | Update completion report and path references |
+| `commands/sdd-new-change.md` | Update path references |
+| `commands/sdd-implement-change.md` | Update path references |
+| `commands/sdd-verify-change.md` | Update path references |
 
-1. **Run `sdd-init --name my-app`** and get a complete project
-2. **Run `npm run bootstrap`** with zero errors
-3. **See the greeter page** at http://localhost:5173
-4. **Create a greeting** and see it work
-5. **Read the example spec** at `specs/changes/example/greetings/SPEC.md`
-6. **Understand how specs map to code** by tracing the example
-7. **Know exactly what to do next**: `/sdd-new-change --type feature --name <feature>`
+**Agents (3 files):**
+
+| File | Changes |
+|------|---------|
+| `agents/planner.md` | Update path references |
+| `agents/spec-writer.md` | Update path references |
+| `agents/tester.md` | Update path references |
+
+**Skills (9 files):**
+
+| File | Changes |
+|------|---------|
+| `skills/change-creation/SKILL.md` | Update path references |
+| `skills/epic-planning/SKILL.md` | Update path references |
+| `skills/external-spec-integration/SKILL.md` | Update path references |
+| `skills/integration-testing/SKILL.md` | Update path references |
+| `skills/e2e-testing/SKILL.md` | Update path references |
+| `skills/unit-testing/SKILL.md` | Update path references |
+| `skills/planning/SKILL.md` | Update path references |
+| `skills/spec-index/SKILL.md` | Update path references |
+| `skills/spec-writing/SKILL.md` | Update path references |
 
 ---
 
@@ -603,31 +795,56 @@ After implementation, a developer should be able to:
 
 Before marking complete, verify:
 
-- [ ] `npm run bootstrap` works on fresh project
-- [ ] Frontend loads at http://localhost:5173
-- [ ] Greeter page creates a greeting successfully
-- [ ] `specs/changes/example/greetings/SPEC.md` exists and is readable
-- [ ] `specs/domain/glossary.md` includes Greeting
-- [ ] `specs/domain/definitions/greeting.md` exists
-- [ ] Completion report shows clear next steps
-- [ ] Each component has a README
+**Project Structure:**
+- [ ] `scaffolding.ts` creates `changes/` and `archive/` at project root
+- [ ] `scaffolding.ts` creates `.claudeignore` with `archive/`
+- [ ] `specs/` contains only `domain/`, `architecture/`, glossary.md
+- [ ] No `specs/changes/` or `specs/external/` directories created
+- [ ] Empty directories have `.gitkeep` files: `specs/domain/definitions/`, `specs/domain/use-cases/`, `specs/architecture/`, `changes/`, `archive/`
+- [ ] `specs/domain/glossary.md` has empty table (no pre-populated terms)
+
+**Backend:**
+- [ ] No greeting-related files exist
+- [ ] All index files are empty barrels with helpful comments
+- [ ] `create_controller.ts` has empty controller structure
+- [ ] `dependencies.ts` has empty Dependencies type
+- [ ] `create_database.ts` uses PostgreSQL (no in-memory hack)
+- [ ] `package.json` includes `pg` dependency
+- [ ] `load_config.ts` includes `databaseUrl` config
+- [ ] Backend compiles with no errors
+
+**Frontend:**
+- [ ] No greeter page or greeting API/hooks
+- [ ] `app.tsx` only routes to HomePage
+- [ ] `sidebar.tsx` only shows Home nav item
+- [ ] All index files are empty barrels with helpful comments
+- [ ] Frontend compiles with no errors
+
+**Contract:**
+- [ ] OpenAPI has base structure only (no greetings endpoints)
+- [ ] Error schema and response definitions remain
+- [ ] Type generation works (produces empty types)
+
+**Database:**
+- [ ] Database component k8s scripts exist (setup, teardown, port-forward)
+- [ ] Root package.json includes database npm scripts
+
+**Completion Report:**
+- [ ] Without external spec: shows `/sdd-new-change` as next step
+- [ ] With external spec: shows changes list and `/sdd-implement-change`
+- [ ] Neither variant mentions `npm run bootstrap`
+
+**Path References (grep for old paths should return 0 results):**
+- [ ] No references to `specs/changes/` in any plugin files
+- [ ] No references to `specs/external/` in any plugin files
+- [ ] All commands, agents, and skills use `changes/` and `archive/`
 
 ---
 
-## Risk Mitigation
+## Open Questions (All Resolved)
 
-| Risk | Mitigation |
-|------|------------|
-| Too many new files overwhelm the developer | Keep specs concise, add "This is an example" markers everywhere |
-| Example feels contrived | Make it genuinely useful - a greeting system is simple but real |
-| Complexity creep | Defer infrastructure templates (helm, cicd) to separate task |
-| Breaking existing scaffolding | Add tests for scaffolding output verification |
-
----
-
-## Open Questions Resolved
-
-1. **Should the example be a change spec?** → Yes, it demonstrates the methodology
-2. **Should we remove k8s from quick start?** → Yes, defer to "Production Deployment" section
-3. **Is in-memory database a feature or hack?** → Feature - document it as such
-4. **Should greeting specs be part of domain-population?** → No, they're static templates (the example is fixed, not dynamic based on discovery)
+1. **Should we include a greetings example?** → No, remove it entirely.
+2. **In-memory database or PostgreSQL?** → PostgreSQL via docker-compose.
+3. **Should domain specs be pre-populated?** → No, always empty at scaffolding.
+4. **Where should changes/ go?** → Project root, not inside specs/.
+5. **What about archive/?** → Project root, added to .claudeignore.

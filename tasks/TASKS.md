@@ -9,6 +9,8 @@
 ### 9. sdd-init should produce ready-to-work components [CRITICAL]
 After running `sdd-init`, all components should be in a ready-to-work state without additional setup or configuration needed. The initial template generated for new components is currently sparse and doesn't include enough content/guidance for the different component types.
 
+**Includes:** Task #42 (restructure specs directory)
+
 **Plan:** [plans/planned/PLAN-task-9-ready-to-work-components.md](plans/planned/PLAN-task-9-ready-to-work-components.md)
 
 ---
@@ -182,14 +184,6 @@ The `tests/src/tests/workflows/sdd-new-change.test.ts` test is failing because t
 - Apply the same external spec handling rules (archive/reference only, create self-sufficient specs)
 - Consistent behavior between `sdd-init` and `sdd-new-change` for external spec workflows
 
-### 42. Restructure specs directory - separate static specs from changes
-Current `specs/` directory mixes static specs with changes. Need to restructure:
-- `specs/` should only contain static files (domain, architecture, etc.)
-- Move `specs/changes/` out to a separate location (e.g., `changes/` at root)
-- Move external specs to a new `archive/` directory
-- Add `archive/` to `.claudeignore` so Claude doesn't read them during implementation
-- Cleaner separation of concerns
-
 ### 43. CI/CD components and .github folder integration
 Need to figure out how to handle separate CI/CD components and how they integrate with the root `.github/` folder:
 - How do CI/CD component types work with monorepo structure?
@@ -284,6 +278,8 @@ Investigate if there's a way to show a welcome prompt/message after plugin insta
 ### 46. Missing Helm chart template → merged into #44
 
 ### 36. Drift detection for direct code changes → merged into #35
+
+### 42. Restructure specs directory → merged into #9
 
 ---
 
