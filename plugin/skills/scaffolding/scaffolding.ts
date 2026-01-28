@@ -544,6 +544,122 @@ jobs:
   }
 
   // -------------------------------------------------------------------------
+  // Step 4: Generate component-specific npm scripts in root package.json
+  // -------------------------------------------------------------------------
+  console.log('\nGenerating npm scripts...');
+
+  const pkgPath = path.join(target, 'package.json');
+  const pkgContent = await fsp.readFile(pkgPath, 'utf-8');
+  const pkg = JSON.parse(pkgContent) as { scripts: Record<string, string> };
+
+  const scripts: Record<string, string> = {};
+  const contracts: string[] = [];
+  const servers: string[] = [];
+  const webapps: string[] = [];
+  const databases: string[] = [];
+
+  for (const component of components) {
+    const workspace = `-w @${config.project_name}/${component.name}`;
+
+    switch (component.type) {
+      case 'contract':
+        contracts.push(component.name);
+        scripts[`${component.name}:generate`] = `npm run generate:types ${workspace}`;
+        scripts[`${component.name}:validate`] = `npm run validate ${workspace}`;
+        console.log(`  Added: ${component.name}:generate, ${component.name}:validate`);
+        break;
+      case 'server':
+        servers.push(component.name);
+        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
+        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
+        scripts[`${component.name}:start`] = `npm run start ${workspace}`;
+        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
+        console.log(`  Added: ${component.name}:dev, ${component.name}:build, ${component.name}:start, ${component.name}:test`);
+        break;
+      case 'webapp':
+        webapps.push(component.name);
+        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
+        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
+        scripts[`${component.name}:preview`] = `npm run preview ${workspace}`;
+        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
+        console.log(`  Added: ${component.name}:dev, ${component.name}:build, ${component.name}:preview, ${component.name}:test`);
+        break;
+      case 'database':
+        databases.push(component.name);
+        scripts[`${component.name}:setup`] = `npm run setup ${workspace}`;
+        scripts[`${component.name}:teardown`] = `npm run teardown ${workspace}`;
+        scripts[`${component.name}:migrate`] = `npm run migrate ${workspace}`;
+        scripts[`${component.name}:seed`] = `npm run seed ${workspace}`;
+        scripts[`${component.name}:reset`] = `npm run reset ${workspace}`;
+        scripts[`${component.name}:port-forward`] = `npm run port-forward ${workspace}`;
+        scripts[`${component.name}:psql`] = `npm run psql ${workspace}`;
+        console.log(`  Added: ${component.name}:setup, ${component.name}:teardown, ${component.name}:migrate, ${component.name}:seed, ${component.name}:reset, ${component.name}:port-forward, ${component.name}:psql`);
+        break;
+      case 'helm': {
+        const dirName = componentDirName(component);
+        scripts[`${component.name}:lint`] = `helm lint components/${dirName}`;
+        console.log(`  Added: ${component.name}:lint`);
+        break;
+      }
+    }
+  }
+
+  // Meta-scripts: orchestration with dependency ordering
+  if (contracts.length > 0 || servers.length > 0 || webapps.length > 0) {
+    console.log('  Adding meta-scripts...');
+
+    // Generate all contract types
+    if (contracts.length > 0) {
+      const generateAll = contracts.map((c) => `${c}:generate`).join(' ');
+      scripts['generate'] = `npm-run-all ${generateAll}`;
+    }
+
+    // Dev: generate types first, then start servers/webapps in parallel
+    const devTargets = [...servers, ...webapps].map((c) => `${c}:dev`);
+    if (devTargets.length > 0) {
+      if (contracts.length > 0) {
+        scripts['dev'] = `npm-run-all generate --parallel ${devTargets.join(' ')}`;
+      } else {
+        scripts['dev'] = `npm-run-all --parallel ${devTargets.join(' ')}`;
+      }
+    }
+
+    // Build: generate types first, then build all in parallel
+    const buildTargets = [...servers, ...webapps].map((c) => `${c}:build`);
+    if (buildTargets.length > 0) {
+      if (contracts.length > 0) {
+        scripts['build'] = `npm-run-all generate --parallel ${buildTargets.join(' ')}`;
+      } else {
+        scripts['build'] = `npm-run-all --parallel ${buildTargets.join(' ')}`;
+      }
+    }
+
+    // Test: generate types first, then test all in parallel
+    const testTargets = [...servers, ...webapps].map((c) => `${c}:test`);
+    if (testTargets.length > 0) {
+      if (contracts.length > 0) {
+        scripts['test'] = `npm-run-all generate --parallel ${testTargets.join(' ')}`;
+      } else {
+        scripts['test'] = `npm-run-all --parallel ${testTargets.join(' ')}`;
+      }
+    }
+
+    // Start: run production builds in parallel
+    const startTargets = [
+      ...servers.map((c) => `${c}:start`),
+      ...webapps.map((c) => `${c}:preview`),
+    ];
+    if (startTargets.length > 0) {
+      scripts['start'] = `npm-run-all --parallel ${startTargets.join(' ')}`;
+    }
+
+    console.log('  Added: generate, dev, build, test, start');
+  }
+
+  pkg.scripts = scripts;
+  await fsp.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+
+  // -------------------------------------------------------------------------
   // Summary
   // -------------------------------------------------------------------------
   console.log(`\n${'='.repeat(60)}`);

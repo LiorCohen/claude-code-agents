@@ -1,19 +1,41 @@
 # Database Component
 
-PostgreSQL database migrations, seeds, and management scripts.
+PostgreSQL database migrations, seeds, and management scripts. Deployed to local Kubernetes cluster.
 
 ## Prerequisites
 
-- PostgreSQL 14+
-- Environment variables: `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+- Local Kubernetes cluster (Docker Desktop, minikube, or kind)
+- kubectl configured and connected
+- Helm 3 installed
+- psql client (for direct database access)
 
-## Usage
+## Quick Start
 
 ```bash
-npm run migrate   # Run all migrations
-npm run seed      # Run all seed files
-npm run reset     # Drop, recreate, migrate, and seed
+# 1. Deploy PostgreSQL to k8s
+npm run setup
+
+# 2. Forward port to access from localhost (run in separate terminal)
+npm run port-forward
+
+# 3. Run migrations
+npm run migrate
+
+# 4. (Optional) Load seed data
+npm run seed
 ```
+
+## Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run setup` | Deploy PostgreSQL to local Kubernetes cluster |
+| `npm run teardown` | Remove PostgreSQL from cluster |
+| `npm run port-forward` | Forward localhost:5432 to database pod |
+| `npm run psql` | Connect to database via psql |
+| `npm run migrate` | Run all pending migrations |
+| `npm run seed` | Load seed data |
+| `npm run reset` | Drop, recreate, migrate, and seed |
 
 ## Adding Migrations
 
@@ -48,20 +70,34 @@ INSERT INTO users (id, email) VALUES (1, 'admin@example.com')
 ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
 ```
 
-## Environment Setup
+## Default Connection Settings
 
-Set these environment variables before running scripts:
+When using port-forward, scripts default to:
+
+| Setting | Value |
+|---------|-------|
+| Host | localhost |
+| Port | 5432 |
+| Database | {{PROJECT_NAME}} |
+| Username | {{PROJECT_NAME}} |
+| Password | {{PROJECT_NAME}}-local |
+
+Override with environment variables:
 
 ```bash
 export PGHOST=localhost
 export PGPORT=5432
-export PGUSER=app_user
-export PGPASSWORD=your_password
 export PGDATABASE={{PROJECT_NAME}}
+export PGUSER={{PROJECT_NAME}}
+export PGPASSWORD=your_password
 ```
 
-Or use a `.env` file with your preferred env loader.
+## Configuration
 
-## Reference
+Customize deployment with environment variables:
 
-See [PostgreSQL Skill](../../../skills/postgresql/SKILL.md) for SQL patterns and best practices.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_NAMESPACE` | default | Kubernetes namespace |
+| `DB_RELEASE_NAME` | {{PROJECT_NAME}}-db | Helm release name |
+| `DB_LOCAL_PORT` | 5432 | Local port for port-forward |

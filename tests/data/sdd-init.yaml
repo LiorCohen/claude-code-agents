@@ -81,3 +81,17 @@ runs:
       input_tokens: 23444
       output_tokens: 357
       total_tokens: 23801
+  - timestamp: "2026-01-28T17:53:31.429Z"
+    plugin_version: "4.7.0"
+    test_file: "tests/src/tests/workflows/sdd-init.test.ts"
+    test_name: "init-fullstack"
+    turn_count: 63
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 3786
+        output_tokens: 442
+        total_tokens: 4228
+    total:
+      input_tokens: 3786
+      output_tokens: 442
+      total_tokens: 4228

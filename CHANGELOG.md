@@ -8,6 +8,32 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## [4.8.0] - 2026-01-28
+
+### Added
+
+- **Component lifecycle npm scripts**: Root package.json now includes component-specific scripts generated dynamically based on project configuration
+  - Pattern: `npm run <component-name>:<action>` (e.g., `npm run backend:dev`, `npm run api:generate`)
+  - Meta-scripts: `dev`, `build`, `test`, `start`, `generate` orchestrate components with proper dependency ordering
+  - Contract types are generated before server/webapp builds
+
+- **Database k8s scripts**: Database component now includes scripts for local Kubernetes deployment
+  - `setup` / `teardown`: Deploy/remove PostgreSQL to local k8s via Helm
+  - `port-forward`: Forward localhost:5432 to database pod
+  - `psql`: Connect to database via psql
+  - All existing scripts (`migrate`, `seed`, `reset`) updated with default connection settings
+
+### Changed
+
+- **Root package.json template**: Removed generic `--workspaces --if-present` scripts (didn't respect dependencies)
+- **Database package name**: Changed from `{{PROJECT_NAME}}-database` to scoped `@{{PROJECT_NAME}}/database`
+
+### Enhanced
+
+- **scaffolding.ts**: New Step 4 generates component-specific npm scripts after creating template files
+
+---
+
 ## [4.7.0] - 2026-01-28
 
 ### Added

@@ -1,11 +1,8 @@
 # Tasks / Improvements Backlog
 
-## Pending
+## High Priority
 
-### 1. Initial template lacks content for different components
-The initial template generated for new components is sparse and doesn't include enough content/guidance for the different component types.
-
-### 2. Add npm run scripts for component lifecycle management
+### 2. Add npm run scripts for component lifecycle management [BROKEN]
 There should be a way to run/stop components using `npm run <component>` or similar. Each component type would have its own semantics for what "run" and "stop" mean, with different run commands depending on the component type.
 
 **Examples:**
@@ -14,20 +11,19 @@ There should be a way to run/stop components using `npm run <component>` or simi
 - Libraries: run tests or build
 - etc.
 
-### 5. Specs from sdd-init with external spec missing plans
-When generating specs from `sdd-init` using an external spec, the resulting specs don't include plans for some reason.
+### 7. External spec handling is broken [CRITICAL]
+Multiple issues with how external specs are processed:
+- Specs generated from `sdd-init` with an external spec don't include plans
+- Large external specs should produce epics, not individual changes (8+ changes = epic)
+- Generated specs are weak and implementation keeps relying on the external spec
+- External specs should be for archive/reference only - Claude should create self-sufficient specs that don't require referring back to the external spec
 
-### 6. Large external specs should produce epics, not changes
-When provided with a large external spec, the system should break things down into epics rather than individual changes. Currently the generated specs are weak and implementation keeps relying on the external spec.
+### 9. sdd-init should produce ready-to-work components [CRITICAL]
+After running `sdd-init`, all components should be in a ready-to-work state without additional setup or configuration needed. The initial template generated for new components is currently sparse and doesn't include enough content/guidance for the different component types.
 
-### 7. External specs should be for archive/reference only
-External specs are meant for archiving and reference. Claude should ignore these files during implementation and create self-sufficient specs that don't require referring back to the external spec.
+---
 
-### 8. Multiple changes should be grouped as epics
-If an external spec requires 8+ changes, this should have been structured as an epic, not individual changes.
-
-### 9. sdd-init should produce ready-to-work components
-After running `sdd-init`, all components should be in a ready-to-work state without additional setup or configuration needed.
+## Pending
 
 ### 10. Missing /sdd-help command
 Need a `/sdd-help` command for when users are stuck or need guidance on what to do next.
@@ -53,7 +49,7 @@ Need to document/clarify when type generation should be run in the workflow. Is 
 - Manually triggered?
 
 ### 15. Planner is too rigid and template-driven
-The planner follows a naive, robotic predefined plan template. Instead, it should use **planning rules** that guide decision-making, not a fixed plan structure. This would allow for more adaptive, context-aware planning.
+The planner follows a naive, robotic predefined plan template. Instead, it should use **planning rules** that guide decision-making, not a fixed plan structure. This would allow for more adaptive, context-aware planning. Templates should be guidance, not constraints - encourage thoughtful, context-aware writing and allow flexibility to deviate when appropriate. Produce rich, meaningful specs rather than formulaic checkbox-filling.
 
 ### 16. Plan changes should cascade to dependent items
 After `sdd-init` generates a plan, changes to one part may affect other parts - especially when reviewing/implementing the first change. The system should:
@@ -116,23 +112,20 @@ When specs contain open questions, implementation cannot proceed. The planner mu
 - Provide clear guidance on which questions need answers
 
 ### 26. Better session separators/visual indicators
-Need a better way to indicate separators inside a session. Currently things are hard to track. Could include:
-- Visual separators between different phases/tasks
-- Clear section headers
+Need a better way to indicate separators inside a session. Currently things are hard to track. Use big ASCII letters or ASCII art to clearly delineate where in the scrollback things happened:
+- Phase transitions
+- Command completions
+- Important milestones
+- Section headers
 - Progress indicators
 - Context markers to help orientation
 
-### 27. JSON Schema for skill inputs/outputs
-Skills currently use YAML examples for inputs/outputs. Need proper JSON Schema definitions instead for:
-- Type safety and validation
-- Clear contract definitions
-- Better tooling support
+Makes it easy to scroll and find key moments.
 
-### 28. Schema validation skill for marketplace
-Create a marketplace skill that "typechecks" plugin artifacts:
-- Validate skills against their schemas
-- Validate commands against their schemas
-- Validate agents against their schemas
+### 27. JSON Schema for skills + validation skill
+Skills currently use YAML examples for inputs/outputs. Need:
+- Proper JSON Schema definitions for type safety and clear contracts
+- A marketplace skill that "typechecks" plugin artifacts (skills, commands, agents)
 - Detect schema mismatches and report them
 
 ### 29. sdd-tasks command for state review and IDE integration
@@ -142,28 +135,6 @@ Need a command that provides a review of the current SDD state without requiring
 - Offer to open relevant files in IDE
 - Provide a welcoming, interactive way to engage with SDD at any lifecycle state
 - Reduce friction of context-switching between CLI and IDE
-
-### 30. Planners and spec writers should not be template-constrained
-Planners and spec writers are being too rigid, writing things simplistically because they follow predefined templates and treat them as constraints. Need to:
-- Make clear that templates are guidance, not constraints
-- Encourage thoughtful, context-aware writing
-- Allow flexibility to deviate from templates when appropriate
-- Produce rich, meaningful specs rather than formulaic checkbox-filling
-
-### 31. Welcome prompt after plugin installation
-Investigate if there's a way to show a welcome prompt/message after plugin installation. Would help with:
-- Introducing users to available commands
-- Guiding first steps
-- Making the plugin feel more welcoming and discoverable
-
-### 32. Use ASCII art/banners for clear visual delineation
-Command summaries need to be very obvious in scrollback. Use big ASCII letters or ASCII art to clearly delineate where in the scrollback things happened:
-- Phase transitions
-- Command completions
-- Important milestones
-- Section headers
-
-Makes it easy to scroll and find key moments.
 
 ### 33. Tests are not useful - need better test creation approach
 Current tests don't capture important things. Need:
@@ -186,6 +157,49 @@ Create a skill that takes a snapshot of existing components and domain specs:
 - `.sdd/` directory should be committed to version control
 - Enables detecting drift, validating consistency, and tracking changes over time
 
+### 36. Drift detection for direct code changes
+Developers often change code directly, bypassing the spec/plan workflow. Need a mechanism to detect when implementation has drifted from specs:
+- New command like `/sdd-check-drift` or hook that runs on commit
+- Compare current code state against:
+  - `specs/domain/` (domain concepts, glossary)
+  - `specs/architecture/` (architectural decisions)
+  - Active change specs in `specs/changes/`
+- Identify violations or inconsistencies with specs
+- Report what's out of sync and suggest remediation
+- Goal: discourage direct changes but handle them gracefully when they occur
+
+### 37. Plan revision workflow for iterative development
+Developers often discover needed changes mid-implementation. Need a workflow for "I've started implementing, but want to revise the plan":
+- New command like `/sdd-revise-plan <change-dir>`
+- Acknowledge current implementation state
+- Allow updating PLAN.md (and possibly SPEC.md if requirements changed)
+- Track which phases need to be re-done
+- Maintain history of revisions (audit trail)
+- Handle partial implementations gracefully
+- Support the natural iterative loop: implement → learn → revise → re-implement
+
+### 38. Integration and E2E testing should be separate components
+Integration tests and end-to-end tests should be distinct component types, not lumped together. Each has different:
+- Scope and purpose
+- Setup/teardown requirements
+- Execution patterns
+- Dependencies
+
+### 39. Capture ad-hoc code changes and sync specs
+When users instruct Claude to make code changes directly (outside the SDD workflow), we need to:
+- Detect that code was changed outside of a spec/plan
+- Prompt to update relevant specs accordingly
+- Especially important after implementing a change - ensure specs reflect what was actually built
+- Keep specs as the source of truth, even when implementation deviates
+- Prevent specs from becoming stale/out-of-sync with reality
+
+### 40. Fix sdd-new-change test - spec format mismatch
+The `tests/src/tests/workflows/sdd-new-change.test.ts` test is failing because the generated SPEC.md format doesn't match what the test expects:
+- Test expects YAML frontmatter with `sdd_version:` field
+- Actual output uses markdown metadata format (`## Metadata` section)
+- Need to either update the test expectations or fix the spec generation to use frontmatter
+- Related to spec format consistency across the plugin
+
 ---
 
 ## Low Priority
@@ -195,6 +209,30 @@ Documentation needs a guide explaining CMDO (Component-Module-Domain-Organizatio
 - Design decisions and rationale
 - Structure overview
 - Methodology and how to apply it
+
+### 31. Welcome prompt after plugin installation
+Investigate if there's a way to show a welcome prompt/message after plugin installation. Would help with:
+- Introducing users to available commands
+- Guiding first steps
+- Making the plugin feel more welcoming and discoverable
+
+---
+
+## Merged
+
+### 8. Multiple changes should be grouped as epics → merged into #6
+
+### 28. Schema validation skill for marketplace → merged into #27
+
+### 30. Planners and spec writers should not be template-constrained → merged into #15
+
+### 32. Use ASCII art/banners for clear visual delineation → merged into #26
+
+### 1. Initial template lacks content for different components → merged into #9
+
+### 5. Specs from sdd-init with external spec missing plans → merged into #7
+
+### 6. Large external specs should produce epics, not changes → merged into #7
 
 ---
 
