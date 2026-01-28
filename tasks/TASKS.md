@@ -78,9 +78,6 @@ Create a critic agent at the marketplace level that can:
 ### 23. Autocomplete for SDD commands
 Typing commands manually is tedious. Need autocomplete support for `/sdd-*` commands to improve developer experience.
 
-### 24. Add plugin Slack support
-Enable Slack integration for the plugin (details TBD - notifications, commands, etc.).
-
 ### 25. Planner must block on open questions in specs
 When specs contain open questions, implementation cannot proceed. The planner must:
 - Detect open questions in specs before planning
@@ -218,6 +215,22 @@ Missing a way to manage local development environments:
 - Integrate with docker-compose or local k8s (minikube, kind, k3d)
 - Handle dependencies between services
 
+### 49. Auto-commit specs and plans after creation
+After specs and/or plans are created in the different workflows (sdd-init, sdd-new-change, etc.), they should be committed automatically to prevent accidental loss of information:
+- Prompt user to commit after spec/plan creation
+- Or auto-commit with a standard message
+- Ensure work-in-progress artifacts are safely persisted
+- Reduces risk of losing planning work due to session interruption or accidental deletion
+
+### 50. Move sdd-settings.yaml to .sdd/ directory
+**Depends on:** #35 (checksumming and drift detection - introduces `.sdd/` directory)
+
+Move the `sdd-settings.yaml` configuration file into the `.sdd/` directory:
+- Consolidates all SDD project state/config in one location
+- `.sdd/` becomes the single source for SDD metadata (settings, checksums, snapshots)
+- Update all references to `sdd-settings.yaml` path
+- Ensure backwards compatibility or migration path for existing projects
+
 ---
 
 ## Low Priority
@@ -234,6 +247,9 @@ Documentation needs a guide explaining CMDO (Component-Module-Domain-Organizatio
 - Design decisions and rationale
 - Structure overview
 - Methodology and how to apply it
+
+### 24. Add plugin Slack support
+Enable Slack integration for the plugin (details TBD - notifications, commands, etc.).
 
 ### 31. Welcome prompt after plugin installation
 Investigate if there's a way to show a welcome prompt/message after plugin installation. Would help with:
