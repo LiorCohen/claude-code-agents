@@ -64,11 +64,27 @@ jobs:
             echo "EOF"
           } >> $GITHUB_OUTPUT
 
+      - name: Create release archive
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          VERSION="${{ steps.current.outputs.version }}"
+          # Create release directory with only plugin files
+          mkdir -p release/sdd-plugin
+          cp -r plugin/* release/sdd-plugin/
+          cp -r .claude-plugin release/sdd-plugin/
+          # Create tarball and zip
+          cd release
+          tar -czvf "sdd-plugin-v${VERSION}.tar.gz" sdd-plugin
+          zip -r "sdd-plugin-v${VERSION}.zip" sdd-plugin
+
       - name: Create GitHub Release
         if: steps.check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v${{ steps.current.outputs.version }}" \
-            --title "SDD Plugin v${{ steps.current.outputs.version }}" \
-            --notes "${{ steps.changelog.outputs.body }}"
+          VERSION="${{ steps.current.outputs.version }}"
+          gh release create "v${VERSION}" \
+            --title "SDD Plugin v${VERSION}" \
+            --notes "${{ steps.changelog.outputs.body }}" \
+            release/sdd-plugin-v${VERSION}.tar.gz \
+            release/sdd-plugin-v${VERSION}.zip
