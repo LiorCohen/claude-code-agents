@@ -44,6 +44,9 @@ jobs:
         id: changelog
         run: |
           VERSION="${{ steps.current.outputs.version }}"
+          # Extract major version (e.g., 5.1.0 -> 5)
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          CHANGELOG_FILE="changelog/v${MAJOR}.md"
           # Extract changelog section for this version (from ## [x.y.z] to next ## [ or ## Infrastructure)
           CHANGELOG=$(awk -v ver="$VERSION" '
             BEGIN { found=0; output="" }
@@ -54,7 +57,7 @@ jobs:
             /^## Infrastructure/ { if (found) exit }
             found { output = output $0 "\n" }
             END { print output }
-          ' CHANGELOG.md)
+          ' "$CHANGELOG_FILE")
           {
             echo "body<<EOF"
             echo "$CHANGELOG"
