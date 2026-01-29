@@ -4,13 +4,20 @@ SDD commands create and modify many files during project initialization and deve
 
 This guide explains how to configure permissions to reduce prompts while maintaining security.
 
-## Automatic Hook (Built-in)
+## Automatic Hooks (Built-in)
 
-The SDD plugin includes a validation hook that automatically:
+The SDD plugin includes hooks that automatically manage file operations:
+
+### PreToolUse Hook: Write Validation
 - **Auto-approves** writes to safe SDD directories (`specs/`, `components/`, `config/`, etc.)
 - **Blocks** writes to sensitive paths (`.env`, `secrets/`, `.git/`, etc.)
 
-This hook is registered automatically when the plugin is installed. No manual configuration required.
+### PostToolUse Hook: Commit Reminders
+- **Prompts to commit** after any write to SDD-managed directories
+- Ensures no file changes are ever lost due to uncommitted work
+- Covers: `changes/`, `specs/`, `components/`, `config/`, `tests/`
+
+Both hooks are registered automatically when the plugin is installed. No manual configuration required.
 
 **Requirement:** The hook requires `jq` to be installed:
 ```bash
@@ -126,11 +133,24 @@ These are always blocked:
 ### Hook Not Working?
 
 1. **Check jq is installed**: `which jq`
-2. **Test hook manually**:
+2. **Test validation hook manually**:
    ```bash
    echo '{"tool":"Write","tool_input":{"file_path":"specs/test.md"}}' | ${CLAUDE_PLUGIN_ROOT}/hooks/validate-sdd-writes.sh
    ```
-3. **Check plugin version**: Ensure you have v4.6.0+ which includes the hook
+3. **Test commit prompt hook manually**:
+   ```bash
+   echo '{"tool":"Write","tool_input":{"file_path":"components/backend/src/index.ts"}}' | ${CLAUDE_PLUGIN_ROOT}/hooks/prompt-commit-after-write.sh
+   ```
+4. **Check plugin version**: Ensure you have v4.6.0+ which includes the hooks
+
+### Too Many Commit Reminders?
+
+The commit prompt hook fires after every write to SDD-managed directories. If this is too frequent:
+
+1. **Batch your changes** - Make multiple related edits before committing
+2. **Disable the hook** - Remove the `PostToolUse` section from `plugin/hooks/hooks.json`
+
+Note: Disabling the hook means you must remember to commit manually to prevent data loss.
 
 ### Permission Denied Unexpectedly?
 

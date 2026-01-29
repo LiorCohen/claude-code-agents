@@ -109,3 +109,31 @@ runs:
       input_tokens: 2682
       output_tokens: 533
       total_tokens: 3215
+  - timestamp: "2026-01-29T13:09:06.073Z"
+    plugin_version: "5.1.0"
+    test_file: "tests/src/tests/workflows/sdd-new-change.test.ts"
+    test_name: "new-change-feature"
+    turn_count: 42
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 15349
+        output_tokens: 546
+        total_tokens: 15895
+    total:
+      input_tokens: 15349
+      output_tokens: 546
+      total_tokens: 15895
+  - timestamp: "2026-01-29T13:12:40.016Z"
+    plugin_version: "5.1.0"
+    test_file: "tests/src/tests/workflows/sdd-new-change.test.ts"
+    test_name: "new-change-feature"
+    turn_count: 35
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 925
+        output_tokens: 125
+        total_tokens: 1050
+    total:
+      input_tokens: 925
+      output_tokens: 125
+      total_tokens: 1050

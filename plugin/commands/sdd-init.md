@@ -354,10 +354,30 @@ The skill:
 
 ### Phase 8: Commit Initial Project Files
 
-Stage and commit all created files:
+Stage and commit all created files using the commit-standards format:
+
 ```bash
-cd ${TARGET_DIR} && git add . && git commit -m "Initial project setup from spec-driven template"
+cd ${TARGET_DIR} && git add .
 ```
+
+Commit with proper message format:
+```
+Add <project-name>: Initialize spec-driven project
+
+- Created project structure with <N> components
+- Set up CMDO architecture (components/, specs/)
+- Configured for <primary-domain> domain
+[- Integrated external spec from <spec-path>] (if --spec provided)
+[- Created <N> change specs in changes/] (if --spec provided)
+
+Co-Authored-By: SDD Plugin vX.Y.Z
+```
+
+**If commit fails:** Display the error and ask the user how to proceed:
+- "Commit failed: <error message>"
+- Options: retry, skip commit, or abort initialization
+
+Note: Since this is project initialization (not a feature), no version bump or changelog entry is needed.
 
 ---
 

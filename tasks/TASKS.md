@@ -73,8 +73,11 @@ Create a critic agent at the marketplace level that can:
 - Provide constructive but honest feedback
 - Help improve quality through skeptical review
 
-### 23. Autocomplete for SDD commands
-Typing commands manually is tedious. Need autocomplete support for `/sdd-*` commands to improve developer experience.
+### 23. Autocomplete for SDD command arguments
+Need autocomplete support for **arguments** to SDD commands, not the command names themselves. For example:
+- `/sdd-implement <tab>` should show available change directories
+- `/sdd-new-change <tab>` should suggest component names
+- Argument completion based on context (existing specs, components, etc.)
 
 ### 25. Planner must block on open questions in specs
 When specs contain open questions, implementation cannot proceed. The planner must:
@@ -197,13 +200,6 @@ Missing a way to manage local development environments:
 - Integrate with docker-compose or local k8s (minikube, kind, k3d)
 - Handle dependencies between services
 
-### 49. Auto-commit specs and plans after creation
-After specs and/or plans are created in the different workflows (sdd-init, sdd-new-change, etc.), they should be committed automatically to prevent accidental loss of information:
-- Prompt user to commit after spec/plan creation
-- Or auto-commit with a standard message
-- Ensure work-in-progress artifacts are safely persisted
-- Reduces risk of losing planning work due to session interruption or accidental deletion
-
 ### 50. Move sdd-settings.yaml to .sdd/ directory
 **Depends on:** #35 (checksumming and drift detection - introduces `.sdd/` directory)
 
@@ -244,6 +240,13 @@ The current `specs/architecture/` approach is naive and not very useful. Need a 
 - Non-functional requirements capture
 - Trade-off analysis framework
 - Evolution and migration planning
+
+### 57. Add /sdd-settings command
+Add a command to view and manage SDD settings:
+- Display current `sdd-settings.yaml` configuration
+- Allow editing settings interactively
+- Show available configuration options with descriptions
+- Validate settings on save
 
 ### 52. Clean up .gitkeep and placeholder content during implementation
 When changes are implemented and actual content is added to directories, ensure that:
@@ -305,6 +308,20 @@ Investigate if there's a way to show a welcome prompt/message after plugin insta
 ---
 
 ## Completed
+
+### 49. Auto-commit to prevent data loss ✓
+**Completed: 2026-01-29**
+
+Added PostToolUse hook to prompt committing after writes to SDD-managed directories:
+- Created `plugin/hooks/prompt-commit-after-write.sh` - fires after Write/Edit to `changes/`, `specs/`, `components/`, `config/`, `tests/`
+- Registered hook in `plugin/hooks/hooks.json`
+- Updated `sdd-new-change` with Step 6: Commit (using commit-standards format)
+- Updated `sdd-init` Phase 8 with commit-standards format and error handling
+- Documented in `plugin/docs/permissions.md`
+
+Goal: Ensure no file changes are ever lost due to uncommitted work.
+
+**Plan:** [plans/complete/PLAN-task-49-auto-commit-specs-plans.md](plans/complete/PLAN-task-49-auto-commit-specs-plans.md)
 
 ### 18. Add commit standards skill inside plugin ✓
 **Completed: 2026-01-29 (v5.1.0)**

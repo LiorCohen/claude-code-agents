@@ -8,7 +8,7 @@
             "name": "sdd",
             "source": "./plugin",
             "description": "Spec-driven development (SDD) plugin for Claude Code — 10 specialized AI agents, phased implementation plans, and verified code generation for full-stack teams",
-            "version": "5.1.0"
+            "version": "5.2.0"
         }
     ]
 }

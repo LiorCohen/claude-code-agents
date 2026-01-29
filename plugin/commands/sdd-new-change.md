@@ -146,6 +146,42 @@ See `skills/change-creation/SKILL.md` for detailed specification.
 - Wait for confirmation before proceeding
 - If user requests changes, edit the files accordingly
 
+### 6. Commit Change Spec
+
+After user confirms the spec and plan are ready:
+
+1. Stage the new files:
+   ```bash
+   git add changes/YYYY/MM/DD/<change-name>/SPEC.md \
+           changes/YYYY/MM/DD/<change-name>/PLAN.md \
+           INDEX.md
+   ```
+
+2. Commit using the commit-standards format:
+   ```
+   Add <change-name>: Create <type> spec and plan
+
+   - Created SPEC.md with <type> specification
+   - Created PLAN.md with implementation phases
+   - Updated INDEX.md with change entry
+
+   Co-Authored-By: SDD Plugin vX.Y.Z
+   ```
+
+3. Confirm commit to user:
+   ```
+   ✓ Committed change spec: <commit-hash>
+
+   Ready to implement! Run:
+     /sdd-implement-change changes/YYYY/MM/DD/<change-name>
+   ```
+
+**If commit fails:** Display the error and ask the user how to proceed:
+- "Commit failed: <error message>"
+- Options: retry, skip commit (with data loss warning), or investigate
+
+**Note:** If the user skips commit or declines, warn that uncommitted specs risk data loss.
+
 ## Important Notes
 
 - **Both arguments required**: The command will ALWAYS require `--type` and `--name` before proceeding
