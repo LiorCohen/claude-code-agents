@@ -25,20 +25,21 @@ export const isExcludedFile = (filename: string): boolean =>
  * Recursively find all markdown files in a directory.
  */
 const walkDir = async (dir: string): Promise<readonly string[]> => {
-  const files: string[] = [];
   const entries = await fs.readdir(dir, { withFileTypes: true });
 
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      const subFiles = await walkDir(fullPath);
-      files.push(...subFiles);
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      files.push(fullPath);
-    }
-  }
+  const results = await Promise.all(
+    entries.map(async (entry): Promise<readonly string[]> => {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        return walkDir(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        return [fullPath];
+      }
+      return [];
+    })
+  );
 
-  return files;
+  return results.flat();
 };
 
 /**
@@ -46,22 +47,20 @@ const walkDir = async (dir: string): Promise<readonly string[]> => {
  */
 export const findSpecFiles = async (specsDir: string): Promise<readonly SpecFile[]> => {
   const allFiles = await walkDir(specsDir);
-  const specs: SpecFile[] = [];
 
-  for (const filePath of allFiles) {
-    const filename = path.basename(filePath);
-    if (isExcludedFile(filename)) continue;
-
-    const content = await fs.readFile(filePath, 'utf-8');
-    specs.push({
-      path: filePath,
-      relativePath: path.relative(specsDir, filePath),
-      content,
-      frontmatter: parseFrontmatter(content),
+  const specPromises = allFiles
+    .filter((filePath) => !isExcludedFile(path.basename(filePath)))
+    .map(async (filePath): Promise<SpecFile> => {
+      const content = await fs.readFile(filePath, 'utf-8');
+      return {
+        path: filePath,
+        relativePath: path.relative(specsDir, filePath),
+        content,
+        frontmatter: parseFrontmatter(content),
+      };
     });
-  }
 
-  return specs;
+  return Promise.all(specPromises);
 };
 
 /**

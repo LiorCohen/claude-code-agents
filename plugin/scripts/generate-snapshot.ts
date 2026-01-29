@@ -24,35 +24,34 @@ interface ActiveSpec {
 const generateSnapshot = async (specsDir: string): Promise<string> => {
   const allSpecs = await findSpecFiles(specsDir);
 
-  // Filter to active specs only
-  const specs: ActiveSpec[] = [];
-  for (const spec of allSpecs) {
-    const fm = spec.frontmatter ?? {};
-    if (fm['status'] === 'active') {
-      specs.push({
+  // Filter to active specs only and transform
+  const specs: readonly ActiveSpec[] = allSpecs
+    .filter((spec) => spec.frontmatter?.['status'] === 'active')
+    .map((spec) => {
+      const fm = spec.frontmatter ?? {};
+      return {
         title: fm['title'] ?? path.basename(spec.path, '.md'),
         path: spec.relativePath,
         domain: fm['domain'] ?? 'Unknown',
         issue: fm['issue'] ?? '',
         overview: extractOverview(spec.content),
-      });
-    }
-  }
+      };
+    });
 
-  // Group by domain
-  const byDomain: Record<string, ActiveSpec[]> = {};
-  for (const spec of specs) {
-    if (!byDomain[spec.domain]) {
-      byDomain[spec.domain] = [];
-    }
-    byDomain[spec.domain]?.push(spec);
-  }
+  // Group by domain using reduce
+  const byDomain: Readonly<Record<string, readonly ActiveSpec[]>> = specs.reduce(
+    (acc, spec) => ({
+      ...acc,
+      [spec.domain]: [...(acc[spec.domain] ?? []), spec],
+    }),
+    {} as Record<string, readonly ActiveSpec[]>
+  );
 
   const today = new Date().toISOString().split('T')[0];
   const domains = Object.keys(byDomain).sort();
 
-  // Generate markdown
-  const lines: string[] = [
+  // Generate markdown using array methods
+  const header: readonly string[] = [
     '# Product Snapshot',
     '',
     `Generated: ${today}`,
@@ -62,68 +61,55 @@ const generateSnapshot = async (specsDir: string): Promise<string> => {
   ];
 
   // Table of contents
-  if (domains.length > 0) {
-    lines.push('## Table of Contents');
-    lines.push('');
-    for (const domain of domains) {
-      const anchor = domain.toLowerCase().replace(/ /g, '-');
-      lines.push(`- [${domain}](#${anchor})`);
-    }
-    lines.push('');
-  }
+  const toc: readonly string[] =
+    domains.length > 0
+      ? [
+          '## Table of Contents',
+          '',
+          ...domains.map((domain) => {
+            const anchor = domain.toLowerCase().replace(/ /g, '-');
+            return `- [${domain}](#${anchor})`;
+          }),
+          '',
+        ]
+      : [];
 
-  // By domain
-  lines.push('## By Domain');
-  lines.push('');
+  // By domain content
+  const domainContent: readonly string[] =
+    domains.length > 0
+      ? [
+          '## By Domain',
+          '',
+          ...domains.flatMap((domain) => {
+            const domainSpecs = byDomain[domain] ?? [];
+            const sorted = [...domainSpecs].sort((a, b) => a.title.localeCompare(b.title));
 
-  for (const domain of domains) {
-    lines.push(`### ${domain}`);
-    lines.push('');
+            return [
+              `### ${domain}`,
+              '',
+              ...sorted.flatMap((spec) => [
+                `#### ${spec.title}`,
+                `**Spec:** [${spec.path}](${spec.path})`,
+                ...(spec.issue ? [`**Issue:** [${spec.issue}](#)`] : []),
+                '',
+                ...(spec.overview ? [spec.overview, ''] : []),
+                '---',
+                '',
+              ]),
+            ];
+          }),
+        ]
+      : ['## By Domain', '', '*No active specs yet*', ''];
 
-    const domainSpecs = byDomain[domain] ?? [];
-    const sorted = [...domainSpecs].sort((a, b) => a.title.localeCompare(b.title));
-
-    for (const spec of sorted) {
-      lines.push(`#### ${spec.title}`);
-      lines.push(`**Spec:** [${spec.path}](${spec.path})`);
-
-      if (spec.issue) {
-        lines.push(`**Issue:** [${spec.issue}](#)`);
-      }
-
-      lines.push('');
-
-      if (spec.overview) {
-        lines.push(spec.overview);
-        lines.push('');
-      }
-
-      lines.push('---');
-      lines.push('');
-    }
-  }
-
-  if (domains.length === 0) {
-    lines.push('*No active specs yet*');
-    lines.push('');
-  }
-
-  return lines.join('\n');
+  return [...header, ...toc, ...domainContent].join('\n');
 };
 
 /**
  * Parse command line arguments.
  */
 const parseArgs = (args: readonly string[]): { specsDir: string } => {
-  let specsDir = 'specs/';
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === '--specs-dir') {
-      specsDir = args[i + 1] ?? 'specs/';
-      i++;
-    }
-  }
+  const specsDirIndex = args.indexOf('--specs-dir');
+  const specsDir = specsDirIndex !== -1 ? (args[specsDirIndex + 1] ?? 'specs/') : 'specs/';
 
   return { specsDir };
 };

@@ -135,26 +135,28 @@ const runPsqlFile = async (
  * Find SQL files recursively in a directory.
  */
 const findSqlFiles = async (dir: string): Promise<readonly string[]> => {
-  const files: string[] = [];
-
-  const walk = async (currentDir: string): Promise<void> => {
+  const walk = async (currentDir: string): Promise<readonly string[]> => {
     try {
       const entries = listDirWithTypes(currentDir);
-      for (const entry of entries) {
-        const fullPath = joinPath(currentDir, entry.name);
-        if (entry.isDirectory) {
-          await walk(fullPath);
-        } else if (entry.isFile && entry.name.endsWith('.sql')) {
-          files.push(fullPath);
-        }
-      }
+      const results = await Promise.all(
+        entries.map(async (entry): Promise<readonly string[]> => {
+          const fullPath = joinPath(currentDir, entry.name);
+          if (entry.isDirectory) {
+            return walk(fullPath);
+          } else if (entry.isFile && entry.name.endsWith('.sql')) {
+            return [fullPath];
+          }
+          return [];
+        })
+      );
+      return results.flat();
     } catch {
       // Directory doesn't exist
+      return [];
     }
   };
 
-  await walk(dir);
-  return files;
+  return walk(dir);
 };
 
 /**

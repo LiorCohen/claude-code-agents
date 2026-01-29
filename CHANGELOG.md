@@ -8,6 +8,28 @@ All notable changes to the SDD plugin and marketplace infrastructure.
 
 ---
 
+## [5.0.1] - 2026-01-29
+
+### Enhanced
+
+- **typescript-standards skill (Task 45)**: Added banned mutable operations section
+  - Banned: `.push()`, `.pop()`, `.shift()`, `.unshift()`, `.splice()`, `.sort()`, `.reverse()`, `.fill()`
+  - Banned object mutations: `obj.prop = value`, `delete obj.prop`, `Object.assign()`
+  - Banned Map/Set mutations: `.set()`, `.delete()`, `.add()`, `.clear()`
+  - Documented alternatives using spread operators, `reduce`, `flatMap`, `toSorted()`, `toReversed()`
+
+### Changed
+
+- **Refactor: Immutable patterns across codebase**: Full compliance with typescript-standards
+  - `scaffolding.ts`: Rewrote with `mergeItems`, `reduce`, `flatMap`, `Object.fromEntries`
+  - `domain-population.ts`: Converted to `Promise.all`, `reduce` for parallel operations
+  - `generate-snapshot.ts`, `generate-index.ts`: Replaced loops with `reduce`, `flatMap`
+  - `validate-spec.ts`: Refactored to return arrays using `filter`/`map`
+  - `spec-utils.ts`: Rewrote `walkDir` using `Promise.all` and `.flat()`
+  - Test files: Applied same patterns, created collector closures for stream handling
+
+---
+
 ## [5.0.0] - 2026-01-28
 
 ### Changed

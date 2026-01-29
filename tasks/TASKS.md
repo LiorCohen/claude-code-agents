@@ -202,14 +202,6 @@ Need a Helm chart template for component scaffolding:
 - Add Victoria Logs for log aggregation
 - Add Victoria Metrics for metrics collection
 
-### 45. TypeScript standards: ban mutable array/object operations
-Add to typescript-standards skill a ban against mutable state operations:
-- No `.push()` on arrays
-- No `obj['foo'] = bar` dynamic property assignment
-- No `.pop()`, `.shift()`, `.unshift()`, `.splice()`
-- Prefer immutable patterns: spread operator, `.concat()`, `.filter()`, `.map()`
-- Enforce functional/immutable approach to data manipulation
-
 ### 47. Local environment create/start/stop workflow
 Missing a way to manage local development environments:
 - Create a local environment (spin up k8s, databases, services)
@@ -316,6 +308,16 @@ Investigate if there's a way to show a welcome prompt/message after plugin insta
 ---
 
 ## Completed
+
+### 45. TypeScript standards: ban mutable array/object operations ✓
+**Completed: 2026-01-28**
+
+Added explicit "Banned Mutable Operations" section to `.claude/skills/typescript-standards/SKILL.md`:
+- Banned array methods: `.push()`, `.pop()`, `.shift()`, `.unshift()`, `.splice()`, `.sort()`, `.reverse()`, `.fill()`
+- Banned object operations: direct assignment, dynamic property assignment, `delete`
+- Banned Map/Set mutations: `.set()`, `.delete()`, `.add()`, `.clear()`
+- Each banned operation includes the immutable alternative
+- Updated summary checklist with new mutation checks
 
 ### 9. sdd-init should produce ready-to-work components ✓
 **Completed: 2026-01-28 (v5.0.0)**

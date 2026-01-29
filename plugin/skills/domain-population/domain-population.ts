@@ -172,11 +172,7 @@ const updateGlossary = async (
   const glossaryPath = path.join(targetDir, 'specs/domain/glossary.md');
 
   // Read existing glossary or create new one
-  let content: string;
-  try {
-    content = await fsp.readFile(glossaryPath, 'utf-8');
-  } catch {
-    content = `# Domain Glossary
+  const defaultContent = `# Domain Glossary
 
 This glossary defines key terms and concepts in the ${domain} domain.
 
@@ -185,110 +181,90 @@ This glossary defines key terms and concepts in the ${domain} domain.
 | Term | Definition | Related Terms |
 |------|------------|---------------|
 `;
-  }
 
-  // Check which entities already exist
-  const existingEntities = new Set<string>();
+  const content = await fsp.readFile(glossaryPath, 'utf-8').catch(() => defaultContent);
+
+  // Check which entities already exist using reduce to collect existing terms
   const lines = content.split('\n');
-  for (const line of lines) {
-    if (line.startsWith('|') && !line.includes('Term') && !line.includes('---')) {
+  const existingEntities: ReadonlySet<string> = lines
+    .filter((line) => line.startsWith('|') && !line.includes('Term') && !line.includes('---'))
+    .reduce((acc, line) => {
       const term = line.split('|')[1]?.trim().toLowerCase();
-      if (term) {
-        existingEntities.add(term);
-      }
-    }
-  }
+      return term ? new Set([...acc, term]) : acc;
+    }, new Set<string>());
 
-  // Add new entities
-  let addedCount = 0;
-  const newEntries: string[] = [];
-
-  for (const entity of entities) {
-    if (!existingEntities.has(entity.toLowerCase())) {
-      newEntries.push(`| ${entity} | A ${entity.toLowerCase()} in the ${domain.toLowerCase()} domain. | (to be defined) |`);
-      addedCount++;
-    }
-  }
+  // Filter to only new entities and create entries
+  const newEntries: readonly string[] = entities
+    .filter((entity) => !existingEntities.has(entity.toLowerCase()))
+    .map(
+      (entity) =>
+        `| ${entity} | A ${entity.toLowerCase()} in the ${domain.toLowerCase()} domain. | (to be defined) |`
+    );
 
   if (newEntries.length > 0) {
     // Find the table and append entries
     const tableEndIndex = content.lastIndexOf('|');
-    if (tableEndIndex !== -1) {
-      // Find the end of the last table row
-      const lastNewline = content.indexOf('\n', tableEndIndex);
-      if (lastNewline !== -1) {
-        content = content.slice(0, lastNewline + 1) + newEntries.join('\n') + '\n' + content.slice(lastNewline + 1);
-      } else {
-        content += '\n' + newEntries.join('\n') + '\n';
-      }
-    } else {
-      // No table found, append at end
-      content += '\n' + newEntries.join('\n') + '\n';
-    }
+    const updatedContent =
+      tableEndIndex !== -1
+        ? (() => {
+            const lastNewline = content.indexOf('\n', tableEndIndex);
+            return lastNewline !== -1
+              ? content.slice(0, lastNewline + 1) +
+                  newEntries.join('\n') +
+                  '\n' +
+                  content.slice(lastNewline + 1)
+              : content + '\n' + newEntries.join('\n') + '\n';
+          })()
+        : content + '\n' + newEntries.join('\n') + '\n';
 
-    await fsp.writeFile(glossaryPath, content);
+    await fsp.writeFile(glossaryPath, updatedContent);
   }
 
-  return addedCount;
+  return newEntries.length;
 };
 
 /**
  * Update SNAPSHOT.md with product overview.
  */
-const updateSnapshot = async (
-  config: Config,
-  targetDir: string
-): Promise<void> => {
+const updateSnapshot = async (config: Config, targetDir: string): Promise<void> => {
   const snapshotPath = path.join(targetDir, 'specs/SNAPSHOT.md');
 
-  // Read existing snapshot
-  let content: string;
-  try {
-    content = await fsp.readFile(snapshotPath, 'utf-8');
-  } catch {
-    content = `# Project Snapshot
+  const defaultContent = `# Project Snapshot
 
 Current state of the project specifications.
 
 `;
-  }
+
+  const content = await fsp.readFile(snapshotPath, 'utf-8').catch(() => defaultContent);
 
   // Check if Product Overview already exists
   if (content.includes('## Product Overview')) {
-    // Already has overview, skip
     return;
   }
 
-  // Build the overview section
-  let overview = `## Product Overview
+  // Build the overview section using array join
+  const sections: readonly string[] = [
+    '## Product Overview',
+    '',
+    `**Problem:** ${config.product_description}`,
+    '',
+    ...(config.user_personas.length > 0
+      ? [
+          '**Target Users:**',
+          ...config.user_personas.map((persona) => `- ${persona.type}: ${persona.actions}`),
+          '',
+        ]
+      : []),
+    ...(config.core_workflows.length > 0
+      ? ['**Core Capabilities:**', ...config.core_workflows.map((w) => `- ${w}`), '']
+      : []),
+    ...(config.domain_entities.length > 0
+      ? [`**Key Entities:** ${config.domain_entities.join(', ')}`, '']
+      : []),
+  ];
 
-**Problem:** ${config.product_description}
-
-`;
-
-  if (config.user_personas.length > 0) {
-    overview += '**Target Users:**\n';
-    for (const persona of config.user_personas) {
-      overview += `- ${persona.type}: ${persona.actions}\n`;
-    }
-    overview += '\n';
-  }
-
-  if (config.core_workflows.length > 0) {
-    overview += '**Core Capabilities:**\n';
-    for (const workflow of config.core_workflows) {
-      overview += `- ${workflow}\n`;
-    }
-    overview += '\n';
-  }
-
-  if (config.domain_entities.length > 0) {
-    overview += `**Key Entities:** ${config.domain_entities.join(', ')}\n\n`;
-  }
-
-  // Append overview to snapshot
-  content += overview;
-  await fsp.writeFile(snapshotPath, content);
+  const updatedContent = content + sections.join('\n');
+  await fsp.writeFile(snapshotPath, updatedContent);
 };
 
 /**
@@ -296,7 +272,6 @@ Current state of the project specifications.
  */
 const populateDomain = async (config: Config): Promise<PopulationResult> => {
   const targetDir = config.target_dir;
-  const filesUpdated: string[] = [];
 
   console.log(`\nPopulating domain specs for: ${config.primary_domain}`);
   console.log(`Target: ${targetDir}`);
@@ -304,28 +279,28 @@ const populateDomain = async (config: Config): Promise<PopulationResult> => {
 
   // Create entity definitions
   console.log('Creating entity definitions...');
-  let entityCount = 0;
-  for (const entity of config.domain_entities) {
-    const filePath = await createEntityDefinition(entity, config.primary_domain, targetDir);
-    filesUpdated.push(filePath);
-    entityCount++;
-    console.log(`  Created: ${filePath}`);
-  }
+  const entityFiles = await Promise.all(
+    config.domain_entities.map(async (entity) => {
+      const filePath = await createEntityDefinition(entity, config.primary_domain, targetDir);
+      console.log(`  Created: ${filePath}`);
+      return filePath;
+    })
+  );
 
   // Create use-case stubs
   console.log('\nCreating use-case stubs...');
-  let useCaseCount = 0;
-  for (const workflow of config.core_workflows) {
-    const filePath = await createUseCaseStub(
-      workflow,
-      config.primary_domain,
-      config.user_personas,
-      targetDir
-    );
-    filesUpdated.push(filePath);
-    useCaseCount++;
-    console.log(`  Created: ${filePath}`);
-  }
+  const useCaseFiles = await Promise.all(
+    config.core_workflows.map(async (workflow) => {
+      const filePath = await createUseCaseStub(
+        workflow,
+        config.primary_domain,
+        config.user_personas,
+        targetDir
+      );
+      console.log(`  Created: ${filePath}`);
+      return filePath;
+    })
+  );
 
   // Update glossary
   console.log('\nUpdating glossary...');
@@ -334,33 +309,44 @@ const populateDomain = async (config: Config): Promise<PopulationResult> => {
     config.primary_domain,
     targetDir
   );
-  if (glossaryEntries > 0) {
-    filesUpdated.push('specs/domain/glossary.md');
-    console.log(`  Updated: specs/domain/glossary.md (${glossaryEntries} entries added)`);
-  } else {
-    console.log('  No new entries to add');
-  }
+  const glossaryFile =
+    glossaryEntries > 0
+      ? (() => {
+          console.log(`  Updated: specs/domain/glossary.md (${glossaryEntries} entries added)`);
+          return ['specs/domain/glossary.md'];
+        })()
+      : (() => {
+          console.log('  No new entries to add');
+          return [];
+        })();
 
   // Update SNAPSHOT
   console.log('\nUpdating SNAPSHOT...');
   await updateSnapshot(config, targetDir);
-  filesUpdated.push('specs/SNAPSHOT.md');
   console.log('  Updated: specs/SNAPSHOT.md');
+
+  // Combine all updated files
+  const filesUpdated: readonly string[] = [
+    ...entityFiles,
+    ...useCaseFiles,
+    ...glossaryFile,
+    'specs/SNAPSHOT.md',
+  ];
 
   // Summary
   console.log(`\n${'='.repeat(60)}`);
   console.log('Domain population complete!');
   console.log(`${'='.repeat(60)}`);
-  console.log(`Created ${entityCount} entity definitions`);
-  console.log(`Created ${useCaseCount} use-case stubs`);
+  console.log(`Created ${entityFiles.length} entity definitions`);
+  console.log(`Created ${useCaseFiles.length} use-case stubs`);
   console.log(`Added ${glossaryEntries} glossary entries`);
   console.log('Updated SNAPSHOT with product overview');
 
   return {
     success: true,
     files_updated: filesUpdated,
-    entity_definitions_created: entityCount,
-    use_cases_created: useCaseCount,
+    entity_definitions_created: entityFiles.length,
+    use_cases_created: useCaseFiles.length,
     glossary_entries_added: glossaryEntries,
   };
 };
@@ -371,18 +357,9 @@ const populateDomain = async (config: Config): Promise<PopulationResult> => {
 const parseArgs = (
   args: readonly string[]
 ): { configPath: string | null; jsonOutput: boolean } => {
-  let configPath: string | null = null;
-  let jsonOutput = false;
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === '--config') {
-      configPath = args[i + 1] ?? null;
-      i++;
-    } else if (arg === '--json-output') {
-      jsonOutput = true;
-    }
-  }
+  const configIndex = args.indexOf('--config');
+  const configPath = configIndex !== -1 ? (args[configIndex + 1] ?? null) : null;
+  const jsonOutput = args.includes('--json-output');
 
   return { configPath, jsonOutput };
 };
@@ -407,11 +384,10 @@ const main = async (): Promise<number> => {
 
   // Validate required fields
   const required = ['target_dir', 'primary_domain', 'product_description'];
-  for (const field of required) {
-    if (!(field in rawConfig)) {
-      console.error(`Error: Missing required config field: ${field}`);
-      return 1;
-    }
+  const missingFields = required.filter((field) => !(field in rawConfig));
+  if (missingFields.length > 0) {
+    console.error(`Error: Missing required config fields: ${missingFields.join(', ')}`);
+    return 1;
   }
 
   // Set defaults
@@ -419,9 +395,9 @@ const main = async (): Promise<number> => {
     target_dir: rawConfig['target_dir'] as string,
     primary_domain: rawConfig['primary_domain'] as string,
     product_description: rawConfig['product_description'] as string,
-    user_personas: (rawConfig['user_personas'] as UserPersona[]) ?? [],
-    core_workflows: (rawConfig['core_workflows'] as string[]) ?? [],
-    domain_entities: (rawConfig['domain_entities'] as string[]) ?? [],
+    user_personas: (rawConfig['user_personas'] as readonly UserPersona[]) ?? [],
+    core_workflows: (rawConfig['core_workflows'] as readonly string[]) ?? [],
+    domain_entities: (rawConfig['domain_entities'] as readonly string[]) ?? [],
   };
 
   // Run population

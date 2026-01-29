@@ -60,19 +60,19 @@ describe('SNAPSHOT.md generation logic', () => {
    * Simulate the generateSnapshot output format.
    */
   const generateSnapshotContent = (specs: readonly ActiveSpec[]): string => {
-    const byDomain: Record<string, ActiveSpec[]> = {};
-
-    for (const spec of specs) {
-      if (!byDomain[spec.domain]) {
-        byDomain[spec.domain] = [];
-      }
-      byDomain[spec.domain]?.push(spec);
-    }
+    // Group specs by domain using reduce (immutable)
+    const byDomain = specs.reduce(
+      (acc, spec) => ({
+        ...acc,
+        [spec.domain]: [...(acc[spec.domain] ?? []), spec],
+      }),
+      {} as Readonly<Record<string, readonly ActiveSpec[]>>
+    );
 
     const today = new Date().toISOString().split('T')[0];
     const domains = Object.keys(byDomain).sort();
 
-    const lines: string[] = [
+    const headerLines: readonly string[] = [
       '# Product Snapshot',
       '',
       `Generated: ${today}`,
@@ -82,53 +82,54 @@ describe('SNAPSHOT.md generation logic', () => {
     ];
 
     // Table of contents
-    if (domains.length > 0) {
-      lines.push('## Table of Contents');
-      lines.push('');
-      for (const domain of domains) {
-        const anchor = domain.toLowerCase().replace(/ /g, '-');
-        lines.push(`- [${domain}](#${anchor})`);
-      }
-      lines.push('');
-    }
+    const tocLines: readonly string[] =
+      domains.length > 0
+        ? [
+            '## Table of Contents',
+            '',
+            ...domains.map((domain) => {
+              const anchor = domain.toLowerCase().replace(/ /g, '-');
+              return `- [${domain}](#${anchor})`;
+            }),
+            '',
+          ]
+        : [];
 
-    // By domain
-    lines.push('## By Domain');
-    lines.push('');
+    // By domain content
+    const domainContentLines: readonly string[] =
+      domains.length > 0
+        ? domains.flatMap((domain) => {
+            const domainSpecs = byDomain[domain] ?? [];
+            const sorted = [...domainSpecs].sort((a, b) => a.title.localeCompare(b.title));
 
-    for (const domain of domains) {
-      lines.push(`### ${domain}`);
-      lines.push('');
+            const specLines = sorted.flatMap((spec): readonly string[] => {
+              const issueLines: readonly string[] = spec.issue ? [`**Issue:** [${spec.issue}](#)`] : [];
+              const overviewLines: readonly string[] = spec.overview ? [spec.overview, ''] : [];
 
-      const domainSpecs = byDomain[domain] ?? [];
-      const sorted = [...domainSpecs].sort((a, b) => a.title.localeCompare(b.title));
+              return [
+                `#### ${spec.title}`,
+                `**Spec:** [${spec.path}](${spec.path})`,
+                ...issueLines,
+                '',
+                ...overviewLines,
+                '---',
+                '',
+              ];
+            });
 
-      for (const spec of sorted) {
-        lines.push(`#### ${spec.title}`);
-        lines.push(`**Spec:** [${spec.path}](${spec.path})`);
+            return [`### ${domain}`, '', ...specLines];
+          })
+        : ['*No active specs yet*', ''];
 
-        if (spec.issue) {
-          lines.push(`**Issue:** [${spec.issue}](#)`);
-        }
+    const allLines: readonly string[] = [
+      ...headerLines,
+      ...tocLines,
+      '## By Domain',
+      '',
+      ...domainContentLines,
+    ];
 
-        lines.push('');
-
-        if (spec.overview) {
-          lines.push(spec.overview);
-          lines.push('');
-        }
-
-        lines.push('---');
-        lines.push('');
-      }
-    }
-
-    if (domains.length === 0) {
-      lines.push('*No active specs yet*');
-      lines.push('');
-    }
-
-    return lines.join('\n');
+    return allLines.join('\n');
   };
 
   /**
@@ -334,15 +335,8 @@ describe('SNAPSHOT.md generation logic', () => {
  */
 describe('argument parsing', () => {
   const parseArgs = (args: readonly string[]): { specsDir: string } => {
-    let specsDir = 'specs/';
-
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
-      if (arg === '--specs-dir') {
-        specsDir = args[i + 1] ?? 'specs/';
-        i++;
-      }
-    }
+    const specsDirIndex = args.indexOf('--specs-dir');
+    const specsDir = specsDirIndex !== -1 ? (args[specsDirIndex + 1] ?? 'specs/') : 'specs/';
 
     return { specsDir };
   };

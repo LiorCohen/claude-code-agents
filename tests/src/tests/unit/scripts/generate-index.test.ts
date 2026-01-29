@@ -60,17 +60,14 @@ describe('INDEX.md generation logic', () => {
   const generateIndexContent = (
     specs: readonly { status: string; entry: SpecEntry }[]
   ): string => {
-    const byStatus: Record<string, SpecEntry[]> = {
-      active: [],
-      deprecated: [],
-      archived: [],
-    };
-
-    for (const { status, entry } of specs) {
-      if (status in byStatus) {
-        byStatus[status]?.push(entry);
-      }
-    }
+    // Group by status using reduce (immutable)
+    const byStatus = specs.reduce(
+      (acc, { status, entry }) => ({
+        ...acc,
+        [status]: [...(acc[status] ?? []), entry],
+      }),
+      { active: [], deprecated: [], archived: [] } as Readonly<Record<string, readonly SpecEntry[]>>
+    );
 
     const today = new Date().toISOString().split('T')[0];
     const total = specs.length;
@@ -78,7 +75,7 @@ describe('INDEX.md generation logic', () => {
     const deprecated = byStatus['deprecated']?.length ?? 0;
     const archived = byStatus['archived']?.length ?? 0;
 
-    const lines: string[] = [
+    const headerLines: readonly string[] = [
       '# Spec Index',
       '',
       `Last updated: ${today}`,
@@ -92,19 +89,17 @@ describe('INDEX.md generation logic', () => {
     ];
 
     const activeSpecs = byStatus['active'] ?? [];
-    if (activeSpecs.length > 0) {
-      const sorted = [...activeSpecs].sort((a, b) => a.created.localeCompare(b.created));
-      for (const spec of sorted) {
-        const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
-        lines.push(
-          `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`
-        );
-      }
-    } else {
-      lines.push('| *No active changes yet* | | | | | |');
-    }
+    const activeRows: readonly string[] =
+      activeSpecs.length > 0
+        ? [...activeSpecs]
+            .sort((a, b) => a.created.localeCompare(b.created))
+            .map((spec) => {
+              const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
+              return `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`;
+            })
+        : ['| *No active changes yet* | | | | | |'];
 
-    return lines.join('\n');
+    return [...headerLines, ...activeRows].join('\n');
   };
 
   /**
@@ -309,15 +304,8 @@ describe('missing frontmatter defaults', () => {
  */
 describe('argument parsing', () => {
   const parseArgs = (args: readonly string[]): { specsDir: string } => {
-    let specsDir = 'specs/';
-
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
-      if (arg === '--specs-dir') {
-        specsDir = args[i + 1] ?? 'specs/';
-        i++;
-      }
-    }
+    const specsDirIndex = args.indexOf('--specs-dir');
+    const specsDir = specsDirIndex !== -1 ? (args[specsDirIndex + 1] ?? 'specs/') : 'specs/';
 
     return { specsDir };
   };

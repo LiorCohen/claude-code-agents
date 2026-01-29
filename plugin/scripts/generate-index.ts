@@ -16,7 +16,16 @@ interface SpecEntry {
   readonly domain: string;
   readonly issue: string;
   readonly created: string;
+  readonly status: string;
 }
+
+/**
+ * Format a spec entry as a table row.
+ */
+const formatTableRow = (spec: SpecEntry): string => {
+  const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
+  return `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`;
+};
 
 /**
  * Generate INDEX.md content.
@@ -24,40 +33,69 @@ interface SpecEntry {
 const generateIndex = async (specsDir: string): Promise<string> => {
   const specs = await findSpecFiles(specsDir);
 
-  // Categorize by status
-  const byStatus: Record<string, SpecEntry[]> = {
-    active: [],
-    deprecated: [],
-    archived: [],
-  };
-
-  for (const spec of specs) {
+  // Transform specs to entries with status
+  const entries: readonly SpecEntry[] = specs.map((spec) => {
     const fm = spec.frontmatter ?? {};
-    const status = fm['status'] ?? 'active';
-    const entry: SpecEntry = {
+    return {
       title: fm['title'] ?? path.basename(spec.path, '.md'),
       type: fm['type'] ?? 'feature',
       path: spec.relativePath,
       domain: fm['domain'] ?? 'Unknown',
       issue: fm['issue'] ?? '',
       created: fm['created'] ?? '',
+      status: fm['status'] ?? 'active',
     };
+  });
 
-    if (status in byStatus) {
-      byStatus[status]?.push(entry);
-    }
-  }
+  // Group by status using reduce
+  const byStatus = entries.reduce(
+    (acc, entry) => ({
+      ...acc,
+      [entry.status]: [...(acc[entry.status] ?? []), entry],
+    }),
+    {} as Readonly<Record<string, readonly SpecEntry[]>>
+  );
+
+  const activeSpecs = byStatus['active'] ?? [];
+  const deprecatedSpecs = byStatus['deprecated'] ?? [];
+  const archivedSpecs = byStatus['archived'] ?? [];
 
   // Count totals
   const total = specs.length;
-  const active = byStatus['active']?.length ?? 0;
-  const deprecated = byStatus['deprecated']?.length ?? 0;
-  const archived = byStatus['archived']?.length ?? 0;
+  const active = activeSpecs.length;
+  const deprecated = deprecatedSpecs.length;
+  const archived = archivedSpecs.length;
 
   const today = new Date().toISOString().split('T')[0];
 
-  // Generate markdown
-  const lines: string[] = [
+  // Generate active section rows
+  const activeRows =
+    activeSpecs.length > 0
+      ? [...activeSpecs].sort((a, b) => a.created.localeCompare(b.created)).map(formatTableRow)
+      : ['| *No active changes yet* | | | | | |'];
+
+  // Generate deprecated section
+  const deprecatedSection =
+    deprecatedSpecs.length > 0
+      ? [
+          '| Change | Type | Spec | Domain | Issue | Deprecated |',
+          '|--------|------|------|--------|-------|------------|',
+          ...[...deprecatedSpecs].sort((a, b) => a.created.localeCompare(b.created)).map(formatTableRow),
+        ]
+      : ['*None*'];
+
+  // Generate archived section
+  const archivedSection =
+    archivedSpecs.length > 0
+      ? [
+          '| Change | Type | Spec | Domain | Issue | Archived |',
+          '|--------|------|------|--------|-------|----------|',
+          ...[...archivedSpecs].sort((a, b) => a.created.localeCompare(b.created)).map(formatTableRow),
+        ]
+      : ['*None*'];
+
+  // Combine all sections
+  const lines: readonly string[] = [
     '# Spec Index',
     '',
     `Last updated: ${today}`,
@@ -68,58 +106,16 @@ const generateIndex = async (specsDir: string): Promise<string> => {
     '',
     '| Change | Type | Spec | Domain | Issue | Since |',
     '|--------|------|------|--------|-------|-------|',
+    ...activeRows,
+    '',
+    '## Deprecated',
+    '',
+    ...deprecatedSection,
+    '',
+    '## Archived',
+    '',
+    ...archivedSection,
   ];
-
-  const activeSpecs = byStatus['active'] ?? [];
-  if (activeSpecs.length > 0) {
-    const sorted = [...activeSpecs].sort((a, b) => a.created.localeCompare(b.created));
-    for (const spec of sorted) {
-      const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
-      lines.push(
-        `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`
-      );
-    }
-  } else {
-    lines.push('| *No active changes yet* | | | | | |');
-  }
-
-  lines.push('');
-  lines.push('## Deprecated');
-  lines.push('');
-
-  const deprecatedSpecs = byStatus['deprecated'] ?? [];
-  if (deprecatedSpecs.length > 0) {
-    lines.push('| Change | Type | Spec | Domain | Issue | Deprecated |');
-    lines.push('|--------|------|------|--------|-------|------------|');
-    const sorted = [...deprecatedSpecs].sort((a, b) => a.created.localeCompare(b.created));
-    for (const spec of sorted) {
-      const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
-      lines.push(
-        `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`
-      );
-    }
-  } else {
-    lines.push('*None*');
-  }
-
-  lines.push('');
-  lines.push('## Archived');
-  lines.push('');
-
-  const archivedSpecs = byStatus['archived'] ?? [];
-  if (archivedSpecs.length > 0) {
-    lines.push('| Change | Type | Spec | Domain | Issue | Archived |');
-    lines.push('|--------|------|------|--------|-------|----------|');
-    const sorted = [...archivedSpecs].sort((a, b) => a.created.localeCompare(b.created));
-    for (const spec of sorted) {
-      const issueLink = spec.issue ? `[${spec.issue}](#)` : '';
-      lines.push(
-        `| ${spec.title} | ${spec.type} | [${spec.path}](${spec.path}) | ${spec.domain} | ${issueLink} | ${spec.created} |`
-      );
-    }
-  } else {
-    lines.push('*None*');
-  }
 
   return lines.join('\n') + '\n';
 };
@@ -128,15 +124,8 @@ const generateIndex = async (specsDir: string): Promise<string> => {
  * Parse command line arguments.
  */
 const parseArgs = (args: readonly string[]): { specsDir: string } => {
-  let specsDir = 'specs/';
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === '--specs-dir') {
-      specsDir = args[i + 1] ?? 'specs/';
-      i++;
-    }
-  }
+  const specsDirIndex = args.indexOf('--specs-dir');
+  const specsDir = specsDirIndex !== -1 ? (args[specsDirIndex + 1] ?? 'specs/') : 'specs/';
 
   return { specsDir };
 };

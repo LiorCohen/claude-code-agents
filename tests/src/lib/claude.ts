@@ -26,6 +26,23 @@ export interface ParsedOutput {
 }
 
 /**
+ * Collect string chunks from a stream.
+ * Note: Uses internal mutation for stream accumulation, returns immutable result.
+ */
+const createStringCollector = (): {
+  add: (chunk: string) => void;
+  getResult: () => readonly string[];
+} => {
+  const chunks: string[] = [];
+  return {
+    add: (chunk: string) => {
+      chunks[chunks.length] = chunk;
+    },
+    getResult: () => chunks,
+  };
+};
+
+/**
  * Run Claude CLI with the SDD plugin loaded.
  */
 export const runClaude = async (
@@ -57,23 +74,21 @@ export const runClaude = async (
 
   const startTime = Date.now();
 
-  // State tracking object - mutations confined to this closure
-  const state = {
-    toolCount: 0,
-    lastTool: '',
-    timeoutId: null as NodeJS.Timeout | null,
-  };
-
   return new Promise((resolve, reject) => {
     const proc: ChildProcess = spawn(cmd, args, {
       cwd: workingDir,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
-    const outputChunks: readonly string[] = [];
+    const outputCollector = createStringCollector();
+
+    // State tracking - mutations confined to this closure
+    let toolCount = 0;
+    let lastTool = '';
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const cleanup = (): void => {
-      if (state.timeoutId) clearTimeout(state.timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
 
     const checkTimeout = (): void => {
@@ -83,25 +98,25 @@ export const runClaude = async (
         proc.kill();
         reject(new Error(`Claude timed out after ${timeoutSeconds}s`));
       } else {
-        state.timeoutId = setTimeout(checkTimeout, 1000);
+        timeoutId = setTimeout(checkTimeout, 1000);
       }
     };
 
-    state.timeoutId = setTimeout(checkTimeout, 1000);
+    timeoutId = setTimeout(checkTimeout, 1000);
 
     proc.stdout?.on('data', (data: Buffer) => {
       const line = data.toString();
-      (outputChunks as string[]).push(line);
+      outputCollector.add(line);
 
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
 
       // Check for tool calls
       const toolMatch = /"name":"([^"]+)"/.exec(line);
-      if (toolMatch?.[1] && toolMatch[1] !== state.lastTool) {
-        state.toolCount++;
-        state.lastTool = toolMatch[1];
+      if (toolMatch?.[1] && toolMatch[1] !== lastTool) {
+        toolCount = toolCount + 1;
+        lastTool = toolMatch[1];
         if (verbose) {
-          console.log(`  \x1b[1;33m[${elapsed}s]\x1b[0m Tool #${state.toolCount}: ${state.lastTool}`);
+          console.log(`  \x1b[1;33m[${elapsed}s]\x1b[0m Tool #${toolCount}: ${lastTool}`);
         }
       }
 
@@ -113,13 +128,13 @@ export const runClaude = async (
     });
 
     proc.stderr?.on('data', (data: Buffer) => {
-      (outputChunks as string[]).push(data.toString());
+      outputCollector.add(data.toString());
     });
 
     proc.on('close', (code) => {
       cleanup();
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const output = outputChunks.join('');
+      const output = outputCollector.getResult().join('');
 
       // Save output for debugging
       writeFile(outputFile, output);

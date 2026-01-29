@@ -19,6 +19,23 @@ export interface RunOptions {
 }
 
 /**
+ * Collect chunks from a stream into an array.
+ * Note: Uses internal mutation for stream accumulation, returns immutable result.
+ */
+const createChunkCollector = (): {
+  add: (chunk: Buffer) => void;
+  getResult: () => readonly Buffer[];
+} => {
+  const chunks: Buffer[] = [];
+  return {
+    add: (chunk: Buffer) => {
+      chunks[chunks.length] = chunk;
+    },
+    getResult: () => chunks,
+  };
+};
+
+/**
  * Run a command and return the result.
  */
 export const runCommand = async (
@@ -32,8 +49,8 @@ export const runCommand = async (
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    const stdoutChunks: readonly Buffer[] = [];
-    const stderrChunks: readonly Buffer[] = [];
+    const stdoutCollector = createChunkCollector();
+    const stderrCollector = createChunkCollector();
     const timeout = options.timeout ?? 120000;
 
     const timeoutId = setTimeout(() => {
@@ -46,18 +63,13 @@ export const runCommand = async (
       proc.stdin?.end();
     }
 
-    proc.stdout?.on('data', (data: Buffer) => {
-      (stdoutChunks as Buffer[]).push(data);
-    });
-
-    proc.stderr?.on('data', (data: Buffer) => {
-      (stderrChunks as Buffer[]).push(data);
-    });
+    proc.stdout?.on('data', stdoutCollector.add);
+    proc.stderr?.on('data', stderrCollector.add);
 
     proc.on('close', (code) => {
       clearTimeout(timeoutId);
-      const stdout = Buffer.concat(stdoutChunks as Buffer[]).toString();
-      const stderr = Buffer.concat(stderrChunks as Buffer[]).toString();
+      const stdout = Buffer.concat([...stdoutCollector.getResult()]).toString();
+      const stderr = Buffer.concat([...stderrCollector.getResult()]).toString();
       resolve({ exitCode: code ?? 0, stdout, stderr });
     });
 

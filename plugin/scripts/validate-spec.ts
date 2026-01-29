@@ -23,8 +23,6 @@ interface ValidationError {
  * Validate a spec file. Returns list of errors.
  */
 const validateSpec = async (specPath: string): Promise<readonly ValidationError[]> => {
-  const errors: ValidationError[] = [];
-
   try {
     await fs.access(specPath);
   } catch {
@@ -38,50 +36,36 @@ const validateSpec = async (specPath: string): Promise<readonly ValidationError[
     return [{ file: specPath, message: 'Missing frontmatter' }];
   }
 
-  for (const field of REQUIRED_FIELDS) {
-    if (!fm[field]) {
-      errors.push({ file: specPath, message: `Missing required field '${field}'` });
-    }
-  }
+  // Check required fields
+  const missingFieldErrors: readonly ValidationError[] = REQUIRED_FIELDS
+    .filter((field) => !fm[field])
+    .map((field) => ({ file: specPath, message: `Missing required field '${field}'` }));
 
+  // Check status validity
   const status = fm['status'];
-  if (status && !(VALID_STATUSES as readonly string[]).includes(status)) {
-    errors.push({
-      file: specPath,
-      message: `Invalid status '${status}'. Must be one of: ${VALID_STATUSES.join(', ')}`,
-    });
-  }
+  const statusErrors: readonly ValidationError[] =
+    status && !(VALID_STATUSES as readonly string[]).includes(status)
+      ? [{ file: specPath, message: `Invalid status '${status}'. Must be one of: ${VALID_STATUSES.join(', ')}` }]
+      : [];
 
+  // Check issue placeholder
   const issue = fm['issue'];
-  if (issue && (PLACEHOLDER_ISSUES as readonly string[]).includes(issue)) {
-    errors.push({
-      file: specPath,
-      message: 'Issue field is placeholder. Must reference actual issue.',
-    });
-  }
+  const issueErrors: readonly ValidationError[] =
+    issue && (PLACEHOLDER_ISSUES as readonly string[]).includes(issue)
+      ? [{ file: specPath, message: 'Issue field is placeholder. Must reference actual issue.' }]
+      : [];
 
-  return errors;
+  return [...missingFieldErrors, ...statusErrors, ...issueErrors];
 };
 
 /**
  * Parse command line arguments.
  */
 const parseArgs = (args: readonly string[]): { all: boolean; specsDir: string; path?: string } => {
-  let all = false;
-  let specsDir = 'specs/';
-  let specPath: string | undefined;
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === '--all') {
-      all = true;
-    } else if (arg === '--specs-dir') {
-      specsDir = args[i + 1] ?? 'specs/';
-      i++;
-    } else if (!arg?.startsWith('-')) {
-      specPath = arg;
-    }
-  }
+  const all = args.includes('--all');
+  const specsDirIndex = args.indexOf('--specs-dir');
+  const specsDir = specsDirIndex !== -1 ? (args[specsDirIndex + 1] ?? 'specs/') : 'specs/';
+  const specPath = args.find((arg) => !arg.startsWith('-') && arg !== args[specsDirIndex + 1]);
 
   return { all, specsDir, path: specPath };
 };
@@ -96,18 +80,16 @@ const main = async (): Promise<number> => {
     }
 
     const specs = await findSpecFiles(args.specsDir);
-    const allErrors: ValidationError[] = [];
 
-    for (const spec of specs) {
-      const errors = await validateSpec(spec.path);
-      allErrors.push(...errors);
-    }
+    // Validate all specs and collect errors
+    const validationResults = await Promise.all(specs.map((spec) => validateSpec(spec.path)));
+    const allErrors = validationResults.flat();
 
     if (allErrors.length > 0) {
       console.log('Validation errors:');
-      for (const error of allErrors) {
+      allErrors.forEach((error) => {
         console.log(`  - ${error.file}: ${error.message}`);
-      }
+      });
       return 1;
     }
 
@@ -119,9 +101,9 @@ const main = async (): Promise<number> => {
     const errors = await validateSpec(args.path);
     if (errors.length > 0) {
       console.log('Validation errors:');
-      for (const error of errors) {
+      errors.forEach((error) => {
         console.log(`  - ${error.message}`);
-      }
+      });
       return 1;
     }
     console.log(`✓ ${args.path} is valid`);
