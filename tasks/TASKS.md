@@ -6,11 +6,6 @@
 
 ## Planned
 
-### 18. Add commit standards skill inside plugin
-The commit skill currently lives at the marketplace level (`.claude/skills/commit/`). Need to add commit standards as a skill inside the plugin itself so users of the plugin get consistent commit guidance.
-
-**Plan:** [plans/planned/PLAN-task-18-commit-standards-plugin-skill.md](plans/planned/PLAN-task-18-commit-standards-plugin-skill.md)
-
 ---
 
 ## Pending
@@ -240,6 +235,16 @@ Add a `helm-standards` skill that provides guidance and standards for writing He
 - ConfigMap and Secret handling
 - **Readability first:** Prioritize simple, readable templates over clever solutions. Minimize use of special functions and Go template wizardry. Charts should be easy to understand at a glance.
 
+### 56. Create architecture skill with meaningful guidance
+The current `specs/architecture/` approach is naive and not very useful. Need a proper architecture skill that provides:
+- Meaningful architectural guidance beyond just listing components
+- Decision records (ADRs) methodology
+- System context and container diagrams guidance
+- Integration patterns and boundaries
+- Non-functional requirements capture
+- Trade-off analysis framework
+- Evolution and migration planning
+
 ### 52. Clean up .gitkeep and placeholder content during implementation
 When changes are implemented and actual content is added to directories, ensure that:
 - `.gitkeep` files are removed once the directory has real content
@@ -300,6 +305,19 @@ Investigate if there's a way to show a welcome prompt/message after plugin insta
 ---
 
 ## Completed
+
+### 18. Add commit standards skill inside plugin ✓
+**Completed: 2026-01-29 (v5.1.0)**
+
+Added `plugin/skills/commit-standards/SKILL.md` with:
+- Conventional commit format (Add, Fix, Update, Remove, Refactor, Docs, Tasks)
+- Changelog standards with split directory structure (`changelog/vN.md`)
+- Version bump guidelines (PATCH/MINOR/MAJOR)
+- SDD-aware practices: reference change directories, commit after phases
+- Critical rule: commit after every filesystem change to prevent data loss
+- Co-Authored-By footer with SDD Plugin version (verified with user)
+
+**Plan:** [plans/complete/PLAN-task-18-commit-standards-plugin-skill.md](plans/complete/PLAN-task-18-commit-standards-plugin-skill.md)
 
 ### 55. Split CHANGELOG.md into per-major-version files ✓
 **Completed: 2026-01-29**

@@ -43,7 +43,7 @@ For each affected plugin, check if version bump is needed:
 - Root `README.md`
 - Root `CLAUDE.md`
 - Root `CONTRIBUTING.md`
-- Root `CHANGELOG.md` (infrastructure entries only - versioned entries need version bump)
+- `changelog/` directory (changelog entries go in version-specific files)
 - `.claude/skills/` (marketplace-level skills)
 - `.gitignore`
 - `.claudeignore`
@@ -61,17 +61,14 @@ Update BOTH files:
 ### Step 3: Changelog Check
 
 **Changelog structure:**
-- `CHANGELOG.md` (root) - Index file with version history table + latest entries
 - `changelog/v{N}.md` - Per-major-version files (v1.md, v2.md, v3.md, v4.md, v5.md)
 
 **Plugin changes**: Format `## [x.y.z] - YYYY-MM-DD` (versioned releases)
 **Infrastructure changes**: Format `## Infrastructure - YYYY-MM-DD` (date-based)
 
-**Update BOTH files:**
-1. **Version-specific file** (`changelog/v{major}.md`): Add entry at the top (after the header)
-2. **Root CHANGELOG.md**: Add entry after the version history table
+**Update the version-specific file** (`changelog/v{major}.md`): Add entry at the top (after the header)
 
-If plugin version was bumped, ensure BOTH changelog files have the versioned entry:
+Entry format:
 
 ```markdown
 ## [x.y.z] - YYYY-MM-DD
@@ -227,7 +224,7 @@ Agent: Updating versions to 1.10.20...
 ✓ Updated plugin.json
 ✓ Updated marketplace.json
 
-CHANGELOG.md needs an entry for 1.10.20.
+changelog/v1.md needs an entry for 1.10.20.
 
 Proposed entry:
 
@@ -241,7 +238,7 @@ Should I add this entry? (yes/edit/no)
 
 User: yes
 
-Agent: ✓ Updated CHANGELOG.md
+Agent: ✓ Updated changelog/v1.md
 
 Proposed commit message:
 
@@ -254,7 +251,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 Files to commit:
 - plugin/agents/backend-dev.md
 - plugin/.claude-plugin/plugin.json
-- CHANGELOG.md
+- changelog/v1.md
 - .claude-plugin/marketplace.json
 
 Proceed with commit? (yes/edit/no)
@@ -283,7 +280,7 @@ Completing a task? → Update tasks/TASKS.md → Update plan status → Stage al
 5. **Wrong commit format** - Must include Co-Authored-By
 6. **Staging incomplete** - Must include all version files in same commit
 7. **Wrong date in CHANGELOG** - Use today's date
-8. **Updating only one changelog file** - Must update BOTH root `CHANGELOG.md` AND `changelog/v{N}.md`
+8. **Wrong changelog file** - Update only `changelog/v{N}.md` (no root CHANGELOG.md)
 9. **Amending pushed commits** - NEVER amend commits that have been pushed to remote
 10. **Multiple changelog entries per commit** - Each commit = one changelog entry. Split if needed
 11. **Forgetting to update tasks/TASKS.md** - When completing a task, move it to Completed section before committing
@@ -340,8 +337,7 @@ cat plugin/.claude-plugin/plugin.json | grep version
 echo "Marketplace version:"
 cat .claude-plugin/marketplace.json | grep version
 
-# Check CHANGELOG has entry for new version (check both files)
-head -30 CHANGELOG.md
+# Check changelog has entry for new version
 head -20 changelog/v5.md  # Adjust version number as needed
 
 # Check staged files
@@ -353,7 +349,6 @@ git status
 The changelog is split by major version to stay within Claude's file size limits:
 
 ```
-CHANGELOG.md           # Index + latest version entries
 changelog/
 ├── v1.md              # All 1.x releases
 ├── v2.md              # All 2.x releases
@@ -365,5 +360,3 @@ changelog/
 When adding a new entry:
 1. Identify the major version (e.g., `5.1.0` → major version `5`)
 2. Add entry to `changelog/v5.md` after the header section
-3. Add entry to root `CHANGELOG.md` after the version history table
-4. Both files must have identical entries for the new version
