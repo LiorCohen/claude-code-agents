@@ -62,7 +62,7 @@ For even fewer prompts, you can add static permission patterns to your project's
 
 For the complete recommended permission set, copy from:
 ```
-plugin/config/recommended-permissions.json
+plugin/hooks/recommended-permissions.json
 ```
 
 ### Option 3: Maximum Convenience (Development Only)

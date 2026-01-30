@@ -103,7 +103,7 @@ SDD commands create many files. To reduce permission prompts, add this to your `
 }
 ```
 
-See **[Permissions Setup](./plugin/docs/permissions.md)** for full configuration options.
+See **[Permissions Setup](./plugin/hooks/PERMISSIONS.md)** for full configuration options.
 
 ---
 
@@ -114,7 +114,7 @@ See **[Permissions Setup](./plugin/docs/permissions.md)** for full configuration
 - **[Commands](./docs/commands.md)** - Full command reference
 - **[Agents](./docs/agents.md)** - What each agent does
 - **[Components](./docs/components.md)** - Component types reference
-- **[Permissions Setup](./plugin/docs/permissions.md)** - Reduce permission prompts
+- **[Permissions Setup](./plugin/hooks/PERMISSIONS.md)** - Reduce permission prompts
 
 ---
 

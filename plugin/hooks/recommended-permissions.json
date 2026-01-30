@@ -1,7 +1,7 @@
 {
   "_description": "Optional static permissions for SDD plugin. The plugin includes an automatic hook for smart file approval, but you can add these static patterns to .claude/settings.local.json for additional coverage.",
   "_version": "1.0.0",
-  "_docs": "See plugin/docs/permissions.md for setup instructions",
+  "_docs": "See plugin/hooks/PERMISSIONS.md for setup instructions",
   "_note": "The hook in hooks/hooks.json is registered automatically when the plugin is installed.",
 
   "permissions": {

@@ -30,7 +30,7 @@ Initialize a new spec-driven project, optionally from an existing external speci
 
 **CRITICAL**: This command follows an approval-based workflow. Do NOT create any files or directories until the user has approved the project configuration.
 
-**Permission Note**: This command creates ~50+ files. If the user hasn't configured SDD permissions, they will see many approval prompts. If you notice excessive prompts during execution, mention that they can reduce prompts by configuring permissions per `plugin/docs/permissions.md`.
+**Permission Note**: This command creates ~50+ files. If the user hasn't configured SDD permissions, they will see many approval prompts. If you notice excessive prompts during execution, mention that they can reduce prompts by configuring permissions per `plugin/hooks/PERMISSIONS.md`.
 
 This command orchestrates multiple skills to complete initialization:
 
