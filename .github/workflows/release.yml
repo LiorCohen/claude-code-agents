@@ -31,30 +31,54 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if version changed
-        id: check
+        id: version_check
         run: |
           echo "Current version: ${{ steps.current.outputs.version }}"
           echo "Previous version: ${{ steps.previous.outputs.version }}"
           if [ "${{ steps.current.outputs.version }}" != "${{ steps.previous.outputs.version }}" ]; then
-            echo "Version changed - will create release"
+            echo "Version changed"
             echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "Version unchanged - skipping release"
+            echo "Version unchanged"
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if release exists
+        id: release_check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.current.outputs.version }}"
+          if gh release view "v${VERSION}" > /dev/null 2>&1; then
+            echo "Release v${VERSION} already exists"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Release v${VERSION} not found"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Determine if release needed
+        id: check
+        run: |
+          if [ "${{ steps.version_check.outputs.changed }}" == "true" ] || [ "${{ steps.release_check.outputs.exists }}" == "false" ]; then
+            echo "Release needed (version_changed=${{ steps.version_check.outputs.changed }}, release_exists=${{ steps.release_check.outputs.exists }})"
+            echo "needed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Release not needed - version unchanged and release exists"
+            echo "needed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract changelog for version
-        if: steps.check.outputs.changed == 'true'
-        id: changelog
+        if: steps.check.outputs.needed == 'true'
         run: |
           VERSION="${{ steps.current.outputs.version }}"
           # Extract major version (e.g., 5.1.0 -> 5)
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
           CHANGELOG_FILE="changelog/v${MAJOR}.md"
 
-          # Extract changelog section for this version
-          # Start after "## [VERSION]" line, stop at next "## " or "---"
-          CHANGELOG=$(awk -v ver="$VERSION" '
+          # Extract changelog section for this version to a file
+          # This avoids shell escaping issues with backticks and special chars
+          awk -v ver="$VERSION" '
             BEGIN { found=0 }
             /^## \[/ {
               if (found) exit
@@ -63,17 +87,13 @@ jobs:
             /^## Infrastructure/ { if (found) exit }
             /^---$/ { if (found) exit }
             found { print }
-          ' "$CHANGELOG_FILE")
+          ' "$CHANGELOG_FILE" > /tmp/release-notes.md
 
-          # Write to output using heredoc
-          {
-            echo "body<<CHANGELOG_EOF"
-            echo "$CHANGELOG"
-            echo "CHANGELOG_EOF"
-          } >> $GITHUB_OUTPUT
+          echo "Extracted changelog:"
+          cat /tmp/release-notes.md
 
       - name: Create release archive
-        if: steps.check.outputs.changed == 'true'
+        if: steps.check.outputs.needed == 'true'
         run: |
           VERSION="${{ steps.current.outputs.version }}"
           # Create release directory with only plugin files
@@ -86,21 +106,14 @@ jobs:
           zip -r "sdd-plugin-v${VERSION}.zip" sdd-plugin
 
       - name: Create GitHub Release
-        if: steps.check.outputs.changed == 'true'
+        if: steps.check.outputs.needed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ steps.current.outputs.version }}"
-
-          # Check if release already exists
-          if gh release view "v${VERSION}" > /dev/null 2>&1; then
-            echo "Release v${VERSION} already exists - skipping"
-            exit 0
-          fi
-
           echo "Creating release v${VERSION}..."
           gh release create "v${VERSION}" \
             --title "SDD Plugin v${VERSION}" \
-            --notes "${{ steps.changelog.outputs.body }}" \
+            --notes-file /tmp/release-notes.md \
             release/sdd-plugin-v${VERSION}.tar.gz \
             release/sdd-plugin-v${VERSION}.zip
