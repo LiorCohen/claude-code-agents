@@ -1,9 +1,9 @@
 {
   "name": "sdd",
-  "version": "5.7.1",
+  "version": "5.7.2",
   "description": "Spec-driven development methodology for full-stack teams",
   "author": {
     "name": "Lior Cohen"
   },
-  "hooks": "../hooks/hooks.json"
+  "hooks": "./hooks/hooks.json"
 }
