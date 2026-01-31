@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#65](5-reviewing/65/): Move external spec handling from sdd-init to sdd-new-change
+(none)
 
 ---
 
@@ -79,6 +79,7 @@
 
 ## Complete
 
+- [#65](6-complete/65/): Move external spec handling from sdd-init to sdd-new-change ✓ (2026-01-31)
 - [#11](6-complete/11/): Missing deeper config integration ✓ (2026-01-30)
 - [#60](6-complete/60/): Standardize TypeScript imports and tsconfig ✓ (2026-01-30)
 - [#62](6-complete/62/): Unified CLI system ✓ (2026-01-30)
