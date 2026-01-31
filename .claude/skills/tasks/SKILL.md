@@ -14,25 +14,35 @@ Manage the project backlog, track progress, and organize implementation plans.
 ```
 .tasks/
 ├── INDEX.md              # Index file - task numbers, titles, links
-├── issues/               # Individual task files by priority
-│   ├── inbox/            # Unsorted - new issues land here
-│   ├── low/              # Low priority
-│   ├── medium/           # Medium priority
-│   ├── high/             # High priority
-│   ├── consolidated/           # Consolidated into other tasks
-│   └── complete/         # Done
-└── plans/                # Implementation plans by status
-    ├── new/              # Just created
-    ├── in-progress/      # Being worked on
-    ├── in-review/        # Ready for review
-    └── complete/         # Done (requires explicit auth)
+├── 1-inbox/              # Open tasks (not yet started)
+│   └── 63/
+│       └── task.md
+├── 2-planning/           # Plan being created
+│   └── 19/
+│       ├── task.md
+│       └── plan.md
+├── 3-ready/              # Has plan, ready to implement
+├── 4-implementing/       # Currently being worked on
+├── 5-reviewing/          # Implementation complete, under review
+├── 6-complete/           # Done
+│   └── 7/
+│       ├── task.md
+│       └── plan.md
+├── 7-rejected/           # Rejected or irrelevant
+└── 8-consolidated/       # Consolidated into other tasks
 ```
+
+Each task is a folder named by its ID containing:
+- `task.md` - the task description and metadata
+- `plan.md` - the implementation plan (created during planning phase)
+
+**Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories but grouped by priority in INDEX.md.
 
 ---
 
-## Issue Schema
+## Task Schema
 
-All issue files use YAML frontmatter.
+All task files use YAML frontmatter.
 
 ### Frontmatter Fields
 
@@ -40,16 +50,16 @@ All issue files use YAML frontmatter.
 |-------|------|----------|-------------|
 | `id` | number | yes | Unique task number |
 | `title` | string | yes | Short title |
-| `priority` | enum | yes | `inbox`, `low`, `medium`, `high` |
-| `status` | enum | yes | `open`, `consolidated`, `complete` |
+| `priority` | enum | no | `low`, `medium`, `high` (unset = unprioritized) |
+| `status` | enum | yes | `open`, `planning`, `ready`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
 | `created` | date | yes | YYYY-MM-DD |
 | `completed` | date | no | YYYY-MM-DD (when status=complete) |
 | `consolidated_into` | number | no | Task ID (when status=consolidated) |
-| `plan` | string | no | Relative path to plan file |
+| `rejected_reason` | string | no | Reason for rejection (when status=rejected) |
 | `depends_on` | number[] | no | Task IDs this depends on |
 | `blocks` | number[] | no | Task IDs blocked by this |
 
-### Issue File Template
+### Task File Template
 
 ```markdown
 ---
@@ -74,7 +84,7 @@ Full description of what needs to be done.
 - [ ] Criterion 2
 ```
 
-### Completed Issue Template
+### Completed Task Template
 
 ```markdown
 ---
@@ -84,7 +94,6 @@ priority: high
 status: complete
 created: 2026-01-25
 completed: 2026-01-28
-plan: ../../plans/complete/PLAN-task-7-external-spec-handling.md
 ---
 
 # Task 7: External spec handling ✓
@@ -100,7 +109,7 @@ Brief summary of what was accomplished.
 - Changed Z
 ```
 
-### Consolidated Issue Template
+### Consolidated Task Template
 
 ```markdown
 ---
@@ -125,37 +134,58 @@ consolidated_into: 27
 [Original acceptance criteria remain here unchanged]
 ```
 
-**IMPORTANT:** When consolidating, the original issue content MUST be preserved in full. Only the frontmatter and title are modified.
+**IMPORTANT:** When consolidating, the original task content MUST be preserved in full. Only the frontmatter and title are modified.
+
+### Rejected Task Template
+
+```markdown
+---
+id: 15
+title: Feature that was rejected
+priority: medium
+status: rejected
+created: 2026-01-20
+rejected_reason: Out of scope for MVP
+---
+
+# Task 15: Feature that was rejected ✗
+
+<!-- Original content preserved below -->
+
+## Description
+
+[Original description content remains here unchanged]
+
+## Acceptance Criteria
+
+[Original acceptance criteria remain here unchanged]
+```
+
+**IMPORTANT:** When rejecting, the original task content MUST be preserved in full. Only the frontmatter and title are modified.
 
 ---
 
 ## Plan Schema
 
-All plan files use YAML frontmatter.
+Plans are stored as `plan.md` inside the task folder. They are created during the planning phase and move with the task through its lifecycle.
 
 ### Frontmatter Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `task_id` | number | yes | Related task number |
 | `title` | string | yes | Plan title |
-| `status` | enum | yes | `new`, `in-progress`, `in-review`, `complete` |
 | `created` | date | yes | YYYY-MM-DD |
 | `updated` | date | no | YYYY-MM-DD (last modification) |
-| `completed` | date | no | YYYY-MM-DD (when status=complete) |
-| `version` | string | no | Plugin version when completed |
 
 ### Plan File Template
 
 ```markdown
 ---
-task_id: 19
 title: Task management skill
-status: new
 created: 2026-01-28
 ---
 
-# Plan: Task Management Skill (Task 19)
+# Plan: Task Management Skill
 
 ## Problem Summary
 
@@ -183,71 +213,83 @@ Details...
 2. How to verify phase 2 works
 ```
 
-### Completed Plan Template
-
-```markdown
----
-task_id: 7
-title: External spec handling
-status: complete
-created: 2026-01-25
-completed: 2026-01-28
-version: v5.0.0
----
-
-# Plan: External Spec Handling (Task 7) ✓
-
-## Summary
-
-What was accomplished...
-```
-
 ---
 
 ## INDEX.md Index Structure
 
+Tasks are grouped by priority first (for open tasks), then by terminal status.
+
 ```markdown
 # Tasks Backlog
 
-Task details in [issues/](issues/) | Plans in [plans/](plans/)
+---
+
+## Planning
+
+- [#19](2-planning/19/): Task management skill
 
 ---
 
-## Inbox (unsorted)
+## Ready
 
-- [#63](issues/inbox/63.md): New feature idea
+- [#20](3-ready/20/): Plugin installation debugging
+
+---
+
+## Implementing
+
+- [#60](4-implementing/60/): Standardize TypeScript imports
+
+---
+
+## Reviewing
+
+- [#55](5-reviewing/55/): Split CHANGELOG.md
 
 ---
 
 ## High Priority
 
-- [#60](issues/high/60.md): Standardize TypeScript imports
-- [#59](issues/high/59.md): Audit and update agents
+- [#59](1-inbox/59/): Audit and update agents
 
 ---
 
 ## Medium Priority
 
-- [#10](issues/medium/10.md): Missing /sdd-help command
+- [#10](1-inbox/10/): Missing /sdd-help command
 
 ---
 
 ## Low Priority
 
-- [#3](issues/low/3.md): Docs missing: CMDO Guide
+- [#3](1-inbox/3/): Docs missing: CMDO Guide
 
 ---
 
-## Consolidated
+## Inbox (unprioritized)
 
-- [#28](issues/consolidated/28.md) → #27
+- [#63](1-inbox/63/): New feature idea
 
 ---
 
 ## Complete
 
-- [#62](issues/complete/62.md): Unified CLI system ✓ (2026-01-30)
+- [#62](6-complete/62/): Unified CLI system ✓ (2026-01-30)
+
+---
+
+## Rejected
+
+- [#5](7-rejected/5/): Out of scope feature
+
+---
+
+## Consolidated
+
+- [#28](8-consolidated/28/) → #27
 ```
+
+**Note:** Links point to task folders. Priority is determined by the `priority` frontmatter field.
 
 ---
 
@@ -268,7 +310,7 @@ User: /tasks list
 User: /tasks 19
 ```
 
-**Action:** Read the individual task file (scan issues/ subdirs to find it).
+**Action:** Find and read `<status-dir>/19/task.md`.
 
 ### Add New Task
 
@@ -277,9 +319,9 @@ User: /tasks add <description>
 ```
 
 **Workflow:**
-1. Determine next task number (highest N + 1 across all subdirs)
-2. Create file in `issues/inbox/` with frontmatter
-3. Add entry to INDEX.md index under Inbox
+1. Determine next task number (highest N + 1 across all status dirs)
+2. Create folder `1-inbox/<N>/` with `task.md`
+3. Add entry to INDEX.md under Inbox
 4. Confirm with task number
 
 New tasks always go to inbox first. User can prioritize later.
@@ -293,10 +335,69 @@ User: /tasks prioritize 15 low
 ```
 
 **Workflow:**
-1. Find task file
-2. Move file to target priority dir (`issues/high/`, `issues/medium/`, `issues/low/`)
-3. Update frontmatter `priority` field
-4. Update INDEX.md index
+1. Find task folder
+2. Update `task.md` frontmatter `priority` field
+3. Move task entry to correct section in INDEX.md
+
+**Note:** Priority only affects INDEX.md grouping, not file location.
+
+### Start Planning
+
+```
+User: /tasks plan 19
+```
+
+**Workflow:**
+1. Find task folder
+2. Move folder to `2-planning/`
+3. Update `task.md` frontmatter: `status: planning`
+4. Create `plan.md` in the task folder
+5. Update INDEX.md
+
+Use when starting to create a plan for a task.
+
+### Mark Ready
+
+```
+User: /tasks ready 19
+```
+
+**Workflow:**
+1. Find task folder
+2. Move folder to `3-ready/`
+3. Update `task.md` frontmatter: `status: ready`
+4. Update INDEX.md
+
+Use when a task has a complete plan and is ready to implement.
+
+### Start Implementing
+
+```
+User: /tasks implement 19
+```
+
+**Workflow:**
+1. Create and switch to a feature branch (e.g., `feature/task-19-<slug>`)
+2. Find task folder
+3. Move folder to `4-implementing/`
+4. Update `task.md` frontmatter: `status: implementing`
+5. Update INDEX.md
+
+**IMPORTANT:** Always create a side branch before implementing. Never implement directly on main.
+
+### Submit for Review
+
+```
+User: /tasks review 19
+```
+
+**Workflow:**
+1. Find task folder
+2. Move folder to `5-reviewing/`
+3. Update `task.md` frontmatter: `status: reviewing`
+4. Update INDEX.md
+
+Use when implementation is complete and ready for review.
 
 ### Complete Task
 
@@ -305,11 +406,24 @@ User: /tasks complete 7
 ```
 
 **Workflow:**
-1. Find task file
-2. Move to `issues/complete/`
-3. Update frontmatter: `status: complete`, add `completed` date
-4. Update INDEX.md index
-5. **If plan exists, ask user** before moving to `plans/complete/`
+1. Find task folder
+2. Move folder to `6-complete/`
+3. Update `task.md` frontmatter: `status: complete`, add `completed` date
+4. Update INDEX.md
+
+### Reject Task
+
+```
+User: /tasks reject 15
+User: /tasks reject 15 "Out of scope for MVP"
+```
+
+**Workflow:**
+1. Find task folder
+2. Move folder to `7-rejected/`
+3. Update `task.md` frontmatter: `status: rejected`
+4. If reason provided, add to `task.md`
+5. Update INDEX.md
 
 ### Consolidate Tasks
 
@@ -318,51 +432,14 @@ User: /tasks consolidate 28 into 27
 ```
 
 **Workflow:**
-1. Find both task files
-2. Move task 28 to `issues/consolidated/`
-3. Update task 28:
+1. Find both task folders
+2. Move task 28 folder to `8-consolidated/`
+3. Update task 28 `task.md`:
    - Update frontmatter: `status: consolidated`, `consolidated_into: 27`
    - Update title to include `→ consolidated into #27`
    - **Preserve ALL original content** (description, acceptance criteria, etc.)
-4. Update task 27 with consolidated context (add ## Consolidated section referencing #28)
-5. Update INDEX.md index
-
-### Create Plan
-
-```
-User: /tasks plan 19
-```
-
-**Workflow:**
-1. Read task file
-2. Analyze codebase
-3. Create `plans/new/PLAN-task-N-slug.md` with frontmatter
-4. Update task file frontmatter with `plan` path
-5. Confirm creation
-
-### Advance Plan Status
-
-```
-User: /tasks plan-status 19 in-progress
-User: /tasks plan-status 19 in-review
-User: /tasks plan-status 19 complete
-```
-
-**Workflow:**
-1. Find plan file
-2. Move to target status dir
-3. Update frontmatter `status` field
-4. Add `updated` or `completed` date as appropriate
-
-**IMPORTANT:** Moving to `complete` requires explicit user confirmation.
-
-### Review Plans
-
-```
-User: /tasks plans
-```
-
-**Action:** List all plans grouped by status (new, in-progress, in-review, complete).
+4. Update task 27 `task.md` with consolidated context (add ## Consolidated section referencing #28)
+5. Update INDEX.md
 
 ---
 
@@ -377,32 +454,65 @@ User: /tasks plans
 
 1. **Inbox first** - New tasks go to inbox, prioritize later
 2. **Keep atomic** - One clear outcome per task
-3. **Consolidate related** - Don't duplicate effort
-4. **Preserve on consolidate** - Never lose original issue content when consolidating
-5. **Link plans** - Always link implementation plans
-6. **Update both** - Task file AND INDEX.md must stay in sync
+3. **Branch before implementing** - Always create a feature branch before starting work
+4. **Consolidate related** - Don't duplicate effort
+5. **Preserve on consolidate** - Never lose original task content when consolidating
+6. **Update both** - Task folder AND INDEX.md must stay in sync
 7. **Add context** - When completing, summarize what was done
 8. **Date everything** - Completion dates help track velocity
-9. **Never move plans without auth** - `plans/complete/` requires explicit approval
 
 ## Lifecycles
 
-### Issue Lifecycle
+### Task Lifecycle
 
 ```
-inbox/ → [prioritize] → low/ | medium/ | high/
-                              ↓
-                        [implement]
-                              ↓
-                        complete/
+                  1-inbox/ (open tasks)
+                           ↓
+                     [/tasks plan]
+                           ↓
+                     2-planning/
+                           ↓
+                    [/tasks ready]
+                           ↓
+                      3-ready/
+                           ↓
+                  [/tasks implement]
+                           ↓
+                   4-implementing/
+                           ↓
+                   [/tasks review]
+                           ↓
+                    5-reviewing/
+                           ↓
+                   [/tasks complete]
+                           ↓
+                     6-complete/
 
-Any priority → consolidated/ (if combined with another)
+Any status → 8-consolidated/ (if combined with another)
+Any status → 7-rejected/ (if irrelevant or out of scope)
 ```
 
-### Plan Lifecycle
+**Priority** (high/medium/low) can be set at any point and only affects INDEX.md grouping.
 
-```
-new/ → in-progress/ → in-review/ → complete/
-```
+Plans are created during the planning phase and move with their task folder through the lifecycle.
 
-Plans move forward through explicit commands, never automatically.
+---
+
+## Automatic Status Updates
+
+When the user gives task-related instructions, **automatically move the task to the appropriate status**:
+
+| User instruction | Inferred status | Action |
+|------------------|-----------------|--------|
+| "Plan task 19" / "Create a plan for #19" | `planning` | Move to `2-planning/`, create `plan.md` |
+| "Task 19 is ready" / "Mark #19 ready" | `ready` | Move to `3-ready/` |
+| "Let's work on task 19" / "Implement #19" | `implementing` | Move to `4-implementing/`, create branch |
+| "Task 19 is ready for review" / "Submit #19" | `reviewing` | Move to `5-reviewing/` |
+| "Task 19 is done" / "Complete #19" | `complete` | Move to `6-complete/`, add completion date |
+| "Reject task 19" / "Close #19 as wontfix" | `rejected` | Move to `7-rejected/` |
+
+**Always update both the task folder location AND INDEX.md when status changes.**
+
+**After completing implementation work, automatically move the task to `5-reviewing/`** to signal that implementation is done and ready for user review.
+
+Skip forward transitions are allowed (e.g., inbox → implementing for quick fixes without formal planning).

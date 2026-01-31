@@ -1,50 +1,35 @@
 # Tasks Backlog
 
-Task details in [issues/](issues/) | Plans in [plans/](plans/)
+---
+
+## Planning
+
+(none)
 
 ---
 
-## Inbox (unsorted)
+## Ready
 
-- [#63](issues/inbox/63.md): Consolidate overlapping skills
-- [#10](issues/inbox/10.md): Missing /sdd-help command
-- [#12](issues/inbox/12.md): User onboarding and process state tracking
-- [#13](issues/inbox/13.md): sdd-init should provide thorough repo guide
-- [#14](issues/inbox/14.md): Unclear when to run type generation
-- [#15](issues/inbox/15.md): Planner is too rigid and template-driven
-- [#16](issues/inbox/16.md): Plan changes should cascade to dependent items
-- [#20](issues/inbox/20.md): Plugin installation debugging skill + workflow fix
-- [#21](issues/inbox/21.md): Project sanity verification command
-- [#22](issues/inbox/22.md): Add critic agent to marketplace
-- [#23](issues/inbox/23.md): Autocomplete for SDD command arguments
-- [#25](issues/inbox/25.md): Planner must block on open questions in specs
-- [#26](issues/inbox/26.md): Better session separators/visual indicators
-- [#27](issues/inbox/27.md): JSON Schema for skills + validation skill
-- [#29](issues/inbox/29.md): sdd-tasks command for state review and IDE integration
-- [#33](issues/inbox/33.md): Tests are not useful - need better test creation approach
-- [#34](issues/inbox/34.md): Audit agent assumptions around interactivity
-- [#35](issues/inbox/35.md): Checksumming and drift detection for specs/components
-- [#37](issues/inbox/37.md): Plan revision workflow for iterative development
-- [#38](issues/inbox/38.md): Integration and E2E testing should be separate components
-- [#39](issues/inbox/39.md): Capture ad-hoc code changes and sync specs
-- [#40](issues/inbox/40.md): Fix sdd-new-change test - spec format mismatch
-- [#41](issues/inbox/41.md): sdd-new-change should handle external specs
-- [#43](issues/inbox/43.md): CI/CD components and .github folder integration
-- [#44](issues/inbox/44.md): Helm chart template + observability stack
-- [#47](issues/inbox/47.md): Local environment create/start/stop workflow
-- [#50](issues/inbox/50.md): Move sdd-settings.yaml to .sdd/ directory
-- [#52](issues/inbox/52.md): Clean up .gitkeep and placeholder content
-- [#53](issues/inbox/53.md): Missing helm-standards skill
-- [#54](issues/inbox/54.md): Missing postgresql-standards skill
-- [#56](issues/inbox/56.md): Create architecture skill with meaningful guidance
-- [#57](issues/inbox/57.md): Add /sdd-settings command
+(none)
+
+---
+
+## Implementing
+
+(none)
+
+---
+
+## Reviewing
+
+(none)
 
 ---
 
 ## High Priority
 
-- [#17](issues/high/17.md): Plans should follow TDD with test review first
-- [#59](issues/high/59.md): Audit and update all agents for compatibility
+- [#17](1-inbox/17/): Plans should follow TDD with test review first
+- [#59](1-inbox/59/): Audit and update all agents for compatibility
 
 ---
 
@@ -56,42 +41,85 @@ Task details in [issues/](issues/) | Plans in [plans/](plans/)
 
 ## Low Priority
 
-- [#3](issues/low/3.md): Docs missing: CMDO Guide
-- [#24](issues/low/24.md): Add plugin Slack support
-- [#31](issues/low/31.md): Welcome prompt after plugin installation
-- [#48](issues/low/48.md): Organize plugin skills directory by cohesion
+- [#3](1-inbox/3/): Docs missing: CMDO Guide
+- [#24](1-inbox/24/): Add plugin Slack support
+- [#31](1-inbox/31/): Welcome prompt after plugin installation
+- [#48](1-inbox/48/): Organize plugin skills directory by cohesion
 
 ---
 
-## Consolidated
+## Inbox (unprioritized)
 
-- [#1](issues/consolidated/1.md) → #9
-- [#5](issues/consolidated/5.md) → #7
-- [#6](issues/consolidated/6.md) → #7
-- [#8](issues/consolidated/8.md) → #6
-- [#28](issues/consolidated/28.md) → #27
-- [#30](issues/consolidated/30.md) → #15
-- [#32](issues/consolidated/32.md) → #26
-- [#36](issues/consolidated/36.md) → #35
-- [#42](issues/consolidated/42.md) → #9
-- [#46](issues/consolidated/46.md) → #44
-- [#58](issues/consolidated/58.md) → #62
-- [#61](issues/consolidated/61.md) → #62
+- [#63](1-inbox/63/): Consolidate overlapping skills
+- [#10](1-inbox/10/): Missing /sdd-help command
+- [#12](1-inbox/12/): User onboarding and process state tracking
+- [#13](1-inbox/13/): sdd-init should provide thorough repo guide
+- [#14](1-inbox/14/): Unclear when to run type generation
+- [#15](1-inbox/15/): Planner is too rigid and template-driven
+- [#16](1-inbox/16/): Plan changes should cascade to dependent items
+- [#20](1-inbox/20/): Plugin installation debugging skill + workflow fix
+- [#21](1-inbox/21/): Project sanity verification command
+- [#22](1-inbox/22/): Add critic agent to marketplace
+- [#23](1-inbox/23/): Autocomplete for SDD command arguments
+- [#25](1-inbox/25/): Planner must block on open questions in specs
+- [#26](1-inbox/26/): Better session separators/visual indicators
+- [#27](1-inbox/27/): JSON Schema for skills + validation skill
+- [#29](1-inbox/29/): sdd-tasks command for state review and IDE integration
+- [#33](1-inbox/33/): Tests are not useful - need better test creation approach
+- [#34](1-inbox/34/): Audit agent assumptions around interactivity
+- [#35](1-inbox/35/): Checksumming and drift detection for specs/components
+- [#37](1-inbox/37/): Plan revision workflow for iterative development
+- [#38](1-inbox/38/): Integration and E2E testing should be separate components
+- [#39](1-inbox/39/): Capture ad-hoc code changes and sync specs
+- [#40](1-inbox/40/): Fix sdd-new-change test - spec format mismatch
+- [#41](1-inbox/41/): sdd-new-change should handle external specs
+- [#43](1-inbox/43/): CI/CD components and .github folder integration
+- [#44](1-inbox/44/): Helm chart template + observability stack
+- [#47](1-inbox/47/): Local environment create/start/stop workflow
+- [#50](1-inbox/50/): Move sdd-settings.yaml to .sdd/ directory
+- [#52](1-inbox/52/): Clean up .gitkeep and placeholder content
+- [#53](1-inbox/53/): Missing helm-standards skill
+- [#54](1-inbox/54/): Missing postgresql-standards skill
+- [#56](1-inbox/56/): Create architecture skill with meaningful guidance
+- [#57](1-inbox/57/): Add /sdd-settings command
 
 ---
 
 ## Complete
 
-- [#11](issues/complete/11.md): Missing deeper config integration ✓ (2026-01-30)
-- [#60](issues/complete/60.md): Standardize TypeScript imports and tsconfig ✓ (2026-01-30)
-- [#62](issues/complete/62.md): Unified CLI system ✓ (2026-01-30)
-- [#49](issues/complete/49.md): Auto-commit hook ✓ (2026-01-29)
-- [#18](issues/complete/18.md): Commit standards skill ✓ (2026-01-29)
-- [#55](issues/complete/55.md): Split CHANGELOG.md ✓ (2026-01-29)
-- [#51](issues/complete/51.md): GitHub Actions releases ✓ (2026-01-29)
-- [#45](issues/complete/45.md): Ban mutable operations ✓ (2026-01-28)
-- [#9](issues/complete/9.md): Ready-to-work components ✓ (2026-01-28)
-- [#19](issues/complete/19.md): Task management skill ✓ (2026-01-28)
-- [#7](issues/complete/7.md): External spec handling ✓ (2026-01-28)
-- [#2](issues/complete/2.md): npm run scripts ✓ (2026-01-28)
-- [#4](issues/complete/4.md): Permission prompts ✓ (2026-01-28)
+- [#11](6-complete/11/): Missing deeper config integration ✓ (2026-01-30)
+- [#60](6-complete/60/): Standardize TypeScript imports and tsconfig ✓ (2026-01-30)
+- [#62](6-complete/62/): Unified CLI system ✓ (2026-01-30)
+- [#49](6-complete/49/): Auto-commit hook ✓ (2026-01-29)
+- [#18](6-complete/18/): Commit standards skill ✓ (2026-01-29)
+- [#55](6-complete/55/): Split CHANGELOG.md ✓ (2026-01-29)
+- [#51](6-complete/51/): GitHub Actions releases ✓ (2026-01-29)
+- [#45](6-complete/45/): Ban mutable operations ✓ (2026-01-28)
+- [#9](6-complete/9/): Ready-to-work components ✓ (2026-01-28)
+- [#19](6-complete/19/): Task management skill ✓ (2026-01-28)
+- [#7](6-complete/7/): External spec handling ✓ (2026-01-28)
+- [#2](6-complete/2/): npm run scripts ✓ (2026-01-28)
+- [#4](6-complete/4/): Permission prompts ✓ (2026-01-28)
+
+---
+
+## Rejected
+
+(none)
+
+---
+
+## Consolidated
+
+- [#1](8-consolidated/1/) → #9
+- [#5](8-consolidated/5/) → #7
+- [#6](8-consolidated/6/) → #7
+- [#8](8-consolidated/8/) → #6
+- [#28](8-consolidated/28/) → #27
+- [#30](8-consolidated/30/) → #15
+- [#32](8-consolidated/32/) → #26
+- [#36](8-consolidated/36/) → #35
+- [#42](8-consolidated/42/) → #9
+- [#46](8-consolidated/46/) → #44
+- [#58](8-consolidated/58/) → #62
+- [#61](8-consolidated/61/) → #62

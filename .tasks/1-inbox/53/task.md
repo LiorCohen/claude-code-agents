@@ -4,6 +4,7 @@ title: Missing helm-standards skill
 priority: inbox
 status: open
 created: 2026-01-25
+plan: ../../plans/new/PLAN-task-53-helm-standards-skill.md
 ---
 
 # Task 53: Missing helm-standards skill
