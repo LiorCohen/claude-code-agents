@@ -56,6 +56,7 @@
 
 ## Inbox (unprioritized)
 
+- [#66](1-inbox/66/): Single context-aware SDD command
 - [#63](1-inbox/63/): Consolidate overlapping skills
 - [#12](1-inbox/12/): User onboarding and process state tracking
 - [#14](1-inbox/14/): Unclear when to run type generation
