@@ -56,6 +56,29 @@ Update BOTH files:
 - `plugin/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
+### Step 2.5: Manifest Validation
+
+**When to run:** After updating version files, before proceeding to changelog.
+
+If changes affect `plugin/.claude-plugin/plugin.json` or `.claude-plugin/marketplace.json`:
+
+1. Use the `manifest-validation` skill to validate both manifests
+2. Fix any errors before proceeding
+
+**Quick validation:**
+```bash
+# Verify versions match
+jq -r '.version' plugin/.claude-plugin/plugin.json
+jq -r '.plugins[0].version' .claude-plugin/marketplace.json
+
+# Verify paths start with ./
+jq -r '.hooks // empty' plugin/.claude-plugin/plugin.json | grep -E '^\./' || echo "ERROR: hooks path invalid"
+```
+
+**Skip conditions:**
+- No changes to manifest files
+- Version-only changes (version match is checked above)
+
 ### Step 3: Changelog Check
 
 **Changelog structure:**

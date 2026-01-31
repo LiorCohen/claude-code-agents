@@ -14,6 +14,7 @@
 
 - **commit** - Use for all commits (handles version bump + changelog)
 - **tasks** - Manage tasks and plans using `.tasks/` directory
+- **manifest-validation** - Validate plugin/marketplace manifests before commits
 - **plugin-testing-standards** - Follow when writing or modifying tests
 - **typescript-standards** - Follow when writing TypeScript code
 
@@ -27,6 +28,7 @@ sdd/
 │   └── skills/
 │       ├── commit/                   # Commit workflow with version/changelog
 │       ├── tasks/                    # Task management skill
+│       ├── manifest-validation/      # Validate plugin manifests
 │       ├── plugin-testing-standards/ # Testing methodology for plugins
 │       └── typescript-standards/     # TypeScript coding standards
 ├── .claude-plugin/
