@@ -1,13 +1,14 @@
 ---
 id: 53
 title: Missing helm-standards skill
-priority: inbox
-status: open
+status: consolidated
 created: 2026-01-25
-plan: ../../plans/new/PLAN-task-53-helm-standards-skill.md
+consolidated_into: 44
 ---
 
-# Task 53: Missing helm-standards skill
+# Task 53: Missing helm-standards skill → consolidated into #44
+
+<!-- Original content preserved below -->
 
 ## Description
 

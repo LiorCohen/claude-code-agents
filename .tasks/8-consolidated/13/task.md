@@ -1,12 +1,14 @@
 ---
 id: 13
 title: sdd-init should provide thorough repo guide
-priority: inbox
-status: open
+status: consolidated
 created: 2026-01-25
+consolidated_into: 12
 ---
 
-# Task 13: sdd-init should provide thorough repo guide
+# Task 13: sdd-init should provide thorough repo guide → consolidated into #12
+
+<!-- Original content preserved below -->
 
 ## Description
 

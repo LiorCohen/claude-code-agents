@@ -1,7 +1,7 @@
 ---
 id: 44
 title: Helm chart template + observability stack
-priority: inbox
+priority: high
 status: open
 created: 2026-01-25
 ---
@@ -17,6 +17,7 @@ Need a Helm chart template for component scaffolding:
 - Add Victoria Logs for log aggregation
 - Add Victoria Metrics for metrics collection
 
-## Related
+## Consolidated
 
-- Merged: #46 (Missing Helm chart template)
+- #46: Missing Helm chart template
+- #53: Missing helm-standards skill

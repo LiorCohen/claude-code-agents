@@ -1,7 +1,7 @@
 ---
 id: 27
 title: JSON Schema for skills + validation skill
-priority: inbox
+priority: medium
 status: open
 created: 2026-01-25
 ---

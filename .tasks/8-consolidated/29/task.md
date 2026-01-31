@@ -1,12 +1,14 @@
 ---
 id: 29
 title: sdd-tasks command for state review and IDE integration
-priority: inbox
-status: open
+status: consolidated
 created: 2026-01-25
+consolidated_into: 10
 ---
 
-# Task 29: sdd-tasks command for state review and IDE integration
+# Task 29: sdd-tasks command for state review and IDE integration → consolidated into #10
+
+<!-- Original content preserved below -->
 
 ## Description
 

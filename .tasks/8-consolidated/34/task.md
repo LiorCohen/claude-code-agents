@@ -1,12 +1,14 @@
 ---
 id: 34
 title: Audit agent assumptions around interactivity
-priority: inbox
-status: open
+status: consolidated
 created: 2026-01-25
+consolidated_into: 59
 ---
 
-# Task 34: Audit agent assumptions around interactivity
+# Task 34: Audit agent assumptions around interactivity → consolidated into #59
+
+<!-- Original content preserved below -->
 
 ## Description
 

@@ -18,3 +18,7 @@ Agents are severely outdated and lacking depth. Need comprehensive review:
 - Verify agents reference correct paths (`changes/` not `specs/changes/`, etc.)
 - Update any outdated tool usage patterns or assumptions
 - Test each agent to ensure it works correctly with current plugin state
+
+## Consolidated
+
+- #34: Audit agent assumptions around interactivity

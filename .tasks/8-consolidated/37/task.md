@@ -1,12 +1,14 @@
 ---
 id: 37
 title: Plan revision workflow for iterative development
-priority: inbox
-status: open
+status: consolidated
 created: 2026-01-25
+consolidated_into: 16
 ---
 
-# Task 37: Plan revision workflow for iterative development
+# Task 37: Plan revision workflow for iterative development → consolidated into #16
+
+<!-- Original content preserved below -->
 
 ## Description
 
