@@ -116,44 +116,27 @@ Why this change was made (for significant changes).
 - Changes only affect task management (`.tasks/`)
 - Trivial changes (typos, formatting)
 
-### Step 5: Tasks & Plans Check
+### Step 5: Task Status Check
 
-**IMPORTANT:** Before committing, verify that tasks and plans are up to date.
+**If changes involve `.tasks/` or are related to a tracked task:**
 
-**Check for task-related work:**
+Use the `tasks` skill to ensure proper task status management. The tasks skill is authoritative for:
+- Task lifecycle (open → planning → ready → implementing → reviewing → complete)
+- Plan creation and approval workflows
+- Automatic status transitions based on user actions
 
-1. **Is this commit completing a task?**
-   - Search `.tasks/INDEX.md` for related task numbers
-   - If completing a task, ensure it will be moved to `## Completed` with:
-     - Completion date (`**Completed: YYYY-MM-DD**`)
-     - Summary of what was accomplished
-     - Link to plan if one exists (`**Plan:** [plans/PLAN-task-N-slug.md](...)`)
+**Common scenarios:**
 
-2. **Does a plan exist for this work?**
-   - Check `.tasks/plans/` directory for related `PLAN-task-N-*.md` files
-   - If a plan exists and work is complete, update plan status to `## Status: COMPLETED ✓`
-   - If a plan exists and work is partial, leave status as `IN PROGRESS`
-
-3. **Should a new task be created?**
-   - If this commit reveals follow-up work needed, prompt to add a new task
-   - If this commit is part of ongoing work not yet tracked, prompt to add a task
-
-**Verification checklist:**
-
-```
-□ If completing a task → .tasks/INDEX.md updated (moved to Completed, date added)
-□ If plan exists → Plan status updated (COMPLETED or still IN PROGRESS)
-□ If follow-up needed → New task added to .tasks/INDEX.md
-□ If work not tracked → Consider adding a task for traceability
-```
+| Scenario | Action |
+|----------|--------|
+| Plan created and approved | Use `/tasks ready N` to move task to ready |
+| Starting implementation | Use `/tasks implement N` to move task to implementing |
+| Implementation complete | Use `/tasks review N` to move task to reviewing |
+| Work fully done | Use `/tasks complete N` to mark task complete |
 
 **Skip conditions:**
 - Trivial changes (typos, formatting) don't need task tracking
-- Changes already tracked in an existing task don't need new tasks
-
-**If tasks/plans need updating:**
-- Update them BEFORE proceeding to commit
-- Include `.tasks/INDEX.md` and/or `.tasks/plans/*.md` in the staged files
+- Changes already have correct task status
 
 ### Step 6: Generate Commit Message
 
@@ -182,7 +165,6 @@ Present to the user:
 - Proposed commit message
 - Version changes (if any)
 - Changelog additions (if any)
-- Task/plan updates (if any)
 
 **Wait for user confirmation before proceeding.**
 
@@ -264,9 +246,9 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 ## Quick Reference
 
 ```
-Plugin file changed? → Bump version → CHANGELOG → Check docs → Check tasks/ → Stage all → Commit
-Infrastructure file changed? → CHANGELOG → Check tasks/ → Stage all → Commit
-Completing a task? → Update tasks/TASKS.md → Update plan status → Stage all → Commit
+Plugin file changed? → Bump version → CHANGELOG → Check docs → Stage all → Commit
+Infrastructure file changed? → CHANGELOG → Stage all → Commit
+Task-related work? → Use tasks skill for status updates → Stage all → Commit
 ```
 
 ## Common Mistakes to Avoid
@@ -281,10 +263,8 @@ Completing a task? → Update tasks/TASKS.md → Update plan status → Stage al
 8. **Wrong changelog file** - Update only `changelog/v{N}.md` (no root CHANGELOG.md)
 9. **Amending pushed commits** - NEVER amend commits that have been pushed to remote
 10. **Multiple changelog entries per commit** - Each commit = one changelog entry. Split if needed
-11. **Forgetting to update .tasks/INDEX.md** - When completing a task, move it to Completed section before committing
-12. **Stale plan status** - Update plan status to COMPLETED when work is done
-13. **Untracked work** - Significant work should have a corresponding task for traceability
-14. **Outdated documentation** - Plugin changes may require docs updates; run docs-writer agent to check
+11. **Incorrect task status** - Use the `tasks` skill for all task status changes; don't manually edit task files
+12. **Outdated documentation** - Plugin changes may require docs updates; run docs-writer agent to check
 
 ## One Commit = One Changelog Entry
 
