@@ -710,12 +710,23 @@ testkube run testsuite integration-tests --watch
 testkube run testsuite e2e-tests --watch
 ```
 
-#### Step 5: Verify Implementation
+#### Step 5: Verify Implementation Against Standards
 
-- Check OpenAPI spec matches requirements
-- Verify backend endpoints exist
-- Verify frontend components exist
-- Check database schema matches
+For each component type affected by the change, verify the implementation follows the corresponding standards skill:
+
+| Component Type | Standards Skill | Key Checks |
+|----------------|-----------------|------------|
+| Backend (server) | `backend-standards` | CMDO architecture, handler→orchestrator→repository layering, dependency injection |
+| Frontend (webapp) | `frontend-standards` | MVVM architecture, TanStack patterns, component structure |
+| Contract | (OpenAPI spec) | Spec matches requirements, endpoints are complete |
+| Database | `postgresql` | Migration conventions, schema matches spec |
+| All TypeScript | `typescript-standards` | Strict typing, readonly patterns, import conventions |
+| All Tests | `unit-testing` | Vitest patterns, isolation, mocking conventions |
+
+For each affected component:
+1. Read the relevant standards skill
+2. Review the implementation against the standards
+3. Flag any violations in the verification report
 
 #### Step 6: Generate Report
 
@@ -740,6 +751,13 @@ testkube run testsuite e2e-tests --watch
 **Unit Tests:** 45/45 passing
 **Integration Tests:** 12/12 passing
 **E2E Tests:** 4/4 passing
+
+### Standards Compliance
+| Standard | Status | Notes |
+|----------|--------|-------|
+| backend-standards | PASS | CMDO architecture followed |
+| typescript-standards | PASS | Strict typing, readonly patterns |
+| unit-testing | PASS | Vitest patterns, proper isolation |
 
 ### Verdict: PASS
 ```
