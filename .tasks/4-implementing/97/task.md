@@ -2,7 +2,7 @@
 id: 97
 title: Plugin quality issues — multiple bugs and DX problems
 priority: high
-status: open
+status: implementing
 created: 2026-02-07
 depends_on: []
 blocks: []
