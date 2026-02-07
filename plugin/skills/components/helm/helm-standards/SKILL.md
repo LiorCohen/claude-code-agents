@@ -1,7 +1,6 @@
 ---
 name: helm-standards
 description: Standards for Helm charts in SDD projects, including settings-driven patterns.
-user-invocable: false
 ---
 
 # Helm Standards Skill

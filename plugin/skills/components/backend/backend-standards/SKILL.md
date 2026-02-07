@@ -1,7 +1,6 @@
 ---
 name: backend-standards
 description: CMDO architecture standards for Node.js/TypeScript backends with strict layer separation.
-user-invocable: false
 ---
 
 

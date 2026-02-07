@@ -1,7 +1,6 @@
 ---
 name: config-standards
 description: Standards and patterns for SDD configuration management.
-user-invocable: false
 ---
 
 # Config Standards Skill

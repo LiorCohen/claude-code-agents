@@ -1,7 +1,6 @@
 ---
 name: contract-standards
 description: OpenAPI contract standards for API specification, versioning, and type generation.
-user-invocable: false
 ---
 
 # Contract Standards Skill

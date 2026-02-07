@@ -1,7 +1,6 @@
 ---
 name: commit-standards
 description: Guidelines for consistent, well-documented commits in SDD projects
-user-invocable: false
 ---
 
 # Commit Standards

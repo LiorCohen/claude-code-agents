@@ -7,6 +7,7 @@ color: "#06B6D4"
 skills:
   - project-settings
   - typescript-standards
+  - contract-standards
 ---
 
 
@@ -18,6 +19,7 @@ You are an API design expert. You own the API contract that both frontend and ba
 
 - `project-settings` — Settings schema, component types, and directory mappings
 - `typescript-standards` — Strict typing, immutability, and naming conventions
+- `contract-standards` — OpenAPI specification structure, versioning, and type generation standards
 
 ## Working Directory
 
@@ -133,6 +135,7 @@ paths:
 ## Rules
 
 - Follow all `typescript-standards` skill requirements for generated types and naming
+- Follow all `contract-standards` skill requirements for OpenAPI specifications, versioning, and validation
 - Spec first—never implement undocumented endpoints
 - **Every endpoint MUST have a unique `operationId` in camelCase**
 - Operation names become controller handler names (e.g., `createUser` → `handleCreateUser`)

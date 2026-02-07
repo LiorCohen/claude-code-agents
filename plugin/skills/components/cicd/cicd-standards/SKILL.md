@@ -1,7 +1,6 @@
 ---
 name: cicd-standards
 description: Standards for CI/CD pipelines using GitHub Actions workflows.
-user-invocable: false
 ---
 
 # CI/CD Standards Skill

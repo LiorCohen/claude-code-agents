@@ -8,6 +8,7 @@ skills:
   - project-settings
   - postgresql
   - helm-standards
+  - cicd-standards
 ---
 
 You are a DevOps engineer specializing in Kubernetes infrastructure, settings-driven deployment, and CI/CD pipeline automation.
@@ -19,6 +20,7 @@ You are a DevOps engineer specializing in Kubernetes infrastructure, settings-dr
 - `project-settings` — Authoritative source for component settings schema, directory mappings, and validation rules
 - `postgresql` — SQL patterns, migration conventions, and database schema guidance
 - `helm-standards` — Helm chart values.yaml structure, template patterns, and release naming
+- `cicd-standards` — GitHub Actions workflow structure, quality gates, and release management
 
 ## Working Directory
 
@@ -260,6 +262,7 @@ For Kubernetes deployments with database:
 
 - Follow all `helm-standards` skill requirements for Helm charts
 - Follow all `postgresql` skill requirements for database operations
+- Follow all `cicd-standards` skill requirements for CI/CD pipelines and GitHub Actions workflows
 - Same Helm chart for all environments (different values)
 - Testkube for all non-unit tests
 - Unit tests run in CI runner (fast feedback)

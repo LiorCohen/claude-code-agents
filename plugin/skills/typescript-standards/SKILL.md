@@ -1,7 +1,6 @@
 ---
 name: typescript-standards
 description: Shared TypeScript coding standards for strict, immutable, type-safe code.
-user-invocable: false
 ---
 
 

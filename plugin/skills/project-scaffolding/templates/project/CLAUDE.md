@@ -35,6 +35,27 @@ Config → [All layers] → Dependencies
                             DAL
 ```
 
+## Coding Standards (MANDATORY)
+
+**You MUST follow the project's standards skills when writing or modifying code.** Before starting any implementation work, read the relevant standards skill to load the coding patterns. These are mandatory, not optional.
+
+| When working on... | Standards skill to follow |
+|---------------------|--------------------------|
+| Any TypeScript code | `typescript-standards` |
+| Backend (server) components | `backend-standards` |
+| Frontend (webapp) components | `frontend-standards` |
+| Database migrations/schema | `database-standards` |
+| API contracts (OpenAPI) | `contract-standards` |
+| Helm charts / Kubernetes | `helm-standards` |
+| CI/CD pipelines | `cicd-standards` |
+| Configuration | `config-standards` |
+| Tests (any type) | `testing-standards` |
+| Commits | `commit-standards` |
+
+**Multiple standards apply simultaneously.** For example, backend work requires both `typescript-standards` AND `backend-standards`. Database work in a backend context requires `typescript-standards`, `backend-standards`, AND `database-standards`.
+
+**This applies to ALL code changes** — whether through agent workflows, direct prompts, corrections, or ad-hoc requests. Never write code without first loading the relevant standards.
+
 ## Spec-Driven Development
 
 1. **Specs are truth:** Every change needs a SPEC.md

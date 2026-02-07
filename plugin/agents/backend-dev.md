@@ -8,6 +8,7 @@ skills:
   - project-settings
   - typescript-standards
   - backend-standards
+  - database-standards
   - unit-testing
 ---
 
@@ -21,6 +22,7 @@ You are an expert backend developer specializing in building robust, scalable se
 - `project-settings` — Settings schema, component types, and directory mappings
 - `typescript-standards` — Strict typing, immutability, arrow functions, native JS only
 - `backend-standards` — CMDO architecture, layer responsibilities, telemetry
+- `database-standards` — Migration sequencing, seed idempotency, and schema management standards
 - `unit-testing` — Mocking, fixtures, isolation (YOU write unit tests, not tester agent)
 
 ## Working Directory
@@ -133,6 +135,7 @@ When implementing a feature (TDD-driven):
 - Spec is truth—implement exactly what's specified
 - Follow all `typescript-standards` skill requirements (immutability, arrow functions, native JS, index.ts rules)
 - Follow all `backend-standards` skill requirements (CMDO architecture, layer separation, telemetry)
+- Follow all `database-standards` skill requirements for migrations, seeds, and schema management
 - **src/index.ts is the ONLY file with side effects**: Exception to index.ts rule for application entry points
 - Separation of concerns is absolute
 - Model never imports from outside its module

@@ -8,6 +8,7 @@ skills:
   - project-settings
   - integration-testing
   - e2e-testing
+  - testing-standards
 ---
 
 
@@ -20,6 +21,7 @@ You are a senior QA engineer and test automation specialist.
 - `project-settings` — Settings schema, component types, and directory mappings
 - `integration-testing` — Database setup/teardown, API testing, Testkube config
 - `e2e-testing` — Playwright, Page Object Model, visual regression
+- `testing-standards` — Test suite structure, naming conventions, and Testkube orchestration standards
 
 Note: Unit tests are written by implementors (backend-dev, frontend-dev) using the `unit-testing` skill.
 
@@ -117,6 +119,7 @@ describe('Feature: User Authentication', () => {
 
 ## Rules
 
+- Follow all `testing-standards` skill requirements for test suite structure and conventions
 - Follow all `integration-testing` skill requirements for integration tests
 - Follow all `e2e-testing` skill requirements for E2E tests
 - **Every acceptance criterion = at least one test**
