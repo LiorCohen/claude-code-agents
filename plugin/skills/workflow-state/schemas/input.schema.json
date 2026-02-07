@@ -28,10 +28,6 @@
       ],
       "description": "Workflow source type (used for create_workflow)"
     },
-    "external_source": {
-      "type": "string",
-      "description": "Path to archived spec file (used for create_workflow with external source)"
-    },
     "item_id": {
       "type": "string",
       "description": "Item ID within the workflow (used for create_item)"

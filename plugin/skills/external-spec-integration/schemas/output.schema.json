@@ -8,10 +8,6 @@
       "type": "boolean",
       "description": "Whether the integration completed successfully"
     },
-    "external_spec_archived": {
-      "type": "string",
-      "description": "Path to the archived copy of the external spec"
-    },
     "workflow_id": {
       "type": "string",
       "description": "Workflow ID associated with this integration"
@@ -55,7 +51,6 @@
   },
   "required": [
     "success",
-    "external_spec_archived",
     "workflow_id",
     "is_hierarchical",
     "items_created"

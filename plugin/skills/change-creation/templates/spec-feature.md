@@ -20,8 +20,6 @@
 
 <source_content>
 
-<!-- Audit reference: <external_source> - DO NOT READ, use content above -->
-
 ---
 
 ## User Stories

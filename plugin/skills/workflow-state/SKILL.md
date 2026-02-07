@@ -83,7 +83,6 @@ files_archived:
 ```yaml
 id: a1b2c3                      # Short unique workflow ID (used in changes/ path)
 source: external | interactive
-external_source: .sdd/archive/external-specs/20260205-feature-spec.md
 created: YYYY-MM-DD
 current: 01-user-management/01-api-contracts  # Path to current item
 
@@ -247,14 +246,13 @@ Regression archives discarded work to `.sdd/archive/regressions/`.
 
 Available operations:
 
-### workflow_state.create_workflow(source, external_source?)
+### workflow_state.create_workflow(source)
 
 Create a new workflow with unique ID.
 
 **Input:**
 ```yaml
 source: external | interactive
-external_source: <path to archived external spec>  # Only if source=external
 ```
 
 **Output:**

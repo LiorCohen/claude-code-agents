@@ -207,8 +207,8 @@ Questions to ask:
 - "Who is the primary user?"
 - "What's the expected outcome?"
 
-If context exists from external spec:
-- "Based on the external spec, this appears to be about X. Is that correct?"
+If context exists (from context.md):
+- "Based on the provided context, this appears to be about X. Is that correct?"
 - Pre-populate answers from context.md
 - Ask for confirmation or clarification
 
@@ -455,10 +455,10 @@ User: /sdd-change continue
 
 Agent: Resuming workflow a1b2c3
 Agent: Current item: API Contracts (a1b2-1)
-Agent: Loading context from external spec...
+Agent: Loading context...
 
 Step 1: Context & Goal
-Based on the external spec, this appears to be about:
+Based on the provided context, this appears to be about:
 - Building REST API endpoints for user authentication
 - Including login, logout, and session refresh
 

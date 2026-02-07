@@ -464,11 +464,9 @@ For each leaf item, create `context.md` in drafts (include transformation output
 ```markdown
 # Context: Registration
 
-> Extracted from: .sdd/archive/external-specs/20260205-feature-spec.md
-
 ## Original Content
 
-[Full section content from external spec]
+[Full section content embedded here — self-sufficient, no external references]
 
 ## Domain Analysis
 
@@ -491,7 +489,6 @@ Note: This context is read-only. Use it as input during spec solicitation.
 
 ```yaml
 success: true
-external_spec_archived: ".sdd/archive/external-specs/20260205-feature-spec.md"
 workflow_id: a1b2c3
 transformation:
   classification: {...}

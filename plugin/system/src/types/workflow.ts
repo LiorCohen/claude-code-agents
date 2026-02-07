@@ -29,7 +29,6 @@ export interface WorkflowItem {
 export interface WorkflowState {
   readonly id: string;
   readonly source: 'external' | 'interactive';
-  readonly external_source?: string;
   readonly created: string;
   readonly current?: string;
   readonly phase: WorkflowPhase;

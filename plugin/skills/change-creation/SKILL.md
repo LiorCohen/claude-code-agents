@@ -105,7 +105,6 @@ sdd_version: <plugin_version>
 affected_components:
   - <component-1>
   - <component-2>
-external_source: <path>  # Only if provided
 decomposition_id: <uuid>  # Only if provided
 ---
 ```

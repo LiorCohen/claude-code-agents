@@ -257,7 +257,6 @@ Output is documented in SPEC.md, NOT applied to sdd-settings.yaml yet.
 ```yaml
 INVOKE workflow-state.create_workflow with:
   source: external
-  external_source: .sdd/archive/external-specs/20260205-feature-spec.md
 ```
 
 #### Step 8: Decomposition (with Thinking Step)
@@ -342,8 +341,6 @@ INVOKE spec-solicitation skill with:
  EXTERNAL SPEC IMPORTED
 ===============================================================
 
-Archived to: .sdd/archive/external-specs/20260205-feature-spec.md
-
 Created workflow: a1b2c3
 Items: 5 features across 2 epics
 
@@ -384,7 +381,7 @@ Show current workflow state and all change IDs.
 ===============================================================
 
 Workflow: a1b2c3
-Source: external (.sdd/archive/external-specs/20260205-feature-spec.md)
+Source: external
 Created: 2026-02-05
 
 Current: a1b2-1 (Registration) - spec_review
