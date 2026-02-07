@@ -143,8 +143,22 @@ If no: Continue with current version
 #### 2.4 .claude/settings.json Verification
 
 Check the project's `.claude/settings.json` for required entries:
-- `extraKnownMarketplaces` must include `{ "name": "sdd", "url": "https://github.com/LiorCohen/sdd" }`
-- `enabledPlugins` must include `"sdd@sdd"`
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "sdd": {
+      "source": {
+        "source": "github",
+        "repo": "LiorCohen/sdd"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "sdd@sdd": true
+  }
+}
+```
 
 If missing: create or merge the required entries (preserve existing settings).
 
