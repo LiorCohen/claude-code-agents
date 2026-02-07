@@ -28,6 +28,7 @@ project/
 │   └── sdd-settings.yaml     # Minimal settings (config component only)
 ├── specs/
 │   └── INDEX.md              # Empty spec registry
+├── package.json              # Workspace root (empty scripts)
 ├── README.md
 ├── CLAUDE.md
 └── .gitignore
@@ -38,7 +39,6 @@ project/
 - `specs/domain/` subdirectories
 - `specs/architecture/`
 - `specs/SNAPSHOT.md`
-- Root `package.json` (individual components have their own)
 
 ### Full Mode (Legacy)
 
@@ -141,18 +141,15 @@ Templates are in this skill's `templates/` directory:
 
 ```text
 skills/project-scaffolding/templates/
-├── minimal/
-│   ├── sdd-settings.yaml
-│   ├── INDEX.md
+├── project/
+│   ├── package.json        # Root workspace package.json
 │   ├── README.md
-│   ├── CLAUDE.md
-│   └── gitignore
-└── full/
-    ├── README.md
-    ├── CLAUDE.md
-    ├── package.json
-    ├── SNAPSHOT.md
-    └── glossary.md
+│   └── CLAUDE.md
+├── specs/
+│   ├── SNAPSHOT.md
+│   └── glossary.md
+└── changes/
+    └── INDEX.md
 ```
 
 ## .gitignore Rules

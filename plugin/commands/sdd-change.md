@@ -138,7 +138,9 @@ INVOKE component-discovery skill with:
 
 For each recommended component:
 1. Check if `components/{type}/` exists
-2. If missing, trigger scaffolding
+2. If missing, trigger scaffolding via the component's scaffolding skill
+
+Each component scaffolding skill handles updating the root `package.json` (see "Root Package.json Update" in each skill).
 
 #### Step 6: Create Workflow Item
 

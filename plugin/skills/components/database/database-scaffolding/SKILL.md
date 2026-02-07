@@ -176,6 +176,17 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts database name and optional project name for migration and seed template generation.
 
+## Root Package.json Update
+
+After scaffolding, update the root `package.json`:
+
+1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
+2. Add component scripts:
+   - `"<name>:setup": "npm run setup -w components/databases/<name>"`
+   - `"<name>:migrate": "npm run migrate -w components/databases/<name>"`
+   - `"<name>:seed": "npm run seed -w components/databases/<name>"`
+   - `"<name>:reset": "npm run reset -w components/databases/<name>"`
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for database component settings schema and directory mappings.

@@ -232,6 +232,7 @@ Create only:
 │       │   └── local/config.yaml
 │       ├── schemas/config.schema.json
 │       └── types/index.ts
+├── package.json              # Workspace root (empty scripts initially)
 ├── .gitignore
 ├── README.md
 └── CLAUDE.md

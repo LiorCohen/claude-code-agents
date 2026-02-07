@@ -218,6 +218,18 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts component name, server type, and optional settings for databases, contracts, and Helm chart generation.
 
+## Root Package.json Update
+
+After scaffolding, update the root `package.json`:
+
+1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
+2. Add component scripts:
+   - `"<name>:dev": "npm run dev -w components/servers/<name>"`
+   - `"<name>:build": "npm run build -w components/servers/<name>"`
+   - `"<name>:start": "npm run start -w components/servers/<name>"`
+   - `"<name>:test": "npm run test -w components/servers/<name>"`
+3. Update meta-scripts (`dev`, `build`, `test`) to include this component
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for server component settings schema, defaults, and validation rules.

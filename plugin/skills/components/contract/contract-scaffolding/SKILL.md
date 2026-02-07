@@ -91,6 +91,16 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts contract name and optional project metadata for OpenAPI spec generation.
 
+## Root Package.json Update
+
+After scaffolding, update the root `package.json`:
+
+1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
+2. Add component scripts:
+   - `"<name>:generate": "npm run generate:types -w components/contracts/<name>"`
+   - `"<name>:validate": "npm run validate -w components/contracts/<name>"`
+3. Update meta-scripts (`generate`) to include this component
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for contract component settings schema and directory mappings.

@@ -224,6 +224,14 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts chart name, deploy target, deployment type, and optional settings for modes, ingress, and webapp assets.
 
+## Root Package.json Update
+
+After scaffolding, update the root `package.json`:
+
+1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
+2. Add component scripts:
+   - `"<name>:lint": "helm lint components/helm_charts/<name>"`
+
 ## Related Skills
 
 - `helm-standards` — Generated Helm charts must follow these standards. Defines `values.yaml` structure, template patterns, settings-driven configuration, and release naming conventions.
