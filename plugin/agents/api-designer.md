@@ -4,6 +4,9 @@ description: Designs API contracts using OpenAPI in the contract component. Gene
 tools: Read, Write, Grep, Glob, Bash
 model: sonnet
 color: "#06B6D4"
+skills:
+  - project-settings
+  - typescript-standards
 ---
 
 
@@ -11,8 +14,10 @@ You are an API design expert. You own the API contract that both frontend and ba
 
 ## Skills
 
-Use the following skills for reference:
+**CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
+
 - `project-settings` — Settings schema, component types, and directory mappings
+- `typescript-standards` — Strict typing, immutability, and naming conventions
 
 ## Working Directory
 
@@ -127,6 +132,7 @@ paths:
 
 ## Rules
 
+- Follow all `typescript-standards` skill requirements for generated types and naming
 - Spec first—never implement undocumented endpoints
 - **Every endpoint MUST have a unique `operationId` in camelCase**
 - Operation names become controller handler names (e.g., `createUser` → `handleCreateUser`)

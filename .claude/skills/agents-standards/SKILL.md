@@ -29,6 +29,9 @@ description: >               # REQUIRED — what this agent does + its expertise
 tools: Read, Write, Grep, Glob, Bash  # REQUIRED — comma-separated list of available tools
 model: sonnet                # REQUIRED — "sonnet" for implementation, "opus" for review/advisory
 color: "#10B981"             # REQUIRED — hex color for UI representation
+skills:                      # REQUIRED — skills to preload into agent context
+  - typescript-standards
+  - backend-standards
 ---
 ```
 
@@ -39,8 +42,7 @@ color: "#10B981"             # REQUIRED — hex color for UI representation
 | `tools` | `string` | Comma-separated list of tools this agent can use. Read-only agents (reviewer, db-advisor) must NOT include `Write`. |
 | `model` | `string` | `sonnet` for implementation agents, `opus` for review/advisory agents. Choose based on the cognitive complexity required. |
 | `color` | `string` | Hex color code for UI. Must be unique across agents. |
-
-**No other frontmatter fields.** Additional metadata belongs in the agent body.
+| `skills` | `list` | Skills to preload into agent context. Full skill content is injected at startup. **Agents do not inherit skills from the parent conversation — they must be listed explicitly.** |
 
 ---
 
@@ -108,16 +110,21 @@ Agents reference skills as instructional context — the skills define patterns 
 ```markdown
 ## Skills
 
-Use the following skills for standards and patterns:
+**CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
+
 - `typescript-standards` — Strict typing, immutability, arrow functions
 - `backend-standards` — CMDO architecture, layer separation, telemetry
 ```
 
+The bold CRITICAL line is mandatory. Without it, agents treat skills as optional reference material and ignore them in practice. The "ALL code you write or scaffold" clause ensures generated/scaffolded files also adhere to the standards.
+
 ### Rules
 
-1. **Brief summary per skill** — After the skill name, include a short phrase describing what the agent uses it for. The reader should understand the role of each skill without loading it.
-2. **Don't duplicate skill content** — Never copy rules, patterns, or checklists from a skill into the agent. The agent loads the skill at runtime.
-3. **Only reference skills that exist** — Every skill name in the agent must correspond to an actual `SKILL.md` somewhere under `plugin/skills/` (scan recursively — skills may be nested, e.g. `plugin/skills/components/backend/backend-standards/`). Referencing nonexistent skills creates silent failures — the agent will have no standards to follow.
+1. **Mandatory language required** — The Skills section MUST include the CRITICAL preamble shown above. The phrase "for reference" or "for standards and patterns" alone is too passive — agents will not follow the skills.
+2. **Reinforce in Rules section** — For each skill, add a corresponding "Follow all `skill-name` skill requirements" line in the agent's Rules section. Double reinforcement ensures compliance.
+3. **Brief summary per skill** — After the skill name, include a short phrase describing what the agent uses it for. The reader should understand the role of each skill without loading it.
+4. **Don't duplicate skill content** — Never copy rules, patterns, or checklists from a skill into the agent. The agent loads the skill at runtime.
+5. **Only reference skills that exist** — Every skill name in the agent must correspond to an actual `SKILL.md` somewhere under `plugin/skills/` (scan recursively — skills may be nested, e.g. `plugin/skills/components/backend/backend-standards/`). Referencing nonexistent skills creates silent failures — the agent will have no standards to follow.
 
 ---
 
