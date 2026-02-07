@@ -18,10 +18,7 @@ Use when creating webapp components. Supports multiple named instances (e.g., `w
 components/<webapp-name>/
 ├── package.json
 ├── tsconfig.json
-├── tsconfig.node.json
 ├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
 ├── index.html
 ├── .gitignore
 └── src/
@@ -63,7 +60,7 @@ Plus supporting directories for services, stores, and API clients.
 | React 18 | UI framework |
 | TypeScript | Type safety |
 | Vite | Build tool and dev server |
-| TailwindCSS | Utility-first CSS |
+| TailwindCSS v4 | Utility-first CSS (CSS-based config) |
 | TanStack Router | Type-safe routing |
 | TanStack Query | Server state management |
 
@@ -107,10 +104,7 @@ All templates are colocated in this skill's `templates/` directory:
 skills/components/frontend/frontend-scaffolding/templates/
 ├── package.json
 ├── tsconfig.json
-├── tsconfig.node.json
 ├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
 ├── index.html
 ├── .gitignore
 └── src/
