@@ -27,6 +27,8 @@
 ---
 
 ## High Priority
+
+- [#97](1-inbox/97/): Plugin quality issues — multiple bugs and DX problems
 - [#95](1-inbox/95/): Fix commands standards violations from audit report
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 - [#91](1-inbox/91/): Fix agents standards violations from audit report
