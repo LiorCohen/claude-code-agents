@@ -10,10 +10,6 @@ Total: 0 specs (Active: 0, Deprecated: 0, Archived: 0)
 |--------|------|------|--------|-------|-------|
 | *No active changes yet* | | | | | |
 
-## External Specifications
-
-*None imported yet*
-
 ## Deprecated
 
 *None*
