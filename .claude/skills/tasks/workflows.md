@@ -12,8 +12,8 @@ User: /tasks list
 ```
 
 **Action:** Read INDEX.md and display the index, grouped by section. Always show all tasks in each section with their full titles - never abbreviate or summarize the inbox or other sections. Skip empty sections and omit Completed, Rejected, and Consolidated sections (these are archival). Render each task reference (`#XX`) as a markdown link pointing to its primary file relative to the repo root:
-- Planning tasks: link to `plan.md`, e.g., `[#67](.tasks/2-planning/67/plan.md)`
-- All other tasks: link to `task.md`, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+- If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
+- Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
 ---
 
