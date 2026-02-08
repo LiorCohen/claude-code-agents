@@ -9,7 +9,7 @@ created: 2026-02-08
 
 The `sdd-change` command currently outputs plain-text file paths and command references in its user-facing output. This forces users to manually navigate to files and manually type commands instead of clicking links. According to the VSCode extension context in CLAUDE.md, file references should use markdown link syntax `[filename.ts](path/to/filename.ts)` to enable clickable navigation in the VSCode terminal.
 
-Additionally, command references (e.g., "Run: /sdd-change status") should ideally be clickable links that populate the prompt when clicked, enabling interactive workflows. This requires research into Claude Code's capabilities.
+Additionally, command references (e.g., "Run: /sdd-change status") should be clickable links to command documentation, enabling users to quickly reference command details.
 
 This affects user experience across all `sdd-change` actions: `new`, `status`, `continue`, `list`, `approve`, `implement`, `verify`, etc.
 
@@ -54,11 +54,10 @@ Spec: [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
 - Replace `a1b2-1` with `[a1b2-1](changes/.../01-registration/)` where the change directory is known
 - Replace task references like `#19` with `[#19](.tasks/.../19/task.md)` patterns (following tasks skill convention)
 
-**Command references (research required):**
-- Investigate if Claude Code supports prompt-populating links
-- If supported, replace command references like `/sdd-change status` with clickable links that populate the prompt
-- If not supported, use documentation links like `[/sdd-change](plugin/commands/sdd-change.md)` to command specs
-- Document findings and update standards accordingly
+**Command references:**
+- Replace command references like `/sdd-change status` with documentation links: `[/sdd-change](plugin/commands/sdd-change.md)`
+- This allows users to click to view command documentation
+- Note: Prompt-populating links (links that fill the prompt when clicked) are not currently supported in Claude Code
 
 ### 2. Commands Standards Documentation
 
@@ -71,32 +70,23 @@ Add markdown link formatting to the Output Formatting section in `commands-stand
 | File references | `[filename.ext](relative/path/to/file.ext)` for clickable links |
 | Line-specific refs | `[filename.ts:42](path/to/filename.ts#L42)` for specific lines |
 | Directory refs | `[dirname/](path/to/dirname/)` for folders |
-| Command refs | Prompt-populating links (if supported) or `[/command](plugin/commands/command.md)` |
+| Command refs | `[/command](plugin/commands/command.md)` for documentation links |
 
 **Add new rule:**
 - **Use markdown links for all file/directory references** — Every file path shown in output must use markdown link syntax relative to the repo root. This enables click-to-navigate in VSCode terminals. Plain-text paths are only acceptable when the path itself is the subject (e.g., showing what would be created in a dry-run).
 
 ## Dependencies
 
-The command reference implementation depends on research findings:
-1. First, research whether Claude Code supports prompt-populating links
-2. Then, update command specs based on what's supported
+None. This is purely a documentation update to existing command specifications.
 
 ## Tests
-
-### Research & Investigation
-
-- [ ] `research_prompt_populating_links` — Determine if Claude Code / VS Code extension supports prompt-populating links
-- [ ] `document_link_syntax` — If supported, document the syntax and any limitations
-- [ ] `identify_alternatives` — If not supported, identify alternative approaches
-- [ ] `update_plan_with_findings` — Update this plan based on research results
 
 ### Documentation Validation
 
 - [ ] `validate_all_file_refs_are_markdown_links` — Scan all Output sections in `sdd-change.md` and verify no plain-text file paths remain (except in code blocks showing file trees)
 - [ ] `validate_change_id_refs_are_links` — Verify all change ID references (a1b2-N format) in output examples use markdown links
 - [ ] `validate_task_refs_are_links` — Verify all task references (#N format) in output examples use markdown links where applicable
-- [ ] `validate_command_refs_use_correct_format` — Verify command references use the appropriate link format based on research findings
+- [ ] `validate_command_refs_are_doc_links` — Verify command references use documentation link format `[/command](plugin/commands/command.md)`
 - [ ] `validate_standards_updated` — Confirm `commands-standards/SKILL.md` includes the new markdown link conventions
 
 ### Manual Verification
@@ -116,11 +106,10 @@ The command reference implementation depends on research findings:
 
 After updating the documentation:
 
-- [ ] Research on prompt-populating links is complete with documented findings
 - [ ] All file path references in user-facing output examples use markdown link syntax
 - [ ] All change ID references in output examples are clickable links to their directories
 - [ ] All task references follow the `[#N](path)` pattern where applicable
-- [ ] All command references use the appropriate link format (prompt-populating if supported, otherwise documentation links)
+- [ ] All command references use documentation link format `[/command](plugin/commands/command.md)`
 - [ ] The commands-standards skill explicitly requires markdown links in output formatting
 - [ ] No plain-text file paths remain in Output sections (except structural displays like file trees)
 - [ ] Link syntax is consistent across all actions (same pattern for SPEC.md, PLAN.md, context.md, etc.)
