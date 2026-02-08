@@ -15,19 +15,11 @@ Manage the project backlog, track progress, and organize implementation plans.
 .tasks/
 ├── INDEX.md              # Index file - task numbers, titles, links
 ├── 1-inbox/              # Open tasks (not yet started)
-│   └── 63/
-│       └── task.md
 ├── 2-planning/           # Plan being created
-│   └── 19/
-│       ├── task.md
-│       └── plan.md
 ├── 3-ready/              # Has plan, ready to implement
 ├── 4-implementing/       # Currently being worked on
 ├── 5-reviewing/          # Implementation complete, under review
 ├── 6-complete/           # Done
-│   └── 7/
-│       ├── task.md
-│       └── plan.md
 ├── 7-rejected/           # Rejected or irrelevant
 └── 8-consolidated/       # Consolidated into other tasks
 ```
@@ -38,289 +30,7 @@ Each task is a folder named by its ID containing:
 
 **Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories but grouped by priority in INDEX.md.
 
----
-
-## Task Schema
-
-All task files use YAML frontmatter.
-
-### Frontmatter Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | number | yes | Unique task number |
-| `title` | string | yes | Short title |
-| `priority` | enum | no | `low`, `medium`, `high` (unset = unprioritized) |
-| `status` | enum | yes | `open`, `planning`, `ready`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
-| `created` | date | yes | YYYY-MM-DD |
-| `completed` | date | no | YYYY-MM-DD (when status=complete) |
-| `consolidated_into` | number | no | Task ID (when status=consolidated) |
-| `rejected_reason` | string | no | Reason for rejection (when status=rejected) |
-| `depends_on` | number[] | no | Task IDs this depends on |
-| `blocks` | number[] | no | Task IDs blocked by this |
-
-### Task File Template
-
-```markdown
----
-id: 63
-title: Short descriptive title
-priority: medium
-status: open
-created: 2026-01-30
-depends_on: []
-blocks: []
----
-
-# Task 63: Short descriptive title
-
-## Description
-
-Full description of what needs to be done.
-
-## Acceptance Criteria
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-```
-
-### Completed Task Template
-
-```markdown
----
-id: 7
-title: External spec handling
-priority: high
-status: complete
-created: 2026-01-25
-completed: 2026-01-28
----
-
-# Task 7: External spec handling ✓
-
-## Summary
-
-Brief summary of what was accomplished.
-
-## Details
-
-- Fixed X
-- Added Y
-- Changed Z
-```
-
-### Consolidated Task Template
-
-```markdown
----
-id: 28
-title: Schema validation skill
-priority: medium
-status: consolidated
-created: 2026-01-20
-consolidated_into: 27
----
-
-# Task 28: Schema validation skill → consolidated into #27
-
-<!-- Original content preserved below -->
-
-## Description
-
-[Original description content remains here unchanged]
-
-## Acceptance Criteria
-
-[Original acceptance criteria remain here unchanged]
-```
-
-**IMPORTANT:** When consolidating, the original task content MUST be preserved in full. Only the frontmatter and title are modified.
-
-### Rejected Task Template
-
-```markdown
----
-id: 15
-title: Feature that was rejected
-priority: medium
-status: rejected
-created: 2026-01-20
-rejected_reason: Out of scope for MVP
----
-
-# Task 15: Feature that was rejected ✗
-
-<!-- Original content preserved below -->
-
-## Description
-
-[Original description content remains here unchanged]
-
-## Acceptance Criteria
-
-[Original acceptance criteria remain here unchanged]
-```
-
-**IMPORTANT:** When rejecting, the original task content MUST be preserved in full. Only the frontmatter and title are modified.
-
----
-
-## Plan Schema
-
-Plans are stored as `plan.md` inside the task folder. They are created during the planning phase and move with the task through its lifecycle.
-
-### Frontmatter Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | string | yes | Plan title |
-| `created` | date | yes | YYYY-MM-DD |
-| `updated` | date | no | YYYY-MM-DD (last modification) |
-
-### Plan File Template
-
-```markdown
----
-title: Task management skill
-created: 2026-01-28
----
-
-# Plan: Task Management Skill
-
-## Problem Summary
-
-Brief description of what problem this solves.
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| path/to/file.ts | Description of what changes |
-
-## Changes
-
-### 1. [Component/Area Name]
-
-What behavioral or functional changes are being made.
-Focus on WHAT is changing, not HOW to implement it.
-
-### 2. [Component/Area Name]
-
-Additional changes...
-
-## Dependencies
-
-What must happen before what. List any sequencing requirements.
-
-## Tests
-
-### Unit Tests
-- [ ] `test_description_of_behavior`
-- [ ] `test_another_behavior`
-
-### Integration Tests
-- [ ] `test_components_work_together`
-
-### E2E Tests (if applicable)
-- [ ] `test_user_facing_flow`
-
-## Verification
-
-- [ ] Outcome 1 is achieved
-- [ ] Outcome 2 is achieved
-```
-
-### Plan Content Guidelines
-
-**Plans focus on WHAT, not HOW:**
-
-| Include in Plans | Do NOT Include in Plans |
-|------------------|-------------------------|
-| What files/components are affected | Full code implementations |
-| What behavior is changing | Line-by-line instructions |
-| What tests verify the changes | Algorithm details |
-| Dependencies and sequencing | Specific function signatures |
-| Brief code snippets as constraints | Step-by-step coding instructions |
-
-**Tests are required:** Every plan must include an extensive list of tests. Tests define expected behavior (WHAT) and can be reviewed before implementation begins.
-
----
-
-## INDEX.md Index Structure
-
-Tasks are grouped by priority first (for open tasks), then by terminal status.
-
-```markdown
-# Tasks Backlog
-
----
-
-## Planning
-
-- [#19](2-planning/19/plan.md): Task management skill
-
----
-
-## Ready
-
-- [#20](3-ready/20/): Plugin installation debugging
-
----
-
-## Implementing
-
-- [#60](4-implementing/60/): Standardize TypeScript imports
-
----
-
-## Reviewing
-
-- [#55](5-reviewing/55/): Split CHANGELOG.md
-
----
-
-## High Priority
-
-- [#59](1-inbox/59/): Audit and update agents
-
----
-
-## Medium Priority
-
-- [#10](1-inbox/10/): Missing /sdd-help command
-
----
-
-## Low Priority
-
-- [#3](1-inbox/3/): Docs missing: CMDO Guide
-
----
-
-## Inbox (unprioritized)
-
-- [#63](1-inbox/63/): New feature idea
-
----
-
-## Complete
-
-- [#62](6-complete/62/): Unified CLI system ✓ (2026-01-30)
-
----
-
-## Rejected
-
-- [#5](7-rejected/5/): Out of scope feature
-
----
-
-## Consolidated
-
-- [#28](8-consolidated/28/) → #27
-```
-
-**Note:** Links point to task folders. Priority is determined by the `priority` frontmatter field.
+**Reference:** See [schemas.md](schemas.md) for full task/plan schemas and templates.
 
 ---
 
@@ -329,343 +39,188 @@ Tasks are grouped by priority first (for open tasks), then by terminal status.
 ### View Backlog
 
 ```
-User: /tasks
-User: /tasks list
+/tasks
+/tasks list
 ```
 
-**Action:** Read INDEX.md and display the index, grouped by section. Always show all tasks in each section with their full titles - never abbreviate or summarize the inbox or other sections. Skip empty sections and omit Completed, Rejected, and Consolidated sections (these are archival). Render each task reference (`#XX`) as a markdown link pointing to its primary file relative to the repo root:
-- Planning tasks: link to `plan.md`, e.g., `[#67](.tasks/2-planning/67/plan.md)`
-- All other tasks: link to `task.md`, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+Read `.tasks/INDEX.md` and display it, omitting the Complete, Rejected, and Consolidated sections. Render task references as clickable markdown links:
+- If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
+- Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+
+---
 
 ### View Single Task
 
 ```
-User: /tasks 19
+/tasks 19
 ```
 
-**Action:** Find and read `<status-dir>/19/task.md`.
+Find and read the task file at `<status-dir>/19/task.md`.
+
+---
 
 ### Add New Task
 
 ```
-User: /tasks add <description>
+/tasks add <description>
 ```
 
-**Workflow:**
-1. Determine next task number (highest N + 1 across all status dirs)
-2. Create folder `1-inbox/<N>/` with `task.md`
-3. Add entry to INDEX.md under Inbox
-4. Commit the transition (e.g., "Tasks: Add #63")
-5. Confirm with task number
+1. Determine next task number (highest N + 1)
+2. Create `1-inbox/<N>/task.md`
+3. Add to INDEX.md under Inbox
+4. Commit: "Tasks: Add #<N>"
 
-New tasks always go to inbox first. User can prioritize later.
+---
 
 ### Prioritize Task
 
 ```
-User: /tasks prioritize 15 high
-User: /tasks prioritize 15 medium
-User: /tasks prioritize 15 low
+/tasks prioritize <id> <high|medium|low>
 ```
 
-**Workflow:**
-1. Find task folder
-2. Update `task.md` frontmatter `priority` field
-3. Move task entry to correct section in INDEX.md
-4. Commit the transition (e.g., "Tasks: Prioritize #15 as high")
+1. Update `task.md` frontmatter `priority` field
+2. Move entry to correct section in INDEX.md
+3. Commit: "Tasks: Prioritize #<id> as <priority>"
 
-**Note:** Priority only affects INDEX.md grouping, not file location.
+---
 
 ### Start Planning
 
 ```
-User: /tasks plan 19
+/tasks plan <id>
 ```
 
-**Workflow:**
-1. Find task folder
-2. Move folder to `2-planning/`
-3. Update `task.md` frontmatter: `status: planning`
-4. Create `plan.md` in the task folder
-5. Update INDEX.md
-6. Commit the transition (e.g., "Tasks: Move #19 to planning")
-7. Confirm with clickable link to plan
+1. Move folder to `2-planning/`
+2. Update `task.md`: `status: planning`
+3. Create `plan.md`
+4. Update INDEX.md
+5. Commit: "Tasks: Move #<id> to planning"
 
-**Output:**
-```
-Task #19 moved to planning status.
+Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 
-Plan: [plan.md](.tasks/2-planning/19/plan.md)
-```
-
-Use when starting to create a plan for a task.
+---
 
 ### Mark Ready
 
 ```
-User: /tasks ready 19
+/tasks ready <id>
 ```
 
-**Workflow:**
-1. Find task folder
-2. Move folder to `3-ready/`
-3. Update `task.md` frontmatter: `status: ready`
-4. Update INDEX.md
-5. Commit the transition (e.g., "Tasks: Move #19 to ready")
+1. Move to `3-ready/`
+2. Update status
+3. Update INDEX.md
+4. Commit: "Tasks: Move #<id> to ready"
 
-Use when a task has a complete plan and is ready to implement.
+---
 
 ### Start Implementing
 
 ```
-User: /tasks implement 19
+/tasks implement <id>
 ```
 
-**Workflow:**
-1. Find task folder
-2. Move folder to `4-implementing/`
-3. Update `task.md` frontmatter: `status: implementing`
-4. Update INDEX.md
-5. Commit the task transition on main (e.g., "Tasks: Move #19 to implementing")
-6. Create a feature branch (e.g., `feature/task-19-<slug>`)
-7. Create a git worktree at `.worktrees/task-<id>/` on that branch
-8. Confirm with the worktree path (e.g., "Worktree created at `.worktrees/task-19/`")
+1. Move to `4-implementing/`
+2. Update status
+3. Update INDEX.md
+4. Commit transition on main
+5. Create feature branch: `feature/task-<id>-<slug>`
+6. Create worktree at `.worktrees/task-<id>/`
 
-**IMPORTANT:** Always create a side branch before implementing. Never implement directly on main. The worktree keeps main available in the primary working directory while implementation happens in the worktree.
+**IMPORTANT:** Never implement on main. Never merge or delete worktree until `/tasks complete`.
 
-**NEVER** merge the feature branch or delete the worktree during implementation. The worktree and branch persist until the task is completed via `/tasks complete`.
-
-**Final implementation commit:** The last commit of the implementation phase (before moving to review) must include the version bump and changelog entry. Use the `commit` skill's Steps 2–3 to bump the version and create the changelog entry for the task's changes.
+---
 
 ### Submit for Review
 
 ```
-User: /tasks review 19
+/tasks review <id>
 ```
 
-**Workflow:**
-1. Find task folder
-2. Move folder to `5-reviewing/`
-3. Update `task.md` frontmatter: `status: reviewing`
-4. Update INDEX.md
-5. Commit the task transition on main (e.g., "Tasks: Move #19 to reviewing")
+1. Move to `5-reviewing/`
+2. Update status
+3. Update INDEX.md
+4. Commit: "Tasks: Move #<id> to reviewing"
 
-Use when implementation is complete and ready for review.
+**IMPORTANT:** Never merge or delete worktree until `/tasks complete`.
 
-**NEVER** merge the feature branch or delete the worktree during reviewing. The worktree and branch persist until the task is completed via `/tasks complete`.
-
-**Commit prefixing:** All commits made during the reviewing phase (e.g., fixes from code review) must be prefixed with the task reference (e.g., `Task #19: Fix validation edge case`).
-
-**Amend when possible:** If the previous commit on the feature branch has NOT been pushed to remote, review-phase commits should amend it and update the existing changelog entry. If it HAS been pushed, create a new commit and amend the changelog entry in-place (update the existing version entry, do not create a new one).
+---
 
 ### Complete Task
 
 ```
-User: /tasks complete 7
+/tasks complete <id>
 ```
 
-**Workflow:**
-1. Find task folder
-2. If a worktree exists at `.worktrees/task-<id>/`:
-   a. **Verify no work is lost** before removing:
-      - Check for uncommitted changes in the worktree (`git -C .worktrees/task-<id> status`)
-      - If uncommitted changes exist, **stop and warn the user** — do not proceed
-   b. Check for commits not merged into main (`git log main..<branch> --oneline`)
-      - If unmerged commits exist, merge the feature branch into main first
-   c. Remove the worktree with `git worktree remove`
-   d. Delete the feature branch only if it has been fully merged into main
-3. Move folder to `6-complete/`
-4. Update `task.md` frontmatter: `status: complete`, add `completed` date
-5. Update INDEX.md
-6. Commit the task transition on main (e.g., "Tasks: Complete #7")
+1. If worktree exists:
+   - Verify no uncommitted changes
+   - Merge feature branch if needed
+   - Remove worktree
+   - Delete feature branch (if fully merged)
+2. Move to `6-complete/`
+3. Update status, add `completed` date
+4. Update INDEX.md
+5. Commit: "Tasks: Complete #<id>"
+
+---
 
 ### Reject Task
 
 ```
-User: /tasks reject 15
-User: /tasks reject 15 "Out of scope for MVP"
+/tasks reject <id> [reason]
 ```
 
-**Workflow:**
-1. Find task folder
-2. **Determine the reason for rejection.** A reason is always required:
-   - If the user says "obsolete", check completed tasks to identify which task(s) made it obsolete. Reference them in the reason (e.g., "Obsolete — superseded by #81")
-   - If the reason is unclear, **ask the user** before proceeding
-3. Move folder to `7-rejected/`
-4. Update `task.md` frontmatter: `status: rejected`, `rejected_reason: <reason>`
-5. Update INDEX.md (include the reason summary after the title, e.g., `— obsolete, superseded by #81`)
-6. Commit the transition (e.g., "Tasks: Reject #15")
+1. Determine rejection reason (required)
+2. Move to `7-rejected/`
+3. Update status, add `rejected_reason`
+4. Update INDEX.md
+5. Commit: "Tasks: Reject #<id>"
+
+---
 
 ### Consolidate Tasks
 
 ```
-User: /tasks consolidate 28 into 27
+/tasks consolidate <id> into <target-id>
 ```
 
-**Workflow:**
-1. Find both task folders
-2. Move task 28 folder to `8-consolidated/`
-3. Update task 28 `task.md`:
-   - Update frontmatter: `status: consolidated`, `consolidated_into: 27`
-   - Update title to include `→ consolidated into #27`
-   - **Preserve ALL original content** (description, acceptance criteria, etc.)
-4. Update task 27 `task.md` with consolidated context (add ## Consolidated section referencing #28)
+1. Move task to `8-consolidated/`
+2. Update status, add `consolidated_into`
+3. Preserve ALL original content
+4. Update target task with consolidated context
 5. Update INDEX.md
-6. Commit the transition (e.g., "Tasks: Consolidate #28 into #27")
+6. Commit: "Tasks: Consolidate #<id> into #<target-id>"
+
+---
 
 ### Audit Backlog
 
 ```
-User: /tasks audit
+/tasks audit
 ```
 
-**Action:** Scan all task directories and INDEX.md, check for compliance issues, identify possibly obsolete tasks, and present a report with action items.
+Scan all tasks and INDEX.md for:
+1. Structural integrity
+2. Frontmatter compliance
+3. INDEX.md sync
+4. Title/heading consistency
+5. Possibly obsolete tasks
+6. Dependency integrity
 
-**Checks to perform:**
+Write report to `.temp/tasks-audit-<datetime>.md`.
 
-#### 1. Structural Integrity
-- Every status directory contains only numbered task folders
-- Every task folder contains a `task.md` file
-- No orphan folders (folders without `task.md`)
-- No task folders exist outside recognized status directories
-
-#### 2. Frontmatter Compliance
-- All required fields present (`id`, `title`, `status`, `created`)
-- `id` matches the folder name
-- `status` matches the directory the task lives in (e.g., `1-inbox/` → `open`, `7-rejected/` → `rejected`)
-- Rejected tasks have `rejected_reason`
-- Consolidated tasks have `consolidated_into`
-- Completed tasks have `completed` date
-- `priority` is a valid value (`low`, `medium`, `high`) or absent
-- `depends_on` and `blocks` reference task IDs that exist
-
-#### 3. INDEX.md Sync
-- Every non-archived task (inbox, planning, ready, implementing, reviewing) appears in INDEX.md
-- Every entry in INDEX.md points to a task folder that exists
-- Tasks appear in the correct INDEX.md section for their status/priority
-- Rejected entries include a reason summary
-- Consolidated entries include the target task reference
-
-#### 4. Title and Heading Consistency
-- Frontmatter `title` matches the `# Task N:` heading in the body
-- Completed tasks have `✓` suffix in heading
-- Rejected tasks have `✗` suffix in heading
-- Consolidated tasks have `→ consolidated into #N` suffix in heading
-
-#### 5. Possibly Obsolete Tasks
-- For each open task (inbox, planning, ready), compare against completed tasks:
-  - Does a completed task's description overlap significantly with this open task?
-  - Does a completed task explicitly address the same problem?
-  - Has the area this task targets been redesigned or replaced?
-- Check `depends_on` references: if a dependency was rejected or consolidated, the task may need updating
-- Flag tasks with stale priorities or outdated descriptions based on recent completions
-
-#### 6. Dependency Integrity
-- `depends_on` references point to tasks that exist
-- `depends_on` does not reference rejected or consolidated tasks (may indicate staleness)
-- `blocks` references are reciprocal (if A blocks B, B should depend on A)
-- No circular dependencies
-
-**Output format:** Write the report to `.temp/tasks-audit-<datetime>.md` (e.g., `tasks-audit-2026-02-07_14-30.md`) and display a summary to the user. Group findings by severity:
-
-```markdown
-# Tasks Audit — YYYY-MM-DD_HH-MM
-
-## Errors (must fix)
-- [ ] #14: Frontmatter `status: open` but task is in `9-rejected/` directory
-- [ ] INDEX.md references #99 but no task folder exists
-
-## Warnings (should fix)
-- [ ] #83: Rejected without `rejected_reason` in frontmatter
-- [ ] #16: `depends_on: [15]` but #15 was consolidated into #64
-
-## Possibly Obsolete
-- [ ] #70: "Git checkpoint workflow" — may be superseded by #49 (Auto-commit hook ✓)
-- [ ] #33: "Tests are not useful" — may be addressed by #68 (Plans focus on WHAT ✓)
-
-## Info
-- 27 open tasks, 16 completed, 4 rejected, 15 consolidated
-- Oldest open task: #3 (created 2026-01-20)
-```
-
-**IMPORTANT:** The "Possibly Obsolete" section requires judgement. Read the description of each open task and compare against completed tasks to identify potential overlap. When uncertain, flag it with a `?` and brief rationale so the user can decide. Never auto-reject — only flag for review.
+**Reference:** See [workflows.md](workflows.md) for detailed audit criteria.
 
 ---
 
-## Task Numbering
+## Quick Reference
 
-- Task numbers are permanent identifiers (never reused)
-- Find highest number across ALL subdirs, increment by 1
-- Numbers may have gaps (merges, deletions)
-- Reference as `#N` or `task N`
+- **Task numbering:** Permanent IDs, never reused. Find highest + 1.
+- **Commit every transition:** Use `Tasks:` prefix
+- **Inbox first:** New tasks → inbox, prioritize later
+- **Worktree lifecycle:** Created by `/tasks implement`, removed by `/tasks complete`
+- **Preserve content:** Never lose original content when consolidating/rejecting
 
-## Best Practices
-
-1. **Commit every transition** - Every state change (add, plan, ready, implement, review, complete, reject, consolidate, prioritize) must be committed immediately. Never leave task changes uncommitted. Use the `Tasks:` prefix for commit messages (e.g., "Tasks: Move #19 to planning")
-2. **Verify clean state after every command** - After every `/tasks` command completes, run `git status` to confirm no uncommitted changes remain in `.tasks/`. If any exist, stage and commit them before returning to the user
-3. **Inbox first** - New tasks go to inbox, prioritize later
-4. **Keep atomic** - One clear outcome per task
-5. **Worktree per task** - `/tasks implement` creates a worktree at `.worktrees/task-<id>/`, keeping main clean
-6. **Never lose work** - Before removing a worktree, always verify all commits are merged and no uncommitted changes exist
-7. **Only `/tasks complete` cleans up** - Never merge the feature branch or delete the worktree during implementation or reviewing phases. Only `/tasks complete` may merge, remove the worktree, and delete the branch
-8. **Consolidate related** - Don't duplicate effort
-9. **Preserve on consolidate** - Never lose original task content when consolidating
-10. **Update both** - Task folder AND INDEX.md must stay in sync
-11. **Add context** - When completing, summarize what was done
-12. **Date everything** - Completion dates help track velocity
-
-## Lifecycles
-
-### Task Lifecycle
-
-```
-                  1-inbox/ (open tasks)
-                           ↓
-                     [/tasks plan]
-                           ↓
-                     2-planning/
-                           ↓
-                    [/tasks ready]
-                           ↓
-                      3-ready/
-                           ↓
-                  [/tasks implement]
-                           ↓
-                   4-implementing/
-                           ↓
-                   [/tasks review]
-                           ↓
-                    5-reviewing/
-                           ↓
-                   [/tasks complete]
-                           ↓
-                     6-complete/
-
-Any status → 8-consolidated/ (if combined with another)
-Any status → 7-rejected/ (if irrelevant or out of scope)
-```
-
-**Priority** (high/medium/low) can be set at any point and only affects INDEX.md grouping.
-
-Plans are created during the planning phase and move with their task folder through the lifecycle.
-
----
-
-## Automatic Status Updates
-
-When the user gives task-related instructions, **automatically move the task to the appropriate status**:
-
-| User instruction | Inferred status | Action |
-|------------------|-----------------|--------|
-| "Plan task 19" / "Create a plan for #19" | `planning` | Move to `2-planning/`, create `plan.md` |
-| "Task 19 is ready" / "Mark #19 ready" | `ready` | Move to `3-ready/` |
-| "Let's work on task 19" / "Implement #19" | `implementing` | Move to `4-implementing/`, create branch + worktree |
-| "Task 19 is ready for review" / "Submit #19" | `reviewing` | Move to `5-reviewing/` |
-| "Task 19 is done" / "Complete #19" | `complete` | Move to `6-complete/`, add completion date |
-| "Reject task 19" / "Close #19 as wontfix" | `rejected` | Move to `7-rejected/` |
-
-**Always update both the task folder location AND INDEX.md when status changes.**
-
-**After completing implementation work, automatically move the task to `5-reviewing/`** to signal that implementation is done and ready for user review.
-
-Skip forward transitions are allowed (e.g., inbox → implementing for quick fixes without formal planning).
+**Full documentation:**
+- [schemas.md](schemas.md) - Task/plan formats and templates
+- [workflows.md](workflows.md) - Detailed command workflows
+- [reference.md](reference.md) - Best practices and lifecycles
