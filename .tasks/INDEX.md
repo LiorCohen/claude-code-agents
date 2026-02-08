@@ -28,7 +28,6 @@
 
 ## High Priority
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
-- [#95](1-inbox/95/): Fix commands standards violations from audit report
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 - [#91](1-inbox/91/): Fix agents standards violations from audit report
 
@@ -90,6 +89,7 @@
 
 ## Complete
 
+- [#95](6-complete/95/): Fix commands standards violations from audit report ✓ (2026-02-08)
 - [#100](6-complete/100/): Ensure all sdd-change outputs use markdown with clickable links ✓ (2026-02-08)
 - [#98](6-complete/98/): Plan templates don't reference standards skills ✓ (2026-02-08)
 - [#97](6-complete/97/): Plugin quality issues — multiple bugs and DX problems ✓ (2026-02-07)
