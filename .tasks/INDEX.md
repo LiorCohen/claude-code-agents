@@ -5,6 +5,7 @@
 ## Planning
 
 - [#67](2-planning/67/): Store user instructions in plans, specs, and .sdd/
+- [#98](2-planning/98/): Plan templates don't reference standards skills
 
 ---
 
@@ -27,8 +28,6 @@
 ---
 
 ## High Priority
-
-- [#98](1-inbox/98/): Plan templates don't reference standards skills
 - [#95](1-inbox/95/): Fix commands standards violations from audit report
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 - [#91](1-inbox/91/): Fix agents standards violations from audit report
