@@ -224,10 +224,11 @@ User: /tasks audit
 **Checks to perform:**
 
 #### 1. Structural Integrity
-- Every status directory contains only numbered task folders
+- Every status directory contains only numbered task folders (and `.gitkeep` if empty)
 - Every task folder contains a `task.md` file
 - No orphan folders (folders without `task.md`)
 - No task folders exist outside recognized status directories
+- `.gitkeep` files in empty directories should not be flagged as errors
 
 #### 2. Frontmatter Compliance
 - All required fields present (`id`, `title`, `status`, `created`)

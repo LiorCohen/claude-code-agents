@@ -17,12 +17,17 @@ Manage the project backlog, track progress, and organize implementation plans.
 ├── 1-inbox/              # Open tasks (not yet started)
 ├── 2-planning/           # Plan being created
 ├── 3-ready/              # Has plan, ready to implement
+│   └── .gitkeep
 ├── 4-implementing/       # Currently being worked on
+│   └── .gitkeep
 ├── 5-reviewing/          # Implementation complete, under review
+│   └── .gitkeep
 ├── 6-complete/           # Done
 ├── 7-rejected/           # Rejected or irrelevant
 └── 8-consolidated/       # Consolidated into other tasks
 ```
+
+**Note:** `.gitkeep` files ensure empty directories are tracked in git. Do not delete these files.
 
 Each task is a folder named by its ID containing:
 - `task.md` - the task description and metadata
