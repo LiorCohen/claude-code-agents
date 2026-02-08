@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#104](1-inbox/104/): sdd-run without arguments should show usage text
 - [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
