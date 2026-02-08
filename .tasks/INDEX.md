@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#98](5-reviewing/98/): Plan templates don't reference standards skills
+(none)
 
 ---
 
@@ -81,6 +81,7 @@
 
 ## Complete
 
+- [#98](6-complete/98/): Plan templates don't reference standards skills ✓ (2026-02-08)
 - [#97](6-complete/97/): Plugin quality issues — multiple bugs and DX problems ✓ (2026-02-07)
 - [#96](6-complete/96/): Fix sdd-init Phase 1 — plugin verification first, tool checks via system CLI ✓ (2026-02-07)
 - [#93](6-complete/93/): Centralize sdd-settings ownership in project-settings skill ✓ (2026-02-07)
