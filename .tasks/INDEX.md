@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#94](1-inbox/94/): local-env is missing settings
 - [#80](1-inbox/80/): Plans should become YAML files
 - [#76](1-inbox/76/): Git worktrees for parallel spec/plan execution
