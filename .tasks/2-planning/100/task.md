@@ -19,3 +19,8 @@ All outputs from the `sdd-change` command should use properly formatted markdown
 - [ ] All task/issue references use clickable markdown links
 - [ ] No plain-text file paths remain in user-facing output
 - [ ] Output renders correctly in VS Code terminal / Claude Code interface
+- [ ] Command references use prompt-populating links (if supported)
+
+## Consolidated
+
+This task consolidates [#101](.tasks/8-consolidated/101/task.md) (Research prompt-populating clickable links in Claude Code). The research findings will determine whether command references can be made interactive.

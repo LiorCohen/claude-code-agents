@@ -1,13 +1,16 @@
 ---
 id: 101
 title: Research prompt-populating clickable links in Claude Code
-status: open
+status: consolidated
 created: 2026-02-08
+consolidated_into: 100
 depends_on: []
 blocks: []
 ---
 
-# Task 101: Research prompt-populating clickable links in Claude Code
+# Task 101: Research prompt-populating clickable links in Claude Code → consolidated into #100
+
+<!-- Original content preserved below -->
 
 ## Description
 

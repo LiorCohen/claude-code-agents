@@ -66,7 +66,6 @@
 - [#104](1-inbox/104/): sdd-run without arguments should show usage text
 - [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
-- [#101](1-inbox/101/): Research prompt-populating clickable links in Claude Code
 - [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#94](1-inbox/94/): local-env is missing settings
 - [#80](1-inbox/80/): Plans should become YAML files
@@ -160,3 +159,4 @@
 - [#13](8-consolidated/13/) → #12
 - [#48](8-consolidated/48/) → #87
 - [#57](8-consolidated/57/) → #44
+- [#101](8-consolidated/101/) → #100
