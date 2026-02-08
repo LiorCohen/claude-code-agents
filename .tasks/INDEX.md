@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#100](4-implementing/100/): Ensure all sdd-change outputs use markdown with clickable links
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#100](5-reviewing/100/): Ensure all sdd-change outputs use markdown with clickable links
 
 ---
 
