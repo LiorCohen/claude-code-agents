@@ -55,6 +55,72 @@ The plugin must protect the integrity of its own configuration file.
 
 ## Implementation Strategy
 
+### Phase 0: Update Settings Schema
+
+**Improve version tracking in settings metadata.**
+
+**Current schema issue**: The `sdd.plugin_version` field is ambiguous - it's unclear if it represents the creating version or the updating version.
+
+**Changes**:
+1. Split version field:
+   - `created_by_plugin_version` - version that initialized the project (immutable)
+   - `updated_by_plugin_version` - version that last modified settings (updated on every write)
+
+2. Use datetime instead of date:
+   - `created_at` - Human-readable UTC datetime when project was created (immutable)
+   - `updated_at` - Human-readable UTC datetime when settings were last modified (auto-updated)
+   - Format: `YYYY-MM-DD HH:MM:SS UTC` (no subseconds, space-separated, explicit UTC)
+
+**File**: [plugin/system/src/types/settings.ts](../../../plugin/system/src/types/settings.ts)
+
+```typescript
+/** SDD metadata in settings file */
+export interface SddMetadata {
+  /** SDD plugin version that created this project (immutable) */
+  readonly created_by_plugin_version: string;
+  /** SDD plugin version that last updated settings */
+  readonly updated_by_plugin_version: string;
+  /** UTC datetime when project was initialized (YYYY-MM-DD HH:MM:SS UTC) */
+  readonly created_at: string;
+  /** UTC datetime when settings were last modified (YYYY-MM-DD HH:MM:SS UTC) */
+  readonly updated_at: string;
+}
+```
+
+**File**: [plugin/system/src/settings/schema.ts](../../../plugin/system/src/settings/schema.ts)
+
+Update the `sddMetadataSchema`:
+
+```typescript
+const sddMetadataSchema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    created_by_plugin_version: {
+      type: 'string',
+      description: 'SDD plugin version that created this project',
+    },
+    updated_by_plugin_version: {
+      type: 'string',
+      description: 'SDD plugin version that last updated settings',
+    },
+    created_at: {
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} UTC$',
+      description: 'UTC datetime when project was initialized (YYYY-MM-DD HH:MM:SS UTC)',
+    },
+    updated_at: {
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} UTC$',
+      description: 'UTC datetime when settings were last modified (YYYY-MM-DD HH:MM:SS UTC)',
+    },
+  },
+  required: ['created_by_plugin_version', 'updated_by_plugin_version', 'created_at', 'updated_at'],
+  additionalProperties: false,
+};
+```
+
+**Migration**: Legacy format migration is handled in the `readSettings()` function in Phase 1.
+
 ### Phase 1: Add Validation Layer in System Code
 
 Create a validated write function that ALL settings modifications must use.
@@ -62,19 +128,21 @@ Create a validated write function that ALL settings modifications must use.
 **File**: [plugin/system/src/settings/write.ts](../../../plugin/system/src/settings/write.ts) (new file)
 
 ```typescript
+import * as path from 'node:path';
 import Ajv from 'ajv';
-import * as yaml from 'yaml';
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { settingsFileSchema } from './schema';
 import { validateSettings } from './validate';
 import type { SettingsFile } from '../types/settings';
-import { writeText } from '../lib/fs';
+import { readText, writeText, readJson } from '@/lib/fs';
+import { getPluginRoot } from '@/lib/config';
+import type { PluginJson } from '@/types/config';
 
-const ajv = new Ajv({ allErrors: true, strict: true });
-const schemaValidator = ajv.compile(settingsFileSchema);
-
-export interface WriteSettingsOptions {
-  readonly skipValidation?: boolean; // escape hatch for emergency fixes
-}
+const ajv = new Ajv({ allErrors: true, strict: false });
+// Remove $schema property as ajv doesn't support 2020-12 draft by default
+const schema = { ...settingsFileSchema };
+delete schema['$schema'];
+const schemaValidator = ajv.compile(schema);
 
 export interface WriteSettingsResult {
   readonly success: boolean;
@@ -83,53 +151,79 @@ export interface WriteSettingsResult {
 }
 
 /**
+ * Get current plugin version from .claude-plugin/plugin.json
+ */
+const getPluginVersion = async (): Promise<string> => {
+  const pluginRoot = getPluginRoot();
+  const pluginJsonPath = path.join(pluginRoot, '.claude-plugin', 'plugin.json');
+  const pluginJson = await readJson<PluginJson>(pluginJsonPath);
+  return pluginJson.version;
+};
+
+/**
+ * Format current UTC datetime in human-readable format.
+ * Returns: "YYYY-MM-DD HH:MM:SS UTC"
+ */
+const formatUtcDatetime = (): string => {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(now.getUTCDate()).padStart(2, '0');
+  const hours = String(now.getUTCHours()).padStart(2, '0');
+  const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} UTC`;
+};
+
+/**
  * Write settings file with schema and cross-reference validation.
  * This is the ONLY approved way to write sdd-settings.yaml.
+ *
+ * Validation is ALWAYS enforced - no escape hatch.
  */
 export const writeSettings = async (
   filePath: string,
-  settings: SettingsFile,
-  options: WriteSettingsOptions = {}
+  settings: SettingsFile
 ): Promise<WriteSettingsResult> => {
   // Step 1: JSON Schema structural validation
-  if (!options.skipValidation) {
-    const schemaValid = schemaValidator(settings);
-    if (!schemaValid) {
-      return {
-        success: false,
-        errors: (schemaValidator.errors ?? []).map(
-          err => `${err.instancePath} ${err.message}`
-        ),
-      };
-    }
+  const schemaValid = schemaValidator(settings);
+  if (!schemaValid) {
+    return {
+      success: false,
+      errors: (schemaValidator.errors ?? []).map(
+        err => `${err.instancePath || '/'} ${err.message}`
+      ),
+    };
   }
 
   // Step 2: Business logic validation (cross-references, etc.)
-  if (!options.skipValidation) {
-    const validationResult = validateSettings(settings);
-    if (!validationResult.valid) {
-      return {
-        success: false,
-        errors: validationResult.errors.map(e =>
-          e.component
-            ? `[${e.component}${e.field ? `.${e.field}` : ''}] ${e.message}`
-            : e.message
-        ),
-        warnings: validationResult.warnings.map(w =>
-          w.component
-            ? `[${w.component}${w.field ? `.${w.field}` : ''}] ${w.message}`
-            : w.message
-        ),
-      };
-    }
+  const validationResult = validateSettings(settings);
+  if (!validationResult.valid) {
+    return {
+      success: false,
+      errors: validationResult.errors.map(e =>
+        e.component
+          ? `[${e.component}${e.field ? `.${e.field}` : ''}] ${e.message}`
+          : e.message
+      ),
+      warnings: validationResult.warnings.map(w =>
+        w.component
+          ? `[${w.component}${w.field ? `.${w.field}` : ''}] ${w.message}`
+          : w.message
+      ),
+    };
   }
 
-  // Step 3: Update last_updated timestamp
+  // Step 3: Update timestamp and plugin version
+  const currentVersion = await getPluginVersion();
+  const timestamp = formatUtcDatetime();
+
   const updatedSettings: SettingsFile = {
     ...settings,
     sdd: {
       ...settings.sdd,
-      last_updated: new Date().toISOString().split('T')[0],
+      updated_by_plugin_version: currentVersion,
+      updated_at: timestamp,
     },
   };
 
@@ -144,7 +238,7 @@ export const writeSettings = async (
     '',
   ].join('\n');
 
-  const yamlContent = yaml.stringify(updatedSettings, {
+  const yamlContent = stringifyYaml(updatedSettings, {
     indent: 2,
     lineWidth: 0, // prevent line wrapping
   });
@@ -154,7 +248,7 @@ export const writeSettings = async (
 
   return {
     success: true,
-    warnings: options.skipValidation ? [] : validateSettings(updatedSettings).warnings.map(w =>
+    warnings: validationResult.warnings.map(w =>
       w.component
         ? `[${w.component}${w.field ? `.${w.field}` : ''}] ${w.message}`
         : w.message
@@ -163,67 +257,307 @@ export const writeSettings = async (
 };
 
 /**
- * Read settings file.
+ * Read settings file with legacy format migration.
  */
 export const readSettings = async (filePath: string): Promise<SettingsFile> => {
   const content = await readText(filePath);
-  return yaml.parse(content) as SettingsFile;
+  const parsed = parseYaml(content) as any;
+
+  // Migrate legacy plugin_version to new format
+  if (parsed.sdd?.plugin_version && !parsed.sdd?.created_by_plugin_version) {
+    parsed.sdd.created_by_plugin_version = parsed.sdd.plugin_version;
+    parsed.sdd.updated_by_plugin_version = parsed.sdd.plugin_version;
+    delete parsed.sdd.plugin_version;
+  }
+
+  // Migrate legacy date fields (YYYY-MM-DD) to datetime
+  if (parsed.sdd?.initialized_at && !parsed.sdd?.created_at) {
+    parsed.sdd.created_at = `${parsed.sdd.initialized_at} 00:00:00 UTC`;
+    delete parsed.sdd.initialized_at;
+  }
+
+  if (parsed.sdd?.last_updated && !parsed.sdd?.updated_at) {
+    parsed.sdd.updated_at = `${parsed.sdd.last_updated} 00:00:00 UTC`;
+    delete parsed.sdd.last_updated;
+  }
+
+  return parsed as SettingsFile;
 };
 ```
 
 **Exports to add to** [plugin/system/src/settings/index.ts](../../../plugin/system/src/settings/index.ts):
 ```typescript
-export type { WriteSettingsOptions, WriteSettingsResult } from './write';
+export type { WriteSettingsResult } from './write';
 export { writeSettings, readSettings } from './write';
 ```
 
-### Phase 2: Update Skills to Use Validated Writes
+### Phase 2: Add System CLI Command
 
-**File**: [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md)
+Expose `writeSettings()` function via system CLI using the `settings` namespace.
 
-Update the skill instructions to REQUIRE using `writeSettings()`:
+#### 2.1: Create settings command handlers
 
-```markdown
-## Write Operations
+**File**: [plugin/system/src/commands/settings/write.ts](../../../plugin/system/src/commands/settings/write.ts) (new file)
 
-**CRITICAL**: All write operations MUST use the validated write function:
+```typescript
+/**
+ * Settings write command.
+ *
+ * Validates and writes sdd-settings.yaml with automatic timestamp/version updates.
+ * Reads settings from stdin as YAML.
+ *
+ * Usage:
+ *   cat .sdd/sdd-settings.yaml | sdd-system settings write
+ */
 
-\```typescript
-import { writeSettings } from '@/settings';
+import * as path from 'node:path';
+import { parse as parseYaml } from 'yaml';
+import type { CommandResult } from '@/lib/args';
+import { writeSettings } from '@/settings/write';
+import type { SettingsFile } from '@/types/settings';
 
-const result = await writeSettings(settingsPath, updatedSettings);
-if (!result.success) {
-  // Return error to user with validation details
-  return {
-    success: false,
-    errors: result.errors,
-  };
-}
-\```
+/**
+ * Read JSON or YAML input from stdin.
+ */
+const readStdin = async (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => {
+      data += chunk;
+    });
+    process.stdin.on('end', () => {
+      resolve(data);
+    });
+    process.stdin.on('error', reject);
+  });
+};
 
-**NEVER** write directly using `fs.writeFileSync`, `writeText`, or `yaml.dump`.
+export const write = async (): Promise<CommandResult> => {
+  try {
+    // Read settings from stdin
+    const inputStr = await readStdin();
+    if (!inputStr.trim()) {
+      return {
+        success: false,
+        error: 'No input provided. Pipe settings YAML to stdin.',
+      };
+    }
+
+    // Parse YAML
+    const settings = parseYaml(inputStr) as SettingsFile;
+
+    // Write to .sdd/sdd-settings.yaml
+    const settingsPath = path.join(process.cwd(), '.sdd', 'sdd-settings.yaml');
+    const result = await writeSettings(settingsPath, settings);
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: 'Settings validation failed',
+        data: { errors: result.errors },
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Settings written successfully',
+      data: {
+        path: settingsPath,
+        warnings: result.warnings,
+      },
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      error: `Failed to write settings: ${errorMessage}`,
+    };
+  }
+};
 ```
 
-**Files to audit and update**:
-1. [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md) - main settings management
-2. [plugin/skills/change-creation/SKILL.md](../../../plugin/skills/change-creation/SKILL.md) - may modify affected_components
-3. [plugin/skills/component-discovery/SKILL.md](../../../plugin/skills/component-discovery/SKILL.md) - adds new components
+**File**: [plugin/system/src/commands/settings/validate.ts](../../../plugin/system/src/commands/settings/validate.ts) (new file)
+
+```typescript
+/**
+ * Settings validate command.
+ *
+ * Validates sdd-settings.yaml without modifying it.
+ *
+ * Usage:
+ *   sdd-system settings validate [--json]
+ */
+
+import * as path from 'node:path';
+import type { CommandResult, GlobalOptions } from '@/lib/args';
+import { readSettings } from '@/settings/write';
+import { validateSettings, formatValidationResult } from '@/settings/validate';
+
+export const validate = async (
+  args: readonly string[],
+  options: GlobalOptions
+): Promise<CommandResult> => {
+  const settingsPath = path.join(process.cwd(), '.sdd', 'sdd-settings.yaml');
+
+  try {
+    const settings = await readSettings(settingsPath);
+    const result = validateSettings(settings);
+
+    if (options.json) {
+      return {
+        success: result.valid,
+        data: {
+          valid: result.valid,
+          errors: result.errors,
+          warnings: result.warnings,
+        },
+        error: result.valid ? undefined : 'Validation failed',
+      };
+    }
+
+    // Text output
+    console.log('Settings Validation Results');
+    console.log('='.repeat(40));
+    console.log(formatValidationResult(result));
+
+    if (result.valid) {
+      console.log('\n✓ Validation passed');
+      return { success: true };
+    } else {
+      console.log('\n✗ Validation failed');
+      return {
+        success: false,
+        error: 'Validation failed',
+      };
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      error: `Failed to read or validate settings: ${errorMessage}`,
+    };
+  }
+};
+```
+
+**File**: [plugin/system/src/commands/settings/index.ts](../../../plugin/system/src/commands/settings/index.ts) (new file)
+
+```typescript
+/**
+ * Settings command namespace handler.
+ */
+
+import type { CommandResult, GlobalOptions } from '@/lib/args';
+import { write } from './write';
+import { validate } from './validate';
+
+export const handleSettings = async (
+  action: string,
+  args: readonly string[],
+  options: GlobalOptions
+): Promise<CommandResult> => {
+  switch (action) {
+    case 'write':
+      return write();
+    case 'validate':
+      return validate(args, options);
+    default:
+      return {
+        success: false,
+        error: `Unknown settings action: ${action}. Available: write, validate`,
+      };
+  }
+};
+```
+
+#### 2.2: Register settings namespace in CLI
+
+**File**: [plugin/system/src/cli.ts](../../../plugin/system/src/cli.ts)
+
+Add to imports:
+```typescript
+import { handleSettings } from '@/commands/settings';
+```
+
+Add to NAMESPACES array:
+```typescript
+const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings'] as const;
+```
+
+Add to COMMAND_HANDLERS:
+```typescript
+const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
+  // ... existing handlers
+  settings: handleSettings,
+};
+```
+
+Add to HELP_TEXT:
+```typescript
+  settings      Settings file operations
+    write       Write and validate sdd-settings.yaml (reads from stdin)
+    validate    Validate sdd-settings.yaml
+```
+
+#### 2.3: Update skills to use the command
+
+Skills should invoke the command via Bash, passing the settings as YAML to stdin:
+
+**Pattern for skills**:
+```bash
+cat <<'EOF' | sdd-system settings write
+sdd:
+  created_by_plugin_version: "6.3.6"
+  updated_by_plugin_version: "6.3.6"
+  created_at: "2026-02-08 10:00:00 UTC"
+  updated_at: "2026-02-08 10:00:00 UTC"
+
+project:
+  name: "my-app"
+  description: "Example app"
+  domain: "Task Management"
+  type: "fullstack"
+
+components:
+  - name: config
+    type: config
+    settings: {}
+EOF
+```
+
+**Files to update**:
+- [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md) - document usage of `sdd-system settings write`
+- [plugin/skills/change-creation/SKILL.md](../../../plugin/skills/change-creation/SKILL.md) - use command instead of direct writes
+- [plugin/skills/component-discovery/SKILL.md](../../../plugin/skills/component-discovery/SKILL.md) - use command instead of direct writes
 
 ### Phase 3: Add Pre-Commit Hook Validation
+
+Add a pre-commit hook that validates sdd-settings.yaml before allowing commits.
 
 **File**: [plugin/system/src/commands/hook/validate-settings.ts](../../../plugin/system/src/commands/hook/validate-settings.ts) (new file)
 
 ```typescript
-import * as path from 'node:path';
-import { readSettings } from '../../settings/write';
-import { validateSettings, formatValidationResult } from '../../settings/validate';
-
 /**
- * Pre-commit hook to validate sdd-settings.yaml changes.
- * Exits with error if validation fails.
+ * PreCommit hook: validate-settings
+ *
+ * Validates sdd-settings.yaml before allowing commits.
+ * Blocks commit if validation fails.
  */
-export const validateSettingsHook = async (): Promise<void> => {
+
+import * as path from 'node:path';
+import type { CommandResult } from '@/lib/args';
+import { readSettings } from '@/settings/write';
+import { validateSettings, formatValidationResult } from '@/settings/validate';
+import { exists } from '@/lib/fs';
+
+export const validateSettingsHook = async (): Promise<CommandResult> => {
   const settingsPath = path.join(process.cwd(), '.sdd', 'sdd-settings.yaml');
+
+  // Only validate if settings file exists
+  if (!(await exists(settingsPath))) {
+    return { success: true };
+  }
 
   try {
     const settings = await readSettings(settingsPath);
@@ -233,7 +567,10 @@ export const validateSettingsHook = async (): Promise<void> => {
       console.error('\n❌ sdd-settings.yaml validation failed:\n');
       console.error(formatValidationResult(result));
       console.error('\nCommit blocked. Fix validation errors before committing.');
-      process.exit(1);
+      return {
+        success: false,
+        error: 'Settings validation failed',
+      };
     }
 
     if (result.warnings.length > 0) {
@@ -241,66 +578,66 @@ export const validateSettingsHook = async (): Promise<void> => {
       console.warn(formatValidationResult(result));
       console.warn('\nCommit allowed but please review warnings.');
     }
+
+    return { success: true };
   } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
     console.error('\n❌ Failed to validate sdd-settings.yaml:');
-    console.error(err);
-    process.exit(1);
+    console.error(errorMessage);
+    return {
+      success: false,
+      error: `Failed to validate settings: ${errorMessage}`,
+    };
   }
 };
 ```
 
-### Phase 4: Add CLI Command for Manual Validation
-
-**File**: [plugin/system/src/commands/settings/validate.ts](../../../plugin/system/src/commands/settings/validate.ts) (new file)
+**Register hook in** [plugin/system/src/commands/hook/index.ts](../../../plugin/system/src/commands/hook/index.ts):
 
 ```typescript
-import * as path from 'node:path';
-import { readSettings } from '../../settings/write';
-import { validateSettings, formatValidationResult } from '../../settings/validate';
+import { validateSettingsHook } from './validate-settings';
 
-export const validateSettingsCommand = async (): Promise<void> => {
-  const settingsPath = path.join(process.cwd(), '.sdd', 'sdd-settings.yaml');
-
-  console.log('Validating sdd-settings.yaml...\n');
-
-  try {
-    const settings = await readSettings(settingsPath);
-    const result = validateSettings(settings);
-
-    console.log(formatValidationResult(result));
-
-    if (result.valid) {
-      console.log('\n✅ Validation passed');
-      process.exit(0);
-    } else {
-      console.log('\n❌ Validation failed');
-      process.exit(1);
-    }
-  } catch (err) {
-    console.error('❌ Failed to read or validate settings:');
-    console.error(err);
-    process.exit(1);
-  }
-};
+// In handleHook function, add case:
+case 'validate-settings':
+  return validateSettingsHook();
 ```
 
-**Add to CLI** ([plugin/system/src/cli.ts](../../../plugin/system/src/cli.ts) or equivalent):
-```typescript
-import { validateSettingsCommand } from './commands/settings/validate';
+**Add hook configuration to plugin** `.claude-plugin/plugin.json` (if not using hooks.yaml):
 
-// In CLI command router:
-if (command === 'validate-settings') {
-  await validateSettingsCommand();
+```json
+{
+  "hooks": {
+    "PreCommit": "sdd-system hook validate-settings"
+  }
 }
 ```
 
-### Phase 5: Update Documentation
+Or update `.claude/hooks.yaml` in generated projects to include the hook.
+
+### Phase 4: Update Documentation
+
+Update documentation to reflect the new validation requirements and CLI commands.
 
 **File**: [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md)
 
-Add section:
+Add sections:
 
 ```markdown
+## Version Tracking
+
+Settings track both creation and update metadata:
+
+**Version tracking:**
+- `created_by_plugin_version` - Plugin version that initialized the project (immutable)
+- `updated_by_plugin_version` - Plugin version that last modified settings (auto-updated)
+
+**Timestamp tracking:**
+- `created_at` - UTC datetime when project was created (immutable)
+- `updated_at` - UTC datetime when settings were last modified (auto-updated)
+- Format: `YYYY-MM-DD HH:MM:SS UTC` (human-readable, no subseconds)
+
+This helps diagnose version-related issues, track modification history, and understand migration needs.
+
 ## Validation
 
 All settings modifications are automatically validated against:
@@ -317,8 +654,43 @@ Validation failures block the write and return clear error messages.
 To validate settings without modifying them:
 
 \```bash
-sdd validate-settings
+sdd-system settings validate
 \```
+
+For JSON output:
+
+\```bash
+sdd-system settings validate --json
+\```
+
+### Writing Settings
+
+Skills should use the validated write command:
+
+\```bash
+cat <<'EOF' | sdd-system settings write
+sdd:
+  created_by_plugin_version: "6.3.6"
+  updated_by_plugin_version: "6.3.6"
+  created_at: "2026-02-08 10:00:00 UTC"
+  updated_at: "2026-02-08 10:00:00 UTC"
+
+project:
+  name: "my-app"
+  description: "Example app"
+
+components:
+  - name: config
+    type: config
+    settings: {}
+EOF
+\```
+
+The command will:
+- Validate against JSON Schema
+- Check cross-references
+- Auto-update `updated_at` and `updated_by_plugin_version`
+- Return errors if validation fails
 
 ### Pre-Commit Hook
 
@@ -339,8 +711,10 @@ Test cases:
 5. ❌ Broken component reference rejected
 6. ❌ Invalid hybrid server (1 mode) rejected
 7. ⚠️  Warnings shown but write succeeds
-8. ✅ Timestamp auto-updated on write
-9. ✅ Skip validation flag bypasses checks
+8. ✅ Datetime timestamp auto-updated on write
+9. ✅ Plugin version auto-updated on write
+10. ✅ Legacy plugin_version field migrated on read
+11. ✅ Legacy date fields (initialized_at, last_updated) migrated to datetime
 
 ### Integration Tests
 
@@ -378,13 +752,17 @@ Commit allowed but please review warnings.
 
 ## Migration Path
 
-1. **Phase 1**: Add `writeSettings()` function (no breaking changes)
-2. **Phase 2**: Update skills to use new function (backward compatible)
-3. **Phase 3**: Add pre-commit hook (validates but doesn't block existing workflows)
-4. **Phase 4**: Add CLI validation command (new feature)
-5. **Phase 5**: Documentation updates
+1. **Phase 0**: Update schema with version tracking (backward compatible via migration)
+2. **Phase 1**: Add `writeSettings()` and `readSettings()` functions (no breaking changes)
+3. **Phase 2**: Add CLI commands and update skills to use new pattern (backward compatible)
+4. **Phase 3**: Add pre-commit hook (defense-in-depth validation)
+5. **Phase 4**: Documentation updates
 
-No breaking changes - existing valid settings files continue to work.
+**Legacy compatibility**: The `readSettings()` function automatically migrates:
+1. Old `plugin_version` field → `created_by_plugin_version` and `updated_by_plugin_version`
+2. Old date fields (`initialized_at`, `last_updated`) → datetime fields (`created_at`, `updated_at`)
+
+Next write persists the migrated format.
 
 ## Acceptance Criteria Mapping
 
@@ -412,18 +790,23 @@ No breaking changes - existing valid settings files continue to work.
 ## Files Changed
 
 ### New Files
-- [plugin/system/src/settings/write.ts](../../../plugin/system/src/settings/write.ts)
-- [plugin/system/src/commands/hook/validate-settings.ts](../../../plugin/system/src/commands/hook/validate-settings.ts)
-- [plugin/system/src/commands/settings/validate.ts](../../../plugin/system/src/commands/settings/validate.ts)
-- [tests/src/tests/unit/settings/settings-write.test.ts](../../../tests/src/tests/unit/settings/settings-write.test.ts)
-- [tests/src/tests/workflows/sdd-settings-validation.test.ts](../../../tests/src/tests/workflows/sdd-settings-validation.test.ts)
+- [plugin/system/src/settings/write.ts](../../../plugin/system/src/settings/write.ts) - `writeSettings()`, `readSettings()`, `getPluginVersion()`, `formatUtcDatetime()`
+- [plugin/system/src/commands/settings/index.ts](../../../plugin/system/src/commands/settings/index.ts) - settings namespace handler
+- [plugin/system/src/commands/settings/write.ts](../../../plugin/system/src/commands/settings/write.ts) - `sdd-system settings write` command
+- [plugin/system/src/commands/settings/validate.ts](../../../plugin/system/src/commands/settings/validate.ts) - `sdd-system settings validate` command
+- [plugin/system/src/commands/hook/validate-settings.ts](../../../plugin/system/src/commands/hook/validate-settings.ts) - pre-commit hook
+- [tests/src/tests/unit/settings/settings-write.test.ts](../../../tests/src/tests/unit/settings/settings-write.test.ts) - unit tests
+- [tests/src/tests/workflows/sdd-settings-validation.test.ts](../../../tests/src/tests/workflows/sdd-settings-validation.test.ts) - workflow tests
 
 ### Modified Files
-- [plugin/system/src/settings/index.ts](../../../plugin/system/src/settings/index.ts) - export new functions
-- [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md) - require writeSettings()
-- [plugin/skills/change-creation/SKILL.md](../../../plugin/skills/change-creation/SKILL.md) - use writeSettings()
-- [plugin/skills/component-discovery/SKILL.md](../../../plugin/skills/component-discovery/SKILL.md) - use writeSettings()
-- [plugin/system/src/cli.ts](../../../plugin/system/src/cli.ts) - add validate-settings command
+- [plugin/system/src/types/settings.ts](../../../plugin/system/src/types/settings.ts) - update `SddMetadata` interface
+- [plugin/system/src/settings/schema.ts](../../../plugin/system/src/settings/schema.ts) - update `sddMetadataSchema`
+- [plugin/system/src/settings/index.ts](../../../plugin/system/src/settings/index.ts) - export `writeSettings`, `readSettings`, `WriteSettingsResult`
+- [plugin/system/src/commands/hook/index.ts](../../../plugin/system/src/commands/hook/index.ts) - register `validate-settings` hook
+- [plugin/system/src/cli.ts](../../../plugin/system/src/cli.ts) - add `settings` namespace
+- [plugin/skills/project-settings/SKILL.md](../../../plugin/skills/project-settings/SKILL.md) - document validation and CLI usage
+- [plugin/skills/change-creation/SKILL.md](../../../plugin/skills/change-creation/SKILL.md) - use `sdd-system settings write` command
+- [plugin/skills/component-discovery/SKILL.md](../../../plugin/skills/component-discovery/SKILL.md) - use `sdd-system settings write` command
 
 ## Notes
 
