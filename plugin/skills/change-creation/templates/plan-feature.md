@@ -27,58 +27,65 @@ Complete implementation of the following changes before starting:
 ### Phase 1: [Component Name] - API Contract
 **Agent:** `api-designer`
 **Component:** <component-name>
+**Standards:** `typescript-standards`, `contract-standards`
 
 Tasks:
-- [ ] Update OpenAPI spec with new endpoints/schemas
-- [ ] Generate TypeScript types
+- [ ] Define endpoints with operationId, request/response schemas per contract-standards
+- [ ] Generate TypeScript types from OpenAPI spec
 
 Deliverables:
-- Updated OpenAPI spec
+- Updated OpenAPI spec with Spectral validation passing
 - Generated TypeScript types
 
 ### Phase 2: [Component Name] - Backend Implementation
 **Agent:** `backend-dev`
 **Component:** <component-name>
+**Standards:** `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing`
 
 Tasks:
-- [ ] Implement domain logic
-- [ ] Add data access layer
-- [ ] Wire up controllers
-- [ ] Write unit tests (TDD)
+- [ ] Implement Model layer (definitions + use-cases with dependency injection)
+- [ ] Implement DAL layer (one function per file, parameterized queries)
+- [ ] Wire Controller layer (HTTP handlers, create Dependencies)
+- [ ] Write unit tests per layer using TDD (red-green-refactor)
+- [ ] Add telemetry (structured logging, metrics, spans)
 
 Deliverables:
-- Working API endpoints
+- Working API endpoints following CMDO architecture
 - Unit tests passing
 
 ### Phase 3: [Component Name] - Frontend Implementation
 **Agent:** `frontend-dev`
 **Component:** <component-name>
+**Standards:** `typescript-standards`, `frontend-standards`, `unit-testing`
 
 Tasks:
-- [ ] Create components
-- [ ] Add hooks
-- [ ] Integrate with API
-- [ ] Write unit tests (TDD)
+- [ ] Create View components (TailwindCSS only, no business logic)
+- [ ] Create ViewModel hooks (TanStack Query for server state)
+- [ ] Implement page-specific Model (business logic, no React dependencies)
+- [ ] Write unit tests per layer using TDD (red-green-refactor)
 
 Deliverables:
-- Working UI
+- Working UI following MVVM architecture
 - Unit tests passing
 
 ### Phase N-1: Integration & E2E Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 Tasks:
-- [ ] Integration tests for API layer
-- [ ] E2E tests for user flows
+- [ ] Integration tests for API layer (test database, HTTP endpoints)
+- [ ] E2E tests for user flows (Playwright, data-testid selectors)
 
 Deliverables:
 - Test suites passing
 
 ### Phase N: Review
 **Agent:** `reviewer`, `db-advisor` (if DB changes)
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
 Tasks:
 - [ ] Spec compliance review
+- [ ] Standards compliance verification (per-phase standards listed above)
 - [ ] Database review (if applicable)
 
 ## Expected Files

@@ -12,11 +12,12 @@ Specification: [SPEC.md](./SPEC.md)
 
 ### Phase 1: Preparation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
 Tasks:
-- [ ] Ensure comprehensive test coverage exists
-- [ ] Document current behavior
-- [ ] Identify all affected areas
+- [ ] Ensure comprehensive test coverage exists per unit-testing standards
+- [ ] Document current behavior and architecture (CMDO layers or MVVM layers)
+- [ ] Identify all affected areas within the component
 
 Deliverables:
 - Test coverage report
@@ -24,18 +25,21 @@ Deliverables:
 
 ### Phase 2: Implementation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
 Tasks:
-- [ ] Implement refactoring changes
-- [ ] Update any affected API contracts (if needed)
+- [ ] Implement refactoring changes following component architecture standards
+- [ ] Update any affected API contracts per contract-standards (if needed)
 - [ ] Maintain backward compatibility (if required)
+- [ ] Verify all existing tests still pass after each change
 
 Deliverables:
-- Refactored code
+- Refactored code following component standards
 - All existing tests passing
 
 ### Phase 3: Integration Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 Tasks:
 - [ ] Run existing test suite
@@ -48,11 +52,12 @@ Deliverables:
 
 ### Phase 4: Review
 **Agent:** `reviewer`
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
 Tasks:
-- [ ] Code review focusing on refactoring goals
+- [ ] Code review focusing on refactoring goals and standards compliance
 - [ ] Verify no regressions
-- [ ] Final QA sign-off
+- [ ] Standards compliance verification
 
 ## Implementation State
 
