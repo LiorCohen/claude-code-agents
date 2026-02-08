@@ -55,8 +55,14 @@ Create separate pino logger instance for file-based system logging:
 - Does NOT intercept or modify any console.* calls
 - Runs independently of user-facing console output
 
+**Baseline requirement - log every CLI invocation:**
+- Command invocation (namespace + action)
+- Arguments passed to the command
+- Command result (success/failure, output, errors)
+
 File logger includes context in every log entry:
 - Command name (namespace + action)
+- Arguments array
 - Timestamp (handled by pino)
 - Process ID (handled by pino)
 - Claude session ID (from `CLAUDE_SESSION_ID` environment variable, if available)
@@ -70,7 +76,9 @@ File logging respects `system.logging.enabled` and `system.logging.level` from s
 Update ONLY the CLI entry point ([cli.ts](../../../plugin/system/src/cli.ts)) to:
 1. Load settings from `.sdd/sdd-settings.yaml` (if exists)
 2. Initialize pino file logger with settings
-3. Add file logging calls at key points (command start/end)
+3. **Log every CLI invocation:**
+   - Command start: namespace, action, arguments
+   - Command result: success/failure, output data, errors
 4. Existing console output and logger usage remains unchanged
 
 Settings are optional - if not found, use defaults (enabled: true, level: info).
@@ -119,7 +127,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 
 - [ ] `test_logger_creates_directory_if_missing` - Logger creates `.sdd/system-logs/` if it doesn't exist
 - [ ] `test_logger_writes_to_correct_file` - Logger writes to `system-YYYY-MM-DD.log` based on current date
-- [ ] `test_logger_includes_required_context` - Log entries include command, timestamp, PID, session ID
+- [ ] `test_logger_includes_required_context` - Log entries include command, arguments, timestamp, PID, session ID
+- [ ] `test_logger_captures_invocation_details` - Every CLI invocation logs namespace, action, and arguments
 - [ ] `test_logger_respects_enabled_setting` - When `logging.enabled` is false, no file writes occur
 - [ ] `test_logger_respects_level_setting` - When `logging.level` is "error", info/debug logs are not written
 - [ ] `test_logger_uses_defaults_when_settings_missing` - Falls back to enabled=true, level=info
@@ -133,6 +142,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 
 - [ ] `test_cli_command_logs_to_file` - Running `sdd-system spec validate` writes logs to file
 - [ ] `test_cli_logs_command_start_and_end` - Log file contains start/end entries for command
+- [ ] `test_cli_logs_invocation_arguments` - Log entries include all arguments passed to command
+- [ ] `test_cli_logs_command_result` - Log entries include command result (success/failure, output, errors)
 - [ ] `test_cli_logs_errors` - Errors are logged with full context
 - [ ] `test_cli_respects_settings` - CLI reads settings and configures logger appropriately
 - [ ] `test_multiple_commands_same_day` - Multiple commands append to same date file
@@ -150,7 +161,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] Pino dependencies installed in plugin/system/package.json
 - [ ] Settings schema includes `system.logging` with correct types and defaults
 - [ ] Logger writes to `.sdd/system-logs/system-YYYY-MM-DD.log`
-- [ ] Log entries include command, timestamp, PID, session ID (if available)
+- [ ] **Every CLI invocation is logged** with namespace, action, arguments, and result
+- [ ] Log entries include command, arguments, timestamp, PID, session ID (if available)
 - [ ] **ALL existing console output unchanged** (verified: no modifications to 200+ console calls)
 - [ ] Console output (user-facing) continues to work identically to before
 - [ ] File logging (system logging) works independently of console output
