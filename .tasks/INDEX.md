@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#104](1-inbox/104/): sdd-run without arguments should show usage text
 - [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
