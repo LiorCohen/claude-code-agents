@@ -18,7 +18,7 @@ The plugin system lacks structured logging infrastructure. Console output serves
 | File | Changes |
 |------|---------|
 | [plugin/system/package.json](../../../plugin/system/package.json) | Add `pino` and `pino-pretty` dependencies |
-| [plugin/system/src/lib/logger.ts](../../../plugin/system/src/lib/logger.ts) | Replace console-only logger with pino-based logger that writes to file |
+| [plugin/system/src/lib/logger.ts](../../../plugin/system/src/lib/logger.ts) | Add pino file logger creation function (existing console logger unchanged) |
 | [plugin/system/src/settings/schema.ts](../../../plugin/system/src/settings/schema.ts) | Add `system.logging` section to settings schema |
 | [plugin/system/src/types/settings.ts](../../../plugin/system/src/types/settings.ts) | Add `SystemSettings` and `LoggingSettings` types |
 | [plugin/system/src/cli.ts](../../../plugin/system/src/cli.ts) | Initialize file logger with settings and context |
@@ -96,6 +96,13 @@ Log files are created in `.sdd/system-logs/` with date-based naming:
 - New log file created automatically for each day
 - Files accumulate (no rotation or deletion yet)
 - Directory is gitignored
+- Create `.sdd/` parent directory if it doesn't exist
+- Create `.sdd/system-logs/` subdirectory if it doesn't exist
+
+**Error handling:**
+- If logging fails (permissions, disk full, etc.), fail silently - do NOT interrupt command execution
+- Log the logging error to console as a warning
+- Continue with console output as normal
 
 Initial implementation does not limit file size or count - this can be added later if needed.
 
@@ -107,7 +114,9 @@ npm run logs
 ```
 
 This script:
+- Checks if `.sdd/system-logs/` exists
 - Finds the latest log file in `.sdd/system-logs/`
+- If no logs exist, shows helpful message and exits
 - Tails it using `tail -f`
 - Pipes through `pino-pretty` for readable formatting
 
@@ -115,8 +124,8 @@ This script:
 
 1. Install pino dependencies first
 2. Update settings schema and types
-3. Update logger implementation
-4. Update CLI to use new logger
+3. Add file logger creation function to logger.ts (do NOT modify existing console logger)
+4. Update CLI to initialize and use file logger
 5. Add npm script and update .gitignore
 
 No blocking dependencies between schema updates and logger implementation - can be done in parallel.
@@ -125,7 +134,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 
 ### Unit Tests
 
-- [ ] `test_logger_creates_directory_if_missing` - Logger creates `.sdd/system-logs/` if it doesn't exist
+- [ ] `test_logger_creates_directory_if_missing` - Logger creates `.sdd/` and `.sdd/system-logs/` if they don't exist
+- [ ] `test_logger_handles_write_failures_gracefully` - When logging fails (permissions, disk full), command continues and logs warning to console
 - [ ] `test_logger_writes_to_correct_file` - Logger writes to `system-YYYY-MM-DD.log` based on current date
 - [ ] `test_logger_includes_required_context` - Log entries include command, arguments, timestamp, PID, session ID
 - [ ] `test_logger_captures_invocation_details` - Every CLI invocation logs namespace, action, and arguments
@@ -153,6 +163,7 @@ No blocking dependencies between schema updates and logger implementation - can 
 ### E2E Tests
 
 - [ ] `test_logs_script_tails_latest_file` - `npm run logs` correctly identifies and tails latest log
+- [ ] `test_logs_script_handles_no_logs` - `npm run logs` shows helpful message when no logs exist
 - [ ] `test_logs_script_pretty_prints` - Output from `npm run logs` is human-readable
 - [ ] `test_gitignore_excludes_logs` - `.sdd/system-logs/` is properly gitignored
 
@@ -160,7 +171,9 @@ No blocking dependencies between schema updates and logger implementation - can 
 
 - [ ] Pino dependencies installed in plugin/system/package.json
 - [ ] Settings schema includes `system.logging` with correct types and defaults
+- [ ] Logger creates `.sdd/` directory if needed
 - [ ] Logger writes to `.sdd/system-logs/system-YYYY-MM-DD.log`
+- [ ] Logging failures don't interrupt command execution
 - [ ] **Every CLI invocation is logged** with namespace, action, arguments, and result
 - [ ] Log entries include command, arguments, timestamp, PID, session ID (if available)
 - [ ] **ALL existing console output unchanged** (verified: no modifications to 200+ console calls)
@@ -169,4 +182,5 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] Logger respects `logging.enabled` and `logging.level` settings
 - [ ] `.sdd/system-logs/` is gitignored
 - [ ] `npm run logs` tails latest log with pretty printing
+- [ ] `npm run logs` handles no logs case gracefully
 - [ ] All tests pass
