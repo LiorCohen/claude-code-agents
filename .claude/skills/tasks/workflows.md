@@ -37,7 +37,7 @@ User: /tasks add <description>
 1. Determine next task number (highest N + 1 across all status dirs)
 2. Create folder `1-inbox/<N>/` with `task.md`
 3. Add entry to INDEX.md under Inbox
-4. Commit the transition (e.g., "Tasks: Add #63")
+4. Stage changes and use commit skill: `Skill(commit, args: '-m "Tasks: Add #63"')`
 5. Confirm with task number
 
 New tasks always go to inbox first. User can prioritize later.
@@ -56,7 +56,7 @@ User: /tasks prioritize 15 low
 1. Find task folder
 2. Update `task.md` frontmatter `priority` field
 3. Move task entry to correct section in INDEX.md
-4. Commit the transition (e.g., "Tasks: Prioritize #15 as high")
+4. Stage changes and use commit skill (e.g., "Tasks: Prioritize #15 as high")
 
 **Note:** Priority only affects INDEX.md grouping, not file location.
 
@@ -74,7 +74,7 @@ User: /tasks plan 19
 3. Update `task.md` frontmatter: `status: planning`
 4. Create `plan.md` in the task folder
 5. Update INDEX.md
-6. Commit the transition (e.g., "Tasks: Move #19 to planning")
+6. Stage changes and use commit skill (e.g., "Tasks: Move #19 to planning")
 7. Confirm with clickable link to plan
 
 **Output:**
@@ -99,7 +99,7 @@ User: /tasks ready 19
 2. Move folder to `3-ready/`
 3. Update `task.md` frontmatter: `status: ready`
 4. Update INDEX.md
-5. Commit the transition (e.g., "Tasks: Move #19 to ready")
+5. Stage changes and use commit skill (e.g., "Tasks: Move #19 to ready")
 
 Use when a task has a complete plan and is ready to implement.
 
@@ -190,7 +190,7 @@ User: /tasks reject 15 "Out of scope for MVP"
 3. Move folder to `7-rejected/`
 4. Update `task.md` frontmatter: `status: rejected`, `rejected_reason: <reason>`
 5. Update INDEX.md (include the reason summary after the title, e.g., `— obsolete, superseded by #81`)
-6. Commit the transition (e.g., "Tasks: Reject #15")
+6. Stage changes and use commit skill (e.g., "Tasks: Reject #15")
 
 ---
 
@@ -209,7 +209,7 @@ User: /tasks consolidate 28 into 27
    - **Preserve ALL original content** (description, acceptance criteria, etc.)
 4. Update task 27 `task.md` with consolidated context (add ## Consolidated section referencing #28)
 5. Update INDEX.md
-6. Commit the transition (e.g., "Tasks: Consolidate #28 into #27")
+6. Stage changes and use commit skill (e.g., "Tasks: Consolidate #28 into #27")
 
 ---
 

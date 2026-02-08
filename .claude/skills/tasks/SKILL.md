@@ -73,7 +73,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 1. Determine next task number (highest N + 1)
 2. Create `1-inbox/<N>/task.md`
 3. Add to INDEX.md under Inbox
-4. Commit: "Tasks: Add #<N>"
+4. Use commit skill: `Skill(commit, args: '-m "Tasks: Add #<N>"')`
 
 ---
 
@@ -85,7 +85,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 
 1. Update `task.md` frontmatter `priority` field
 2. Move entry to correct section in INDEX.md
-3. Commit: "Tasks: Prioritize #<id> as <priority>"
+3. Use commit skill: `Skill(commit, args: '-m "Tasks: Prioritize #<id> as <priority>"')`
 
 ---
 
@@ -99,7 +99,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 2. Update `task.md`: `status: planning`
 3. Create `plan.md`
 4. Update INDEX.md
-5. Commit: "Tasks: Move #<id> to planning"
+5. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to planning"')`
 
 Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 
@@ -114,7 +114,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 1. Move to `3-ready/`
 2. Update status
 3. Update INDEX.md
-4. Commit: "Tasks: Move #<id> to ready"
+4. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to ready"
 
 ---
 
@@ -127,7 +127,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 1. Move to `4-implementing/`
 2. Update status
 3. Update INDEX.md
-4. Commit transition on main
+4. Use commit skill on main: `Skill(commit, args: '-m "Tasks: Move #<id> to implementing"')`
 5. Create feature branch: `feature/task-<id>-<slug>`
 6. Create worktree at `.worktrees/task-<id>/`
 
@@ -144,7 +144,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 1. Move to `5-reviewing/`
 2. Update status
 3. Update INDEX.md
-4. Commit: "Tasks: Move #<id> to reviewing"
+4. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to reviewing"
 
 **IMPORTANT:** Never merge or delete worktree until `/tasks complete`.
 
@@ -164,7 +164,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 2. Move to `6-complete/`
 3. Update status, add `completed` date
 4. Update INDEX.md
-5. Commit: "Tasks: Complete #<id>"
+5. Use commit skill: `Skill(commit, args: '-m "Tasks: Complete #<id>"
 
 ---
 
@@ -178,7 +178,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 2. Move to `7-rejected/`
 3. Update status, add `rejected_reason`
 4. Update INDEX.md
-5. Commit: "Tasks: Reject #<id>"
+5. Use commit skill: `Skill(commit, args: '-m "Tasks: Reject #<id>"
 
 ---
 
@@ -193,7 +193,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 3. Preserve ALL original content
 4. Update target task with consolidated context
 5. Update INDEX.md
-6. Commit: "Tasks: Consolidate #<id> into #<target-id>"
+6. Use commit skill: `Skill(commit, args: '-m "Tasks: Consolidate #<id> into #<target-id>"
 
 ---
 
