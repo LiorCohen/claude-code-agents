@@ -2,8 +2,9 @@
 id: 23
 title: Autocomplete for SDD command arguments
 priority: inbox
-status: open
+status: rejected
 created: 2026-01-25
+rejected_reason: Feature not supported by Claude Code
 ---
 
 # Task 23: Autocomplete for SDD command arguments

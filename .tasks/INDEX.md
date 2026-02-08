@@ -76,7 +76,6 @@
 - [#69](1-inbox/69/): Fix sdd-init workflow test timeout
 - [#12](1-inbox/12/): User onboarding and process state tracking
 - [#21](1-inbox/21/): Project sanity verification command
-- [#23](1-inbox/23/): Autocomplete for SDD command arguments
 - [#33](1-inbox/33/): Tests are not useful - need better test creation approach
 - [#35](1-inbox/35/): Checksumming and drift detection for specs/components
 - [#38](1-inbox/38/): Integration and E2E testing should be separate components
@@ -129,6 +128,7 @@
 
 ## Rejected
 
+- [#23](7-rejected/23/): Autocomplete for SDD command arguments — feature not supported by Claude Code
 - [#14](7-rejected/14/): Unclear when to run type generation — obsolete with workflow gating (v6.1.0)
 - [#52](7-rejected/52/): Clean up .gitkeep and placeholder content — obsolete with on-demand scaffolding (#78)
 - [#54](7-rejected/54/): Missing postgresql-standards skill — already exists at components/database/postgresql/
