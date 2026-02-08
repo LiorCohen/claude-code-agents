@@ -114,6 +114,27 @@ export interface ContractSettings {
 export type ConfigSettings = Record<string, never>;
 
 // =============================================================================
+// System Settings
+// =============================================================================
+
+/** Log levels supported by pino */
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+
+/** Logging settings */
+export interface LoggingSettings {
+  /** Enable/disable file logging */
+  readonly enabled: boolean;
+  /** Log level */
+  readonly level: LogLevel;
+}
+
+/** System-wide settings */
+export interface SystemSettings {
+  /** Logging configuration */
+  readonly logging: LoggingSettings;
+}
+
+// =============================================================================
 // Component Type Unions
 // =============================================================================
 
@@ -265,4 +286,5 @@ export interface SettingsFile {
   readonly sdd: SddMetadata;
   readonly project: ProjectMetadata;
   readonly components: readonly Component[];
+  readonly system?: SystemSettings;
 }

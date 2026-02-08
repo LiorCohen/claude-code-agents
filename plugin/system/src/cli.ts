@@ -15,8 +15,12 @@
  *   env           Local environment management
  */
 
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import YAML from 'yaml';
 import { parseArgs, type CommandResult, type GlobalOptions, outputResult } from '@/lib/args';
-import { createLogger } from '@/lib/logger';
+import { createLogger, createFileLogger } from '@/lib/logger';
+import type { SettingsFile, LogLevel } from '@/types/settings';
 
 // Command imports
 import { handleSpec } from '@/commands/spec';
@@ -140,14 +144,59 @@ const showHelp = (options: GlobalOptions): CommandResult => {
   return { success: true };
 };
 
+/**
+ * Load settings from .sdd/sdd-settings.yaml if it exists.
+ * Returns default settings if file doesn't exist or can't be loaded.
+ */
+const loadSettings = (): SettingsFile | null => {
+  try {
+    const settingsPath = join(process.cwd(), '.sdd', 'sdd-settings.yaml');
+    const content = readFileSync(settingsPath, 'utf-8');
+    return YAML.parse(content) as SettingsFile;
+  } catch {
+    // Settings file doesn't exist or can't be read - use defaults
+    return null;
+  }
+};
+
 const main = async (): Promise<number> => {
   const { namespace, action, args, options } = parseArgs(process.argv.slice(2));
   const logger = createLogger(options);
+
+  // Load settings and initialize file logger
+  const settings = loadSettings();
+  const loggingConfig = settings?.system?.logging ?? {
+    enabled: true,
+    level: 'info' as LogLevel,
+  };
+
+  const command = namespace && action ? `${namespace} ${action}` : undefined;
+  const fileLogger = createFileLogger({
+    enabled: loggingConfig.enabled,
+    level: loggingConfig.level,
+    command,
+    args,
+  });
+
+  // Log CLI invocation
+  if (fileLogger && command) {
+    fileLogger.info({
+      namespace,
+      action,
+      arguments: args,
+    }, 'CLI invocation');
+  }
 
   // Handle help flag
   if (options.help || !namespace) {
     const result = showHelp(options);
     outputResult(result, options);
+
+    // Log result
+    if (fileLogger) {
+      fileLogger.info({ result }, 'Command completed');
+    }
+
     return result.success ? 0 : 1;
   }
 
@@ -158,6 +207,12 @@ const main = async (): Promise<number> => {
       error: `Unknown namespace: ${namespace}. Available: ${NAMESPACES.join(', ')}`,
     };
     outputResult(result, options);
+
+    // Log error result
+    if (fileLogger) {
+      fileLogger.error({ result }, 'Invalid namespace');
+    }
+
     return 1;
   }
 
@@ -170,6 +225,12 @@ const main = async (): Promise<number> => {
       error: `Missing action for namespace '${namespace}'. Use --help for available actions.`,
     };
     outputResult(result, options);
+
+    // Log error result
+    if (fileLogger) {
+      fileLogger.error({ result }, 'Missing action');
+    }
+
     return 1;
   }
 
@@ -177,6 +238,16 @@ const main = async (): Promise<number> => {
     logger.debug(`Executing: ${namespace} ${action}`, { args, options });
     const result = await handler(action, args, options);
     outputResult(result, options);
+
+    // Log result
+    if (fileLogger) {
+      if (result.success) {
+        fileLogger.info({ result }, 'Command completed');
+      } else {
+        fileLogger.error({ result }, 'Command failed');
+      }
+    }
+
     return result.success ? 0 : 1;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
@@ -186,6 +257,16 @@ const main = async (): Promise<number> => {
       error: errorMessage,
     };
     outputResult(result, options);
+
+    // Log exception
+    if (fileLogger) {
+      fileLogger.error({
+        error: errorMessage,
+        stack: err instanceof Error ? err.stack : undefined,
+        result,
+      }, 'Command exception');
+    }
+
     return 1;
   }
 };
