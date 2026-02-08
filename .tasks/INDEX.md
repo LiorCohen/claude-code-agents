@@ -6,6 +6,7 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
+- [#110](2-planning/110/plan.md): Add pino logging to plugin/system with .sdd/system-logs output
 
 ---
 
@@ -36,7 +37,6 @@
 
 ## Medium Priority
 
-- [#110](1-inbox/110/): Add pino logging to plugin/system with .sdd/system-logs output
 - [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
