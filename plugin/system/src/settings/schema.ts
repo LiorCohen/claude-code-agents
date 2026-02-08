@@ -331,6 +331,36 @@ const projectMetadataSchema: JSONSchema7 = {
   additionalProperties: false,
 };
 
+/** JSON Schema for logging settings */
+const loggingSettingsSchema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    enabled: {
+      type: 'boolean',
+      default: true,
+      description: 'Enable/disable file logging',
+    },
+    level: {
+      type: 'string',
+      enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
+      default: 'info',
+      description: 'Log level',
+    },
+  },
+  required: ['enabled', 'level'],
+  additionalProperties: false,
+};
+
+/** JSON Schema for system settings */
+const systemSettingsSchema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    logging: loggingSettingsSchema,
+  },
+  required: ['logging'],
+  additionalProperties: false,
+};
+
 /** Complete JSON Schema for settings file */
 export const settingsFileSchema: JSONSchema7 = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -345,6 +375,7 @@ export const settingsFileSchema: JSONSchema7 = {
       items: componentSchema,
       description: 'List of project components with their settings',
     },
+    system: systemSettingsSchema,
   },
   required: ['sdd', 'project', 'components'],
   additionalProperties: false,
@@ -360,6 +391,8 @@ export const schemas = {
   databaseSettings: databaseSettingsSchema,
   contractSettings: contractSettingsSchema,
   configSettings: configSettingsSchema,
+  loggingSettings: loggingSettingsSchema,
+  systemSettings: systemSettingsSchema,
   component: componentSchema,
   serverComponent: serverComponentSchema,
   webappComponent: webappComponentSchema,

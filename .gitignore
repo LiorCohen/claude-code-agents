@@ -10,6 +10,9 @@ test-apps/
 # Claude temp files
 .temp/
 
+# System logs
+.sdd/system-logs/
+
 # Worktrees
 .worktrees/
 

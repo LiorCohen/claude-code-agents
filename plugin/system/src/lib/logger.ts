@@ -2,7 +2,11 @@
  * Logging utilities for the CLI.
  */
 
+import { mkdirSync } from 'fs';
+import { join } from 'path';
+import pino from 'pino';
 import type { GlobalOptions } from './args';
+import type { LogLevel } from '@/types/settings';
 
 // ANSI color codes
 const COLORS = {
@@ -72,4 +76,74 @@ export const success = (message: string): void => {
 
 export const error = (message: string): void => {
   console.error(`${COLORS.red}✗${COLORS.reset} ${message}`);
+};
+
+/**
+ * File logger configuration options.
+ */
+export interface FileLoggerOptions {
+  /** Enable/disable file logging */
+  readonly enabled: boolean;
+  /** Log level */
+  readonly level: LogLevel;
+  /** Command name (namespace + action) */
+  readonly command?: string;
+  /** Command arguments */
+  readonly args?: readonly string[];
+}
+
+/**
+ * Create a pino file logger instance that writes to .sdd/system-logs/.
+ *
+ * This logger is INDEPENDENT of console output. Console output is user-facing
+ * and remains completely unchanged. File logging is for system audit/debug.
+ *
+ * @param options - File logger configuration
+ * @returns Pino logger instance, or null if logging is disabled
+ */
+export const createFileLogger = (
+  options: FileLoggerOptions
+): pino.Logger | null => {
+  if (!options.enabled) {
+    return null;
+  }
+
+  try {
+    // Get current date for log file naming
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Ensure .sdd/system-logs/ directory exists
+    const logDir = join(process.cwd(), '.sdd', 'system-logs');
+    mkdirSync(logDir, { recursive: true });
+
+    // Create log file path
+    const logFile = join(logDir, `system-${date}.log`);
+
+    // Create pino logger with file transport
+    const logger = pino(
+      {
+        level: options.level,
+        // Base context included in every log entry
+        base: {
+          pid: process.pid,
+          sessionId: process.env.CLAUDE_SESSION_ID || undefined,
+          command: options.command,
+          args: options.args,
+        },
+      },
+      pino.destination({
+        dest: logFile,
+        sync: true, // Sync mode for short-lived CLI processes
+      })
+    );
+
+    return logger;
+  } catch (err) {
+    // Fail silently - don't interrupt command execution
+    console.warn(
+      `${COLORS.yellow}Warning:${COLORS.reset} Failed to initialize file logger:`,
+      err instanceof Error ? err.message : String(err)
+    );
+    return null;
+  }
 };
