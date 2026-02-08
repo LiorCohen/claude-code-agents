@@ -1,7 +1,7 @@
 ---
 id: 100
 title: Ensure all sdd-change outputs use markdown with clickable links
-status: ready
+status: implementing
 created: 2026-02-08
 depends_on: []
 blocks: []

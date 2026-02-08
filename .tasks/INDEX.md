@@ -10,13 +10,13 @@
 
 ## Ready
 
-- [#100](3-ready/100/): Ensure all sdd-change outputs use markdown with clickable links
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#100](4-implementing/100/): Ensure all sdd-change outputs use markdown with clickable links
 
 ---
 
