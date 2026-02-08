@@ -1,13 +1,14 @@
 ---
 id: 100
 title: Ensure all sdd-change outputs use markdown with clickable links
-status: reviewing
+status: complete
 created: 2026-02-08
+completed: 2026-02-08
 depends_on: []
 blocks: []
 ---
 
-# Task 100: Ensure all sdd-change outputs use markdown with clickable links
+# Task 100: Ensure all sdd-change outputs use markdown with clickable links ✓
 
 ## Description
 
