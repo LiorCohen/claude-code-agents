@@ -12,10 +12,11 @@ Specification: [SPEC.md](./SPEC.md)
 
 ### Phase 1: Investigation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards` | frontend: `typescript-standards`, `frontend-standards` -->
 
 Tasks:
 - [ ] Reproduce the bug locally
-- [ ] Identify root cause
+- [ ] Identify root cause within the component's architecture (CMDO layers or MVVM layers)
 - [ ] Document findings in SPEC.md
 
 Deliverables:
@@ -24,11 +25,12 @@ Deliverables:
 
 ### Phase 2: Implementation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
 Tasks:
-- [ ] Implement the fix
-- [ ] Write regression test (TDD - test should fail before fix)
-- [ ] Update any affected API contracts (if needed)
+- [ ] Write regression test first using TDD (test must fail before fix)
+- [ ] Implement the fix following component architecture standards
+- [ ] Update any affected API contracts per contract-standards (if needed)
 
 Deliverables:
 - Working fix
@@ -36,6 +38,7 @@ Deliverables:
 
 ### Phase 3: Integration Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 Tasks:
 - [ ] Verify fix resolves the issue
@@ -47,11 +50,12 @@ Deliverables:
 
 ### Phase 4: Review
 **Agent:** `reviewer`
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
 Tasks:
-- [ ] Code review
+- [ ] Code review against spec and component standards
 - [ ] Verify acceptance criteria met
-- [ ] Final QA sign-off
+- [ ] Standards compliance verification
 
 ## Implementation State
 

@@ -51,6 +51,8 @@ Returns path to created PLAN.md and review status.
 ### Plan Content Guidelines
 
 **Acceptable in plans:**
+- Standards references per phase (which standards skills apply to each agent's work)
+- Methodology-level task descriptions (e.g., "Implement Model layer" not "Implement domain logic")
 - Brief code snippets as constraints or guidelines (e.g., "interface must include X field")
 - High-level examples showing intent
 - File paths and component names
@@ -135,15 +137,15 @@ If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, t
                 │           ↓
                 └───────→ webapp
    ```
-4. **Assign agents** based on component + change nature:
+4. **Assign agents and standards** based on component + change nature:
 
-| Component | Primary Agent | Notes |
-|-----------|---------------|-------|
-| contract | api-designer | API design and OpenAPI updates |
-| server | backend-dev | Backend implementation + DB (TDD) |
-| webapp | frontend-dev | Frontend implementation (TDD) |
-| helm | devops | Deployment and infrastructure |
-| config | contextual | backend-dev, frontend-dev, or devops based on what config affects |
+| Component | Primary Agent | Standards | Notes |
+|-----------|---------------|-----------|-------|
+| contract | api-designer | `typescript-standards`, `contract-standards` | API design and OpenAPI updates |
+| server | backend-dev | `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | Backend implementation + DB (TDD) |
+| webapp | frontend-dev | `typescript-standards`, `frontend-standards`, `unit-testing` | Frontend implementation (TDD) |
+| helm | devops | `helm-standards`, `cicd-standards` | Deployment and infrastructure |
+| config | contextual | Depends on agent assigned | backend-dev, frontend-dev, or devops based on what config affects |
 
 5. **Add final phases:**
    - `tester` for integration/E2E testing
@@ -243,18 +245,20 @@ sdd_version: [X.Y.Z]
 ### Phase 1: API Contract
 **Agent:** `api-designer`
 **Component:** contract
+**Standards:** `typescript-standards`, `contract-standards`
 
 **Outcome:** API contracts defined per SPEC.md
 
 **Deliverables:**
-- Updated OpenAPI spec
+- Updated OpenAPI spec with Spectral validation passing
 - Generated TypeScript types
 
 ### Phase 2: Backend Implementation
 **Agent:** `backend-dev`
 **Component:** server
+**Standards:** `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing`
 
-**Outcome:** Backend functionality complete per SPEC.md
+**Outcome:** Backend functionality complete per SPEC.md following CMDO architecture
 
 **Deliverables:**
 - Working API endpoints
@@ -263,8 +267,9 @@ sdd_version: [X.Y.Z]
 ### Phase 3: Frontend Implementation
 **Agent:** `frontend-dev`
 **Component:** webapp
+**Standards:** `typescript-standards`, `frontend-standards`, `unit-testing`
 
-**Outcome:** Frontend functionality complete per SPEC.md
+**Outcome:** Frontend functionality complete per SPEC.md following MVVM architecture
 
 **Deliverables:**
 - Working UI
@@ -272,6 +277,7 @@ sdd_version: [X.Y.Z]
 
 ### Phase 4: Integration & E2E Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 **Outcome:** All integration and E2E tests passing
 
@@ -280,8 +286,9 @@ sdd_version: [X.Y.Z]
 
 ### Phase 5: Review
 **Agent:** `reviewer`, `db-advisor` (if DB changes)
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
-**Outcome:** Implementation verified against SPEC.md
+**Outcome:** Implementation verified against SPEC.md and standards
 
 ## Dependencies
 
@@ -338,6 +345,7 @@ sdd_version: [X.Y.Z]
 
 ### Phase 1: Investigation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards` | frontend: `typescript-standards`, `frontend-standards` -->
 
 **Outcome:** Root cause identified and documented in SPEC.md
 
@@ -347,6 +355,7 @@ sdd_version: [X.Y.Z]
 
 ### Phase 2: Implementation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
 **Outcome:** Bug fixed with regression test per SPEC.md
 
@@ -356,6 +365,7 @@ sdd_version: [X.Y.Z]
 
 ### Phase 3: Integration Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 **Outcome:** All tests passing, no regressions
 
@@ -364,8 +374,9 @@ sdd_version: [X.Y.Z]
 
 ### Phase 4: Review
 **Agent:** `reviewer`
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
-**Outcome:** Fix verified against SPEC.md acceptance criteria
+**Outcome:** Fix verified against SPEC.md acceptance criteria and standards
 
 ## Tests
 
@@ -414,6 +425,7 @@ sdd_version: [X.Y.Z]
 
 ### Phase 1: Preparation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
 **Outcome:** Test coverage verified, affected areas documented per SPEC.md
 
@@ -423,15 +435,17 @@ sdd_version: [X.Y.Z]
 
 ### Phase 2: Implementation
 **Agent:** `backend-dev` or `frontend-dev` (based on component)
+**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
 
-**Outcome:** Refactoring complete per SPEC.md, all tests passing
+**Outcome:** Refactoring complete per SPEC.md following component standards, all tests passing
 
 **Deliverables:**
-- Refactored code
+- Refactored code following component standards
 - All existing tests passing
 
 ### Phase 3: Integration Testing
 **Agent:** `tester`
+**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
 **Outcome:** No behavior changes, all tests passing
 
@@ -441,8 +455,9 @@ sdd_version: [X.Y.Z]
 
 ### Phase 4: Review
 **Agent:** `reviewer`
+**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 
-**Outcome:** Refactoring goals verified, no regressions
+**Outcome:** Refactoring goals verified, no regressions, standards compliance confirmed
 
 ## Tests
 
