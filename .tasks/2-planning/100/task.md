@@ -19,7 +19,7 @@ All outputs from the `sdd-change` command should use properly formatted markdown
 - [ ] All task/issue references use clickable markdown links
 - [ ] No plain-text file paths remain in user-facing output
 - [ ] Output renders correctly in VS Code terminal / Claude Code interface
-- [ ] Command references use documentation links
+- [ ] Command references remain as plain text (prompt-populating links not supported)
 
 ## Consolidated
 
