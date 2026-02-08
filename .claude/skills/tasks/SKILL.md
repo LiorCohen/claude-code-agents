@@ -257,7 +257,7 @@ Tasks are grouped by priority first (for open tasks), then by terminal status.
 
 ## Planning
 
-- [#19](2-planning/19/): Task management skill
+- [#19](2-planning/19/plan.md): Task management skill
 
 ---
 
@@ -333,7 +333,9 @@ User: /tasks
 User: /tasks list
 ```
 
-**Action:** Read INDEX.md and display the index, grouped by section. Always show all tasks in each section with their full titles - never abbreviate or summarize the inbox or other sections. Skip empty sections and omit Completed, Rejected, and Consolidated sections (these are archival). Render each task reference (`#XX`) as a markdown link pointing to its `task.md` file relative to the repo root, e.g., `[#67](.tasks/1-inbox/67/task.md)`.
+**Action:** Read INDEX.md and display the index, grouped by section. Always show all tasks in each section with their full titles - never abbreviate or summarize the inbox or other sections. Skip empty sections and omit Completed, Rejected, and Consolidated sections (these are archival). Render each task reference (`#XX`) as a markdown link pointing to its primary file relative to the repo root:
+- Planning tasks: link to `plan.md`, e.g., `[#67](.tasks/2-planning/67/plan.md)`
+- All other tasks: link to `task.md`, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
 ### View Single Task
 
@@ -387,6 +389,14 @@ User: /tasks plan 19
 4. Create `plan.md` in the task folder
 5. Update INDEX.md
 6. Commit the transition (e.g., "Tasks: Move #19 to planning")
+7. Confirm with clickable link to plan
+
+**Output:**
+```
+Task #19 moved to planning status.
+
+Plan: [plan.md](.tasks/2-planning/19/plan.md)
+```
 
 Use when starting to create a plan for a task.
 
