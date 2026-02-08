@@ -48,7 +48,7 @@ Each task is a folder named by its ID containing:
 /tasks list
 ```
 
-Read `.tasks/INDEX.md` and display it, omitting the Complete, Rejected, and Consolidated sections. Render task references as clickable markdown links:
+Read `.tasks/INDEX.md` and display it. Skip empty sections. Omit Complete, Rejected, and Consolidated sections (archival). Render task references as clickable markdown links:
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
 - Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
