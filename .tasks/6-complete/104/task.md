@@ -1,8 +1,9 @@
 ---
 id: 104
 title: sdd-run without arguments should show usage text
-status: open
+status: complete
 created: 2026-02-08
+completed: 2026-02-08
 depends_on: []
 blocks: []
 ---

@@ -65,7 +65,6 @@
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
-- [#104](1-inbox/104/): sdd-run without arguments should show usage text
 - [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
 - [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
@@ -89,6 +88,7 @@
 
 ## Complete
 
+- [#104](6-complete/104/): sdd-run without arguments should show usage text ✓ (2026-02-08)
 - [#95](6-complete/95/): Fix commands standards violations from audit report ✓ (2026-02-08)
 - [#100](6-complete/100/): Ensure all sdd-change outputs use markdown with clickable links ✓ (2026-02-08)
 - [#98](6-complete/98/): Plan templates don't reference standards skills ✓ (2026-02-08)
