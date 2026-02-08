@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
 - [#101](1-inbox/101/): Research prompt-populating clickable links in Claude Code
 - [#100](1-inbox/100/): Ensure all sdd-change outputs use markdown with clickable links
