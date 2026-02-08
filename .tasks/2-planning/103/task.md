@@ -1,7 +1,7 @@
 ---
 id: 103
 title: Validate sdd-settings writes against schema during sdd-change workflows
-status: open
+status: planning
 created: 2026-02-08
 depends_on: []
 blocks: []

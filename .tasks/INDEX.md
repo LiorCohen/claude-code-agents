@@ -4,7 +4,8 @@
 
 ## Planning
 
-- [#67](2-planning/67/): Store user instructions in plans, specs, and .sdd/
+- [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
+- [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
 ---
 
@@ -64,7 +65,6 @@
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
-- [#103](1-inbox/103/): Validate sdd-settings writes against schema during sdd-change workflows
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
 - [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#94](1-inbox/94/): local-env is missing settings
