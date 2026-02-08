@@ -39,11 +39,19 @@ The settings schema validates these fields and provides defaults.
 
 ### 3. Logger Implementation
 
-Replace the current console-only logger with a dual-output logger:
-- **Console output** - Unchanged, continues to write formatted output to stdout/stderr
-- **File output** - New, writes JSON-structured logs to `.sdd/system-logs/system-YYYY-MM-DD.log`
+**CRITICAL CONSTRAINT: Zero changes to existing console usage. All 200+ existing console.log/error/warn calls throughout the codebase remain exactly as-is.**
 
-Logger includes context in every log entry:
+Enhance the logger module to ADD file logging alongside existing console behavior:
+- **Console output** - Zero changes. All existing console usage stays identical.
+- **File output** - NEW. Pino writes structured JSON logs to `.sdd/system-logs/system-YYYY-MM-DD.log`
+
+The implementation adds a pino logger instance that:
+- Runs in parallel to existing console output
+- Logs to file when methods like `logger.info()`, `logger.error()` are called
+- Does NOT intercept or modify any console.* calls
+- Does NOT replace existing logger behavior
+
+File logger includes context in every log entry:
 - Command name (namespace + action)
 - Timestamp (handled by pino)
 - Process ID (handled by pino)
@@ -53,13 +61,21 @@ File logging respects `system.logging.enabled` and `system.logging.level` from s
 
 ### 4. CLI Integration
 
-Update CLI entry point to:
+**NO changes to command handlers or existing code paths.**
+
+Update ONLY the CLI entry point ([cli.ts](../../../plugin/system/src/cli.ts)) to:
 1. Load settings from `.sdd/sdd-settings.yaml` (if exists)
-2. Create logger with file transport configured from settings
-3. Pass logger to command handlers
-4. Log command start/end, errors, and validation results
+2. Initialize pino file logger with settings
+3. Add file logging calls at key points (command start/end)
+4. Existing console output and logger usage remains unchanged
 
 Settings are optional - if not found, use defaults (enabled: true, level: info).
+
+**What does NOT change:**
+- Command handler implementations - no modifications
+- Existing logger.info/error/debug calls - keep working exactly as before
+- Direct console.log/error/warn calls (200+ throughout codebase) - untouched
+- Any output formatting or user-facing messages
 
 ### 5. Log Management
 
@@ -103,7 +119,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] `test_logger_respects_enabled_setting` - When `logging.enabled` is false, no file writes occur
 - [ ] `test_logger_respects_level_setting` - When `logging.level` is "error", info/debug logs are not written
 - [ ] `test_logger_uses_defaults_when_settings_missing` - Falls back to enabled=true, level=info
-- [ ] `test_logger_console_output_unchanged` - Console output continues to work as before
+- [ ] `test_logger_console_output_unchanged` - All existing console.* calls work identically
+- [ ] `test_no_console_calls_modified` - Verify zero changes to existing console usage (200+ calls)
 - [ ] `test_settings_schema_validates_logging_config` - Schema accepts valid logging config
 - [ ] `test_settings_schema_rejects_invalid_level` - Schema rejects invalid log levels
 - [ ] `test_settings_schema_provides_defaults` - Schema defaults logging.enabled=true, level=info
@@ -130,7 +147,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] Settings schema includes `system.logging` with correct types and defaults
 - [ ] Logger writes to `.sdd/system-logs/system-YYYY-MM-DD.log`
 - [ ] Log entries include command, timestamp, PID, session ID (if available)
-- [ ] Console output continues to work unchanged
+- [ ] **ALL existing console usage unchanged** (verified: no modifications to 200+ console calls)
+- [ ] Console output continues to work identically to before
 - [ ] Logger respects `logging.enabled` and `logging.level` settings
 - [ ] `.sdd/system-logs/` is gitignored
 - [ ] `npm run logs` tails latest log with pretty printing
