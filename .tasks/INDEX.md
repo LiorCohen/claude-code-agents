@@ -11,13 +11,13 @@
 
 ## Ready
 
-- [#110](3-ready/110/plan.md): Add pino logging to plugin/system with .sdd/system-logs output
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#110](4-implementing/110/plan.md): Add pino logging to plugin/system with .sdd/system-logs output
 
 ---
 

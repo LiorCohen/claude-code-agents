@@ -2,7 +2,7 @@
 
 ---
 id: 110
-status: ready
+status: implementing
 priority: medium
 created: 2026-02-08
 ---
