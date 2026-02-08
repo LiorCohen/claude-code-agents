@@ -36,6 +36,7 @@
 
 ## Medium Priority
 
+- [#110](1-inbox/110/): Add pino logging to plugin/system with .sdd/system-logs output
 - [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
