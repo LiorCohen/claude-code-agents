@@ -2,7 +2,7 @@
 
 ---
 id: 110
-status: inbox
+status: ready
 priority: medium
 created: 2026-02-08
 ---
