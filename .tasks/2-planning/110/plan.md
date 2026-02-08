@@ -7,7 +7,11 @@ created: 2026-02-08
 
 ## Problem Summary
 
-The plugin system lacks structured logging infrastructure. Console output (stdout/stderr) provides immediate feedback but doesn't persist information needed for debugging, auditing, or understanding system behavior over time. This plan adds comprehensive structured logging using pino, writing to date-partitioned log files in `.sdd/system-logs/`.
+The plugin system lacks structured logging infrastructure. Console output serves its purpose for user-facing feedback (progress, results, errors shown to the user), but the system doesn't record what happens for later debugging, auditing, or troubleshooting. This plan adds file-based system logging using pino, writing to date-partitioned log files in `.sdd/system-logs/`.
+
+**Important distinction:**
+- **Console = user output** (what users see in real-time)
+- **File logging = system logging** (what we record for debugging/audit)
 
 ## Files to Modify
 
@@ -37,19 +41,19 @@ Add new `system` section to settings schema with logging configuration:
 
 The settings schema validates these fields and provides defaults.
 
-### 3. Logger Implementation
+### 3. File Logger Implementation
 
-**CRITICAL CONSTRAINT: Zero changes to existing console usage. All 200+ existing console.log/error/warn calls throughout the codebase remain exactly as-is.**
+**CRITICAL CONSTRAINT: Zero changes to existing console output. Console is user-facing OUTPUT, not logging. All 200+ existing console.log/error/warn calls remain exactly as-is.**
 
-Enhance the logger module to ADD file logging alongside existing console behavior:
-- **Console output** - Zero changes. All existing console usage stays identical.
-- **File output** - NEW. Pino writes structured JSON logs to `.sdd/system-logs/system-YYYY-MM-DD.log`
+Add NEW pino-based file logger for system logging:
+- **Console output** - Zero changes. Console is for USER OUTPUT (progress, results, feedback). Stays identical.
+- **File logging** - NEW. Pino writes SYSTEM LOGS to `.sdd/system-logs/system-YYYY-MM-DD.log`
 
-The implementation adds a pino logger instance that:
-- Runs in parallel to existing console output
-- Logs to file when methods like `logger.info()`, `logger.error()` are called
+Create separate pino logger instance for file-based system logging:
+- Logs system events (command execution, errors, validation) to files
+- Does NOT touch console output
 - Does NOT intercept or modify any console.* calls
-- Does NOT replace existing logger behavior
+- Runs independently of user-facing console output
 
 File logger includes context in every log entry:
 - Command name (namespace + action)
@@ -73,9 +77,9 @@ Settings are optional - if not found, use defaults (enabled: true, level: info).
 
 **What does NOT change:**
 - Command handler implementations - no modifications
-- Existing logger.info/error/debug calls - keep working exactly as before
-- Direct console.log/error/warn calls (200+ throughout codebase) - untouched
+- All console output (200+ calls) - untouched. Console is for USER OUTPUT, not logging.
 - Any output formatting or user-facing messages
+- Existing logger.ts behavior - if it currently outputs to console, that stays
 
 ### 5. Log Management
 
@@ -119,8 +123,8 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] `test_logger_respects_enabled_setting` - When `logging.enabled` is false, no file writes occur
 - [ ] `test_logger_respects_level_setting` - When `logging.level` is "error", info/debug logs are not written
 - [ ] `test_logger_uses_defaults_when_settings_missing` - Falls back to enabled=true, level=info
-- [ ] `test_logger_console_output_unchanged` - All existing console.* calls work identically
-- [ ] `test_no_console_calls_modified` - Verify zero changes to existing console usage (200+ calls)
+- [ ] `test_console_output_unchanged` - All existing console output works identically (console is OUTPUT, not logging)
+- [ ] `test_no_console_calls_modified` - Verify zero changes to console usage (200+ calls)
 - [ ] `test_settings_schema_validates_logging_config` - Schema accepts valid logging config
 - [ ] `test_settings_schema_rejects_invalid_level` - Schema rejects invalid log levels
 - [ ] `test_settings_schema_provides_defaults` - Schema defaults logging.enabled=true, level=info
@@ -147,8 +151,9 @@ No blocking dependencies between schema updates and logger implementation - can 
 - [ ] Settings schema includes `system.logging` with correct types and defaults
 - [ ] Logger writes to `.sdd/system-logs/system-YYYY-MM-DD.log`
 - [ ] Log entries include command, timestamp, PID, session ID (if available)
-- [ ] **ALL existing console usage unchanged** (verified: no modifications to 200+ console calls)
-- [ ] Console output continues to work identically to before
+- [ ] **ALL existing console output unchanged** (verified: no modifications to 200+ console calls)
+- [ ] Console output (user-facing) continues to work identically to before
+- [ ] File logging (system logging) works independently of console output
 - [ ] Logger respects `logging.enabled` and `logging.level` settings
 - [ ] `.sdd/system-logs/` is gitignored
 - [ ] `npm run logs` tails latest log with pretty printing
