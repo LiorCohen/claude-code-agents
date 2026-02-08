@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
