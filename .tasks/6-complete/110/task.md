@@ -2,9 +2,10 @@
 
 ---
 id: 110
-status: implementing
+status: complete
 priority: medium
 created: 2026-02-08
+completed: 2026-02-08
 ---
 
 ## Description

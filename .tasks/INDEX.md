@@ -17,7 +17,7 @@
 
 ## Implementing
 
-- [#110](4-implementing/110/plan.md): Add pino logging to plugin/system with .sdd/system-logs output
+(none)
 
 ---
 
@@ -86,6 +86,7 @@
 
 ## Complete
 
+- [#110](6-complete/110/): Add pino logging to plugin/system with .sdd/system-logs output ✓ (2026-02-08)
 - [#104](6-complete/104/): sdd-run without arguments should show usage text ✓ (2026-02-08)
 - [#95](6-complete/95/): Fix commands standards violations from audit report ✓ (2026-02-08)
 - [#100](6-complete/100/): Ensure all sdd-change outputs use markdown with clickable links ✓ (2026-02-08)
