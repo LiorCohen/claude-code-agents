@@ -61,6 +61,7 @@
 
 ## Inbox (unprioritized)
 
+- [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#104](1-inbox/104/): sdd-run without arguments should show usage text
