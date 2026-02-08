@@ -4,14 +4,13 @@
 
 ## Planning
 
-- [#100](2-planning/100/): Ensure all sdd-change outputs use markdown with clickable links
 - [#67](2-planning/67/): Store user instructions in plans, specs, and .sdd/
 
 ---
 
 ## Ready
 
-(none)
+- [#100](3-ready/100/): Ensure all sdd-change outputs use markdown with clickable links
 
 ---
 
