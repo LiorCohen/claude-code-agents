@@ -38,11 +38,16 @@ Instead of requiring users to remember specific commands like `/sdd-init`, `/sdd
 - Enables continuity across sessions and smarter context inference
 - State file may be committed (shared team context) or git-ignored (local) depending on use case
 
+## Consolidated From
+
+- **#10**: Missing /sdd-help command — a context-aware `/sdd` command should provide help/guidance when users are stuck
+
 ## Acceptance Criteria
 
 - [ ] Single `/sdd` command entry point that handles all SDD workflows
 - [ ] Namespaced subcommands for explicit control (`/sdd init`, `/sdd change`, etc.)
 - [ ] Default mode (no args) infers action from project state and session context
+- [ ] Help/guidance mode when users are stuck or need direction (from #10)
 - [ ] State file in `.sdd/` directory for workflow memory and session continuity
 - [ ] Context detection for project state (new project, existing project, mid-implementation)
 - [ ] Intent inference from natural language descriptions

@@ -52,7 +52,6 @@
 - [#3](1-inbox/3/): Docs missing: CMDO Guide
 - [#24](1-inbox/24/): Add plugin Slack support
 - [#31](1-inbox/31/): Welcome prompt after plugin installation
-- [#10](1-inbox/10/): Missing /sdd-help command
 - [#22](1-inbox/22/): Add critic agent to marketplace
 - [#26](1-inbox/26/): Better session separators/visual indicators
 - [#20](1-inbox/20/): Plugin installation debugging skill + workflow fix
@@ -164,3 +163,4 @@
 - [#48](8-consolidated/48/) → #87
 - [#57](8-consolidated/57/) → #44
 - [#101](8-consolidated/101/) → #100
+- [#10](8-consolidated/10/) → #66

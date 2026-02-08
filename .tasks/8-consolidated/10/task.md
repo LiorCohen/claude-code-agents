@@ -2,8 +2,9 @@
 id: 10
 title: Missing /sdd-help command
 priority: low
-status: open
+status: consolidated
 created: 2026-01-25
+consolidated_into: 66
 ---
 
 # Task 10: Missing /sdd-help command
