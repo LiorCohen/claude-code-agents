@@ -19,6 +19,32 @@ Manage project configuration for SDD projects.
 - `diff` - Show differences between environments
 - `add-env` - Add a new environment directory
 
+### When Called Without Arguments
+
+When invoked without an operation, displays a usage guide:
+
+```
+⚠ Missing required operation argument.
+
+USAGE:
+  /sdd-config <operation> [options]
+
+OPERATIONS:
+  generate    Generate merged config file for a target environment
+  validate    Validate config against schemas
+  diff        Show differences between environments
+  add-env     Add a new environment directory
+
+EXAMPLES:
+  /sdd-config generate --env production
+  /sdd-config validate
+  /sdd-config diff local production
+  /sdd-config add-env staging
+
+NEXT STEPS:
+  Run /sdd-config <operation> to get started, or see details below.
+```
+
 ## Operations
 
 ### generate

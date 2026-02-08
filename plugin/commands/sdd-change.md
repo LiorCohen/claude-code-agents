@@ -13,6 +13,52 @@ Unified command for the entire change lifecycle. Replaces the separate `sdd-new-
 /sdd-change <action> [args] [options]
 ```
 
+### When Called Without Arguments
+
+When invoked without an action, displays a usage guide:
+
+```
+⚠ Missing required action argument.
+
+USAGE:
+  /sdd-change <action> [args] [options]
+
+ACTIONS:
+  new              Create a new change (interactive or from external spec)
+  status           Show current workflow state and all change IDs
+  continue         Resume current workflow from persisted state
+  list             List all changes in current workflow
+  approve spec     Approve SPEC.md, trigger PLAN.md creation
+  approve plan     Approve PLAN.md, enable implementation
+  implement        Start implementation (requires plan_approved)
+  verify           Verify implementation, mark complete
+  review           Submit for user review (after implementation)
+  plan             Begin planning phase (after ALL specs approved)
+  answer           Answer an open question
+  assume           Mark question as assumption
+  regress          Go back to earlier phase
+  request-changes  Request changes during review
+
+COMMON WORKFLOWS:
+
+  Start new feature:
+    /sdd-change new --type feature --name user-auth
+
+  Import external spec:
+    /sdd-change new --spec /path/to/requirements.md
+
+  Resume work:
+    /sdd-change continue
+
+  Approve and implement:
+    /sdd-change approve spec <change-id>
+    /sdd-change approve plan <change-id>
+    /sdd-change implement <change-id>
+
+NEXT STEPS:
+  Run /sdd-change <action> to get started, or see Quick Reference below.
+```
+
 ## Actions
 
 | Action | Description | Example |

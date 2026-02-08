@@ -1,7 +1,6 @@
 ---
 name: commands-standards
 description: Standards for authoring SDD plugin commands — frontmatter, user interaction, skill/agent invocation, CLI integration, and output formatting.
-user-invocable: false
 ---
 
 # Commands Standards
@@ -183,6 +182,61 @@ Or inline within a flow step:
 
 ---
 
+## Argument Handling
+
+Commands must be designed with clear argument requirements and provide helpful guidance when invoked incorrectly.
+
+### Rules
+
+1. **Never run without arguments unless designed for it** — Commands should not execute their primary workflow when called without arguments, unless the command's only intended use is without arguments (e.g., `/sdd-init` which initializes a new project). Multi-action commands like `/sdd-config` or `/sdd-change` must require at least an action argument.
+2. **Show focused usage guide for insufficient arguments** — When a command is invoked with missing or insufficient required arguments, display a focused usage guide showing:
+   - Command syntax with all actions and arguments
+   - Brief description of each action
+   - Example invocations that demonstrate the missing arguments
+   - `NEXT STEPS` section pointing to how to proceed
+
+   The usage guide should be tailored to what's missing. For example:
+   - Zero arguments → show full command usage
+   - Missing action (e.g., `/sdd-config` without operation) → show all available actions
+   - Missing required flags (e.g., `/sdd-config generate` without `--env`) → show that action's usage with required flags highlighted
+3. **Fail fast on missing arguments** — Don't prompt for missing arguments interactively when the argument structure is invalid. Show the usage guide and exit. Interactive prompts should only happen during valid workflow execution (e.g., asking which option to select), not to recover from invalid invocation.
+4. **Consistent help patterns** — Commands with a `--help` or `-h` flag should show the same usage guide as when invoked without arguments. The usage guide is the canonical reference.
+
+### Example: Multi-action command invoked without arguments
+
+```
+$ /sdd-config
+
+⚠ Missing required action argument.
+
+USAGE:
+  /sdd-config <action> [options]
+
+ACTIONS:
+  generate    Generate merged configuration for an environment
+  validate    Validate configuration against schema
+  diff        Compare configurations between environments
+
+EXAMPLES:
+  /sdd-config generate --env production
+  /sdd-config validate
+  /sdd-config diff --from dev --to staging
+
+NEXT STEPS:
+  Run /sdd-config <action> to get started, or /sdd-config <action> --help for details.
+```
+
+### Example: Zero-argument command (sdd-init)
+
+```
+$ /sdd-init
+
+# This command is designed to run without arguments, so it proceeds directly
+# to its initialization workflow. It does not show a usage guide.
+```
+
+---
+
 ## Actions and Subcommands
 
 Commands with multiple operations use an actions pattern. Each action is a distinct workflow the user can invoke.
@@ -354,6 +408,8 @@ Use when creating or reviewing a plugin command:
 - [ ] `description` is 1-2 sentences: what the command does from the user's perspective
 - [ ] H1 title includes the leading slash (e.g., `# /sdd-config`)
 - [ ] `## Usage` section with syntax code block
+- [ ] Command requires arguments unless designed to run without them (like `sdd-init`)
+- [ ] When called without required arguments, shows comprehensive usage guide (not an error message)
 - [ ] Multi-action commands have a summary table before action detail sections
 - [ ] Each action has: Usage, Arguments (if any), Flow, Output
 - [ ] Every INVOKE specifies inputs and documents expected output

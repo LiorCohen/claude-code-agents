@@ -13,6 +13,38 @@ Manage your local development environment and validate artifacts.
 /sdd-run <namespace> <action> [args] [options]
 ```
 
+### When Called Without Arguments
+
+When invoked without namespace and action, displays a usage guide:
+
+```
+⚠ Missing required arguments.
+
+USAGE:
+  /sdd-run <namespace> <action> [args] [options]
+
+NAMESPACES:
+  database      Manage local PostgreSQL databases (setup, migrate, seed, reset, psql)
+  contract      Validate OpenAPI specifications
+  env           Manage local Kubernetes environments (create, deploy, status)
+  permissions   Configure Claude Code permissions for SDD
+
+EXAMPLES:
+  /sdd-run database setup my-db
+  /sdd-run contract validate my-api
+  /sdd-run env create
+  /sdd-run env deploy
+  /sdd-run permissions configure
+
+GLOBAL OPTIONS:
+  --json       Output in JSON format
+  --verbose    Enable verbose logging
+  --help       Show help for namespace/action
+
+NEXT STEPS:
+  Run /sdd-run <namespace> <action> to get started, or see details below.
+```
+
 ## When to Use
 
 While workflow commands (`/sdd-init`, `/sdd-change`, etc.) orchestrate multi-step processes with agents, `/sdd-run` gives you direct control over local dev operations—spinning up databases, running migrations, or validating your API contract.
@@ -152,7 +184,7 @@ Manages port forwards for local access to services.
 /sdd-run env config
 ```
 
-Generates `components/config/envs/local/config.yaml` with localhost URLs matching port-forwarded services.
+Generates [local/config.yaml](components/config/envs/local/config.yaml) with localhost URLs matching port-forwarded services.
 
 ### Install Infrastructure
 

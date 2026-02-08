@@ -66,8 +66,8 @@ When you modify settings, the following happens automatically:
 1. **Working tree check** - If uncommitted changes exist:
    ```
    You have uncommitted changes in:
-   - components/servers/main-server/model/user.ts
-   - components/config/envs/default/config.yaml
+   - [model/user.ts](components/servers/main-server/model/user.ts)
+   - [envs/default/config.yaml](components/config/envs/default/config.yaml)
 
    Settings changes may modify these files. Options:
    [1] Auto-commit current changes (recommended)
@@ -80,8 +80,8 @@ When you modify settings, the following happens automatically:
 3. **Preview** - Show what will happen:
    ```
    Adding database 'reporting-db' to main-server will:
-   - Add DAL layer for reporting-db in components/servers/main-server/dal/
-   - Add database config section in components/config/envs/*/config.yaml
+   - Add DAL layer for reporting-db in [dal/](components/servers/main-server/dal/)
+   - Add database config section in [envs/*/config.yaml](components/config/envs/)
    - Update helm chart values with new DB connection
 
    Proceed? [y/n]
@@ -109,7 +109,7 @@ Refer to the `project-settings` skill for:
 ```
 
 Result:
-- Adds DAL layer at `components/servers/main-server/dal/analytics-db/`
+- Adds DAL layer at [dal/analytics-db/](components/servers/main-server/dal/analytics-db/)
 - Adds config section:
   ```yaml
   main-server:
@@ -128,8 +128,8 @@ Result:
 ```
 
 Result:
-- Adds `templates/ingress.yaml` to the helm chart
-- Updates `values.yaml` with ingress configuration
+- Adds [templates/ingress.yaml](components/helm-charts/main-server-api/templates/ingress.yaml) to the helm chart
+- Updates [values.yaml](components/helm-charts/main-server-api/values.yaml) with ingress configuration
 
 ### Convert Server to Hybrid
 
