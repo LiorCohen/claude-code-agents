@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#98](4-implementing/98/): Plan templates don't reference standards skills
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#98](5-reviewing/98/): Plan templates don't reference standards skills
 
 ---
 

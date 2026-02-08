@@ -2,7 +2,7 @@
 id: 98
 title: Plan templates don't reference standards skills
 priority: high
-status: implementing
+status: reviewing
 created: 2026-02-08
 depends_on: []
 blocks: []
