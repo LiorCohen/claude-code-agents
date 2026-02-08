@@ -5,7 +5,6 @@
 ## Planning
 
 - [#67](2-planning/67/): Store user instructions in plans, specs, and .sdd/
-- [#98](2-planning/98/): Plan templates don't reference standards skills
 
 ---
 
@@ -17,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#98](4-implementing/98/): Plan templates don't reference standards skills
 
 ---
 
