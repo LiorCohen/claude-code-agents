@@ -244,6 +244,11 @@ Commands produce user-facing terminal output. Consistent formatting makes the pl
 | Indented details | Two-space indent under parent |
 | Status tables | Aligned columns with `─────` separator |
 | Next steps | `NEXT STEPS:` header with numbered items |
+| File references | `[filename.ext](relative/path/to/file.ext)` for clickable links |
+| Line-specific refs | `[filename.ts:42](path/to/filename.ts#L42)` for specific lines |
+| Directory refs | `[dirname/](path/to/dirname/)` for folders |
+| Change ID refs | `[a1b2-1](changes/.../01-registration/)` linking to change directory |
+| Task refs | `[#19](.tasks/.../19/task.md)` following tasks skill convention |
 
 ### Rules
 
@@ -251,6 +256,7 @@ Commands produce user-facing terminal output. Consistent formatting makes the pl
 2. **Structured, not conversational** — Output uses tables, aligned columns, and headers — not paragraphs of prose. Users scan terminal output; they don't read it.
 3. **Status indicators are consistent** — Use `✓`/`✗`/`⚠` across all commands. Don't invent custom indicators.
 4. **Box headers for major milestones** — Use the `═══════` box format for completion messages and major state transitions. Don't use it for intermediate steps.
+5. **Use markdown links for all file/directory references** — Every file path shown in output must use markdown link syntax relative to the repo root. This enables click-to-navigate in VSCode terminals. Plain-text paths are only acceptable when the path itself is the subject (e.g., showing what would be created in a dry-run or displaying file tree structure).
 
 ---
 

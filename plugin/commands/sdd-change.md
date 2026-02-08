@@ -181,7 +181,7 @@ This moves the item from drafts to changes/ and sets status to `spec_review`.
 ===============================================================
 
 Change: a1b2-1 (User Authentication)
-Spec: changes/2026/02/05/a1b2c3/01-user-auth/SPEC.md
+Spec: [SPEC.md](changes/2026/02/05/a1b2c3/01-user-auth/SPEC.md)
 
 Please review the specification.
 
@@ -216,7 +216,7 @@ Same as interactive flow - suggest branch if on main/master.
 Copy to `.sdd/archive/external-specs/` with format: `yyyymmdd-lowercased-filename.md`
 
 ```
-Archived external spec to: .sdd/archive/external-specs/20260205-feature-spec.md
+Archived external spec to: [.sdd/archive/external-specs/20260205-feature-spec.md](.sdd/archive/external-specs/20260205-feature-spec.md)
 (This is read-only - for audit trail only)
 ```
 
@@ -344,7 +344,7 @@ INVOKE spec-solicitation skill with:
 Created workflow: a1b2c3
 Items: 5 features across 2 epics
 
-Current: a1b2-1 (Registration)
+Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 Status: Spec solicitation in progress
 
 IMPORTANT: Specs are created interactively, one at a time.
@@ -384,17 +384,17 @@ Workflow: a1b2c3
 Source: external
 Created: 2026-02-05
 
-Current: a1b2-1 (Registration) - spec_review
+Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration) - spec_review
 
 ITEMS:
-  a1b2-1  Registration         spec_review    changes/2026/02/05/a1b2c3/01-registration/
-  a1b2-2  Authentication       pending        .sdd/workflows/a1b2c3/drafts/...
-  a1b2-3  Password Reset       pending        .sdd/workflows/a1b2c3/drafts/...
-  a1b2-4  Analytics            pending        .sdd/workflows/a1b2c3/drafts/...
-  a1b2-5  Settings             pending        .sdd/workflows/a1b2c3/drafts/...
+  a1b2-1  Registration         spec_review    [changes/...](changes/2026/02/05/a1b2c3/01-registration/)
+  a1b2-2  Authentication       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
+  a1b2-3  Password Reset       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
+  a1b2-4  Analytics            pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
+  a1b2-5  Settings             pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
 
 NEXT ACTION:
-  Review spec at: changes/2026/02/05/a1b2c3/01-registration/SPEC.md
+  Review spec at: [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
   Then run: /sdd-change approve spec a1b2-1
 ```
 
@@ -431,7 +431,7 @@ Resume current workflow from persisted state.
 ```
 Resuming workflow a1b2c3...
 
-Current: a1b2-1 (Registration)
+Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 Status: soliciting (spec creation in progress)
 
 Previously collected:
@@ -471,13 +471,13 @@ List all changes in current workflow.
 
 ID        TITLE                 TYPE      STATUS         LOCATION
 ───────── ───────────────────── ───────── ────────────── ─────────────────────────
-a1b2-1    Registration          feature   spec_review    changes/2026/02/05/...
-a1b2-2    Authentication        feature   pending        .sdd/workflows/...
-a1b2-3    Password Reset        feature   pending        .sdd/workflows/...
+a1b2-1    Registration          feature   spec_review    [changes/...](changes/2026/02/05/a1b2c3/01-registration/)
+a1b2-2    Authentication        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/02-authentication/)
+a1b2-3    Password Reset        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/03-password-reset/)
 
 Dependencies:
-  a1b2-2 depends on: a1b2-1
-  a1b2-3 depends on: a1b2-2
+  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) depends on: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/)
+  [a1b2-3](changes/2026/02/05/a1b2c3/03-password-reset/) depends on: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/)
 ```
 
 ---
@@ -509,12 +509,12 @@ Approve SPEC.md and trigger PLAN.md creation.
 ### Output
 
 ```
-Approving spec for: a1b2-1 (Registration)
+Approving spec for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
-Reading SPEC.md...
+Reading [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)...
 Generating PLAN.md...
 
-PLAN.md created at: changes/2026/02/05/a1b2c3/01-registration/PLAN.md
+PLAN.md created at: [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md)
 
 Status: plan_review
 
@@ -545,7 +545,7 @@ Approve PLAN.md and enable implementation.
 ### Output
 
 ```
-Approving plan for: a1b2-1 (Registration)
+Approving plan for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
 Status: plan_approved
 
@@ -554,7 +554,7 @@ NEXT STEPS:
     /sdd-change implement a1b2-1
 
   Option 2: Continue with next change
-    Next: a1b2-2 (Authentication)
+    Next: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication)
     Run: /sdd-change continue
 ```
 
@@ -623,16 +623,16 @@ INVOKE workflow-state.update_status with:
 ### Output
 
 ```
-Implementing: a1b2-1 (Registration)
+Implementing: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
 Step 1: Loading spec and plan...
-  Read PLAN.md
-  Read SPEC.md
+  Read [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md)
+  Read [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
   [Displays comprehensive summary]
 
 Step 2: Executing Domain Updates...
   Adding glossary term: User
-  Creating definition: specs/domain/definitions/user.md
+  Creating definition: [specs/domain/definitions/user.md](specs/domain/definitions/user.md)
   Domain updates complete
 
 Step 3: Beginning implementation phases...
@@ -730,8 +730,8 @@ For each affected component:
 ```markdown
 ## Verification Report: Registration
 
-**Change ID:** a1b2-1
-**Spec:** changes/2026/02/05/a1b2c3/01-registration/SPEC.md
+**Change ID:** [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/)
+**Spec:** [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
 **Date:** 2026-02-05
 
 ### Specs Traceability
@@ -777,7 +777,7 @@ INVOKE workflow-state.advance
 ### Output
 
 ```
-Verifying: a1b2-1 (Registration)
+Verifying: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
 Step 1: Loading spec...
 Step 2: Validating specs traceability...
@@ -792,10 +792,10 @@ Step 5: Verifying implementation...
 
 VERIFICATION PASSED
 
-Change a1b2-1 marked complete.
+Change [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) marked complete.
 
 NEXT:
-  Next change: a1b2-2 (Authentication)
+  Next change: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication)
   Run: /sdd-change continue
 ```
 
@@ -834,12 +834,12 @@ Checking phase gate: ALL specs approved ✓
 
 Creating plans in dependency order:
 
-  a1b2-1 (Registration)
-    PLAN.md created
+  [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+    [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md) created
     Status: plan_ready_for_review
 
-  a1b2-2 (Authentication) [depends on: a1b2-1]
-    PLAN.md created
+  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication) [depends on: a1b2-1]
+    [PLAN.md](changes/2026/02/05/a1b2c3/02-authentication/PLAN.md) created
     Status: plan_ready_for_review
 
 Plans created: 2
@@ -870,12 +870,12 @@ Submit a change for user review after implementation.
 ### Output
 
 ```
-Submitting for review: a1b2-1 (Registration)
+Submitting for review: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
 Implementation complete. Ready for user review.
 
 REVIEW CHECKLIST:
-  [ ] Check SPEC.md requirements are met
+  [ ] Check [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md) requirements are met
   [ ] Review changed files in git diff
   [ ] Verify tests pass
   [ ] Check specs/ changes match declaration
@@ -996,22 +996,22 @@ Go back to an earlier phase (e.g., from planning back to spec).
 ### Output
 
 ```
-Regressing a1b2-1 to spec phase...
+Regressing [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) to spec phase...
 
 Reason: Need to add OAuth support
 
 Archived:
-  PLAN.md → .sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md
+  [PLAN.md](.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md) → [.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md](.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md)
 
 Status changes:
   spec_status: approved → needs_rereview
   plan_status: approved → pending
 
 Dependent items flagged for re-review:
-  a1b2-2 (Authentication) - depends on a1b2-1
+  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication) - depends on a1b2-1
 
 NEXT STEPS:
-  Edit SPEC.md to add OAuth requirements
+  Edit [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md) to add OAuth requirements
   Then run: /sdd-change approve spec a1b2-1
 ```
 
@@ -1044,7 +1044,7 @@ Request changes during the review phase.
 ### Output
 
 ```
-Requesting changes for: a1b2-1 (Registration)
+Requesting changes for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
 
 Reason: Error messages need to be more user-friendly
 
