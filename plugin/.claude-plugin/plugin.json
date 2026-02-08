@@ -1,8 +1,20 @@
 {
   "name": "sdd",
-  "version": "6.3.2",
+  "version": "6.3.3",
   "description": "Spec-driven development methodology for full-stack teams",
   "author": {
     "name": "Lior Cohen"
-  }
+  },
+  "skills": [
+    "./skills/",
+    "./skills/components/backend/",
+    "./skills/components/frontend/",
+    "./skills/components/database/",
+    "./skills/components/contract/",
+    "./skills/components/config/",
+    "./skills/components/cicd/",
+    "./skills/components/helm/",
+    "./skills/components/e2e-testing/",
+    "./skills/components/integration-testing/"
+  ]
 }
