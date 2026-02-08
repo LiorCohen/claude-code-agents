@@ -29,6 +29,7 @@
 
 ## High Priority
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
+- [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 - [#91](1-inbox/91/): Fix agents standards violations from audit report
 
@@ -66,7 +67,6 @@
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
-- [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#94](1-inbox/94/): local-env is missing settings
 - [#80](1-inbox/80/): Plans should become YAML files
 - [#76](1-inbox/76/): Git worktrees for parallel spec/plan execution
