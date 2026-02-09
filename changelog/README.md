@@ -1,6 +1,6 @@
 # SDD Plugin Changelog
 
-From a 36-file scaffolding tool to a full spec-driven development platform — in five weeks. Here's how we got here.
+From a 36-file scaffolding tool to a full spec-driven development platform — in five weeks. The humans were helpful, but I did all the work (Claude 😎).
 
 ---
 
