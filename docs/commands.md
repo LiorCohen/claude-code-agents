@@ -294,26 +294,29 @@ Show the installed plugin version and the project's plugin version, highlighting
 
 **What it shows:**
 - The installed SDD plugin version (from `plugin.json`)
-- The project's plugin version (from `.sdd/sdd-settings.yaml`)
+- The project's current plugin version (from `sdd.updated_by_plugin_version` in `.sdd/sdd-settings.yaml`)
+- The version that originally created the project (from `sdd.initialized_by_plugin_version`)
 - Whether the project is up to date, outdated, or newer than the installed plugin
 
 **Example output (versions match):**
 ```
 SDD Plugin
 
-  Installed:  6.5.0
-  Project:    6.5.0  ✓ match
+  Installed:       6.5.0
+  Project:         6.5.0  ✓ match
+  Originally from: 6.2.0
 ```
 
 **Example output (project outdated):**
 ```
 SDD Plugin
 
-  Installed:  6.5.0
-  Project:    6.2.0  ⚠ outdated
+  Installed:       6.5.0
+  Project:         6.2.0  ⚠ outdated
+  Originally from: 6.0.0
 
-The project was created with an older plugin version.
-Run /sdd-init to upgrade project settings and repair any drift.
+The project settings were last reconciled with an older plugin version.
+Run /sdd-init to reconcile settings with the current plugin.
 ```
 
 ---

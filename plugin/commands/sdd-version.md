@@ -23,12 +23,13 @@ Display the installed SDD plugin version and the project's plugin version, highl
 
 1. Read the installed plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `version` field
 2. Check if `.sdd/sdd-settings.yaml` exists in the current directory
-3. If it exists, read the project plugin version from `sdd.plugin_version`
-4. Compare versions using semver:
+3. If it exists, read the project plugin version from `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version` for pre-reconciliation files)
+4. Optionally read `sdd.initialized_by_plugin_version` for context (the version that first created the project)
+5. Compare versions using semver:
    - **Match** — installed and project versions are the same
    - **Project outdated** — project version is older than installed version (the common case after a plugin upgrade)
    - **Project newer** — project version is newer than installed (unusual — may indicate a downgraded plugin)
-5. Display the version report
+6. Display the version report
 
 ## Output
 
@@ -37,8 +38,9 @@ Display the installed SDD plugin version and the project's plugin version, highl
 ```
 SDD Plugin
 
-  Installed:  6.5.0
-  Project:    6.5.0  ✓ match
+  Installed:       6.5.0
+  Project:         6.5.0  ✓ match
+  Originally from: 6.2.0
 ```
 
 ### When project is outdated (installed is newer)
@@ -46,11 +48,12 @@ SDD Plugin
 ```
 SDD Plugin
 
-  Installed:  6.5.0
-  Project:    6.2.0  ⚠ outdated
+  Installed:       6.5.0
+  Project:         6.2.0  ⚠ outdated
+  Originally from: 6.0.0
 
-The project was created with an older plugin version.
-Run /sdd-init to upgrade project settings and repair any drift.
+The project settings were last reconciled with an older plugin version.
+Run /sdd-init to reconcile settings with the current plugin.
 ```
 
 ### When project is newer than installed (unusual)
@@ -58,8 +61,9 @@ Run /sdd-init to upgrade project settings and repair any drift.
 ```
 SDD Plugin
 
-  Installed:  6.3.0
-  Project:    6.5.0  ⚠ installed plugin is older than project
+  Installed:       6.3.0
+  Project:         6.5.0  ⚠ installed plugin is older than project
+  Originally from: 6.0.0
 
 The installed plugin is older than what this project expects.
 Run: claude plugins update sdd

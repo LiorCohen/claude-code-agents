@@ -118,12 +118,15 @@ describe('sdd-change new with external spec', () => {
 
     await writeFileAsync(
       joinPath(testProject.path, '.sdd', 'sdd-settings.yaml'),
-      `plugin_version: "5.0.0"
+      `sdd:
+  initialized_by_plugin_version: "5.0.0"
+  updated_by_plugin_version: "5.0.0"
+  initialized_at: "2026-01-01 00:00:00Z"
+  updated_at: "2026-01-01 00:00:00Z"
 project:
   name: test-external-spec
   description: Test project for external spec import
-  domain: User Management
-  type: fullstack
+components: []
 `
     );
 

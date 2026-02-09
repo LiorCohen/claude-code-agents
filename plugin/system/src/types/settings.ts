@@ -303,12 +303,14 @@ export const isHelmWebappSettings = (
 
 /** SDD metadata in settings file */
 export interface SddMetadata {
-  /** SDD plugin version that created this project */
-  readonly plugin_version: string;
-  /** Date project was initialized (YYYY-MM-DD) */
+  /** Plugin version that first created this project (immutable after init) */
+  readonly initialized_by_plugin_version: string;
+  /** Plugin version that last reconciled settings */
+  readonly updated_by_plugin_version: string;
+  /** UTC datetime project was initialized (YYYY-MM-DD HH:MM:SSZ) */
   readonly initialized_at: string;
-  /** Date settings were last modified (YYYY-MM-DD) */
-  readonly last_updated: string;
+  /** UTC datetime settings were last updated (YYYY-MM-DD HH:MM:SSZ) */
+  readonly updated_at: string;
 }
 
 /** Project metadata in settings file */
@@ -316,11 +318,7 @@ export interface ProjectMetadata {
   /** Project name (lowercase, hyphens) */
   readonly name: string;
   /** Project description */
-  readonly description: string;
-  /** Primary business domain */
-  readonly domain: string;
-  /** Project type */
-  readonly type: 'fullstack' | 'backend' | 'frontend' | 'custom';
+  readonly description?: string;
 }
 
 /** Complete settings file schema */

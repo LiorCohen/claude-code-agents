@@ -108,6 +108,22 @@ describe('settings.ts source file', () => {
     expect(content).toContain('export const isHelmWebappSettings');
   });
 
+  it('exports SddMetadata interface with split version fields', () => {
+    const content = readFile(SETTINGS_TYPES_PATH);
+    expect(content).toContain('export interface SddMetadata');
+    expect(content).toContain('readonly initialized_by_plugin_version: string');
+    expect(content).toContain('readonly updated_by_plugin_version: string');
+    expect(content).toContain('readonly initialized_at: string');
+    expect(content).toContain('readonly updated_at: string');
+  });
+
+  it('exports ProjectMetadata with name required and description optional', () => {
+    const content = readFile(SETTINGS_TYPES_PATH);
+    expect(content).toContain('export interface ProjectMetadata');
+    expect(content).toContain('readonly name: string');
+    expect(content).toContain('readonly description?: string');
+  });
+
   it('exports SettingsFile interface', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
     expect(content).toContain('export interface SettingsFile');

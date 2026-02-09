@@ -153,24 +153,16 @@ describe('settings file schema', () => {
 
   it('requires sdd metadata section', () => {
     expect(content).toContain('sddMetadataSchema');
-    expect(content).toContain("'plugin_version'");
+    expect(content).toContain("'initialized_by_plugin_version'");
+    expect(content).toContain("'updated_by_plugin_version'");
     expect(content).toContain("'initialized_at'");
-    expect(content).toContain("'last_updated'");
+    expect(content).toContain("'updated_at'");
   });
 
   it('requires project metadata section', () => {
     expect(content).toContain('projectMetadataSchema');
     expect(content).toContain("'name'");
-    expect(content).toContain("'description'");
-    expect(content).toContain("'domain'");
-    expect(content).toContain("'type'");
-  });
-
-  it('validates project type enum', () => {
-    expect(content).toContain("'fullstack'");
-    expect(content).toContain("'backend'");
-    expect(content).toContain("'frontend'");
-    expect(content).toContain("'custom'");
+    expect(content).toContain("required: ['name']");
   });
 
   it('requires components array', () => {

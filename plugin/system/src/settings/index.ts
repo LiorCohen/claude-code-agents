@@ -33,7 +33,14 @@ export type {
   DatabaseComponent,
   ContractComponent,
   ConfigComponent,
+  TestingComponent,
+  CicdComponent,
   Component,
+  TestingSettings,
+  CicdSettings,
+  LogLevel,
+  LoggingSettings,
+  SystemSettings,
   SddMetadata,
   ProjectMetadata,
   SettingsFile,
@@ -87,6 +94,14 @@ export {
   generateWebappConfigSection,
   formatSyncPreview,
 } from './sync';
+
+// Re-export reconciliation
+export type {
+  ReconciliationChange,
+  ReconciliationWarning,
+  ReconciliationResult,
+} from './reconcile';
+export { reconcileSettings } from './reconcile';
 
 // Re-export helm sync utilities
 export type { HelmTemplateSet } from './sync-helm';
