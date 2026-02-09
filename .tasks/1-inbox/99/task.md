@@ -86,8 +86,7 @@ sdd:
 project:
   name: "my-app"                       # Preserved
   description: "My application"        # Preserved
-  domain: "ecommerce"                  # Preserved
-  type: "fullstack"                    # Preserved
+  # domain and type removed (deprecated — functionality moved to sdd-change)
 components:
   - name: "api-server"                 # Preserved
     type: "server"                     # Preserved
@@ -172,6 +171,9 @@ We considered three approaches:
   - `initialized_at` → keep name, convert date-only to full datetime with timezone (append `00:00:00 +0000` for unknown times)
   - `last_updated` → rename to `updated_at`, set to current datetime
   - Remove old field names after migration
+- Remove deprecated `project` fields:
+  - `domain` and `type` are leftovers from earlier sdd-init iterations — that functionality now lives in sdd-change
+  - `ProjectMetadata` should only contain `name` and `description`
 - Add missing optional fields with schema defaults (additive only)
 - Update `sdd.updated_by_plugin_version` to current version
 - Update `sdd.updated_at` to current datetime
@@ -199,5 +201,6 @@ We considered three approaches:
 - [ ] `sdd` metadata migrated to new schema (`initialized_by_plugin_version`, `updated_by_plugin_version`, `initialized_at`, `updated_at`)
 - [ ] `sdd.updated_by_plugin_version` and `sdd.updated_at` are updated after reconciliation
 - [ ] `sdd.initialized_by_plugin_version` and `sdd.initialized_at` are preserved (immutable after first init)
-- [ ] User is informed of any fields added during reconciliation
+- [ ] Deprecated `project.domain` and `project.type` fields removed during reconciliation
+- [ ] User is informed of any fields added or removed during reconciliation
 - [ ] Schema validation confirms reconciled settings are valid
