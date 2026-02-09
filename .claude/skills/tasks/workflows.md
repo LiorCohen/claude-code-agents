@@ -137,12 +137,62 @@ User: /tasks review 19
 
 **Workflow:**
 1. Find task folder
-2. Move folder to `5-reviewing/`
-3. Update `task.md` frontmatter: `status: reviewing`
-4. Update INDEX.md
-5. Commit the task transition on main (e.g., "Tasks: Move #19 to reviewing")
+2. **Ask the user:** "Would you like me to generate a change report before moving to review?"
+3. If the user says yes, generate a `changes.md` file in the task folder (see **Change Report Format** below)
+4. Move folder to `5-reviewing/`
+5. Update `task.md` frontmatter: `status: reviewing`
+6. Update INDEX.md
+7. Commit the task transition on main (e.g., "Tasks: Move #19 to reviewing")
 
 Use when implementation is complete and ready for review.
+
+### Change Report Format
+
+The change report is saved as `changes.md` in the task folder (e.g., `.tasks/5-reviewing/19/changes.md`). It documents every file changed on the feature branch vs main.
+
+**How to generate:**
+1. Run `git diff main..HEAD --stat` to get the file list and line counts
+2. Run `git diff main..HEAD` to get the full diff
+3. Write `changes.md` with one section per file, each containing:
+   - A clickable markdown link to the file
+   - The file path as a heading
+   - A one-line description of what changed
+   - The actual diff in a syntax-highlighted fenced code block
+
+**Template:**
+
+```markdown
+# Task #<id> — Change Report
+
+**Branch:** `<branch-name>`
+**Commits:** <count>
+**Files changed:** <count> (+<additions> / -<deletions> lines)
+
+---
+
+## 1. [`<file-path>`](<file-path>)
+
+<One-line description of what changed.>
+
+\`\`\`diff
+<actual diff for this file>
+\`\`\`
+
+---
+
+## 2. [`<file-path>`](<file-path>)
+
+...
+```
+
+**Rules:**
+- One section per changed file, numbered sequentially
+- Each heading is a clickable markdown link to the file (e.g., `[plugin/system/src/cli.ts](plugin/system/src/cli.ts)`)
+- Each section has the file link, a brief description, and the diff
+- Use `diff` as the code fence language for all diffs (provides +/- syntax highlighting)
+- For new files where you show the full content instead of a diff, use the file's language for syntax highlighting (e.g., `typescript`, `json`, `yaml`, `markdown`)
+- New files show the full content
+- Order files logically (core types first, then modules, then commands, then tests, then version/changelog)
 
 **NEVER** merge the feature branch or delete the worktree during reviewing. The worktree and branch persist until the task is completed via `/tasks complete`.
 

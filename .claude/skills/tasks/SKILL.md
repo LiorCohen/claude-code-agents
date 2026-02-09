@@ -33,6 +33,7 @@ Manage the project backlog, track progress, and organize implementation plans.
 Each task is a folder named by its ID containing:
 - `task.md` - the task description and metadata
 - `plan.md` - the implementation plan (created during planning phase)
+- `changes.md` - change report (optional, generated when moving to review)
 
 **Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories but grouped by priority in INDEX.md.
 
@@ -142,10 +143,12 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 /tasks review <id>
 ```
 
-1. Move to `5-reviewing/`
-2. Update status
-3. Update INDEX.md
-4. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to reviewing"
+1. **Ask the user** if they want a change report generated
+2. If yes, generate `changes.md` in the task folder (see [workflows.md](workflows.md) for format)
+3. Move to `5-reviewing/`
+4. Update status
+5. Update INDEX.md
+6. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to reviewing"
 
 **IMPORTANT:** Never merge or delete worktree until `/tasks complete`.
 
