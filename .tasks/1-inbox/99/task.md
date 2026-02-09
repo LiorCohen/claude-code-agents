@@ -79,9 +79,10 @@ components:
 After reconciliation to v6.4.0:
 ```yaml
 sdd:
-  plugin_version: "6.4.0"              # Updated
-  initialized_at: "2025-12-01"         # Preserved
-  last_updated: "2026-02-09"           # Updated
+  initialized_by_plugin_version: "6.3.6"            # Migrated from plugin_version (preserved)
+  updated_by_plugin_version: "6.4.0"                 # Set to current version
+  initialized_at: "2025-12-01 00:00:00 +0000"              # Migrated (original date, time unknown)
+  updated_at: "2026-02-09 14:30:00 +0200"                  # Migrated from last_updated, set to now
 project:
   name: "my-app"                       # Preserved
   description: "My application"        # Preserved
@@ -109,14 +110,29 @@ Note: `consumes_contracts: []` and `helm: true` are preserved even though they m
 
 The following infrastructure already exists (as of v6.4.0):
 
-### Version Tracking
+### Version Tracking (current — to be changed)
 ```typescript
+// Current (v6.4.0):
 interface SddMetadata {
-  readonly plugin_version: string;      // Version that created the project
-  readonly initialized_at: string;
-  readonly last_updated: string;
+  readonly plugin_version: string;      // Single version field
+  readonly initialized_at: string;      // Date only (YYYY-MM-DD)
+  readonly last_updated: string;        // Date only (YYYY-MM-DD)
+}
+
+// Proposed (this task):
+interface SddMetadata {
+  readonly initialized_by_plugin_version: string;  // Version that first created the project
+  readonly updated_by_plugin_version: string;       // Version that last reconciled settings
+  readonly initialized_at: string;                  // Full datetime with timezone, human readable
+  readonly updated_at: string;                      // Full datetime with timezone, human readable
 }
 ```
+
+This split is important because:
+- `initialized_by_plugin_version` is immutable — set once during first `sdd-init`, never changes
+- `updated_by_plugin_version` tracks the most recent plugin version that touched settings
+- Full datetimes with timezone (e.g., `"2026-02-09 14:30:00 +0200"`) are more useful than date-only strings
+- Renaming `last_updated` → `updated_at` for consistency with `initialized_at`
 
 ### Backwards Compatibility Pattern
 - Optional fields with defaults: `helm?: boolean`, `databases?: string[]`, etc.
@@ -136,7 +152,7 @@ We considered three approaches:
 ## Scope
 
 ### 1. Plugin Version Detection & Build (MUST BE FIRST)
-- Compare `sdd.plugin_version` (from `.sdd/sdd-settings.yaml`) with current plugin version (from `plugin/.claude-plugin/plugin.json`)
+- Compare `sdd.updated_by_plugin_version` (from `.sdd/sdd-settings.yaml`) with current plugin version (from `plugin/.claude-plugin/plugin.json`)
 - **This must happen before any other sdd-init logic runs**, because if the plugin code has changed, all subsequent logic (validation, reconciliation, CLI commands) would run against stale built code and produce incorrect results
 - If version changed:
   - Run `npm install` in plugin workspace
@@ -151,9 +167,14 @@ We considered three approaches:
 
 ### 3. Settings Reconciliation (if version changed)
 - Load existing sdd-settings
+- Migrate `sdd` metadata fields:
+  - `plugin_version` → `initialized_by_plugin_version` (preserve original value) + `updated_by_plugin_version` (set to current)
+  - `initialized_at` → keep name, convert date-only to full datetime with timezone (append `00:00:00 +0000` for unknown times)
+  - `last_updated` → rename to `updated_at`, set to current datetime
+  - Remove old field names after migration
 - Add missing optional fields with schema defaults (additive only)
-- Update `sdd.plugin_version` to current version
-- Update `sdd.last_updated` to today's date
+- Update `sdd.updated_by_plugin_version` to current version
+- Update `sdd.updated_at` to current datetime
 - Validate result against current schema
 - Inform user of changes made
 
@@ -175,6 +196,8 @@ We considered three approaches:
 - [ ] Existing values are preserved unchanged (reflect current reality)
 - [ ] Directory structure mismatches are detected and reported (not auto-fixed)
 - [ ] Component directory structures are respected (no forced migrations)
-- [ ] `sdd.plugin_version` and `sdd.last_updated` are updated after reconciliation
+- [ ] `sdd` metadata migrated to new schema (`initialized_by_plugin_version`, `updated_by_plugin_version`, `initialized_at`, `updated_at`)
+- [ ] `sdd.updated_by_plugin_version` and `sdd.updated_at` are updated after reconciliation
+- [ ] `sdd.initialized_by_plugin_version` and `sdd.initialized_at` are preserved (immutable after first init)
 - [ ] User is informed of any fields added during reconciliation
 - [ ] Schema validation confirms reconciled settings are valid
