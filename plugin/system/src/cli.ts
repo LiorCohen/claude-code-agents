@@ -13,6 +13,7 @@
  *   contract      Contract component operations
  *   config        Config component operations
  *   env           Local environment management
+ *   settings      Settings reconciliation
  */
 
 import { readFileSync } from 'fs';
@@ -34,8 +35,9 @@ import { handleConfig } from '@/commands/config';
 import { handleEnvironment } from '@/commands/env';
 import { handlePermissions } from '@/commands/permissions';
 import { handleWorkflow } from '@/commands/workflow';
+import { handleSettings } from '@/commands/settings';
 
-const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
@@ -99,6 +101,9 @@ Namespaces:
   workflow      Workflow phase gate management
     check-gate  Check if prerequisites are met to advance to target phase
 
+  settings      Settings management
+    reconcile   Reconcile settings to latest plugin schema
+
 Global Options:
   --json        JSON output mode
   --verbose     Verbose logging
@@ -129,6 +134,7 @@ const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   env: handleEnvironment,
   permissions: handlePermissions,
   workflow: handleWorkflow,
+  settings: handleSettings,
 };
 
 const showHelp = (options: GlobalOptions): CommandResult => {

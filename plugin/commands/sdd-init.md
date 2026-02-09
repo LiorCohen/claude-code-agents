@@ -67,7 +67,7 @@ This command follows an approval-based workflow that verifies environment, creat
 3. Read current plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `version` field
 4. If versions differ:
    - Run `npm install` in `${CLAUDE_PLUGIN_ROOT}/system/`
-   - Run `npm run build:plugin` from `${CLAUDE_PLUGIN_ROOT}`
+   - Run `npm run build` in `${CLAUDE_PLUGIN_ROOT}/system/`
    - Only proceed once plugin is built with current code
 5. If no settings file exists, this is a new project — skip version check, proceed to Phase 1
 
@@ -141,10 +141,10 @@ This must pass before any other checks. The plugin's absolute path is available 
 1. Check `${CLAUDE_PLUGIN_ROOT}`. If set, use it as the plugin path. If not set, fall back to searching `~/.claude/plugins` recursively for the SDD plugin (look for `marketplace.json` or `plugin.json` marker files). If neither finds the plugin: **STOP** — display installation instructions and exit.
 2. Verify the plugin path exists and contains expected marker files (`plugin.json` or `.claude-plugin/marketplace.json`)
 3. Check build readiness:
-   - `${CLAUDE_PLUGIN_ROOT}/system/node_modules/` exists (dependencies installed)
    - `${CLAUDE_PLUGIN_ROOT}/system/dist/` exists (plugin built)
-4. If dependencies missing: run `npm install` in `${CLAUDE_PLUGIN_ROOT}/system/`
-5. If not built: run `npm run build:plugin` from `${CLAUDE_PLUGIN_ROOT}`
+   - `${CLAUDE_PLUGIN_ROOT}/system/node_modules/` exists (dependencies installed)
+4. If `dist/` exists: plugin is ready (this is the normal case for installed plugins)
+5. If `dist/` missing but `system/package.json` exists: run `npm install && npm run build` in `${CLAUDE_PLUGIN_ROOT}/system/` (development mode)
 6. If repairs fail: **STOP** — display error details and exit
 
 **This is a hard blocker.** If the plugin is not installed, not built, or not functional after repair attempts, do NOT continue to other phases.
@@ -249,35 +249,10 @@ Note: permissions written to `.claude/settings.local.json` do NOT take effect mi
 
 If this is an existing project with a version mismatch (detected in Phase 0):
 
-1. Load the raw-parsed settings from `.sdd/sdd-settings.yaml`
-2. Run `reconcileSettings()` from `plugin/system/src/settings/reconcile.ts` (or apply the same logic):
-   - Migrate `sdd` metadata fields (`plugin_version` → split fields, `last_updated` → `updated_at`, date-only → UTC datetime)
-   - Remove deprecated `project.domain` and `project.type` fields
-   - Add missing component `path` fields (infer from filesystem or generate)
-   - Add `system.logging` section if missing
-   - Validate the reconciled result
-3. Write the reconciled settings back to `.sdd/sdd-settings.yaml`
-4. Display a summary of changes:
-
-```
-Settings reconciled to v6.5.0:
-  ✓ Migrated sdd.plugin_version → initialized_by_plugin_version + updated_by_plugin_version
-  ✓ Migrated sdd.last_updated → updated_at (UTC datetime)
-  ✓ Removed deprecated project.domain
-  ✓ Removed deprecated project.type
-  ✓ Added system.logging defaults
-```
-
-5. Display directory mismatch warnings if any:
-
-```
-⚠ Directory warnings:
-  - Component "api-server" path "components/servers/api-server" does not exist on disk
-  - Directory "components/old-service/" exists but is not tracked in sdd-settings
-```
-
-6. **Skip Phase 3 and Phase 4** — structure already exists, git already initialized
-7. Jump to Phase 5 with upgrade-specific messaging
+1. Run `sdd-system settings reconcile` to migrate settings to the latest schema
+2. Display the command output (it prints a summary of changes and any directory warnings)
+3. **Skip Phase 3 and Phase 4** — structure already exists, git already initialized
+4. Jump to Phase 5 with upgrade-specific messaging
 
 ---
 
