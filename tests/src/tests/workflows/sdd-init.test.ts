@@ -27,6 +27,22 @@ import {
   type TestProject,
 } from '@/lib';
 
+const EXISTING_PROJECT_PROMPT = `Run /sdd-init on this existing project.
+
+AUTOMATED TEST MODE - SKIP ALL INTERACTIVE PHASES:
+- This is an existing SDD project (sdd-settings.yaml already exists)
+- Skip environment verification: Assume all tools are installed
+- Skip permissions check: Assume permissions are configured
+- The project name should be loaded from sdd-settings.yaml (test-existing-project)
+- DO NOT ask for the project name — it's already configured
+
+CRITICAL INSTRUCTIONS:
+1. DO NOT ask any questions - all input is provided above
+2. DO NOT wait for user approval - consider everything pre-approved
+3. Since sdd-settings.yaml exists, detect this is an existing project
+4. Load the project name from settings (do NOT prompt for it)
+5. Complete the workflow without stopping`;
+
 const MINIMAL_INIT_PROMPT = `Run /sdd-init to create a new project.
 
 AUTOMATED TEST MODE - SKIP ALL INTERACTIVE PHASES:
@@ -125,4 +141,73 @@ describe('sdd-init command', () => {
 
     console.log('\nAll assertions passed!');
   }, 240000); // 4 minute timeout for minimal scaffolding
+});
+
+/**
+ * WHY: When sdd-init runs on an existing project, it should detect the
+ * existing settings and NOT prompt for project name.
+ */
+describe('sdd-init existing project detection', () => {
+  let testProject: TestProject;
+
+  beforeAll(async () => {
+    testProject = await createTestProject('test-existing-project');
+
+    // Set up a pre-existing SDD project with old-format settings
+    const { execSync } = await import('child_process');
+    execSync(`mkdir -p "${joinPath(testProject.path, '.sdd')}"`, { encoding: 'utf-8' });
+    execSync(`mkdir -p "${joinPath(testProject.path, 'specs')}"`, { encoding: 'utf-8' });
+    execSync(`mkdir -p "${joinPath(testProject.path, 'components', 'config')}"`, { encoding: 'utf-8' });
+
+    // Write old-format settings (pre-reconciliation)
+    await writeFileAsync(
+      joinPath(testProject.path, '.sdd', 'sdd-settings.yaml'),
+      `sdd:
+  plugin_version: "5.0.0"
+  initialized_at: "2026-01-01"
+  last_updated: "2026-01-15"
+project:
+  name: test-existing-project
+  description: Test project for upgrade detection
+  domain: Testing
+  type: fullstack
+components:
+  - name: config
+    type: config
+    path: components/config
+    settings: {}
+`
+    );
+
+    // Write empty specs INDEX
+    await writeFileAsync(
+      joinPath(testProject.path, 'specs', 'INDEX.md'),
+      '# Spec Index\n\n(empty)\n'
+    );
+
+    // Initialize git so the project looks valid
+    execSync('git init', {
+      cwd: testProject.path,
+      encoding: 'utf-8',
+    });
+  });
+
+  it('detects existing project and skips name prompt', async () => {
+    console.log(`\nTest directory: ${testProject.path}\n`);
+    console.log('Running /sdd-init on existing project...');
+
+    const result = await runClaude(EXISTING_PROJECT_PROMPT, testProject.path, 180);
+
+    // Save output for debugging
+    await writeFileAsync(joinPath(testProject.path, 'claude-output.json'), result.output);
+
+    // The existing .sdd/sdd-settings.yaml should still exist
+    expect(projectIsFile(testProject, '.sdd', 'sdd-settings.yaml')).toBe(true);
+
+    // Settings should still contain the project name (not overwritten)
+    expect(projectFileContains(testProject, '.sdd/sdd-settings.yaml', 'test-existing-project')).toBe(true);
+
+    console.log('✓ Existing project detected, name preserved');
+    console.log('\nAll assertions passed!');
+  }, 240000);
 });
