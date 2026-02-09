@@ -27,10 +27,12 @@ This command follows an approval-based workflow that verifies environment, creat
 
 | Phase | Purpose |
 |-------|---------|
-| 1     | Detect project name from current directory |
+| 0     | Version detection + plugin build (if existing project with version mismatch) |
+| 1     | Detect project name from current directory (or load from existing settings) |
 | 2     | Environment verification (plugin, tools, settings, permissions) |
-| 3     | Create minimal structure (config component only) |
-| 4     | Git init + commit |
+| 2.7   | Settings reconciliation (if existing project with version mismatch) |
+| 3     | Create minimal structure (config component only) — skipped for existing projects |
+| 4     | Git init + commit — skipped for existing projects |
 | 5     | Completion message |
 
 ---
@@ -40,10 +42,12 @@ This command follows an approval-based workflow that verifies environment, creat
 **You MUST complete ALL phases before declaring initialization complete.** Use this checklist to track progress:
 
 ```
+[ ] Phase 0: Version check completed (or skipped for new projects)
 [ ] Phase 1: Project name detected and confirmed
 [ ] Phase 2: Environment verified (plugin, tools, settings, permissions)
-[ ] Phase 3: Minimal structure created
-[ ] Phase 4: Git repository initialized and committed
+[ ] Phase 2.7: Settings reconciled (or skipped if versions match / new project)
+[ ] Phase 3: Minimal structure created (or skipped for existing projects)
+[ ] Phase 4: Git repository initialized and committed (or skipped for existing projects)
 [ ] Phase 5: Completion report displayed
 ```
 
@@ -54,8 +58,29 @@ This command follows an approval-based workflow that verifies environment, creat
 
 ---
 
+### Phase 0: Version Detection & Plugin Build
+
+**This phase runs BEFORE any other logic.** If plugin code has changed, all subsequent logic (validation, reconciliation, CLI commands) would run against stale built code.
+
+1. Check if `.sdd/sdd-settings.yaml` exists
+2. If it exists, raw-parse the YAML and read version from `sdd.updated_by_plugin_version` (or legacy `sdd.plugin_version` for pre-reconciliation files)
+3. Read current plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `version` field
+4. If versions differ:
+   - Run `npm install` in `${CLAUDE_PLUGIN_ROOT}/system/`
+   - Run `npm run build:plugin` from `${CLAUDE_PLUGIN_ROOT}`
+   - Only proceed once plugin is built with current code
+5. If no settings file exists, this is a new project — skip version check, proceed to Phase 1
+
+---
+
 ### Phase 1: Detect Project Name
 
+**If `.sdd/sdd-settings.yaml` exists** (existing project):
+- Load `project.name` from the settings file
+- **Do NOT prompt** for project name — it's already configured
+- Switch to **upgrade/repair mode** (see below)
+
+**If new project** (no settings file):
 Derive project name from the current directory:
 
 ```
@@ -73,14 +98,13 @@ Is this correct? (yes/no)
 
 If user says no: Ask for project name interactively.
 
-**Existing Project Check:**
-If `.sdd/sdd-settings.yaml` exists, this is an existing SDD project. Switch to **upgrade/repair mode**:
+**Existing Project — Upgrade/Repair Mode:**
 
 ```
-Existing SDD project detected.
+Existing SDD project detected: <project-name>
 
 Running environment check...
-  ✓ Plugin v5.11.0 (up to date)
+  ✓ Plugin v6.5.0 (up to date)
   ✓ All required tools available
   ✓ Permissions configured
 
@@ -219,7 +243,47 @@ Note: permissions written to `.claude/settings.local.json` do NOT take effect mi
 
 ---
 
+### Phase 2.7: Settings Reconciliation (Existing Projects Only)
+
+**Skip this phase if:** this is a new project (no existing `.sdd/sdd-settings.yaml`), or if versions already match.
+
+If this is an existing project with a version mismatch (detected in Phase 0):
+
+1. Load the raw-parsed settings from `.sdd/sdd-settings.yaml`
+2. Run `reconcileSettings()` from `plugin/system/src/settings/reconcile.ts` (or apply the same logic):
+   - Migrate `sdd` metadata fields (`plugin_version` → split fields, `last_updated` → `updated_at`, date-only → UTC datetime)
+   - Remove deprecated `project.domain` and `project.type` fields
+   - Add missing component `path` fields (infer from filesystem or generate)
+   - Add `system.logging` section if missing
+   - Validate the reconciled result
+3. Write the reconciled settings back to `.sdd/sdd-settings.yaml`
+4. Display a summary of changes:
+
+```
+Settings reconciled to v6.5.0:
+  ✓ Migrated sdd.plugin_version → initialized_by_plugin_version + updated_by_plugin_version
+  ✓ Migrated sdd.last_updated → updated_at (UTC datetime)
+  ✓ Removed deprecated project.domain
+  ✓ Removed deprecated project.type
+  ✓ Added system.logging defaults
+```
+
+5. Display directory mismatch warnings if any:
+
+```
+⚠ Directory warnings:
+  - Component "api-server" path "components/servers/api-server" does not exist on disk
+  - Directory "components/old-service/" exists but is not tracked in sdd-settings
+```
+
+6. **Skip Phase 3 and Phase 4** — structure already exists, git already initialized
+7. Jump to Phase 5 with upgrade-specific messaging
+
+---
+
 ### Phase 3: Create Minimal Structure
+
+**Skip this phase for existing projects** (upgrade/repair mode skips to Phase 5).
 
 **INVOKE the `project-scaffolding` skill** with:
 

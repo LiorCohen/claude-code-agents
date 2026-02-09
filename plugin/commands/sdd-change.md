@@ -314,7 +314,6 @@ INVOKE spec-decomposition skill with:
   spec_content: <full content>
   classified_transformation: <from step 5>
   discovered_components: <from step 6>
-  default_domain: <from sdd-settings.yaml>
 ```
 
 The skill performs:
