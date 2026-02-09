@@ -61,7 +61,7 @@ export const getServerHelmTemplates = (
   // Service only if deploying api mode and server provides contracts
   if (
     deployModes.includes('api') &&
-    serverSettings.provides_contracts.length > 0
+    (serverSettings.provides_contracts ?? []).length > 0
   ) {
     conditional.push('service.yaml');
   }
@@ -193,7 +193,7 @@ export const generateServerHelmValues = (
   // Service config if provides contracts
   if (
     deployModes.includes('api') &&
-    serverSettings.provides_contracts.length > 0
+    (serverSettings.provides_contracts ?? []).length > 0
   ) {
     values['service'] = {
       type: 'ClusterIP',

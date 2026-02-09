@@ -123,7 +123,7 @@ describe('config section generation', () => {
   });
 
   it('generates port only when provides_contracts is non-empty', () => {
-    expect(content).toContain('provides_contracts.length > 0');
+    expect(content).toContain('(settings.provides_contracts ?? []).length > 0');
     expect(content).toContain("config['port'] = 3000");
   });
 
@@ -134,14 +134,14 @@ describe('config section generation', () => {
   });
 
   it('generates database sections per database', () => {
-    expect(content).toContain('databases.length > 0');
+    expect(content).toContain('(settings.databases ?? []).length > 0');
     expect(content).toContain("config['databases']");
     expect(content).toContain('host');
     expect(content).toContain('port: 5432');
   });
 
   it('generates API sections for consumed contracts', () => {
-    expect(content).toContain('consumes_contracts.length > 0');
+    expect(content).toContain('(settings.consumes_contracts ?? []).length > 0');
     expect(content).toContain("config['apis']");
     expect(content).toContain('base_url');
   });
@@ -211,7 +211,7 @@ describe('helm template selection', () => {
 
   it('includes service.yaml conditionally', () => {
     expect(content).toContain("'service.yaml'");
-    expect(content).toContain('provides_contracts.length > 0');
+    expect(content).toContain('(serverSettings.provides_contracts ?? []).length > 0');
   });
 
   it('includes ingress.yaml based on settings', () => {

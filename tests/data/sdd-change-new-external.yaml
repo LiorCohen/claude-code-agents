@@ -183,3 +183,17 @@ runs:
       input_tokens: 53
       output_tokens: 607
       total_tokens: 660
+  - timestamp: "2026-02-09T08:29:47.447Z"
+    plugin_version: "6.3.7"
+    test_file: "tests/src/tests/workflows/sdd-change-new-external.test.ts"
+    test_name: "change-new-external-spec"
+    turn_count: 71
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 175
+        output_tokens: 332
+        total_tokens: 507
+    total:
+      input_tokens: 175
+      output_tokens: 332
+      total_tokens: 507

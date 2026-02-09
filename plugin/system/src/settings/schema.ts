@@ -49,29 +49,16 @@ const serverSettingsSchema: JSONSchema7 = {
     },
     helm: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'Whether this server needs a helm chart',
     },
   },
-  required: [
-    'server_type',
-    'databases',
-    'provides_contracts',
-    'consumes_contracts',
-    'helm',
-  ],
+  required: ['server_type'],
   if: {
     properties: { server_type: { const: 'hybrid' } },
   },
   then: {
-    required: [
-      'server_type',
-      'modes',
-      'databases',
-      'provides_contracts',
-      'consumes_contracts',
-      'helm',
-    ],
+    required: ['server_type', 'modes'],
   },
   additionalProperties: false,
 };
@@ -88,11 +75,11 @@ const webappSettingsSchema: JSONSchema7 = {
     },
     helm: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'Whether this webapp needs a helm chart',
     },
   },
-  required: ['contracts', 'helm'],
+  required: [],
   additionalProperties: false,
 };
 
@@ -197,15 +184,28 @@ const configSettingsSchema: JSONSchema7 = {
   additionalProperties: false,
 };
 
+/** JSON Schema for testing settings (empty object) */
+const testingSettingsSchema: JSONSchema7 = {
+  type: 'object',
+  additionalProperties: false,
+};
+
+/** JSON Schema for cicd settings (empty object) */
+const cicdSettingsSchema: JSONSchema7 = {
+  type: 'object',
+  additionalProperties: false,
+};
+
 /** JSON Schema for server component */
 const serverComponentSchema: JSONSchema7 = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
     type: { type: 'string', const: 'server' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: serverSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -215,9 +215,10 @@ const webappComponentSchema: JSONSchema7 = {
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
     type: { type: 'string', const: 'webapp' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: webappSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -227,9 +228,10 @@ const helmComponentSchema: JSONSchema7 = {
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
     type: { type: 'string', const: 'helm' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: helmSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -239,9 +241,10 @@ const databaseComponentSchema: JSONSchema7 = {
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
     type: { type: 'string', const: 'database' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: databaseSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -251,9 +254,10 @@ const contractComponentSchema: JSONSchema7 = {
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
     type: { type: 'string', const: 'contract' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: contractSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -263,9 +267,36 @@ const configComponentSchema: JSONSchema7 = {
   properties: {
     name: { type: 'string', const: 'config' },
     type: { type: 'string', const: 'config' },
+    path: { type: 'string', description: 'Relative path from project root' },
     settings: configSettingsSchema,
   },
-  required: ['name', 'type', 'settings'],
+  required: ['name', 'type', 'path', 'settings'],
+  additionalProperties: false,
+};
+
+/** JSON Schema for testing component */
+const testingComponentSchema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
+    type: { type: 'string', const: 'testing' },
+    path: { type: 'string', description: 'Relative path from project root' },
+    settings: testingSettingsSchema,
+  },
+  required: ['name', 'type', 'path', 'settings'],
+  additionalProperties: false,
+};
+
+/** JSON Schema for cicd component */
+const cicdComponentSchema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
+    type: { type: 'string', const: 'cicd' },
+    path: { type: 'string', description: 'Relative path from project root' },
+    settings: cicdSettingsSchema,
+  },
+  required: ['name', 'type', 'path', 'settings'],
   additionalProperties: false,
 };
 
@@ -278,6 +309,8 @@ const componentSchema: JSONSchema7 = {
     databaseComponentSchema,
     contractComponentSchema,
     configComponentSchema,
+    testingComponentSchema,
+    cicdComponentSchema,
   ],
 };
 
@@ -351,7 +384,7 @@ const loggingSettingsSchema: JSONSchema7 = {
   additionalProperties: false,
 };
 
-/** JSON Schema for system settings */
+/** JSON Schema for SDD CLI system settings */
 const systemSettingsSchema: JSONSchema7 = {
   type: 'object',
   properties: {
@@ -391,6 +424,8 @@ export const schemas = {
   databaseSettings: databaseSettingsSchema,
   contractSettings: contractSettingsSchema,
   configSettings: configSettingsSchema,
+  testingSettings: testingSettingsSchema,
+  cicdSettings: cicdSettingsSchema,
   loggingSettings: loggingSettingsSchema,
   systemSettings: systemSettingsSchema,
   component: componentSchema,
@@ -400,6 +435,8 @@ export const schemas = {
   databaseComponent: databaseComponentSchema,
   contractComponent: contractComponentSchema,
   configComponent: configComponentSchema,
+  testingComponent: testingComponentSchema,
+  cicdComponent: cicdComponentSchema,
   sddMetadata: sddMetadataSchema,
   projectMetadata: projectMetadataSchema,
   settingsFile: settingsFileSchema,

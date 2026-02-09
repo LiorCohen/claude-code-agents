@@ -80,6 +80,7 @@ export { validateSettings, formatValidationResult } from './validate';
 export type { SyncResult, SettingsDiff } from './sync';
 export {
   diffSettings,
+  generateComponentPath,
   getComponentDir,
   previewSync,
   generateServerConfigSection,

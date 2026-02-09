@@ -22,14 +22,14 @@ export interface ServerSettings {
   readonly server_type: ServerType;
   /** Required when server_type is 'hybrid' (2+ modes) */
   readonly modes?: readonly ServerMode[];
-  /** Database components this server uses (adds DAL layer, DB config) */
-  readonly databases: readonly string[];
-  /** Contracts this server implements (adds Service, routes) */
-  readonly provides_contracts: readonly string[];
-  /** Contracts this server calls (generates API clients) */
-  readonly consumes_contracts: readonly string[];
-  /** Whether this server needs a helm chart for deployment */
-  readonly helm: boolean;
+  /** Database components this server uses (adds DAL layer, DB config) (default: []) */
+  readonly databases?: readonly string[];
+  /** Contracts this server implements (adds Service, routes) (default: []) */
+  readonly provides_contracts?: readonly string[];
+  /** Contracts this server calls (generates API clients) (default: []) */
+  readonly consumes_contracts?: readonly string[];
+  /** Whether this server needs a helm chart for deployment (default: false) */
+  readonly helm?: boolean;
 }
 
 // =============================================================================
@@ -38,10 +38,10 @@ export interface ServerSettings {
 
 /** Settings for webapp components */
 export interface WebappSettings {
-  /** Contract components this webapp uses (generates API clients) */
-  readonly contracts: readonly string[];
-  /** Whether this webapp needs a helm chart for deployment */
-  readonly helm: boolean;
+  /** Contract components this webapp uses (generates API clients) (default: []) */
+  readonly contracts?: readonly string[];
+  /** Whether this webapp needs a helm chart for deployment (default: false) */
+  readonly helm?: boolean;
 }
 
 // =============================================================================
@@ -114,6 +114,20 @@ export interface ContractSettings {
 export type ConfigSettings = Record<string, never>;
 
 // =============================================================================
+// Testing Settings
+// =============================================================================
+
+/** Settings for testing component (no settings) */
+export type TestingSettings = Record<string, never>;
+
+// =============================================================================
+// CI/CD Settings
+// =============================================================================
+
+/** Settings for CI/CD component (no settings) */
+export type CicdSettings = Record<string, never>;
+
+// =============================================================================
 // System Settings
 // =============================================================================
 
@@ -128,7 +142,7 @@ export interface LoggingSettings {
   readonly level: LogLevel;
 }
 
-/** System-wide settings */
+/** SDD CLI system settings */
 export interface SystemSettings {
   /** Logging configuration */
   readonly logging: LoggingSettings;
@@ -145,7 +159,9 @@ export type ComponentType =
   | 'helm'
   | 'database'
   | 'contract'
-  | 'config';
+  | 'config'
+  | 'testing'
+  | 'cicd';
 
 /** Mapping of component types to their settings */
 export interface ComponentSettingsMap {
@@ -155,6 +171,8 @@ export interface ComponentSettingsMap {
   readonly database: DatabaseSettings;
   readonly contract: ContractSettings;
   readonly config: ConfigSettings;
+  readonly testing: TestingSettings;
+  readonly cicd: CicdSettings;
 }
 
 /** Settings for any component type */
@@ -170,6 +188,8 @@ export interface ComponentBase {
   readonly name: string;
   /** Component type */
   readonly type: ComponentType;
+  /** Relative path from project root (e.g., "components/servers/api-server") */
+  readonly path: string;
 }
 
 /** Server component */
@@ -208,6 +228,18 @@ export interface ConfigComponent extends ComponentBase {
   readonly settings: ConfigSettings;
 }
 
+/** Testing component */
+export interface TestingComponent extends ComponentBase {
+  readonly type: 'testing';
+  readonly settings: TestingSettings;
+}
+
+/** CI/CD component */
+export interface CicdComponent extends ComponentBase {
+  readonly type: 'cicd';
+  readonly settings: CicdSettings;
+}
+
 /** Union of all component types with their settings */
 export type Component =
   | ServerComponent
@@ -215,7 +247,9 @@ export type Component =
   | HelmComponent
   | DatabaseComponent
   | ContractComponent
-  | ConfigComponent;
+  | ConfigComponent
+  | TestingComponent
+  | CicdComponent;
 
 // =============================================================================
 // Type Guards
@@ -244,6 +278,14 @@ export const isContractComponent = (c: Component): c is ContractComponent =>
 /** Check if component is config */
 export const isConfigComponent = (c: Component): c is ConfigComponent =>
   c.type === 'config';
+
+/** Check if component is testing */
+export const isTestingComponent = (c: Component): c is TestingComponent =>
+  c.type === 'testing';
+
+/** Check if component is CI/CD */
+export const isCicdComponent = (c: Component): c is CicdComponent =>
+  c.type === 'cicd';
 
 /** Check if helm settings are for a server */
 export const isHelmServerSettings = (

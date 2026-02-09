@@ -95,20 +95,24 @@ describe('server settings schema', () => {
     expect(content).toContain('minItems: 2');
   });
 
-  it('requires databases array', () => {
-    expect(content).toContain("'databases'");
+  it('defines optional databases array', () => {
+    expect(content).toContain('databases:');
+    expect(content).toContain('default: []');
   });
 
-  it('requires provides_contracts array', () => {
-    expect(content).toContain("'provides_contracts'");
+  it('defines optional provides_contracts array', () => {
+    expect(content).toContain('provides_contracts:');
+    expect(content).toContain('default: []');
   });
 
-  it('requires consumes_contracts array', () => {
-    expect(content).toContain("'consumes_contracts'");
+  it('defines optional consumes_contracts array', () => {
+    expect(content).toContain('consumes_contracts:');
+    expect(content).toContain('default: []');
   });
 
-  it('requires helm boolean', () => {
-    expect(content).toContain("'helm'");
+  it('defines optional helm boolean', () => {
+    expect(content).toContain('helm:');
+    expect(content).toContain('default: false');
   });
 });
 

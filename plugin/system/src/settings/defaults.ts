@@ -22,38 +22,22 @@ import type {
 /** Default settings for an API server */
 export const DEFAULT_API_SERVER_SETTINGS: ServerSettings = {
   server_type: 'api',
-  databases: [],
-  provides_contracts: [],
-  consumes_contracts: [],
-  helm: true,
 };
 
 /** Default settings for a worker server */
 export const DEFAULT_WORKER_SERVER_SETTINGS: ServerSettings = {
   server_type: 'worker',
-  databases: [],
-  provides_contracts: [],
-  consumes_contracts: [],
-  helm: true,
 };
 
 /** Default settings for a cron server */
 export const DEFAULT_CRON_SERVER_SETTINGS: ServerSettings = {
   server_type: 'cron',
-  databases: [],
-  provides_contracts: [],
-  consumes_contracts: [],
-  helm: true,
 };
 
 /** Default settings for a hybrid server (api + worker) */
 export const DEFAULT_HYBRID_SERVER_SETTINGS: ServerSettings = {
   server_type: 'hybrid',
   modes: ['api', 'worker'],
-  databases: [],
-  provides_contracts: [],
-  consumes_contracts: [],
-  helm: true,
 };
 
 /** Get default server settings based on server type */
@@ -77,10 +61,7 @@ export const getDefaultServerSettings = (
 // =============================================================================
 
 /** Default settings for a webapp */
-export const DEFAULT_WEBAPP_SETTINGS: WebappSettings = {
-  contracts: [],
-  helm: true,
-};
+export const DEFAULT_WEBAPP_SETTINGS: WebappSettings = {};
 
 // =============================================================================
 // Helm Chart Defaults

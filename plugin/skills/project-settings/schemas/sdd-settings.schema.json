@@ -6,6 +6,33 @@
   "required": ["sdd", "project", "components"],
   "additionalProperties": false,
   "properties": {
+    "system": {
+      "type": "object",
+      "description": "SDD CLI system settings (logging, etc.).",
+      "required": ["logging"],
+      "additionalProperties": false,
+      "properties": {
+        "logging": {
+          "type": "object",
+          "description": "Logging configuration.",
+          "required": ["enabled", "level"],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable/disable file logging."
+            },
+            "level": {
+              "type": "string",
+              "enum": ["trace", "debug", "info", "warn", "error", "fatal"],
+              "default": "info",
+              "description": "Log level."
+            }
+          }
+        }
+      }
+    },
     "sdd": {
       "type": "object",
       "description": "SDD plugin metadata.",
@@ -31,7 +58,7 @@
     "project": {
       "type": "object",
       "description": "Project metadata.",
-      "required": ["name"],
+      "required": ["name", "description", "domain", "type"],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -70,12 +97,16 @@
     },
     "component": {
       "type": "object",
-      "required": ["name", "type", "settings"],
+      "required": ["name", "type", "path", "settings"],
       "properties": {
         "name": { "$ref": "#/$defs/component_name" },
         "type": {
           "type": "string",
           "enum": ["config", "server", "webapp", "helm", "database", "contract", "testing", "cicd"]
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path from project root (e.g., 'components/servers/api-server' or 'components/api-server' for flat structure)"
         },
         "settings": { "type": "object" }
       },
@@ -158,6 +189,7 @@
     },
     "server_settings": {
       "type": "object",
+      "required": ["server_type"],
       "additionalProperties": false,
       "properties": {
         "server_type": {
@@ -192,7 +224,7 @@
         },
         "helm": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Whether to generate a helm chart for this server."
         }
       },
@@ -205,6 +237,7 @@
     },
     "webapp_settings": {
       "type": "object",
+      "required": [],
       "additionalProperties": false,
       "properties": {
         "contracts": {
@@ -215,14 +248,14 @@
         },
         "helm": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Whether to generate a helm chart for this webapp."
         }
       }
     },
     "helm_settings": {
       "type": "object",
-      "required": ["deploys", "deploy_type"],
+      "required": ["deploys", "deploy_type", "ingress"],
       "additionalProperties": false,
       "properties": {
         "deploys": {
@@ -250,10 +283,17 @@
           "default": "bundled",
           "description": "For webapps: asset strategy."
         }
+      },
+      "if": {
+        "properties": { "deploy_type": { "const": "webapp" } }
+      },
+      "then": {
+        "required": ["deploys", "deploy_type", "ingress", "assets"]
       }
     },
     "database_settings": {
       "type": "object",
+      "required": ["provider", "dedicated"],
       "additionalProperties": false,
       "properties": {
         "provider": {
@@ -271,6 +311,7 @@
     },
     "contract_settings": {
       "type": "object",
+      "required": ["visibility"],
       "additionalProperties": false,
       "properties": {
         "visibility": {

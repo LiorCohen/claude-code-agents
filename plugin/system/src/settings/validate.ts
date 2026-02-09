@@ -99,7 +99,7 @@ const validateReferences = (
     const { name, settings } = component;
 
     // Check database references
-    for (const db of settings.databases) {
+    for (const db of settings.databases ?? []) {
       if (!databaseNames.has(db)) {
         errors.push({
           component: name,
@@ -110,7 +110,7 @@ const validateReferences = (
     }
 
     // Check provides_contracts references
-    for (const contract of settings.provides_contracts) {
+    for (const contract of settings.provides_contracts ?? []) {
       if (!contractNames.has(contract)) {
         errors.push({
           component: name,
@@ -121,7 +121,7 @@ const validateReferences = (
     }
 
     // Check consumes_contracts references
-    for (const contract of settings.consumes_contracts) {
+    for (const contract of settings.consumes_contracts ?? []) {
       if (!contractNames.has(contract)) {
         errors.push({
           component: name,
@@ -137,7 +137,7 @@ const validateReferences = (
     const { name, settings } = component;
 
     // Check contracts references
-    for (const contract of settings.contracts) {
+    for (const contract of settings.contracts ?? []) {
       if (!contractNames.has(contract)) {
         errors.push({
           component: name,

@@ -7,6 +7,7 @@
 
 import type {
   Component,
+  ComponentType,
   ServerSettings,
   WebappSettings,
   HelmSettings,
@@ -115,10 +116,20 @@ const diffComponentSettings = (
 };
 
 /**
- * Get the directory path for a component.
+ * Generate the conventional path for a component based on current standards.
+ * Used when creating new components.
+ *
+ * Current convention:
+ * - components/{type-plural}/{name} for most types
+ * - components/config for singleton config component
+ *
+ * Previous versions used flat structure: components/{name}
  */
-export const getComponentDir = (component: Component): string => {
-  const typeDirMap: Record<string, string> = {
+export const generateComponentPath = (
+  type: ComponentType,
+  name: string
+): string => {
+  const typeDirMap: Record<ComponentType, string> = {
     server: 'servers',
     webapp: 'webapps',
     helm: 'helm-charts',
@@ -126,16 +137,25 @@ export const getComponentDir = (component: Component): string => {
     database: 'databases',
     contract: 'contracts',
     config: 'config',
+    cicd: 'cicd',
   };
 
-  const typeDir = typeDirMap[component.type] ?? component.type;
+  const typeDir = typeDirMap[type];
 
   // Config is a singleton at components/config/
-  if (component.type === 'config') {
+  if (type === 'config') {
     return 'components/config';
   }
 
-  return `components/${typeDir}/${component.name}`;
+  return `components/${typeDir}/${name}`;
+};
+
+/**
+ * Get the directory path for a component.
+ * Uses the path from settings for backwards compatibility with flat structures.
+ */
+export const getComponentDir = (component: Component): string => {
+  return component.path;
 };
 
 /**
@@ -243,7 +263,7 @@ export const generateServerConfigSection = (
   };
 
   // Add port if provides contracts (API server)
-  if (settings.provides_contracts.length > 0) {
+  if ((settings.provides_contracts ?? []).length > 0) {
     config['port'] = 3000;
   }
 
@@ -258,9 +278,9 @@ export const generateServerConfigSection = (
   }
 
   // Add database sections
-  if (settings.databases.length > 0) {
+  if ((settings.databases ?? []).length > 0) {
     const databases: Record<string, unknown> = {};
-    for (const db of settings.databases) {
+    for (const db of settings.databases ?? []) {
       databases[db] = {
         host: 'localhost',
         port: 5432,
@@ -272,9 +292,9 @@ export const generateServerConfigSection = (
   }
 
   // Add API sections for consumed contracts
-  if (settings.consumes_contracts.length > 0) {
+  if ((settings.consumes_contracts ?? []).length > 0) {
     const apis: Record<string, unknown> = {};
-    for (const contract of settings.consumes_contracts) {
+    for (const contract of settings.consumes_contracts ?? []) {
       apis[contract] = {
         base_url: `http://${contract}:3000`,
       };
@@ -295,9 +315,9 @@ export const generateWebappConfigSection = (
   const config: Record<string, unknown> = {};
 
   // Add API sections for consumed contracts
-  if (settings.contracts.length > 0) {
+  if ((settings.contracts ?? []).length > 0) {
     const apis: Record<string, unknown> = {};
-    for (const contract of settings.contracts) {
+    for (const contract of settings.contracts ?? []) {
       apis[contract] = {
         base_url: `http://localhost:3000`,
       };

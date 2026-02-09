@@ -41,16 +41,16 @@ describe('settings.ts source file', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
     expect(content).toContain('export interface ServerSettings');
     expect(content).toContain('readonly server_type: ServerType');
-    expect(content).toContain('readonly databases: readonly string[]');
-    expect(content).toContain('readonly provides_contracts: readonly string[]');
-    expect(content).toContain('readonly consumes_contracts: readonly string[]');
-    expect(content).toContain('readonly helm: boolean');
+    expect(content).toContain('readonly databases?: readonly string[]');
+    expect(content).toContain('readonly provides_contracts?: readonly string[]');
+    expect(content).toContain('readonly consumes_contracts?: readonly string[]');
+    expect(content).toContain('readonly helm?: boolean');
   });
 
   it('exports WebappSettings interface', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
     expect(content).toContain('export interface WebappSettings');
-    expect(content).toContain('readonly contracts: readonly string[]');
+    expect(content).toContain('readonly contracts?: readonly string[]');
   });
 
   it('exports HelmServerSettings interface', () => {

@@ -295,3 +295,31 @@ runs:
       input_tokens: 49
       output_tokens: 621
       total_tokens: 670
+  - timestamp: "2026-02-09T08:28:50.930Z"
+    plugin_version: "6.3.7"
+    test_file: "tests/src/tests/workflows/sdd-init.test.ts"
+    test_name: "init-minimal"
+    turn_count: 60
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 316
+        output_tokens: 511
+        total_tokens: 827
+    total:
+      input_tokens: 316
+      output_tokens: 511
+      total_tokens: 827
+  - timestamp: "2026-02-09T08:31:36.882Z"
+    plugin_version: "6.3.7"
+    test_file: "tests/src/tests/workflows/sdd-init.test.ts"
+    test_name: "init-minimal"
+    turn_count: 51
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 480
+        output_tokens: 702
+        total_tokens: 1182
+    total:
+      input_tokens: 480
+      output_tokens: 702
+      total_tokens: 1182

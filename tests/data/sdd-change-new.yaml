@@ -515,3 +515,17 @@ runs:
       input_tokens: 178
       output_tokens: 563
       total_tokens: 741
+  - timestamp: "2026-02-09T08:32:34.286Z"
+    plugin_version: "6.3.7"
+    test_file: "tests/src/tests/workflows/sdd-change-new.test.ts"
+    test_name: "change-new-feature"
+    turn_count: 60
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 224
+        output_tokens: 423
+        total_tokens: 647
+    total:
+      input_tokens: 224
+      output_tokens: 423
+      total_tokens: 647
