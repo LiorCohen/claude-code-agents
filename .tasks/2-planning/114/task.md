@@ -1,7 +1,7 @@
 ---
 id: 114
 title: Use .temp/ for test environments and preserve on failure
-status: inbox
+status: planning
 priority: high
 created: 2026-02-09
 ---
