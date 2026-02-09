@@ -60,6 +60,7 @@ An agent must be fully understandable on its own. An LLM reading a single agent 
 6. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the agent explicitly documents it as a precondition. If the project may vary (multi-instance), tell the agent where to check (e.g., `.sdd/sdd-settings.yaml`).
 7. **Define your own terms** — If the agent introduces domain-specific vocabulary (e.g., "CMDO architecture"), define it on first use or delegate to a skill that defines it.
 8. **Complete examples** — Every example must be understandable without external context.
+9. **Plugin boundary** — Plugin agents (`plugin/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin agent.
 
 ---
 

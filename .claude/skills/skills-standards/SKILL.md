@@ -69,6 +69,7 @@ Each skill must be fully understandable on its own. An LLM reading a single skil
 4. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the skill explicitly documents it. If the skill requires a file to exist or a tool to be available, state that as a precondition.
 5. **Define your own terms** — If the skill introduces domain-specific vocabulary, define it on first use. Don't define terms that belong to other skills — delegate instead.
 6. **Complete examples** — Every example must be understandable without external context. Include the data shapes, field names, and structure needed to make the example self-contained.
+7. **Plugin boundary** — Plugin skills (`plugin/skills/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin skill.
 
 ### Cross-references
 

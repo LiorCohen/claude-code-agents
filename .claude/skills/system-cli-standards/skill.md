@@ -145,6 +145,10 @@ If an operation is deterministic and repeatable, it belongs in the CLI. If it re
 
 This is a strict one-way dependency. The CLI is a standalone tool that knows nothing about the prompt layer.
 
+### Plugin boundary
+
+All plugin prompt files (`plugin/skills/`, `plugin/commands/`, `plugin/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin prompt file.
+
 ---
 
 ## When to Use CLI vs Prompt Logic

@@ -66,6 +66,10 @@
 - `.temp/` is gitignored — never commit its contents
 - Do NOT write temporary files to `/tmp`, `prompts/`, or other locations
 
+## Plugin Boundary Rule
+
+Files inside `plugin/` have **no runtime access** to anything outside `plugin/`. Never suggest a reference from within `plugin/` to `.claude/`, `.tasks/`, or any root-level file. The plugin is a self-contained unit — its skills, commands, agents, and templates can only reference things inside the plugin directory.
+
 ## Repository Structure
 
 ```

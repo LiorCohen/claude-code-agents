@@ -71,6 +71,7 @@ A command must be fully understandable on its own. An LLM reading a single comma
 4. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the command explicitly documents it as a precondition. If the command requires files to exist (e.g., `.sdd/sdd-settings.yaml`), state that as a precondition.
 5. **Define your own terms** — If the command introduces domain-specific vocabulary, define it on first use. Don't define terms that belong to skills — delegate instead.
 6. **Complete examples** — Every example must be understandable without external context. Include the arguments, expected output, and any state changes.
+7. **Plugin boundary** — Plugin commands (`plugin/commands/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin command.
 
 ---
 
