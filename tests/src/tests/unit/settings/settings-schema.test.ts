@@ -162,7 +162,7 @@ describe('settings file schema', () => {
   it('requires project metadata section', () => {
     expect(content).toContain('projectMetadataSchema');
     expect(content).toContain("'name'");
-    expect(content).toContain("'description'");
+    expect(content).toContain("required: ['name']");
   });
 
   it('requires components array', () => {
