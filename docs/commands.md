@@ -282,6 +282,42 @@ Configure Claude Code permissions for SDD:
 
 ---
 
+## /sdd-version
+
+Show the installed plugin version and the project's plugin version, highlighting when the project is outdated.
+
+```
+/sdd-version
+```
+
+**No arguments required.**
+
+**What it shows:**
+- The installed SDD plugin version (from `plugin.json`)
+- The project's plugin version (from `.sdd/sdd-settings.yaml`)
+- Whether the project is up to date, outdated, or newer than the installed plugin
+
+**Example output (versions match):**
+```
+SDD Plugin
+
+  Installed:  6.5.0
+  Project:    6.5.0  ✓ match
+```
+
+**Example output (project outdated):**
+```
+SDD Plugin
+
+  Installed:  6.5.0
+  Project:    6.2.0  ⚠ outdated
+
+The project was created with an older plugin version.
+Run /sdd-init to upgrade project settings and repair any drift.
+```
+
+---
+
 ## Next Steps
 
 - [Getting Started](getting-started.md) - First project tutorial
