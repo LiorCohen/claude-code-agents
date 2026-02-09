@@ -124,19 +124,30 @@ interface SddMetadata {
 - Nullish coalescing pattern: `?? []` fallbacks for safe array access
 - Dual functions: `generateComponentPath()` for new, `getComponentDir()` for existing
 
+## Architecture Decision: No Heavyweight Migration Framework
+
+We considered three approaches:
+- **Option A**: Full migration system with versioned migration scripts
+- **Option B**: Detect mismatches and prompt user to fix manually
+- **Option C**: Schema flexibility + additive reconciliation
+
+**Chosen: Option C.** The v6.4.0 changes demonstrate that most migrations can be handled through schema flexibility (optional fields with defaults, stored paths, `?? []` fallbacks) rather than explicit migration code. This keeps the implementation simple and avoids maintaining a migration chain.
+
 ## Scope
 
-### 1. Plugin Version Detection & Build
-- Check if plugin version has changed (compare with `sdd.plugin_version`)
-- **Before doing anything else**, if version changed:
+### 1. Plugin Version Detection & Build (MUST BE FIRST)
+- Compare `sdd.plugin_version` (from `.sdd/sdd-settings.yaml`) with current plugin version (from `plugin/.claude-plugin/plugin.json`)
+- **This must happen before any other sdd-init logic runs**, because if the plugin code has changed, all subsequent logic (validation, reconciliation, CLI commands) would run against stale built code and produce incorrect results
+- If version changed:
   - Run `npm install` in plugin workspace
   - Run `npm run build:plugin`
   - Only proceed once plugin is built with current code
 
-### 2. Existing Project Detection
+### 2. Existing Project Detection (independent of version mismatch)
 - If `.sdd/sdd-settings.yaml` exists, this is an existing project
 - Load `project.name` from settings instead of prompting
 - Skip all "new project" prompts for already-configured values
+- This applies regardless of whether a version mismatch was detected — even when versions match, don't re-ask for information that already exists
 
 ### 3. Settings Reconciliation (if version changed)
 - Load existing sdd-settings
@@ -146,18 +157,23 @@ interface SddMetadata {
 - Validate result against current schema
 - Inform user of changes made
 
-### 4. Directory Structure
+### 4. Directory Structure Mismatch Detection
+- Check for mismatches between what sdd-settings describes and what exists on the filesystem:
+  - Component `path` in settings points to a directory that doesn't exist on disk
+  - Directories exist on disk that aren't tracked in sdd-settings
+  - The current plugin version expects a different layout than what earlier versions created (e.g., flat `components/{name}` vs type-based `components/{type-plural}/{name}`)
 - Respect existing component `path` values (no forced migrations)
 - New components use current conventions via `generateComponentPath()`
-- No assumptions about flat vs type-based structure
+- Report discrepancies to user but do NOT auto-fix directory structure — just record where things currently live
 
 ## Acceptance Criteria
 
 - [ ] `sdd-init` detects plugin version changes before any other logic runs
 - [ ] Plugin dependencies are installed and built when version changes detected
-- [ ] Existing project detection prevents redundant prompts for app name
+- [ ] Existing project detection prevents redundant prompts (independent of version mismatch)
 - [ ] Settings reconciliation adds missing optional fields with defaults
 - [ ] Existing values are preserved unchanged (reflect current reality)
+- [ ] Directory structure mismatches are detected and reported (not auto-fixed)
 - [ ] Component directory structures are respected (no forced migrations)
 - [ ] `sdd.plugin_version` and `sdd.last_updated` are updated after reconciliation
 - [ ] User is informed of any fields added during reconciliation
