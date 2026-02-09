@@ -38,6 +38,7 @@
 
 ## Medium Priority
 
+- [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
 - [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
