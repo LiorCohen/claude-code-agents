@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#99](4-implementing/99/plan.md): sdd-init should ensure sdd-settings are updated during plugin updates
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#99](5-reviewing/99/changes.md): sdd-init should ensure sdd-settings are updated during plugin updates
 
 ---
 
