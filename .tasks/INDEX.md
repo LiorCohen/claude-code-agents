@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#115](5-reviewing/115/changes.md): Create system-cli-standards skill and audit CLI invocation violations
+(none)
 
 ---
 
@@ -88,6 +88,7 @@
 
 ## Complete
 
+- [#115](6-complete/115/): Create system-cli-standards skill and audit CLI invocation violations ✓ (2026-02-09)
 - [#99](6-complete/99/): sdd-init should ensure sdd-settings are updated during plugin updates ✓ (2026-02-09)
 - [#112](6-complete/112/): Add sdd-version command showing project and installed plugin versions ✓ (2026-02-09)
 - [#110](6-complete/110/): Add pino logging to plugin/system with .sdd/system-logs output ✓ (2026-02-08)
