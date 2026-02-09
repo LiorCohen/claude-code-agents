@@ -201,3 +201,4 @@ Before adding a new CLI command, verify:
 2. For each match, classify by violation category
 3. Check `plugin/skills/*/templates/` for scaffolded files that emit CLI references
 4. Write report to `.temp/system-cli-audit-<datetime>.md`
+5. If the user asks to turn the audit into a task, **copy the report file into the task directory** (e.g., `.tasks/issues/116/audit.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
