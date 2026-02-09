@@ -193,12 +193,19 @@ Before adding a new CLI command, verify:
 
 ### How to audit
 
-1. Search all files in `plugin/skills/`, `plugin/agents/`, `plugin/commands/` for:
-   - `sdd-system` (bare command references)
+**Use Opus model for audits** — thoroughness matters more than speed here.
+
+1. Run grep searches across `plugin/skills/`, `plugin/agents/`, `plugin/commands/` for:
+   - `sdd-system` (bare command references — in code blocks AND prose)
    - `npx sdd-system` (npx invocations)
    - `node.*cli.js` (direct CLI invocations)
    - `available in PATH` or `in PATH` (wrong reference claims)
-2. For each match, classify by violation category
-3. Check `plugin/skills/*/templates/` for scaffolded files that emit CLI references
-4. Write report to `.temp/system-cli-audit-<datetime>.md`
-5. If the user asks to turn the audit into a task, **copy the report file into the task directory** (e.g., `.tasks/issues/116/audit.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
+   - `/tmp/sdd` (temp file patterns)
+2. Also search `plugin/skills/*/templates/` for scaffolded files that emit CLI references
+3. For **every** match, record the exact file path, line number, and violating text
+4. Classify each match by violation category
+5. Count violations per file and per category — cross-check totals against grep output to ensure nothing is missed
+6. Write report to `.temp/system-cli-audit-<datetime>.md`
+7. If the user asks to turn the audit into a task, **copy the report file into the task directory** (e.g., `.tasks/1-inbox/116/audit.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
+
+**Note:** `plugin/system/README.md` is the CLI's own documentation and is out of scope for prompt file audits.
