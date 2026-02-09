@@ -10,37 +10,44 @@ updated: 2026-02-09
 
 When users update the SDD plugin, `sdd-init` doesn't detect the version change, doesn't ensure the plugin is built, re-prompts for information that already exists, and doesn't reconcile sdd-settings with schema changes. Users can end up running with stale builds or incomplete settings.
 
+## Core Principle
+
+The reconciler's job is to **translate any older sdd-settings file into the latest schema**. The output always conforms to the current schema. There is no need to remain backward-compatible with older formats — we just need to be able to read them and produce a clean, up-to-date file without requiring filesystem changes.
+
+"Preservative" applies to **component settings values** (don't alter `databases: ["main-db"]`, don't strip `consumes_contracts: []`) — not to deprecated metadata fields being migrated away.
+
 ## Files to Modify
 
 ### Source Files
 
 | File | Changes |
 |------|---------|
-| `plugin/system/src/types/settings.ts` | Migrate `SddMetadata` interface (split version fields, UTC datetimes). Make `ProjectMetadata.domain` and `ProjectMetadata.type` optional. Add `RawSettingsFile` type for pre-reconciliation YAML |
-| `plugin/system/src/settings/reconcile.ts` | **New file** — reconciliation logic: field migration, additive defaults, component path inference, directory mismatch detection |
-| `plugin/system/src/settings/schema.ts` | Update `sddMetadataSchema` (lines 318-338): new field names, remove date-only pattern, accept UTC datetime. Update `projectMetadataSchema` (lines 341-365): make `domain` and `type` optional. Both have `additionalProperties: false` — must reflect new-format-only fields |
+| `plugin/system/src/types/settings.ts` | Migrate `SddMetadata` interface (split version fields, UTC datetimes). Remove `domain` and `type` from `ProjectMetadata`. Make `description` optional |
+| `plugin/system/src/settings/reconcile.ts` | **New file** — reconciliation logic: accepts `unknown` from `YAML.parse()`, returns `SettingsFile` conforming to latest schema |
+| `plugin/system/src/settings/schema.ts` | Update `sddMetadataSchema` (lines 318-338): new field names, UTC datetime pattern. Update `projectMetadataSchema` (lines 341-365): remove `domain` and `type`, make `description` optional |
 | `plugin/system/src/settings/index.ts` | Add re-exports for new `reconcile.ts` module (functions + types) |
-| `plugin/system/src/cli.ts` | Update `loadSettings()` (line 152): parse YAML as `RawSettingsFile`, not `SettingsFile`. CLI only uses `system.logging` from settings — this field is unchanged so the cast is safe, but the type should be honest |
+| `plugin/system/src/cli.ts` | Update `loadSettings()` (line 152): the cast `as SettingsFile` is only safe for already-reconciled files. CLI only reads `system.logging` — extract just that field instead of casting the whole object |
 
 ### Command and Skill Files
 
 | File | Changes |
 |------|---------|
 | `plugin/commands/sdd-init.md` | Add Phase 0 (version detection + build) before current Phase 1. Modify Phase 1 to skip prompts for existing projects. Add Phase 2.7 for reconciliation |
-| `plugin/commands/sdd-version.md` | Line 26: change `sdd.plugin_version` → `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version`). Update output to show both initialized and current versions |
-| `plugin/skills/project-settings/SKILL.md` | Update schema documentation, minimal template, examples, and `create` operation parameters to reflect new metadata fields. Make `domain` and `type` optional in docs |
-| `plugin/skills/project-settings/schemas/sdd-settings.schema.json` | Update `sdd` object: new field names, datetime format. Update `project` object: make `domain` and `type` optional (remove from `required`, keep in `properties`) |
-| `plugin/skills/project-settings/schemas/input.schema.json` | Update `create` operation: rename `plugin_version` param, make `project_domain` and `project_type` optional |
+| `plugin/commands/sdd-version.md` | Line 26: change `sdd.plugin_version` → `sdd.updated_by_plugin_version`. Add fallback for pre-reconciliation files. Show both initialized and current versions |
+| `plugin/commands/sdd-change.md` | Line 317: remove `default_domain: <from sdd-settings.yaml>` — domain no longer lives in settings. Spec-decomposition skill already handles domain inference from spec content |
+| `plugin/skills/project-settings/SKILL.md` | Update schema documentation, minimal template, examples, and `create` operation parameters. Remove `domain` and `type` references |
+| `plugin/skills/project-settings/schemas/sdd-settings.schema.json` | Update `sdd` object: new field names, datetime format. Update `project` object: remove `domain` and `type` from both `required` and `properties`. Make `description` optional |
+| `plugin/skills/project-settings/schemas/input.schema.json` | Update `create` operation: rename `plugin_version` param, remove `project_domain` and `project_type` |
 
 ### Test Files
 
 | File | Changes |
 |------|---------|
 | `tests/src/tests/settings/reconcile.test.ts` | **New file** — unit tests for reconciliation logic |
-| `tests/src/tests/unit/settings/settings-schema.test.ts` | Update assertions: lines 156-158 check for old field names (`plugin_version`, `initialized_at`, `last_updated`), lines 165-166 check `domain` and `type`. Must reflect new field names and optional status |
-| `tests/src/tests/unit/settings/settings-types.test.ts` | Update assertions if interface field content changes (lines 114-115 check `readonly sdd: SddMetadata`) |
+| `tests/src/tests/unit/settings/settings-schema.test.ts` | Lines 156-158: update field name assertions to new names. Lines 165-166: remove `domain`/`type` assertions |
+| `tests/src/tests/unit/settings/settings-types.test.ts` | Update interface content assertions for changed `SddMetadata` and `ProjectMetadata` fields |
 | `tests/src/tests/workflows/sdd-init.test.ts` | Add test for existing project detection (upgrade mode) |
-| `tests/src/tests/workflows/sdd-change-new-external.test.ts` | Lines 121-127: update sample sdd-settings.yaml from old format (`plugin_version`, missing `sdd:` wrapper, `domain`, `type`) to new format |
+| `tests/src/tests/workflows/sdd-change-new-external.test.ts` | Lines 121-127: update sample sdd-settings.yaml to latest format (new field names, proper `sdd:` wrapper, no `domain`/`type`) |
 
 ### Documentation Files
 
@@ -52,12 +59,12 @@ When users update the SDD plugin, `sdd-init` doesn't detect the version change, 
 
 | File | Why |
 |------|-----|
-| `plugin/system/src/settings/validate.ts` | Only validates component cross-references (databases, contracts, helm, naming). Does not check metadata field names. Reconciliation transforms old→new BEFORE validation runs, so `validate.ts` only ever sees the new format |
-| `plugin/system/src/settings/sync.ts` | Only uses `Component` and `SettingsFile` types for component diffing. No references to `SddMetadata` or `ProjectMetadata` fields |
-| `plugin/system/src/settings/defaults.ts` | Only contains component settings defaults, no metadata defaults |
-| `plugin/skills/scaffolding/SKILL.md` | Uses `primary_domain` as its own input parameter, independent of project settings schema |
-| `plugin/skills/domain-population/SKILL.md` | Same — `primary_domain` is an input parameter, not read from settings directly |
-| `plugin/commands/sdd-change.md` | References `default_domain: <from sdd-settings.yaml>` but this is a read operation — the field remains readable as long as it exists. During reconciliation we preserve `domain` in the file, so existing projects still have it available. New projects won't have it, but sdd-change already handles missing domain gracefully |
+| `plugin/system/src/settings/validate.ts` | Only validates component cross-references (databases, contracts, helm, naming). Does not check metadata fields. Reconciliation runs before validation |
+| `plugin/system/src/settings/sync.ts` | Only uses `Component` types for component diffing. No metadata field references |
+| `plugin/system/src/settings/defaults.ts` | Only contains component settings defaults |
+| `plugin/skills/scaffolding/SKILL.md` | Uses `primary_domain` as its own input parameter, independent of project settings |
+| `plugin/skills/domain-population/SKILL.md` | Same — `primary_domain` is an input parameter |
+| `plugin/skills/spec-decomposition/SKILL.md` | Takes `default_domain` as input param; infers domain from spec content when not provided |
 
 ## Changes
 
@@ -71,25 +78,16 @@ The `SddMetadata` interface changes from single-version tracking to split init/u
 - `last_updated` → rename to `updated_at`, full UTC datetime
 
 **`ProjectMetadata` changes:**
-- `domain` and `type` become optional (deprecated — functionality moved to sdd-change)
+- `domain` and `type` are **removed** (deprecated — functionality moved to sdd-change)
 - `name` remains required; `description` becomes optional (the minimal template already omits it)
-
-**`RawSettingsFile` type:**
-
-A new type for raw YAML before reconciliation. This is needed because `YAML.parse()` may return old-format fields that don't match the updated `SettingsFile` interface. The reconciler accepts `RawSettingsFile` (loose typing with `Record<string, unknown>` for `sdd` and `project`) and returns `SettingsFile` (strict typing with new field names).
 
 ### 2. Schema Validation Strategy
 
 **Key decision: reconcile first, validate second.**
 
-Both `schema.ts` and `sdd-settings.schema.json` have `additionalProperties: false` on the `sdd` and `project` objects. This means they cannot simultaneously accept both old and new field names. Instead:
+Both `schema.ts` and `sdd-settings.schema.json` have `additionalProperties: false` on the `sdd` and `project` objects. The schemas are updated to the **latest format only**. The `reconcileSettings()` function transforms any older format into the latest before validation runs.
 
-1. The schemas are updated to the **new format only** (new field names, UTC datetime pattern)
-2. The `reconcileSettings()` function transforms old format → new format
-3. Schema validation runs **after** reconciliation, so it only ever validates new-format data
-4. Old-format files on disk are valid — they just get reconciled before validation
-
-This eliminates the need for `oneOf`/`anyOf` complexity in the schema.
+There is no need for `oneOf`/`anyOf` complexity — old-format files are never validated directly. They are always reconciled first.
 
 ### 3. sdd-init Command: Phase 0 — Version Detection & Build
 
@@ -97,7 +95,7 @@ Insert a new Phase 0 **before** the current Phase 1. This runs before any other 
 
 Behavior:
 - Check if `.sdd/sdd-settings.yaml` exists
-- If it does, read `sdd.updated_by_plugin_version` (or legacy `sdd.plugin_version`) — use raw YAML parse, not typed, since the file may be in old format
+- If it does, raw-parse the YAML and read version from `sdd.updated_by_plugin_version` or legacy `sdd.plugin_version`
 - Compare against current plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`
 - If versions differ: run `npm install` in plugin workspace, then `npm run build:plugin`
 - If no settings file exists, this is a new project — skip version check, proceed to Phase 1
@@ -114,37 +112,32 @@ Modify Phase 1 to detect existing projects **independent of version mismatch**:
 
 New file `plugin/system/src/settings/reconcile.ts` with a pure `reconcileSettings()` function.
 
-**Input:** raw parsed YAML (`RawSettingsFile`), current plugin version (`string`), project root path (`string` — for filesystem checks)
+**Input:** raw parsed YAML (`unknown`), current plugin version (`string`), project root path (`string` — for filesystem checks)
 **Output:** `ReconciliationResult` containing the reconciled `SettingsFile` and a change summary
 
 **Reconciliation steps (in order):**
 
 1. **Migrate `sdd` metadata fields:**
-   - If `plugin_version` exists and `initialized_by_plugin_version` does not: copy `plugin_version` → `initialized_by_plugin_version`
+   - If `plugin_version` exists: copy to `initialized_by_plugin_version` (if not already set)
    - Set `updated_by_plugin_version` to current plugin version
-   - If `initialized_at` is date-only (`YYYY-MM-DD`): append ` 00:00:00Z`
-   - If `last_updated` exists: rename to `updated_at`, set to current UTC datetime
+   - If `initialized_at` is date-only (`YYYY-MM-DD`): convert to `YYYY-MM-DD 00:00:00Z`
+   - If `last_updated` exists: discard it, set `updated_at` to current UTC datetime
    - Remove old field names (`plugin_version`, `last_updated`)
 
-2. **Handle deprecated `project` fields:**
-   - `domain` and `type` are **preserved in the YAML file** if they exist (no data loss, other commands may still read them)
-   - They are marked optional in the TypeScript interface and JSON schema (no longer required for new projects)
-   - They are NOT stripped during reconciliation — the "preservative" philosophy applies
+2. **Remove deprecated `project` fields:**
+   - Strip `domain` and `type` from the output — these are no longer part of the schema
+   - The reconciled file conforms to the latest schema which does not include them
 
 3. **Add missing component `path` fields:**
    - For components missing `path`: check if `components/{name}/` exists on disk (flat layout) and use that; otherwise use `generateComponentPath(type, name)`
    - Never move files — just record where the component currently lives
 
-4. **Add missing optional fields with schema defaults:**
-   - Walk each component's settings and add any fields that are defined in the schema with defaults but missing from the file
-   - Only add, never modify existing values (preservative philosophy)
-
-5. **Add `system` section if missing:**
+4. **Add `system` section if missing:**
    - Add `system.logging` with defaults `{enabled: true, level: "info"}`
 
-6. **Validate the reconciled result** using `validateSettings()`
+5. **Validate the reconciled result** using `validateSettings()`
 
-The function returns a `ReconciliationResult` describing what was changed, so the command can inform the user.
+The function returns a `ReconciliationResult` describing what was changed (fields migrated, fields removed, fields added), so the command can inform the user.
 
 ### 6. Directory Structure Mismatch Detection
 
@@ -158,7 +151,7 @@ Report format: a list of warnings included in `ReconciliationResult`, shown to t
 ### 7. sdd-init Command: Phase 2.7 — Run Reconciliation
 
 After environment verification (Phase 2) and before structure creation (Phase 3), if this is an existing project with a version mismatch:
-- Run `reconcileSettings()` on the loaded settings
+- Run `reconcileSettings()` on the raw-parsed settings
 - Write the reconciled settings back to `.sdd/sdd-settings.yaml`
 - Display a summary of changes to the user
 - Display directory mismatch warnings if any
@@ -167,44 +160,38 @@ After environment verification (Phase 2) and before structure creation (Phase 3)
 
 ### 8. sdd-version Command Update
 
-Update `plugin/commands/sdd-version.md` to read the project version from the new field:
-- Read `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version` for pre-reconciliation files)
-- Optionally show `sdd.initialized_by_plugin_version` as "Originally created with" for context
-- Update output format to reflect both versions when they differ
+Update `plugin/commands/sdd-version.md`:
+- Read project version from `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version` for pre-reconciliation files)
+- Show `sdd.initialized_by_plugin_version` as "Originally created with" for context
 - Update "project outdated" message to reference `/sdd-init` for reconciliation
 
-### 9. Schema and Documentation Updates
+### 9. sdd-change Command Update
 
-Update the project-settings skill, JSON schemas, and docs:
-- `sdd-settings.schema.json`: new `sdd` field names, `initialized_at` pattern accepts both date and datetime, `project.domain` and `project.type` move from `required` to optional
+Remove `default_domain: <from sdd-settings.yaml>` from the spec-decomposition invocation (line 317). The spec-decomposition skill already infers domain from spec content when `default_domain` is not provided.
+
+### 10. Schema and Documentation Updates
+
+Update the project-settings skill, JSON schemas, and docs to latest format only:
+- `sdd-settings.schema.json`: new `sdd` field names with UTC datetime pattern, remove `domain`/`type` from `project`
 - `schema.ts`: mirror the same changes in the programmatic schema (lines 318-365)
 - `input.schema.json`: update `create` operation parameters
 - `SKILL.md`: update minimal template, examples, field tables, `create` operation docs
 - `docs/commands.md`: update sdd-version description
 
-### 10. Existing Test Updates
+### 11. Existing Test Updates
 
-Tests that directly assert old field names or formats must be updated:
-
-- **`settings-schema.test.ts`** lines 156-158: change assertions from `'plugin_version'`/`'initialized_at'`/`'last_updated'` to new field names. Lines 165-166: keep `'domain'`/`'type'` assertions but verify they're optional (not in required array)
-- **`settings-types.test.ts`**: verify `SddMetadata` interface has new field names
-- **`sdd-change-new-external.test.ts`** lines 121-127: update sample settings to new format with `sdd:` wrapper and new field names
+Tests that assert old field names or formats:
+- **`settings-schema.test.ts`**: update assertions to new field names, remove `domain`/`type` assertions
+- **`settings-types.test.ts`**: update `SddMetadata`/`ProjectMetadata` content assertions
+- **`sdd-change-new-external.test.ts`**: update sample settings to latest format
 
 ## Dependencies
 
-1. **Types must change first** — `SddMetadata` and `ProjectMetadata` interface changes + `RawSettingsFile` type gate everything
-2. **Both schemas update together** — `schema.ts` and `sdd-settings.schema.json` must change in sync with types
-3. **Reconciliation module** — depends on updated types, imports `generateComponentPath` from sync.ts
-4. **Index re-exports** — `index.ts` updated after reconcile.ts exists
-5. **Command updates** — sdd-init.md and sdd-version.md depend on reconciliation module being available
-6. **Existing test updates** — must change alongside the types/schemas they assert against
-7. **New tests** — reconciliation unit tests written alongside the module; workflow test depends on all other changes
-
 Recommended order:
-1. Types + both schemas + existing test updates (atomic — must all change together)
-2. Reconciliation module + new tests
-3. Index re-exports + cli.ts type fix
-4. Command updates (sdd-init.md, sdd-version.md)
+1. Types + both schemas + existing test updates (atomic — must all change together to compile)
+2. Reconciliation module + new unit tests
+3. Index re-exports + cli.ts fix
+4. Command updates (sdd-init.md, sdd-version.md, sdd-change.md)
 5. Skill docs + input schema
 6. docs/commands.md
 7. Workflow test for existing project upgrade
@@ -218,29 +205,30 @@ Recommended order:
 - [ ] `test_migrates_last_updated_to_updated_at` — `last_updated: "2026-01-15"` becomes `updated_at: "<current UTC datetime>"`
 - [ ] `test_converts_date_only_initialized_at_to_utc` — `initialized_at: "2026-01-15"` becomes `initialized_at: "2026-01-15 00:00:00Z"`
 - [ ] `test_preserves_full_utc_initialized_at` — `initialized_at: "2026-01-15 10:30:00Z"` is not modified
-- [ ] `test_preserves_project_domain_and_type` — existing `domain` and `type` values are kept in the output (not stripped)
-- [ ] `test_does_not_require_domain_or_type_for_new_projects` — settings without `domain`/`type` pass validation
-- [ ] `test_preserves_project_name_and_description` — existing values unchanged
+- [ ] `test_strips_deprecated_project_domain_and_type` — existing `domain` and `type` are removed from output
+- [ ] `test_works_without_domain_or_type` — settings without `domain`/`type` reconcile cleanly
+- [ ] `test_preserves_project_name` — existing `name` value unchanged
+- [ ] `test_preserves_project_description` — existing `description` value unchanged
+- [ ] `test_works_without_description` — settings without `description` reconcile cleanly
 - [ ] `test_adds_missing_component_path_using_generate` — component without `path` gets `generateComponentPath()` result
 - [ ] `test_infers_existing_flat_path_from_filesystem` — component without `path` but `components/{name}/` exists on disk → uses flat path
 - [ ] `test_preserves_existing_component_path` — component with `path` keeps its value unchanged
 - [ ] `test_adds_missing_system_logging_section` — settings without `system` get `system.logging` with defaults
 - [ ] `test_preserves_existing_system_settings` — settings with `system.logging` are not modified
-- [ ] `test_adds_missing_optional_server_fields` — server without `databases` doesn't get it force-added (optional fields with defaults only added where schema requires)
 - [ ] `test_preserves_empty_arrays` — `consumes_contracts: []` stays as `[]` (not removed)
-- [ ] `test_preserves_all_existing_component_settings` — full round-trip: no data loss for any field
+- [ ] `test_preserves_all_existing_component_settings` — full round-trip: no data loss for component settings
 - [ ] `test_detects_path_not_on_disk` — warning for component path that doesn't exist as directory
 - [ ] `test_detects_untracked_component_directories` — warning for `components/foo-server/` that's not in settings
 - [ ] `test_validates_reconciled_output` — reconciled settings pass `validateSettings()`
 - [ ] `test_returns_change_summary` — result describes what fields were added/migrated/removed
 - [ ] `test_full_reconciliation_v636_to_v640` — end-to-end scenario from task description (v6.3.6 → v6.4.0)
-- [ ] `test_already_reconciled_is_noop` — running reconciliation on already-new-format settings produces no changes
+- [ ] `test_already_reconciled_is_noop` — running reconciliation on already-current-format settings produces no changes
 
 ### Existing Test Updates
 
 - [ ] `settings-schema.test.ts` — update field name assertions to match new schema
-- [ ] `settings-types.test.ts` — update interface content assertions if needed
-- [ ] `sdd-change-new-external.test.ts` — update sample sdd-settings.yaml to new format
+- [ ] `settings-types.test.ts` — update interface content assertions for changed fields
+- [ ] `sdd-change-new-external.test.ts` — update sample sdd-settings.yaml to latest format
 
 ### Integration Tests (sdd-init workflow)
 
@@ -249,16 +237,15 @@ Recommended order:
 
 ## Verification
 
-- [ ] New projects initialize with new metadata field names (`initialized_by_plugin_version`, `updated_by_plugin_version`, `initialized_at` with UTC, `updated_at` with UTC)
+- [ ] New projects initialize with latest metadata field names
 - [ ] Existing projects with old field names get migrated on next `sdd-init` run
 - [ ] `initialized_by_plugin_version` and `initialized_at` are never overwritten after first set
-- [ ] Existing `project.domain` and `project.type` values are preserved (not stripped)
-- [ ] New projects work without `domain` and `type` fields
+- [ ] Deprecated `project.domain` and `project.type` are stripped during reconciliation
 - [ ] Plugin is built before any logic runs when version mismatch detected
-- [ ] Existing project values are preserved (no data loss)
+- [ ] Component settings values are preserved (no data loss on component-level fields)
 - [ ] Directory mismatches are reported but not auto-fixed
 - [ ] `/sdd-version` correctly reads version from new field name (with legacy fallback)
-- [ ] Schema validates new-format settings (old-format files are reconciled first, not validated directly)
-- [ ] All existing tests continue to pass after updates
-- [ ] `npm run build:plugin` succeeds with updated types
+- [ ] Reconciled output conforms to latest schema — no backward-compat format accepted by schema
+- [ ] All existing tests pass after updates
+- [ ] `npm run build:plugin` succeeds
 - [ ] `npm test` passes
