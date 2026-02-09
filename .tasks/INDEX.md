@@ -4,7 +4,6 @@
 
 ## Planning
 
-- [#99](2-planning/99/plan.md): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
@@ -12,7 +11,7 @@
 
 ## Ready
 
-(none)
+- [#99](3-ready/99/plan.md): sdd-init should ensure sdd-settings are updated during plugin updates
 
 ---
 

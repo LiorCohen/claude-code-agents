@@ -1,7 +1,7 @@
 ---
 id: 99
 title: sdd-init should ensure sdd-settings are updated during plugin updates
-status: planning
+status: ready
 priority: high
 created: 2026-02-08
 depends_on: []
