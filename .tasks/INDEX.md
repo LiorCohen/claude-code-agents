@@ -28,6 +28,7 @@
 ---
 
 ## High Priority
+- [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#99](1-inbox/99/): sdd-init should ensure sdd-settings are updated during plugin updates
 - [#17](1-inbox/17/): Plans should follow TDD with test review first

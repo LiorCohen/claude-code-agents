@@ -7,8 +7,6 @@
  * - Performs domain analysis with thinking step
  * - Creates epic structure when 3+ changes identified
  * - Never references archive/ in generated specs
- *
- * Token usage is recorded to tests/data/sdd-change-new-external.yaml for benchmarking.
  */
 
 import { describe, expect, it, beforeAll } from 'vitest';
@@ -21,12 +19,8 @@ import {
   readFileAsync,
   joinPath,
   statAsync,
-  recordBenchmark,
-  getTestFilePath,
   type TestProject,
 } from '@/lib';
-
-const TEST_FILE = getTestFilePath(import.meta.url.replace('file://', ''));
 
 // Sample external spec with 3 sections (should trigger epic recommendation)
 const EXTERNAL_SPEC_CONTENT = `# User Management System
@@ -309,18 +303,6 @@ project:
       // If no numbered epics, check for regular epic structure or individual changes
       console.log('Note: Numbered epic structure not detected (may have created flat changes)');
     }
-
-    // Record token usage benchmark
-    const benchmark = await recordBenchmark(
-      'sdd-change-new-external',
-      TEST_FILE,
-      'change-new-external-spec',
-      result.output
-    );
-    console.log(`\nToken usage recorded:`);
-    console.log(`  Total: ${benchmark.total.total_tokens} tokens`);
-    console.log(`  Input: ${benchmark.total.input_tokens}, Output: ${benchmark.total.output_tokens}`);
-    console.log(`  Turns: ${benchmark.turn_count}`);
 
     console.log('\nAll assertions passed!');
   }, 660000); // 11 minute timeout for external spec processing

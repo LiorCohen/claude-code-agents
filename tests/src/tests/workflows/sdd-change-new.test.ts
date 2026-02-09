@@ -4,8 +4,6 @@
  * WHY: Verifies that sdd-change new correctly creates SPEC.md
  * with proper structure and content. This ensures the SDD workflow produces
  * valid specifications. Plans are created via separate approval step.
- *
- * Token usage is recorded to tests/data/sdd-change-new.yaml for benchmarking.
  */
 
 import { describe, expect, it, beforeAll } from 'vitest';
@@ -18,12 +16,8 @@ import {
   joinPath,
   statAsync,
   readFileAsync,
-  recordBenchmark,
-  getTestFilePath,
   type TestProject,
 } from '@/lib';
-
-const TEST_FILE = getTestFilePath(import.meta.url.replace('file://', ''));
 
 const NEW_CHANGE_PROMPT = `Run /sdd-change new --type feature --name user-auth to create a new change specification.
 
@@ -124,18 +118,6 @@ The primary business domain.
 
     // Note: PLAN.md is now created via /sdd-change approve spec
     // This test only verifies spec creation
-
-    // Record token usage benchmark
-    const benchmark = await recordBenchmark(
-      'sdd-change-new',
-      TEST_FILE,
-      'change-new-feature',
-      result.output
-    );
-    console.log(`\nToken usage recorded:`);
-    console.log(`  Total: ${benchmark.total.total_tokens} tokens`);
-    console.log(`  Input: ${benchmark.total.input_tokens}, Output: ${benchmark.total.output_tokens}`);
-    console.log(`  Turns: ${benchmark.turn_count}`);
 
     console.log('\nAll assertions passed!');
   }, 360000); // 6 minute timeout

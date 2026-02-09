@@ -12,8 +12,6 @@
  * - README.md, CLAUDE.md, .gitignore
  *
  * Full component scaffolding happens on-demand via /sdd-change new.
- *
- * Token usage is recorded to tests/data/sdd-init.yaml for benchmarking.
  */
 
 import { describe, expect, it, beforeAll } from 'vitest';
@@ -26,12 +24,8 @@ import {
   projectFileDoesNotExist,
   writeFileAsync,
   joinPath,
-  recordBenchmark,
-  getTestFilePath,
   type TestProject,
 } from '@/lib';
-
-const TEST_FILE = getTestFilePath(import.meta.url.replace('file://', ''));
 
 const MINIMAL_INIT_PROMPT = `Run /sdd-init to create a new project.
 
@@ -128,13 +122,6 @@ describe('sdd-init command', () => {
     expect(projectFileDoesNotExist(project, 'components', 'webapp')).toBe(true);
     expect(projectFileDoesNotExist(project, 'components', 'contract')).toBe(true);
     expect(projectFileDoesNotExist(project, 'components', 'database')).toBe(true);
-
-    // Record token usage benchmark
-    const benchmark = await recordBenchmark('sdd-init', TEST_FILE, 'init-minimal', result.output);
-    console.log(`\nToken usage recorded:`);
-    console.log(`  Total: ${benchmark.total.total_tokens} tokens`);
-    console.log(`  Input: ${benchmark.total.input_tokens}, Output: ${benchmark.total.output_tokens}`);
-    console.log(`  Turns: ${benchmark.turn_count}`);
 
     console.log('\nAll assertions passed!');
   }, 240000); // 4 minute timeout for minimal scaffolding

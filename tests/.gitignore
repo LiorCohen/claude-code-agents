@@ -1,0 +1,3 @@
+# Test artifacts that should never be committed
+.sdd/
+changes/

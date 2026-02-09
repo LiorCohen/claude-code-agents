@@ -3,3 +3,7 @@ dist/
 
 # Dependencies - installed at runtime
 node_modules/
+
+# Test artifacts (should never appear here, but prevent accidental commits)
+.sdd/
+changes/

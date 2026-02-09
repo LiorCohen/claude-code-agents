@@ -67,16 +67,3 @@ export {
 // HTTP utilities
 export type { HttpResponse } from './http';
 export { waitForServer, httpGet, httpPost } from './http';
-
-// Benchmark utilities
-export type { TokenUsage, BenchmarkRun, BenchmarkData } from './benchmark';
-export {
-  BENCHMARK_DATA_DIR,
-  getPluginVersion,
-  parseTokenUsage,
-  getBenchmarkFilePath,
-  loadBenchmarkData,
-  saveBenchmarkData,
-  recordBenchmark,
-  getTestFilePath,
-} from './benchmark';
