@@ -36,29 +36,33 @@
     "sdd": {
       "type": "object",
       "description": "SDD plugin metadata.",
-      "required": ["plugin_version", "initialized_at", "last_updated"],
+      "required": ["initialized_by_plugin_version", "updated_by_plugin_version", "initialized_at", "updated_at"],
       "additionalProperties": false,
       "properties": {
-        "plugin_version": {
+        "initialized_by_plugin_version": {
           "type": "string",
-          "description": "SDD plugin version that created this project."
+          "description": "Plugin version that first created this project (immutable after init)."
+        },
+        "updated_by_plugin_version": {
+          "type": "string",
+          "description": "Plugin version that last reconciled settings."
         },
         "initialized_at": {
           "type": "string",
-          "format": "date",
-          "description": "Date project was initialized (YYYY-MM-DD)."
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$",
+          "description": "UTC datetime project was initialized (YYYY-MM-DD HH:MM:SSZ)."
         },
-        "last_updated": {
+        "updated_at": {
           "type": "string",
-          "format": "date",
-          "description": "Date settings were last modified (YYYY-MM-DD)."
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$",
+          "description": "UTC datetime settings were last updated (YYYY-MM-DD HH:MM:SSZ)."
         }
       }
     },
     "project": {
       "type": "object",
       "description": "Project metadata.",
-      "required": ["name", "description", "domain", "type"],
+      "required": ["name"],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -69,15 +73,6 @@
         "description": {
           "type": "string",
           "description": "Brief project description."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Primary business domain."
-        },
-        "type": {
-          "type": "string",
-          "enum": ["fullstack", "backend", "frontend", "custom"],
-          "description": "Project type classification."
         }
       }
     },

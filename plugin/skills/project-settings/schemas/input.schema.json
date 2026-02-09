@@ -20,25 +20,11 @@
     },
     "project_description": {
       "type": "string",
-      "description": "Project description (used for create operation)"
+      "description": "Project description (used for create operation, optional)"
     },
-    "project_domain": {
+    "initialized_by_plugin_version": {
       "type": "string",
-      "description": "Business domain (used for create operation)"
-    },
-    "project_type": {
-      "type": "string",
-      "enum": [
-        "fullstack",
-        "backend",
-        "frontend",
-        "custom"
-      ],
-      "description": "Project type classification"
-    },
-    "plugin_version": {
-      "type": "string",
-      "description": "SDD plugin version (used for create operation)"
+      "description": "Plugin version creating this project (used for create operation)"
     },
     "components": {
       "type": "array",

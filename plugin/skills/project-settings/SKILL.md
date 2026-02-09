@@ -55,23 +55,24 @@ The schema defines three top-level sections: `sdd` (plugin metadata), `project` 
 
 ```yaml
 sdd:
-  plugin_version: "6.2.1"
-  initialized_at: "2026-02-07"
-  last_updated: "2026-02-07"
+  initialized_by_plugin_version: "6.2.1"
+  updated_by_plugin_version: "6.4.0"
+  initialized_at: "2026-02-07 00:00:00Z"
+  updated_at: "2026-02-09 14:30:00Z"
 
 project:
   name: "my-app"
   description: "A task management SaaS application"
-  domain: "Task Management"
-  type: "fullstack"
 
 components:
   - name: config
     type: config
+    path: components/config
     settings: {}
 
   - name: main-server
     type: server
+    path: components/servers/main-server
     settings:
       server_type: hybrid
       modes: [api, worker]
@@ -82,12 +83,14 @@ components:
 
   - name: admin-dashboard
     type: webapp
+    path: components/webapps/admin-dashboard
     settings:
       contracts: [public-api]
       helm: true
 
   - name: main-server-api
     type: helm
+    path: components/helm-charts/main-server-api
     settings:
       deploys: main-server
       deploy_type: server
@@ -96,12 +99,14 @@ components:
 
   - name: primary-db
     type: database
+    path: components/databases/primary-db
     settings:
       provider: postgresql
       dedicated: false
 
   - name: public-api
     type: contract
+    path: components/contracts/public-api
     settings:
       visibility: internal
 ```
@@ -220,11 +225,9 @@ Initialize a new settings file.
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `plugin_version` | Yes | Current SDD plugin version |
+| `initialized_by_plugin_version` | Yes | Current SDD plugin version |
 | `project_name` | Yes | Project name |
-| `project_description` | Yes | Project description |
-| `project_domain` | Yes | Primary domain |
-| `project_type` | Yes | One of: `fullstack`, `backend`, `frontend`, `custom` |
+| `project_description` | No | Project description |
 | `components` | Yes | List of components with settings |
 
 ### Operation: `read`
@@ -290,15 +293,13 @@ Template for initializing a new `.sdd/sdd-settings.yaml`:
 # ============================================================================
 
 sdd:
-  plugin_version: "{{PLUGIN_VERSION}}"
-  initialized_at: "{{CURRENT_DATE}}"
-  last_updated: "{{CURRENT_DATE}}"
+  initialized_by_plugin_version: "{{PLUGIN_VERSION}}"
+  updated_by_plugin_version: "{{PLUGIN_VERSION}}"
+  initialized_at: "{{CURRENT_UTC_DATETIME}}"
+  updated_at: "{{CURRENT_UTC_DATETIME}}"
 
 project:
   name: "{{PROJECT_NAME}}"
-  # description and domain are populated as you build features
-  # description: "A task management application"
-  # domain: "Task Management"
 
 # Components are added here as they are scaffolded via /sdd-change new
 # The first change targeting a component type triggers scaffolding.
@@ -306,14 +307,14 @@ project:
 # Example after scaffolding a server:
 #   - name: my-app-server
 #     type: server
+#     path: components/servers/my-app-server
 #     settings:
 #       server_type: api
-#       databases: []
-#       provides_contracts: []
 
 components:
   - name: config
     type: config
+    path: components/config
     settings: {}
 ```
 
