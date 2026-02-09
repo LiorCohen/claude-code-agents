@@ -42,8 +42,8 @@ v6.3.7 introduced the `system` section. When reconciling a v6.3.6 project:
 
 v6.4.0 made `databases`, `provides_contracts`, `consumes_contracts`, `contracts`, and `helm` optional. When reconciling:
 - If a server has `databases: ["users-db"]` → keep it (reflects reality)
-- If a server has `databases: []` → keep it (still valid, user wrote it)
-- Do NOT strip empty arrays or normalize to "minimal" form — respect what the user has
+- If a server has `databases: []` → keep it (still valid, set by a previous plugin version)
+- Do NOT strip empty arrays or normalize to "minimal" form — respect what was set by prior tooling
 
 **Example 3: Adding a required field (v6.4.0 added `path` to components)**
 
@@ -81,8 +81,8 @@ After reconciliation to v6.4.0:
 sdd:
   initialized_by_plugin_version: "6.3.6"            # Migrated from plugin_version (preserved)
   updated_by_plugin_version: "6.4.0"                 # Set to current version
-  initialized_at: "2025-12-01 00:00:00 +0000"              # Migrated (original date, time unknown)
-  updated_at: "2026-02-09 14:30:00 +0200"                  # Migrated from last_updated, set to now
+  initialized_at: "2025-12-01 00:00:00 Z"              # Migrated (original date, time unknown)
+  updated_at: "2026-02-09 14:30:00 Z"                  # Migrated from last_updated, set to now
 project:
   name: "my-app"                       # Preserved
   description: "My application"        # Preserved
@@ -95,15 +95,15 @@ components:
       server_type: "api"               # Preserved
       databases: ["main-db"]           # Preserved (non-empty)
       provides_contracts: ["user-api"] # Preserved (non-empty)
-      consumes_contracts: []           # Preserved (user wrote it)
-      helm: true                       # Preserved (user set it)
+      consumes_contracts: []           # Preserved (set by prior plugin version)
+      helm: true                       # Preserved (set by prior plugin version)
 system:                                # Added (new section)
   logging:
     enabled: true
     level: "info"
 ```
 
-Note: `consumes_contracts: []` and `helm: true` are preserved even though they match defaults — we don't normalize what the user has written.
+Note: `consumes_contracts: []` and `helm: true` are preserved even though they match defaults — users never edit sdd-settings directly, but values set by prior plugin versions reflect the project state at that time and should not be normalized away.
 
 ## Existing Infrastructure
 
@@ -122,15 +122,15 @@ interface SddMetadata {
 interface SddMetadata {
   readonly initialized_by_plugin_version: string;  // Version that first created the project
   readonly updated_by_plugin_version: string;       // Version that last reconciled settings
-  readonly initialized_at: string;                  // Full datetime with timezone, human readable
-  readonly updated_at: string;                      // Full datetime with timezone, human readable
+  readonly initialized_at: string;                  // Full UTC datetime (YYYY-MM-DD HH:MM:SSZ)
+  readonly updated_at: string;                      // Full UTC datetime (YYYY-MM-DD HH:MM:SSZ)
 }
 ```
 
 This split is important because:
 - `initialized_by_plugin_version` is immutable — set once during first `sdd-init`, never changes
 - `updated_by_plugin_version` tracks the most recent plugin version that touched settings
-- Full datetimes with timezone (e.g., `"2026-02-09 14:30:00 +0200"`) are more useful than date-only strings
+- Full UTC datetimes (e.g., `"2026-02-09 14:30:00Z"`) are more useful than date-only strings
 - Renaming `last_updated` → `updated_at` for consistency with `initialized_at`
 
 ### Backwards Compatibility Pattern
@@ -168,7 +168,7 @@ We considered three approaches:
 - Load existing sdd-settings
 - Migrate `sdd` metadata fields:
   - `plugin_version` → `initialized_by_plugin_version` (preserve original value) + `updated_by_plugin_version` (set to current)
-  - `initialized_at` → keep name, convert date-only to full datetime with timezone (append `00:00:00 +0000` for unknown times)
+  - `initialized_at` → keep name, convert date-only to full UTC datetime (append `00:00:00Z` for unknown times)
   - `last_updated` → rename to `updated_at`, set to current datetime
   - Remove old field names after migration
 - Remove deprecated `project` fields:
