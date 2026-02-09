@@ -30,6 +30,81 @@ Reconciliation must be:
 - **Permissive**: Accept structural variations (flat vs type-based directories)
 - **Non-destructive**: Never force-update existing values to "ideal" defaults
 
+### Concrete Examples
+
+**Example 1: Adding a new section (v6.3.6 → v6.3.7 added `system.logging`)**
+
+v6.3.7 introduced the `system` section. When reconciling a v6.3.6 project:
+- Add `system.logging` with defaults `{enabled: true, level: "info"}`
+- Do NOT touch anything else in the file
+
+**Example 2: Making fields optional (v6.3.7 → v6.4.0 made arrays optional)**
+
+v6.4.0 made `databases`, `provides_contracts`, `consumes_contracts`, `contracts`, and `helm` optional. When reconciling:
+- If a server has `databases: ["users-db"]` → keep it (reflects reality)
+- If a server has `databases: []` → keep it (still valid, user wrote it)
+- Do NOT strip empty arrays or normalize to "minimal" form — respect what the user has
+
+**Example 3: Adding a required field (v6.4.0 added `path` to components)**
+
+v6.4.0 made `path` required on all components. When reconciling a pre-v6.4.0 project:
+- A component `{name: "api-server", type: "server"}` needs a `path` added
+- Infer from filesystem or generate using `generateComponentPath("server", "api-server")` → `"components/servers/api-server"`
+- Do NOT move any files — just record where the component currently lives
+
+**Example 4: Full reconciliation scenario (v6.3.6 → v6.4.0)**
+
+Before (v6.3.6):
+```yaml
+sdd:
+  plugin_version: "6.3.6"
+  initialized_at: "2025-12-01"
+  last_updated: "2025-12-01"
+project:
+  name: "my-app"
+  description: "My application"
+  domain: "ecommerce"
+  type: "fullstack"
+components:
+  - name: "api-server"
+    type: "server"
+    settings:
+      server_type: "api"
+      databases: ["main-db"]
+      provides_contracts: ["user-api"]
+      consumes_contracts: []
+      helm: true
+```
+
+After reconciliation to v6.4.0:
+```yaml
+sdd:
+  plugin_version: "6.4.0"              # Updated
+  initialized_at: "2025-12-01"         # Preserved
+  last_updated: "2026-02-09"           # Updated
+project:
+  name: "my-app"                       # Preserved
+  description: "My application"        # Preserved
+  domain: "ecommerce"                  # Preserved
+  type: "fullstack"                    # Preserved
+components:
+  - name: "api-server"                 # Preserved
+    type: "server"                     # Preserved
+    path: "components/servers/api-server"  # Added (inferred)
+    settings:
+      server_type: "api"               # Preserved
+      databases: ["main-db"]           # Preserved (non-empty)
+      provides_contracts: ["user-api"] # Preserved (non-empty)
+      consumes_contracts: []           # Preserved (user wrote it)
+      helm: true                       # Preserved (user set it)
+system:                                # Added (new section)
+  logging:
+    enabled: true
+    level: "info"
+```
+
+Note: `consumes_contracts: []` and `helm: true` are preserved even though they match defaults — we don't normalize what the user has written.
+
 ## Existing Infrastructure
 
 The following infrastructure already exists (as of v6.4.0):
