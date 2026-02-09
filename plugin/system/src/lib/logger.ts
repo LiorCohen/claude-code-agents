@@ -90,6 +90,8 @@ export interface FileLoggerOptions {
   readonly command?: string;
   /** Command arguments */
   readonly args?: readonly string[];
+  /** Project root directory (defaults to process.cwd()) */
+  readonly projectRoot?: string;
 }
 
 /**
@@ -112,8 +114,9 @@ export const createFileLogger = (
     // Get current date for log file naming
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Ensure .sdd/system-logs/ directory exists
-    const logDir = join(process.cwd(), '.sdd', 'system-logs');
+    // Use provided projectRoot or fallback to process.cwd()
+    const projectRoot = options.projectRoot ?? process.cwd();
+    const logDir = join(projectRoot, '.sdd', 'system-logs');
     mkdirSync(logDir, { recursive: true });
 
     // Create log file path

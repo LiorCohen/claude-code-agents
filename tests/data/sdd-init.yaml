@@ -323,3 +323,17 @@ runs:
       input_tokens: 480
       output_tokens: 702
       total_tokens: 1182
+  - timestamp: "2026-02-09T10:10:11.457Z"
+    plugin_version: "6.4.0"
+    test_file: "tests/src/tests/workflows/sdd-init.test.ts"
+    test_name: "init-minimal"
+    turn_count: 47
+    usage:
+      claude-sonnet-4-5-20250929:
+        input_tokens: 251
+        output_tokens: 950
+        total_tokens: 1201
+    total:
+      input_tokens: 251
+      output_tokens: 950
+      total_tokens: 1201

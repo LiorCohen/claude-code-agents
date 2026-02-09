@@ -20,6 +20,7 @@ import { join } from 'path';
 import YAML from 'yaml';
 import { parseArgs, type CommandResult, type GlobalOptions, outputResult } from '@/lib/args';
 import { createLogger, createFileLogger } from '@/lib/logger';
+import { findProjectRoot } from '@/lib/config';
 import type { SettingsFile, LogLevel } from '@/types/settings';
 
 // Command imports
@@ -163,6 +164,10 @@ const main = async (): Promise<number> => {
   const { namespace, action, args, options } = parseArgs(process.argv.slice(2));
   const logger = createLogger(options);
 
+  // Find project root (directory containing package.json or .sdd/)
+  // If no project found (null), disable file logging to avoid polluting non-project directories
+  const projectRoot = await findProjectRoot();
+
   // Load settings and initialize file logger
   const settings = loadSettings();
   const loggingConfig = settings?.system?.logging ?? {
@@ -172,10 +177,11 @@ const main = async (): Promise<number> => {
 
   const command = namespace && action ? `${namespace} ${action}` : undefined;
   const fileLogger = createFileLogger({
-    enabled: loggingConfig.enabled,
+    enabled: loggingConfig.enabled && projectRoot !== null,
     level: loggingConfig.level,
     command,
     args,
+    projectRoot: projectRoot ?? undefined,
   });
 
   // Log CLI invocation
