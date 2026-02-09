@@ -361,13 +361,19 @@ The changelog is split by major version to stay within Claude's file size limits
 
 ```
 changelog/
+├── README.md          # Compelling summary of all major versions (for evaluators)
 ├── v1.md              # All 1.x releases
 ├── v2.md              # All 2.x releases
 ├── v3.md              # All 3.x releases
 ├── v4.md              # All 4.x releases
-└── v5.md              # All 5.x releases (current)
+├── v5.md              # All 5.x releases
+└── v6.md              # All 6.x releases (current)
 ```
 
 When adding a new entry:
 1. Identify the major version (e.g., `5.1.0` → major version `5`)
 2. Add entry to `changelog/v5.md` after the header section
+
+When creating a **new major version**:
+1. Create `changelog/v{N}.md`
+2. Add a summary paragraph and table row to `changelog/README.md`
