@@ -6,7 +6,6 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
-- [#116](2-planning/116/plan.md): Fix system CLI standards violations from audit report
 
 ---
 
@@ -18,7 +17,7 @@
 
 ## Implementing
 
-(none)
+- [#116](4-implementing/116/plan.md): Fix system CLI standards violations from audit report
 
 ---
 
