@@ -67,7 +67,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "pattern": "^[a-z0-9-]+$",
+          "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
           "description": "Project name (lowercase, hyphens, no spaces)."
         },
         "description": {
@@ -87,7 +87,7 @@
   "$defs": {
     "component_name": {
       "type": "string",
-      "pattern": "^[a-z0-9-]+$",
+      "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
       "description": "Lowercase, hyphens only. Should be multi-word and domain-specific (e.g., order-service, analytics-db)."
     },
     "component": {
