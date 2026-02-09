@@ -218,6 +218,19 @@ Write report to `.temp/tasks-audit-<datetime>.md`.
 
 ---
 
+## User Approval Rule
+
+**CRITICAL:** Each `/tasks` command is a standalone operation. After executing the requested command, **STOP and return control to the user**. NEVER chain commands or advance a task to the next status without explicit user approval.
+
+- `/tasks add` → add to inbox, commit, stop. Do NOT proceed to plan.
+- `/tasks plan` → move to planning, create plan, commit, stop. Do NOT proceed to ready/implement.
+- `/tasks ready` → move to ready, commit, stop. Do NOT proceed to implement.
+- `/tasks implement` → move to implementing, create branch, commit, stop. Do NOT start coding.
+
+The user decides when to advance. Always wait for their instruction.
+
+---
+
 ## Quick Reference
 
 - **Task numbering:** Permanent IDs, never reused. Find highest + 1.
