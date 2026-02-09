@@ -63,6 +63,12 @@ An agent must be fully understandable on its own. An LLM reading a single agent 
 
 ---
 
+## CLI Delegation
+
+Agents should not invoke the system CLI directly. Instead, agents delegate to commands or skills that handle CLI invocation. This keeps CLI coupling out of agents and in the orchestration layers. **For the canonical CLI invocation pattern, see the `system-cli-standards` skill.**
+
+---
+
 ## No User Interaction
 
 Agents run as subprocesses (subagents) invoked by commands or other agents. They have **no direct access to the user**. This is a hard constraint of the execution environment, not a style preference.

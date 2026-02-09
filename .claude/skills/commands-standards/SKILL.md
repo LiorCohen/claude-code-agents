@@ -152,7 +152,7 @@ INVOKE <skill-name>.<method> with:
 
 ## CLI Integration
 
-Commands may call the `sdd-system` CLI for deterministic, system-layer operations (file creation, validation, version bumping). This is a different delegation path than INVOKE — CLI calls are shell executions, not prompt-layer context loading.
+Commands may call the `sdd-system` CLI for deterministic, system-layer operations (file creation, validation, version bumping). This is a different delegation path than INVOKE — CLI calls are shell executions, not prompt-layer context loading. **For the canonical invocation pattern, output contracts, and authority boundaries, see the `system-cli-standards` skill.**
 
 ### Format
 

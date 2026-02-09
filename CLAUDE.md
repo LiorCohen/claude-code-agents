@@ -58,6 +58,7 @@
 - **skills-standards** - Follow when creating or reviewing skills
 - **agents-standards** - Follow when creating or reviewing agents
 - **commands-standards** - Follow when creating or reviewing commands
+- **system-cli-standards** - Follow when invoking or referencing the system CLI from prompt files
 
 ## Temporary Files
 
@@ -80,7 +81,8 @@ sdd/
 │       ├── typescript-standards/     # TypeScript coding standards
 │       ├── skills-standards/        # Standards for authoring skills
 │       ├── agents-standards/       # Standards for authoring agents
-│       └── commands-standards/     # Standards for authoring commands
+│       ├── commands-standards/     # Standards for authoring commands
+│       └── system-cli-standards/  # Standards for CLI invocation from prompts
 ├── .claude-plugin/
 │   └── marketplace.json              # Marketplace manifest
 ├── .temp/                               # Temp files for skills/agents (gitignored)
