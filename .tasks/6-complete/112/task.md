@@ -1,8 +1,9 @@
 ---
 id: 112
 title: Add sdd-version command showing project and installed plugin versions
-status: open
+status: complete
 created: 2026-02-09
+completed: 2026-02-09
 depends_on: []
 blocks: []
 ---

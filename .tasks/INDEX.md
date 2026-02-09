@@ -63,7 +63,6 @@
 
 ## Inbox (unprioritized)
 
-- [#112](1-inbox/112/): Add sdd-version command showing project and installed plugin versions
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
@@ -88,6 +87,7 @@
 
 ## Complete
 
+- [#112](6-complete/112/): Add sdd-version command showing project and installed plugin versions ✓ (2026-02-09)
 - [#110](6-complete/110/): Add pino logging to plugin/system with .sdd/system-logs output ✓ (2026-02-08)
 - [#104](6-complete/104/): sdd-run without arguments should show usage text ✓ (2026-02-08)
 - [#95](6-complete/95/): Fix commands standards violations from audit report ✓ (2026-02-08)
