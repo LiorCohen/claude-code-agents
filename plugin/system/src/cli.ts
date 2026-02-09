@@ -21,7 +21,7 @@ import YAML from 'yaml';
 import { parseArgs, type CommandResult, type GlobalOptions, outputResult } from '@/lib/args';
 import { createLogger, createFileLogger } from '@/lib/logger';
 import { findProjectRoot } from '@/lib/config';
-import type { SettingsFile, LogLevel } from '@/types/settings';
+import type { LogLevel } from '@/types/settings';
 
 // Command imports
 import { handleSpec } from '@/commands/spec';
@@ -145,15 +145,28 @@ const showHelp = (options: GlobalOptions): CommandResult => {
   return { success: true };
 };
 
+/** Logging config extracted from raw settings YAML (safe for pre-reconciled files) */
+interface RawLoggingConfig {
+  readonly enabled: boolean;
+  readonly level: LogLevel;
+}
+
 /**
- * Load settings from .sdd/sdd-settings.yaml if it exists.
- * Returns default settings if file doesn't exist or can't be loaded.
+ * Load logging config from .sdd/sdd-settings.yaml if it exists.
+ * Safely extracts system.logging without assuming the full SettingsFile shape,
+ * since the file may not yet be reconciled to the latest schema.
  */
-const loadSettings = (): SettingsFile | null => {
+const loadLoggingConfig = (): RawLoggingConfig | null => {
   try {
     const settingsPath = join(process.cwd(), '.sdd', 'sdd-settings.yaml');
     const content = readFileSync(settingsPath, 'utf-8');
-    return YAML.parse(content) as SettingsFile;
+    const raw = YAML.parse(content) as Record<string, unknown>;
+    const system = raw?.system as Record<string, unknown> | undefined;
+    const logging = system?.logging as Record<string, unknown> | undefined;
+    if (logging && typeof logging.enabled === 'boolean' && typeof logging.level === 'string') {
+      return { enabled: logging.enabled, level: logging.level as LogLevel };
+    }
+    return null;
   } catch {
     // Settings file doesn't exist or can't be read - use defaults
     return null;
@@ -168,9 +181,8 @@ const main = async (): Promise<number> => {
   // If no project found (null), disable file logging to avoid polluting non-project directories
   const projectRoot = await findProjectRoot();
 
-  // Load settings and initialize file logger
-  const settings = loadSettings();
-  const loggingConfig = settings?.system?.logging ?? {
+  // Load logging config from settings (safe for pre-reconciled files)
+  const loggingConfig = loadLoggingConfig() ?? {
     enabled: true,
     level: 'info' as LogLevel,
   };

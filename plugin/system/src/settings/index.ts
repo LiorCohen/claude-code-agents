@@ -88,6 +88,14 @@ export {
   formatSyncPreview,
 } from './sync';
 
+// Re-export reconciliation
+export type {
+  ReconciliationChange,
+  ReconciliationWarning,
+  ReconciliationResult,
+} from './reconcile';
+export { reconcileSettings } from './reconcile';
+
 // Re-export helm sync utilities
 export type { HelmTemplateSet } from './sync-helm';
 export {
