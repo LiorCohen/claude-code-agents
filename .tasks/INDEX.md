@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#99](5-reviewing/99/changes.md): sdd-init should ensure sdd-settings are updated during plugin updates
+(none)
 
 ---
 
@@ -88,6 +88,7 @@
 
 ## Complete
 
+- [#99](6-complete/99/): sdd-init should ensure sdd-settings are updated during plugin updates ✓ (2026-02-09)
 - [#112](6-complete/112/): Add sdd-version command showing project and installed plugin versions ✓ (2026-02-09)
 - [#110](6-complete/110/): Add pino logging to plugin/system with .sdd/system-logs output ✓ (2026-02-08)
 - [#104](6-complete/104/): sdd-run without arguments should show usage text ✓ (2026-02-08)

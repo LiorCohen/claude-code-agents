@@ -1,14 +1,15 @@
 ---
 id: 99
 title: sdd-init should ensure sdd-settings are updated during plugin updates
-status: reviewing
+status: complete
 priority: high
 created: 2026-02-08
+completed: 2026-02-09
 depends_on: []
 blocks: []
 ---
 
-# Task 99: sdd-init should ensure sdd-settings are updated during plugin updates
+# Task 99: sdd-init should ensure sdd-settings are updated during plugin updates ✓
 
 ## Description
 
