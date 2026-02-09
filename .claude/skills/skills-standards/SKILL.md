@@ -243,6 +243,8 @@ CLI ↛ Skills (NEVER — CLI must not route through or invoke skill definitions
 
 A skill may document calling the CLI (e.g., "run `sdd-system spec validate`"). A skill must never document being invoked by the CLI (e.g., "runs via `sdd-system scaffolding project`"). If the CLI has a subcommand that implements what a skill describes, the skill should be refactored so that the command or skill orchestrates CLI primitives — not the other way around.
 
+**For the canonical CLI invocation pattern, output contracts, and authority boundaries, see the `system-cli-standards` skill.**
+
 ---
 
 ## Skill Structure
