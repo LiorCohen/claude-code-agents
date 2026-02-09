@@ -17,26 +17,41 @@ This standard applies to skills shipped with the SDD plugin — all `SKILL.md` f
 
 ## Frontmatter
 
-Every `SKILL.md` must start with YAML frontmatter containing exactly these fields:
+Every `SKILL.md` must start with YAML frontmatter. The following fields are supported:
 
 ```yaml
 ---
-name: my-skill              # REQUIRED — kebab-case, must match directory name
-description: >              # REQUIRED — what it does + what it needs/produces
+name: my-skill              # OPTIONAL — kebab-case, uses directory name if omitted
+description: >              # RECOMMENDED — what it does + what it needs/produces
   Discover required technical components through targeted questions
   based on classified requirements. Accepts classified requirements
   and produces a component list with types, names, and rationale.
-user-invocable: false        # REQUIRED — true only for skills the user triggers via /command
+user-invocable: false        # OPTIONAL — true if user can invoke via /command (default: true)
+model: opus                  # OPTIONAL — model to use when skill is active
+disable-model-invocation: true  # OPTIONAL — prevent Claude from auto-loading (default: false)
 ---
 ```
 
-| Field | Type | Rule |
-|-------|------|------|
-| `name` | `string` | kebab-case, matches parent directory name |
-| `description` | `string` | 1-3 sentences. First sentence: what the skill does. Remaining sentences (optional): what it accepts/produces, key constraints, or disambiguation from similar skills. Never reference where or when the skill is used — the skill doesn't know its callers. The model uses this to decide whether to load the skill, so include enough signal for accurate selection. |
-| `user-invocable` | `boolean` | `true` if the user invokes it via `/skill-name`; `false` for internal skills invoked by the plugin workflow or other skills |
+### Required Fields
 
-**No other frontmatter fields.** Additional metadata belongs in the skill body.
+Only `description` is recommended. All other fields are optional.
+
+### Supported Fields
+
+| Field | Type | Default | Rule |
+|-------|------|---------|------|
+| `name` | `string` | Directory name | kebab-case, matches parent directory name if specified |
+| `description` | `string` | First paragraph | 1-3 sentences. First sentence: what the skill does. Remaining sentences (optional): what it accepts/produces, key constraints, or disambiguation from similar skills. Never reference where or when the skill is used — the skill doesn't know its callers. The model uses this to decide whether to load the skill, so include enough signal for accurate selection. |
+| `user-invocable` | `boolean` | `true` | `true` if the user invokes it via `/skill-name`; `false` for internal skills invoked by the plugin workflow or other skills |
+| `model` | `string` | Inherits session model | Model to use when this skill is active. Options: `opus`, `sonnet`, `haiku`, `inherit` |
+| `disable-model-invocation` | `boolean` | `false` | Set to `true` to prevent Claude from automatically loading this skill. Use for workflows you want to trigger manually. |
+| `argument-hint` | `string` | None | Hint shown during autocomplete to indicate expected arguments (e.g., `[issue-number]`, `[filename] [format]`) |
+| `allowed-tools` | `string` | None | Comma-separated list of tools Claude can use without permission when this skill is active |
+| `context` | `string` | None | Set to `fork` to run in a forked subagent context |
+| `agent` | `string` | `general-purpose` | Which subagent type to use when `context: fork` is set |
+| `hooks` | `object` | None | Hooks scoped to this skill's lifecycle |
+
+**For SDD plugin skills, only use frontmatter fields that are necessary for the skill's functionality.** Keep frontmatter minimal and prefer documentation in the skill body.
 
 ---
 
@@ -297,10 +312,12 @@ Include a drift risk summary table:
 
 Use when creating or reviewing a plugin skill:
 
-- [ ] Frontmatter has exactly `name`, `description`, and `user-invocable`
-- [ ] `name` is kebab-case and matches the directory name
+- [ ] Frontmatter includes `description` (recommended) and only uses supported optional fields
+- [ ] `name` (if specified) is kebab-case and matches the directory name
 - [ ] `description` is 1-3 sentences: what the skill does + what it accepts/produces. No references to callers or workflow position.
-- [ ] `user-invocable` is explicitly `true` or `false`
+- [ ] `user-invocable` is explicitly `true` or `false` if specified (defaults to `true` if omitted)
+- [ ] `model` (if specified) uses valid values: `opus`, `sonnet`, `haiku`, or `inherit`
+- [ ] Only necessary frontmatter fields are included — keep it minimal
 - [ ] Cross-references describe the delegation contract (what goes in, what comes out, where responsibility lives)
 - [ ] No duplicated definitions — concepts owned by other skills are delegated, not copied
 - [ ] No cross-skill file references — never read or link to files inside another skill's directory

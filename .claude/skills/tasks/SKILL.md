@@ -1,6 +1,7 @@
 ---
 name: tasks
 description: Manage tasks and plans using the .tasks/ directory.
+model: opus
 ---
 
 # Task Management Skill
