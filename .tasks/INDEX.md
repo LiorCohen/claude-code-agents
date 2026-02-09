@@ -11,13 +11,13 @@
 
 ## Ready
 
-- [#99](3-ready/99/plan.md): sdd-init should ensure sdd-settings are updated during plugin updates
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#99](4-implementing/99/plan.md): sdd-init should ensure sdd-settings are updated during plugin updates
 
 ---
 
