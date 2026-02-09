@@ -318,22 +318,26 @@ const componentSchema: JSONSchema7 = {
 const sddMetadataSchema: JSONSchema7 = {
   type: 'object',
   properties: {
-    plugin_version: {
+    initialized_by_plugin_version: {
       type: 'string',
-      description: 'SDD plugin version that created this project',
+      description: 'Plugin version that first created this project',
+    },
+    updated_by_plugin_version: {
+      type: 'string',
+      description: 'Plugin version that last reconciled settings',
     },
     initialized_at: {
       type: 'string',
-      pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-      description: 'Date project was initialized (YYYY-MM-DD)',
+      pattern: '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$',
+      description: 'UTC datetime project was initialized (YYYY-MM-DD HH:MM:SSZ)',
     },
-    last_updated: {
+    updated_at: {
       type: 'string',
-      pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-      description: 'Date settings were last modified (YYYY-MM-DD)',
+      pattern: '^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$',
+      description: 'UTC datetime settings were last updated (YYYY-MM-DD HH:MM:SSZ)',
     },
   },
-  required: ['plugin_version', 'initialized_at', 'last_updated'],
+  required: ['initialized_by_plugin_version', 'updated_by_plugin_version', 'initialized_at', 'updated_at'],
   additionalProperties: false,
 };
 
@@ -350,17 +354,8 @@ const projectMetadataSchema: JSONSchema7 = {
       type: 'string',
       description: 'Project description',
     },
-    domain: {
-      type: 'string',
-      description: 'Primary business domain',
-    },
-    type: {
-      type: 'string',
-      enum: ['fullstack', 'backend', 'frontend', 'custom'],
-      description: 'Project type',
-    },
   },
-  required: ['name', 'description', 'domain', 'type'],
+  required: ['name'],
   additionalProperties: false,
 };
 
