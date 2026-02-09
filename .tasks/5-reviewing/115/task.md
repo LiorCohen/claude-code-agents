@@ -2,7 +2,7 @@
 id: 115
 title: Create system-cli-standards skill and audit CLI invocation violations
 priority: high
-status: implementing
+status: reviewing
 created: 2026-02-09
 depends_on: []
 blocks: []

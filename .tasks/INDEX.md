@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#115](4-implementing/115/plan.md): Create system-cli-standards skill and audit CLI invocation violations
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#115](5-reviewing/115/changes.md): Create system-cli-standards skill and audit CLI invocation violations
 
 ---
 
