@@ -14,15 +14,17 @@ Scaffolding logic is split between the system CLI (`project.ts` — file operati
 | File | Changes |
 |------|---------|
 | `plugin/system/src/commands/scaffolding/engine.ts` | **New** — Core engine module: spec types, condition evaluator, operation handlers, executor |
+| `plugin/system/src/commands/scaffolding/scaffold-spec.schema.json` | **New** — JSON Schema for the scaffold spec format |
 | `plugin/system/src/commands/scaffolding/apply.ts` | **New** — CLI handler for `scaffolding apply --spec <path> [--dry-run]` |
 | `plugin/system/src/commands/scaffolding/index.ts` | Add `apply` action to router |
 | `plugin/system/src/commands/scaffolding/project.ts` | Refactor to build a spec and call engine internally; remove meta-scripts |
-| `plugin/skills/components/backend/backend-scaffolding/SKILL.md` | Add spec-building instructions |
-| `plugin/skills/components/frontend/frontend-scaffolding/SKILL.md` | Add spec-building instructions |
-| `plugin/skills/components/config/config-scaffolding/SKILL.md` | Add spec-building instructions |
-| `plugin/skills/components/contract/contract-scaffolding/SKILL.md` | Add spec-building instructions |
-| `plugin/skills/components/database/database-scaffolding/SKILL.md` | Add spec-building instructions |
-| `plugin/skills/components/helm/helm-scaffolding/SKILL.md` | Add spec-building instructions |
+| `plugin/skills/project-scaffolding/templates/project/package.json` | Remove `npm-run-all` devDependency |
+| `plugin/skills/components/backend/backend-scaffolding/SKILL.md` | Replace prose scaffolding with spec-building instructions (Tier 2) |
+| `plugin/skills/components/frontend/frontend-scaffolding/SKILL.md` | Replace prose scaffolding with spec-building instructions (Tier 1) |
+| `plugin/skills/components/config/config-scaffolding/SKILL.md` | Add spec-building instructions for base templates (Tier 3 — dynamic sections stay as skill logic) |
+| `plugin/skills/components/contract/contract-scaffolding/SKILL.md` | Replace prose scaffolding with spec-building instructions (Tier 1) |
+| `plugin/skills/components/database/database-scaffolding/SKILL.md` | Replace prose scaffolding with spec-building instructions (Tier 1) |
+| `plugin/skills/components/helm/helm-scaffolding/SKILL.md` | Replace prose scaffolding with spec-building instructions (Tier 2) |
 | `plugin/skills/scaffolding/SKILL.md` | Update orchestrator to use `scaffolding apply` |
 | `plugin/skills/project-scaffolding/SKILL.md` | Update to reference engine invocation |
 | `tests/src/tests/unit/commands/scaffolding/engine.test.ts` | **New** — Unit tests for engine core |
@@ -48,53 +50,87 @@ The engine module is the heart of this task. It contains:
 
 All functions use existing `@/lib/fs` utilities (`ensureDir`, `writeText`, `readText`, `readJson`, `writeJson`, `walkDir`, `exists`, `copyFile`).
 
-### 2. CLI Handler (`apply.ts`)
+### 2. JSON Schema (`scaffold-spec.schema.json`)
+
+A JSON Schema file defining the spec format, colocated with the engine. Validates:
+- Top-level required fields (`target_dir`, `base_dir`, `variables`, `operations`)
+- Operation type discriminator and per-type required fields
+- `when` condition structure (`key` + `equals`/`not_empty`)
+- `if_exists` enum values (`skip`, `overwrite`)
+
+Used by `apply.ts` for runtime validation before executing. Follows the project's existing pattern (`schemas/*.schema.json`).
+
+### 3. CLI Handler (`apply.ts`)
 
 Thin handler that:
 - Parses `--spec <path>` and `--dry-run` from args
 - Reads and JSON-parses the spec file
-- Validates required fields (`target_dir`, `base_dir`, `variables`, `operations`)
+- Validates spec against the JSON Schema; returns structured error on validation failure
+- Validates that `target_dir` and `base_dir` exist on the filesystem
 - Calls `executeSpec(spec, dryRun)`
 - Returns `CommandResult` with engine output as `data`
 
-### 3. Router Update (`index.ts`)
+Error handling (follows project.ts patterns):
+- Missing `--spec` argument → error with usage hint
+- Spec file not found → error with path
+- Malformed JSON → error with parse details
+- Schema validation failure → error listing which fields are invalid
+- `base_dir` not found → error (templates can't be resolved)
+- `target_dir` not found → error (nowhere to write)
+- Individual operation failures (e.g., source template missing) → logged in output, execution continues for remaining operations
+
+### 4. Router Update (`index.ts`)
 
 Add `'apply'` to the `ACTIONS` tuple. Add the dynamic import case for `apply.ts` in `handleScaffolding`.
 
-### 4. Project.ts Refactor
+### 5. Project.ts Refactor
 
 Refactor `runScaffolding` to:
 1. Build a `ScaffoldSpec` from the existing `ScaffoldingConfig` (translate component entries into operations)
 2. Call `executeSpec(spec, false)`
 3. Map `EngineResult` back to the existing `ScaffoldingResult` format for backward compatibility
 
-Remove `generateMetaScripts()` and all references to meta-scripts (`dev`, `build`, `test`, `start` orchestration scripts, `npm-run-all`). Keep `generateComponentScripts()` since it's used to compute per-component scripts that feed into `package_json_scripts` operations.
+The spec builder translates all current inline content generation into `write_file` operations:
+- Root `.gitignore` (line ~400) → `write_file` with inline content
+- `.claudeignore` (line ~449) → `write_file` with inline content
+- `.gitkeep` files (line ~438) → `mkdir` with `gitkeep: true`
+- Architecture overview (line ~609) → `write_file` (content computed by builder)
+- Contract `.gitignore` (line ~650) → `write_file` with inline content
+- CI/CD workflow YAML (line ~712) → `write_file` (content computed by builder)
+
+Remove `generateMetaScripts()` and all references to meta-scripts (`dev`, `build`, `test`, `start` orchestration scripts). Keep `generateComponentScripts()` since it's used to compute per-component scripts that feed into `package_json_scripts` operations.
 
 The existing helper functions (`substituteVariables`, `copyTemplateFile`, `copyTemplateDir`) become unused after refactoring and are removed — the engine has its own implementations.
 
-### 5. Component Skills Update
+### 6. Project Template Update
 
-Each skill gets a new section explaining how to build and invoke a scaffold spec. The skill retains its domain knowledge (what a backend component needs, what conditions apply) but the "What It Creates" section now explains that the LLM should construct a spec JSON and invoke `scaffolding apply`.
+Remove `npm-run-all` from `plugin/skills/project-scaffolding/templates/project/package.json` devDependencies. This dependency was only needed by meta-scripts, which are being dropped.
 
-The skill documents:
+### 7. Component Skills Update
+
+Each skill gets a new "Scaffold Spec" section that replaces the prose file-creation instructions. The skill retains its domain knowledge (what a backend component needs, what conditions apply) and documents:
 - Which variables to set
 - Which context flags to compute from settings
 - The full operations list (with `when` conditions where applicable)
-- Example spec (already in task.md for most components)
+- Example spec
 
-The existing prose instructions for file creation are replaced with spec-building instructions.
+**Tier 1 skills** (frontend, contract, database) — straightforward replacement. Prose instructions become a fixed spec with no conditions.
 
-### 6. Orchestrator and Project-Scaffolding Skills
+**Tier 2 skills** (backend, helm) — specs include `when` conditions. The skill explains which context flags to derive from settings and how.
 
-The orchestrator skill (`plugin/skills/scaffolding/SKILL.md`) is updated to describe the new flow: for each component, build a spec and invoke `scaffolding apply --spec <path>`.
+**Tier 3 skills** (config) — different pattern. The base config component templates use the engine (`template_dir`), but dynamic config section generation (per-component YAML content) stays as skill logic. The skill builds the YAML content and passes it via `write_file` operations with `if_exists: "skip"` (additive only, never clobber existing sections). The skill explicitly documents this split: "Use the engine for the component structure. Compute config sections yourself and write them via `write_file`."
+
+### 8. Orchestrator and Project-Scaffolding Skills
+
+The orchestrator skill (`plugin/skills/scaffolding/SKILL.md`) is updated to describe the new flow: for each component, build a spec and invoke `scaffolding apply --spec <path>`. The LLM writes the spec JSON to `.temp/` and passes the path.
 
 The project-scaffolding skill is updated to reference the engine for its file operations (project structure spec from the task).
 
 ## Dependencies
 
-1. Engine core (`engine.ts`) must be implemented first — all other changes depend on it
+1. Engine core (`engine.ts`) and JSON Schema must be implemented first — all other changes depend on it
 2. CLI handler (`apply.ts`) and router update (`index.ts`) can happen together, after engine
-3. Project.ts refactor depends on engine being complete and tested
+3. Project.ts refactor and template update depend on engine being complete and tested
 4. Skill updates are independent of each other but depend on the engine working
 5. Tests should be written alongside the engine (TDD for core logic)
 
@@ -132,10 +168,13 @@ Engine operations (filesystem, temp dirs):
 - `test_handleTemplateDir_creates_intermediate_dirs`
 - `test_handleTemplateDir_skips_existing_files_by_default`
 - `test_handleTemplateDir_overwrites_when_if_exists_overwrite`
+- `test_handleTemplateDir_if_exists_overwrite_mixed_creates_new_and_overwrites_existing`
+- `test_handleTemplateDir_source_not_found_returns_error_in_output`
 - `test_handleTemplateFile_copies_single_file`
 - `test_handleTemplateFile_substitutes_variables`
 - `test_handleTemplateFile_skips_existing_by_default`
 - `test_handleTemplateFile_overwrites_when_if_exists_overwrite`
+- `test_handleTemplateFile_source_not_found_returns_error_in_output`
 - `test_handleMkdir_creates_directory`
 - `test_handleMkdir_creates_gitkeep_when_requested`
 - `test_handleMkdir_idempotent_on_existing_dir`
@@ -148,6 +187,16 @@ Engine operations (filesystem, temp dirs):
 - `test_handlePackageJsonScripts_does_not_overwrite_existing_scripts`
 - `test_handlePackageJsonScripts_warns_if_no_package_json`
 - `test_handlePackageJsonScripts_creates_scripts_field_if_missing`
+
+Validation and error handling:
+
+- `test_apply_rejects_missing_spec_argument`
+- `test_apply_rejects_nonexistent_spec_file`
+- `test_apply_rejects_malformed_json`
+- `test_apply_rejects_spec_missing_required_fields`
+- `test_apply_rejects_unknown_operation_type`
+- `test_apply_rejects_nonexistent_base_dir`
+- `test_apply_rejects_nonexistent_target_dir`
 
 Full engine execution:
 
@@ -176,8 +225,10 @@ Using real plugin templates:
 - [ ] `scaffolding apply --spec spec.json --dry-run` outputs correct structure without creating files
 - [ ] Conditional operations correctly evaluate `when` clauses
 - [ ] Non-destructive: existing files are skipped by default, overwritten with `if_exists: "overwrite"`
-- [ ] `scaffolding project` still produces the same output after refactoring
-- [ ] Meta-scripts (`dev`, `build`, `test`, `start`) are removed from project scaffolding
+- [ ] JSON Schema validates spec format and rejects malformed input
+- [ ] Error handling: clear messages for missing spec, bad JSON, invalid fields, missing dirs
+- [ ] `scaffolding project` still produces the same output after refactoring (minus meta-scripts)
+- [ ] Meta-scripts (`dev`, `build`, `test`, `start`) and `npm-run-all` removed from project scaffolding
 - [ ] All existing tests pass
 - [ ] New engine tests pass
 - [ ] `npm run build:plugin` succeeds
