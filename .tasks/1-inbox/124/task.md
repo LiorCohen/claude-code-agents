@@ -45,6 +45,7 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - The tone should be direct, skeptical, and constructive — Lior's actual review style
 - It should catch the most common Claude failure modes: over-engineering, making assumptions without reading code, drifting from plans, adding unnecessary abstractions, being too agreeable
 - **Anti-grep rule:** Claude over-relies on grep to skim for keywords instead of reading full files. The critic must enforce: "Did you actually READ the files, or did you just grep for a keyword and assume you understand the context? Read the full file. Grep is for finding files, not for understanding them."
+- **Learning feedback loop:** The critic should maintain a `feedback-log.md` file that accumulates Lior's actual feedback over time. When Lior pushes back on a plan, rejects an approach, or corrects Claude's thinking, the critic should capture that pattern and add it to its knowledge base. Over time, the critic gets sharper because it learns from real interactions — not just the initial static prompts. The skill prompt should read this log at each phase and apply any relevant learned patterns.
 
 ## Acceptance Criteria
 
@@ -55,3 +56,6 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - [ ] Tasks skill references the critic at each transition point
 - [ ] Critic catches common Claude failure modes (over-engineering, assumptions, drift, gold-plating)
 - [ ] Anti-grep rule included: grep is for finding files, not understanding them — read full files
+- [ ] `feedback-log.md` file created for accumulating Lior's real feedback patterns
+- [ ] Skill prompt reads feedback log at each lifecycle phase and applies learned patterns
+- [ ] Instructions for when/how to append new feedback entries to the log
