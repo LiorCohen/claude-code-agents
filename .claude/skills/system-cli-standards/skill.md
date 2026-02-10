@@ -194,3 +194,13 @@ Before adding a new CLI command, verify:
 6. Ask the user if they want to turn the audit into a task. If yes, **copy the report file into the task directory** (e.g., `.tasks/1-inbox/116/audit-<datetime>.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
 
 **Note:** `plugin/system/README.md` is the CLI's own documentation and is out of scope for prompt file audits.
+
+### TypeScript standards audit
+
+Audit the `plugin/system/` TypeScript source code against the `typescript-standards` skill.
+
+1. Load the `typescript-standards` skill — use its full Summary Checklist as the audit criteria
+2. Read every `.ts` file in `plugin/system/src/` (recursively)
+3. For each file, check every item in the typescript-standards Summary Checklist
+4. Record every finding with exact file path, line number, and the specific standard violated
+5. Append results to the same `.temp/system-cli-audit-<datetime>.md` report (under a separate "TypeScript Standards" heading), or write a standalone `.temp/typescript-audit-<datetime>.md` if running independently
