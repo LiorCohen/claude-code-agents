@@ -25,20 +25,21 @@ The TypeScript standards skill is missing several patterns that are used through
 
 ### Medium Priority (widely used patterns)
 
-6. **Generic constraints** — When and how to use `<T extends ...>` bounds
-7. **Null vs undefined semantics** — Convention for when to use each
-8. **`Record<string, never>` for empty objects** — Placeholder/empty type pattern
-9. **Nullish coalescing (`??`) vs logical OR (`||`)** — When each is appropriate
-10. **`import type` for type-only imports** — Separate type imports from value imports
+6. **Semantic type aliases** — Use `type Milliseconds = number` to give meaning to primitives rather than raw `number`/`string`
+7. **Generic constraints** — When and how to use `<T extends ...>` bounds
+8. **Null vs undefined semantics** — Convention for when to use each
+9. **`Record<string, never>` for empty objects** — Placeholder/empty type pattern
+10. **Nullish coalescing (`??`) vs logical OR (`||`)** — When each is appropriate
+11. **`import type` for type-only imports** — Separate type imports from value imports
 
 ### Lower Priority (nice to have)
 
-11. **`keyof` and indexed access types** — For type-safe property access
-12. **`Object.entries`/`Object.fromEntries`** — Immutable object transformation pattern
+12. **`keyof` and indexed access types** — For type-safe property access
+13. **`Object.entries`/`Object.fromEntries`** — Immutable object transformation pattern
 
 ### Correction
 
-13. **Ban `let` entirely** — Remove "let if absolutely necessary" language. Use `const` with `.map`/`.reduce`/recursion instead.
+14. **Ban `let` entirely** — Remove "let if absolutely necessary" language. Use `const` with `.map`/`.reduce`/recursion instead.
 
 ## Acceptance Criteria
 
@@ -48,5 +49,6 @@ The TypeScript standards skill is missing several patterns that are used through
 - [ ] Type guards section shows both custom predicates and discriminated unions
 - [ ] `as const` section shows deriving union types from arrays
 - [ ] Error handling section covers catch blocks, throw vs null, and wrapping
+- [ ] Semantic type aliases section shows primitives with domain meaning
 - [ ] All examples use patterns from the actual codebase where possible
 - [ ] Summary checklist at the bottom is updated to reflect new rules
