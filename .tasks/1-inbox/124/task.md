@@ -45,8 +45,9 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - The tone should be direct, skeptical, and constructive — Lior's actual review style
 - It should catch the most common Claude failure modes: over-engineering, making assumptions without reading code, drifting from plans, adding unnecessary abstractions, being too agreeable
 - **Anti-grep rule:** Claude over-relies on grep to skim for keywords instead of reading full files. The critic must enforce: "Did you actually READ the files, or did you just grep for a keyword and assume you understand the context? Read the full file. Grep is for finding files, not for understanding them."
-- **Learning feedback loop:** The critic should maintain a `feedback-log.md` file inside `.crit/` at the repo root. This file accumulates Lior's actual feedback over time. When Lior pushes back on a plan, rejects an approach, or corrects Claude's thinking, the critic should capture that pattern and add it to its knowledge base. Over time, the critic gets sharper because it learns from real interactions — not just the initial static prompts. The skill prompt should read `.crit/feedback-log.md` at each phase and apply any relevant learned patterns.
-- **Feedback log hygiene:** The feedback log must be kept consistent — no contradictions, no duplications. When adding a new entry, check if it overlaps with or contradicts an existing entry. If it overlaps, merge them into one stronger rule. If it contradicts, replace the old one. Keep the log concise — distill patterns into sharp rules, don't just append raw transcripts. Never lose functionality during summarization. If unsure whether a new entry subsumes or conflicts with an existing one, ask Lior before modifying.
+- **Learning feedback loop:** The `.crit/` directory at the repo root stores the critic's learned knowledge, organized by topic into separate files. When Lior pushes back on a plan, rejects an approach, or corrects Claude's thinking, the critic captures that pattern and files it into the appropriate topic file. Over time, the critic gets sharper because it learns from real interactions — not just the initial static prompts. The skill prompt should read the relevant `.crit/*.md` files at each phase and apply learned patterns.
+- **`.crit/` directory structure:** Organize feedback by topic, not chronologically. Example files: `planning.md` (planning mistakes and corrections), `implementation.md` (coding patterns and anti-patterns), `scope.md` (over/under-engineering feedback), `communication.md` (how to present work). Each file is a concise set of rules, not a raw transcript. New topics get new files. The skill reads all files at startup but focuses on phase-relevant ones.
+- **Feedback log hygiene:** Each `.crit/` file must be kept consistent — no contradictions, no duplications. When adding a new entry, check if it overlaps with or contradicts an existing entry in the same or another file. If it overlaps, merge into one stronger rule. If it contradicts, replace the old one. Keep files concise — distill patterns into sharp rules. Never lose functionality during summarization. If unsure whether a new entry subsumes or conflicts with an existing one, ask Lior before modifying.
 
 ## Acceptance Criteria
 
@@ -57,8 +58,8 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - [ ] Tasks skill references the critic at each transition point
 - [ ] Critic catches common Claude failure modes (over-engineering, assumptions, drift, gold-plating)
 - [ ] Anti-grep rule included: grep is for finding files, not understanding them — read full files
-- [ ] `.crit/` directory created at repo root for critic state
-- [ ] `.crit/feedback-log.md` file created for accumulating Lior's real feedback patterns
-- [ ] Skill prompt reads `.crit/feedback-log.md` at each lifecycle phase and applies learned patterns
-- [ ] Instructions for when/how to append new feedback entries to the log
+- [ ] `.crit/` directory created at repo root with topic-organized feedback files
+- [ ] Initial topic files created (e.g., `planning.md`, `implementation.md`, `scope.md`, `communication.md`)
+- [ ] Skill prompt reads relevant `.crit/*.md` files at each lifecycle phase
+- [ ] Instructions for when/how to add entries and when to create new topic files
 - [ ] Feedback log hygiene rules: no contradictions, no duplications, merge overlaps, ask Lior if unsure
