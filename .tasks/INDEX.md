@@ -7,6 +7,7 @@
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 - [#122](2-planning/122/plan.md): Fix TypeScript standards violations in plugin/system
+- [#123](2-planning/123/plan.md): Update TypeScript standards with missing patterns and corrections
 ---
 
 ## Ready
@@ -65,7 +66,6 @@
 ---
 
 ## Inbox (unprioritized)
-- [#123](1-inbox/123/): Update TypeScript standards with missing patterns and corrections
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding

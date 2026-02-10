@@ -1,7 +1,7 @@
 ---
 id: 123
 title: Update TypeScript standards with missing patterns and corrections
-status: open
+status: planning
 created: 2026-02-10
 depends_on: []
 blocks: []
