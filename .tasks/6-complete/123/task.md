@@ -1,8 +1,9 @@
 ---
 id: 123
 title: Update TypeScript standards with missing patterns and corrections
-status: reviewing
+status: complete
 created: 2026-02-10
+completed: 2026-02-10
 depends_on: []
 blocks: []
 ---
