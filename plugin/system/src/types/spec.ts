@@ -2,12 +2,12 @@
  * Type definitions for spec-related operations.
  */
 
-export interface ValidationError {
+export type ValidationError = {
   readonly file: string;
   readonly message: string;
 }
 
-export interface SpecEntry {
+export type SpecEntry = {
   readonly title: string;
   readonly type: string;
   readonly path: string;
@@ -18,7 +18,7 @@ export interface SpecEntry {
   readonly spec_type?: SpecType;
 }
 
-export interface ActiveSpec {
+export type ActiveSpec = {
   readonly title: string;
   readonly path: string;
   readonly domain: string;

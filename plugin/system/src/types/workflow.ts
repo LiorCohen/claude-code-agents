@@ -12,7 +12,7 @@ export type ReviewStatus = 'pending' | 'ready_for_review' | 'approved' | 'change
 export type WorkflowPhase = 'spec' | 'plan' | 'implement' | 'review';
 
 // Workflow item with four-field status model
-export interface WorkflowItem {
+export type WorkflowItem = {
   readonly id: string;
   readonly change_id: string;
   readonly title: string;
@@ -26,7 +26,7 @@ export interface WorkflowItem {
 }
 
 // Workflow state from workflow.yaml
-export interface WorkflowState {
+export type WorkflowState = {
   readonly id: string;
   readonly source: 'external' | 'interactive';
   readonly created: string;
@@ -37,7 +37,7 @@ export interface WorkflowState {
   readonly items: readonly WorkflowItem[];
 }
 
-export interface WorkflowProgress {
+export type WorkflowProgress = {
   readonly total_items: number;
   readonly specs_completed: number;
   readonly specs_pending: number;
@@ -48,13 +48,13 @@ export interface WorkflowProgress {
 }
 
 // Phase gate check result
-export interface PhaseGateResult {
+export type PhaseGateResult = {
   readonly can_advance: boolean;
   readonly blocking_items: readonly BlockingItem[];
   readonly message: string;
 }
 
-export interface BlockingItem {
+export type BlockingItem = {
   readonly change_id: string;
   readonly title: string;
   readonly current_status: string;
@@ -62,7 +62,7 @@ export interface BlockingItem {
 }
 
 // Open question from spec
-export interface OpenQuestion {
+export type OpenQuestion = {
   readonly id: string;
   readonly question: string;
   readonly status: 'OPEN' | 'ANSWERED' | 'ASSUMED' | 'DEFERRED';

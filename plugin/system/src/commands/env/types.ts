@@ -6,13 +6,13 @@ export const DEFAULT_CLUSTER_NAME = 'sdd-local';
 
 export type ClusterProvider = 'kind' | 'minikube' | 'docker-desktop';
 
-export interface EnvironmentConfig {
+export type EnvironmentConfig = {
   readonly clusterName: string;
   readonly provider: ClusterProvider;
   readonly namespace: string;
 }
 
-export interface InfrastructureConfig {
+export type InfrastructureConfig = {
   readonly metricsEnabled: boolean;
   readonly logsEnabled: boolean;
   readonly metricsRetention: string;
