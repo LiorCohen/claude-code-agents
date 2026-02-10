@@ -214,19 +214,76 @@ Cluster-level observability (Victoria Metrics, Victoria Logs) is set up separate
 
 ---
 
+## Scaffold Spec
+
+To scaffold a Helm chart, build a spec with context flags derived from helm + server settings and invoke the engine:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+### Variables
+
+| Variable | Source |
+|----------|--------|
+| `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+| `CHART_NAME` | Helm component name |
+| `CHART_DESCRIPTION` | `"Helm chart for <chart-name>"` |
+| `DEPLOYS_COMPONENT` | Name of the component this chart deploys |
+| `IS_HYBRID` | `"true"` or `"false"` |
+| `HAS_SERVICE` | `"true"` or `"false"` |
+| `HAS_INGRESS` | `"true"` or `"false"` |
+
+### Context Flags (derived from settings)
+
+| Flag | Derived From |
+|------|-------------|
+| `deploy_type` | `settings.deploy_type` (`"server"` or `"webapp"`) |
+| `is_hybrid` | `deploy_modes.length > 1` |
+| `is_cron_only` | `deploy_modes === ["cron"]` |
+| `has_api_mode` | `deploy_modes.includes("api")` |
+| `has_worker_mode` | `deploy_modes.includes("worker")` |
+| `has_cron_mode` | `deploy_modes.includes("cron")` |
+| `needs_service` | `has_api_mode && provides_contracts.length > 0` |
+| `has_ingress` | `settings.ingress === true` |
+
+### Example Spec (server chart)
+
+See the full Helm chart spec example in the task description. Each template file is a separate `template_file` operation with appropriate `when` conditions based on the pre-computed context flags.
+
+### Operations Pattern
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "CHART_NAME": "<chart-name>", "..." : "..." },
+  "context": {
+    "is_hybrid": false,
+    "is_cron_only": false,
+    "has_api_mode": true,
+    "needs_service": true,
+    "has_ingress": true
+  },
+  "operations": [
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/Chart.yaml", "dest": "components/helm-charts/<chart-name>/Chart.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/values.yaml", "dest": "components/helm-charts/<chart-name>/values.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/_helpers.tpl", "dest": "components/helm-charts/<chart-name>/templates/_helpers.tpl" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/configmap.yaml", "dest": "components/helm-charts/<chart-name>/templates/configmap.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/servicemonitor.yaml", "dest": "components/helm-charts/<chart-name>/templates/servicemonitor.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/deployment.yaml", "dest": "components/helm-charts/<chart-name>/templates/deployment.yaml", "when": [{ "key": "is_hybrid", "equals": false }, { "key": "is_cron_only", "equals": false }] },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/service.yaml", "dest": "components/helm-charts/<chart-name>/templates/service.yaml", "when": { "key": "needs_service", "equals": true } },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/ingress.yaml", "dest": "components/helm-charts/<chart-name>/templates/ingress.yaml", "when": { "key": "has_ingress", "equals": true } },
+    { "type": "package_json_scripts", "scripts": { "<chart-name>:lint": "helm lint components/helm-charts/<chart-name>" } }
+  ]
+}
+```
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts chart name, deploy target, deployment type, and optional settings for modes, ingress, and webapp assets.
-
-## Root Package.json Update
-
-After scaffolding, update the root `package.json`:
-
-1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add component scripts:
-   - `"<name>:lint": "helm lint components/helm_charts/<name>"`
 
 ## Related Skills
 

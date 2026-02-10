@@ -205,6 +205,64 @@ When running in repair/upgrade mode, check existing `.gitignore`:
 3. If `changes/` pattern exists, remove it
 4. Log warning: "Removed .sdd from .gitignore - SDD artifacts must be version controlled"
 
+## Scaffold Spec
+
+Project scaffolding uses the scaffolding engine internally. The `scaffolding project` command builds a spec from the project config and calls `executeSpec`. You do not need to invoke `scaffolding apply` separately for project-level files — the CLI handles it.
+
+### Engine Integration
+
+The project scaffolding CLI:
+
+1. Translates `ScaffoldingConfig` into a `ScaffoldSpec`
+2. Maps each component to `template_dir` operations (using colocated templates in each component skill)
+3. Generates inline content (`.gitignore`, `.claudeignore`, architecture overview) as `write_file` operations
+4. Computes per-component scripts and adds `package_json_scripts` operations
+5. Executes the full spec via the engine
+
+### Example Spec (generated internally)
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": {
+    "PROJECT_NAME": "my-app",
+    "PROJECT_DESCRIPTION": "My application",
+    "PRIMARY_DOMAIN": "Task Management"
+  },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "project-scaffolding/templates/project",
+      "dest": "."
+    },
+    {
+      "type": "template_dir",
+      "source": "components/config/config-scaffolding/templates",
+      "dest": "components/config"
+    },
+    {
+      "type": "template_dir",
+      "source": "components/backend/backend-scaffolding/templates",
+      "dest": "components/servers/task-service"
+    },
+    {
+      "type": "write_file",
+      "path": ".gitignore",
+      "content": "<computed-content>",
+      "if_exists": "skip"
+    },
+    {
+      "type": "package_json_scripts",
+      "scripts": {
+        "task-service:dev": "npm run dev -w @my-app/task-service",
+        "task-service:build": "npm run build -w @my-app/task-service"
+      }
+    }
+  ]
+}
+```
+
 ## Related Skills
 
 - **config-scaffolding** — Generates the config component for centralized configuration. Accepts component settings from `sdd-settings.yaml` and produces `config.yaml`, validation schemas, and TypeScript types.

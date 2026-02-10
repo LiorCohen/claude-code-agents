@@ -158,18 +158,44 @@ export type DatabaseConfig = Readonly<{
 
 ---
 
+## Scaffold Spec
+
+To scaffold a database component, build a spec and invoke the engine:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+### Variables
+
+| Variable | Source |
+|----------|--------|
+| `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+
+### Operations
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "PROJECT_NAME": "<project-name>" },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "components/database/database-scaffolding/templates",
+      "dest": "components/databases/<database-name>"
+    }
+  ]
+}
+```
+
+No conditions needed.
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts database name and optional project name for migration and seed template generation.
-
-## Root Package.json Update
-
-After scaffolding, update the root `package.json`:
-
-1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add the database component as a workspace entry (no component-level scripts needed — database operations use the system CLI directly)
 
 ## Related Skills
 

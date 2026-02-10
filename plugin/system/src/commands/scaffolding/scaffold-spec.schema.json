@@ -1,0 +1,118 @@
+{
+  "title": "Scaffold Spec",
+  "description": "Declarative specification for the SDD scaffolding engine.",
+  "type": "object",
+  "required": ["target_dir", "base_dir", "variables", "operations"],
+  "additionalProperties": false,
+  "properties": {
+    "target_dir": {
+      "type": "string",
+      "description": "Absolute path to project root. All dest/path fields are relative to this."
+    },
+    "base_dir": {
+      "type": "string",
+      "description": "Absolute path to skills directory. All source fields are relative to this."
+    },
+    "variables": {
+      "type": "object",
+      "description": "Key-value pairs for {{VAR}} substitution in file contents.",
+      "additionalProperties": { "type": "string" }
+    },
+    "context": {
+      "type": "object",
+      "description": "Key-value pairs for when-condition evaluation.",
+      "additionalProperties": true
+    },
+    "operations": {
+      "type": "array",
+      "description": "Ordered list of operations to execute.",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "oneOf": [
+          {
+            "properties": {
+              "type": { "const": "template_dir" },
+              "source": { "type": "string" },
+              "dest": { "type": "string" },
+              "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
+              "when": { "$ref": "#/definitions/when" }
+            },
+            "required": ["type", "source", "dest"],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "type": { "const": "template_file" },
+              "source": { "type": "string" },
+              "dest": { "type": "string" },
+              "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
+              "when": { "$ref": "#/definitions/when" }
+            },
+            "required": ["type", "source", "dest"],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "type": { "const": "mkdir" },
+              "path": { "type": "string" },
+              "gitkeep": { "type": "boolean" },
+              "when": { "$ref": "#/definitions/when" }
+            },
+            "required": ["type", "path"],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "type": { "const": "write_file" },
+              "path": { "type": "string" },
+              "content": { "type": "string" },
+              "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
+              "when": { "$ref": "#/definitions/when" }
+            },
+            "required": ["type", "path", "content"],
+            "additionalProperties": false
+          },
+          {
+            "properties": {
+              "type": { "const": "package_json_scripts" },
+              "scripts": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              },
+              "when": { "$ref": "#/definitions/when" }
+            },
+            "required": ["type", "scripts"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "single_condition": {
+      "type": "object",
+      "required": ["key"],
+      "properties": {
+        "key": { "type": "string" },
+        "equals": {},
+        "not_empty": { "type": "boolean", "const": true }
+      },
+      "oneOf": [
+        { "required": ["equals"] },
+        { "required": ["not_empty"] }
+      ],
+      "additionalProperties": false
+    },
+    "when": {
+      "oneOf": [
+        { "$ref": "#/definitions/single_condition" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/single_condition" },
+          "minItems": 1
+        }
+      ]
+    }
+  }
+}
