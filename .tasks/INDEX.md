@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#123](4-implementing/123/plan.md): Update TypeScript standards with missing patterns and corrections
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#123](5-reviewing/123/plan.md): Update TypeScript standards with missing patterns and corrections
 
 ---
 
