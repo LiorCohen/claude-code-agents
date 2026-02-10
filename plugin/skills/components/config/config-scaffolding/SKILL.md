@@ -12,10 +12,6 @@ Scaffolds the mandatory config component for centralized configuration managemen
 
 Use during project initialization to create the config component. The config component is **mandatory** — every SDD project has exactly one.
 
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
-
 ## What It Creates
 
 ```text
@@ -148,7 +144,7 @@ The config component is a minimal TypeScript project with no runtime code. It ex
 
 1. **Other components can import types** via workspace package `@{project}/config/types`
 2. **YAML files are the source of truth** for configuration values
-3. **`sdd-system` CLI** (via `/sdd-config`) generates merged configs for each environment
+3. **The system CLI** (via `/sdd-config`) generates merged configs for each environment
 
 ## Environment Structure
 

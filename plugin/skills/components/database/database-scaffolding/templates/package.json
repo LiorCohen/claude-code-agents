@@ -1,13 +1,4 @@
 {
   "name": "@{{PROJECT_NAME}}/database",
-  "private": true,
-  "scripts": {
-    "setup": "sdd-system database setup {{COMPONENT_NAME}}",
-    "teardown": "sdd-system database teardown {{COMPONENT_NAME}}",
-    "migrate": "sdd-system database migrate {{COMPONENT_NAME}}",
-    "seed": "sdd-system database seed {{COMPONENT_NAME}}",
-    "reset": "sdd-system database reset {{COMPONENT_NAME}}",
-    "port-forward": "sdd-system database port-forward {{COMPONENT_NAME}}",
-    "psql": "sdd-system database psql {{COMPONENT_NAME}}"
-  }
+  "private": true
 }

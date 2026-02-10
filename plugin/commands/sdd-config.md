@@ -242,23 +242,23 @@ helm install my-release ./components/helm-charts/task-service \
 
 ## Implementation
 
-This command invokes `sdd-system` CLI subcommands:
+This command invokes the system CLI via `system-run.sh`:
 
 ```bash
 # generate
-sdd-system config generate --env <env> [--component <name>] [--output <path>]
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env <env> [--component <name>] [--output <path>]
 
 # validate
-sdd-system config validate [--env <env>]
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config validate [--env <env>]
 
 # diff
-sdd-system config diff <env1> <env2>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config diff <env1> <env2>
 
 # add-env
-sdd-system config add-env <env-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config add-env <env-name>
 ```
 
-The `sdd-system` CLI handles the actual merge logic, validation, and file operations.
+The system CLI handles the actual merge logic, validation, and file operations.
 
 ---
 

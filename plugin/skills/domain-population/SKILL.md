@@ -26,8 +26,7 @@ During implementation, this skill:
 This skill uses a TypeScript script for deterministic file creation:
 
 ```bash
-# 1. Create a config JSON file
-cat > /tmp/sdd-domain-config.json << 'EOF'
+cat << 'EOF' | "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding domain --config -
 {
     "target_dir": "/path/to/project",
     "primary_domain": "Task Management",
@@ -40,12 +39,6 @@ cat > /tmp/sdd-domain-config.json << 'EOF'
     "domain_entities": ["Team", "Project", "Task", "User"]
 }
 EOF
-
-# 2. Run the domain population command
-sdd-system scaffolding domain --config /tmp/sdd-domain-config.json
-
-# 3. Clean up config file
-rm /tmp/sdd-domain-config.json
 ```
 
 ## Input

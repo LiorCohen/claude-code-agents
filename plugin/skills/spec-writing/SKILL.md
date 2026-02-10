@@ -11,10 +11,6 @@ user-invocable: false
 
 Use templates below as starting points.
 
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
-
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
@@ -122,7 +118,7 @@ updated: YYYY-MM-DD
 
 ### Validation Rules
 
-Run `npx sdd-system spec validate <path>` to check:
+Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate <path>` to check:
 - Required frontmatter fields present based on `spec_type`
 - Acceptance criteria in Given/When/Then format (tech specs only)
 - All referenced definitions exist in domain glossary

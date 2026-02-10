@@ -26,19 +26,17 @@ describe('Database package.json Template', () => {
   });
 
   /**
-   * WHY: Database management requires standard npm scripts for migrations,
-   * seeding, and reset operations. Missing scripts force manual operations.
+   * WHY: Database templates are minimal - scripts cannot reference the
+   * system CLI because ${CLAUDE_PLUGIN_ROOT} doesn't exist in scaffolded
+   * projects. Database operations are documented in database-standards.
    */
-  it('package.json defines migrate, seed, and reset scripts', () => {
+  it('package.json has no scripts (CLI not available in scaffolded projects)', () => {
     const packageJson = joinPath(DATABASE_TEMPLATES_DIR, 'package.json');
     const content = JSON.parse(readFile(packageJson)) as {
       scripts?: Record<string, string>;
     };
 
-    expect(content.scripts).toBeDefined();
-    expect(content.scripts?.['migrate']).toBeDefined();
-    expect(content.scripts?.['seed']).toBeDefined();
-    expect(content.scripts?.['reset']).toBeDefined();
+    expect(content.scripts).toBeUndefined();
   });
 
   /**
@@ -67,16 +65,16 @@ describe('Database README.md Template', () => {
   });
 
   /**
-   * WHY: The README must document the npm run commands so users know
+   * WHY: The README must document the SDD commands so users know
    * how to perform database operations without reading the code.
    */
-  it('README.md documents npm run commands', () => {
+  it('README.md documents /sdd-run database commands', () => {
     const readme = joinPath(DATABASE_TEMPLATES_DIR, 'README.md');
     const content = readFile(readme);
 
-    expect(content).toContain('npm run migrate');
-    expect(content).toContain('npm run seed');
-    expect(content).toContain('npm run reset');
+    expect(content).toContain('/sdd-run database migrate');
+    expect(content).toContain('/sdd-run database seed');
+    expect(content).toContain('/sdd-run database reset');
   });
 });
 
@@ -147,34 +145,19 @@ describe('Database Seeds Templates', () => {
 });
 
 /**
- * WHY: Database operations are now handled by the sdd-system CLI.
- * The package.json scripts call CLI commands instead of shell scripts.
- * This provides type-safe, testable implementations.
+ * WHY: Database templates are minimal packages. The system CLI is only
+ * available during plugin sessions (via ${CLAUDE_PLUGIN_ROOT}), not in
+ * scaffolded projects. Database operations are documented in standards.
  */
-describe('Database CLI Integration', () => {
+describe('Database Template Minimality', () => {
   /**
-   * WHY: package.json scripts should use sdd-system CLI commands
-   * instead of local shell scripts for better maintainability.
+   * WHY: Scaffolded templates must not reference sdd-system or the
+   * system CLI since these are not available in generated projects.
    */
-  it('package.json uses sdd-system CLI commands', () => {
+  it('package.json does not reference sdd-system', () => {
     const packageJson = joinPath(DATABASE_TEMPLATES_DIR, 'package.json');
     const content = readFile(packageJson);
 
-    expect(content).toContain('sdd-system database setup');
-    expect(content).toContain('sdd-system database migrate');
-    expect(content).toContain('sdd-system database seed');
-    expect(content).toContain('sdd-system database reset');
-    expect(content).toContain('sdd-system database teardown');
-  });
-
-  /**
-   * WHY: The CLI commands should use {{COMPONENT_NAME}} variable
-   * so each database component can be managed independently.
-   */
-  it('package.json uses {{COMPONENT_NAME}} variable for CLI commands', () => {
-    const packageJson = joinPath(DATABASE_TEMPLATES_DIR, 'package.json');
-    const content = readFile(packageJson);
-
-    expect(content).toContain('{{COMPONENT_NAME}}');
+    expect(content).not.toContain('sdd-system');
   });
 });

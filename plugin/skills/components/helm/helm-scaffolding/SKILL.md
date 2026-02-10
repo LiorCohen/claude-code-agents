@@ -17,10 +17,6 @@ Use the following skills for reference:
 
 Use when creating Helm chart components. Creates Helm charts that integrate with the SDD config system.
 
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
-
 ## Settings-Driven Scaffolding
 
 Helm charts are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Refer to the `project-settings` skill for the complete helm settings schema and defaults.
@@ -188,7 +184,7 @@ The ConfigMap is mounted in deployments and `SDD_CONFIG_PATH` is set automatical
 Deployment workflow:
 ```bash
 # Generate merged config
-sdd-system config generate --env production --component main-server \
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env production --component main-server \
   --output production-config.yaml
 
 # Deploy with config

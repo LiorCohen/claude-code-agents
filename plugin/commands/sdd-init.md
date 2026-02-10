@@ -188,7 +188,7 @@ If missing: create or merge the required entries (preserve existing settings).
 
 #### 2.5 Required Tools Check (via System CLI)
 
-Run `sdd-system env check-tools --json` and interpret the result:
+Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" env check-tools --json` and interpret the result:
 - Display the human-readable tool summary
 - If all tools installed: continue to next phase
 - If any tools are missing: list the missing tools with their install hints
@@ -249,7 +249,7 @@ Note: permissions written to `.claude/settings.local.json` do NOT take effect mi
 
 If this is an existing project with a version mismatch (detected in Phase 0):
 
-1. Run `sdd-system settings reconcile` to migrate settings to the latest schema
+1. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" settings reconcile` to migrate settings to the latest schema
 2. Display the command output (it prints a summary of changes and any directory warnings)
 3. **Skip Phase 3 and Phase 4** — structure already exists, git already initialized
 4. Jump to Phase 5 with upgrade-specific messaging

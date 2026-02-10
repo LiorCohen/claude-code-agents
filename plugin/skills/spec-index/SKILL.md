@@ -9,14 +9,14 @@ user-invocable: false
 
 ## Commands
 
-The spec commands are available via the sdd-system CLI:
+The spec commands are available via the system CLI:
 
 ### Generate Index
 
 Generates `changes/INDEX.md` from all change spec files.
 
 ```bash
-sdd-system spec index --changes-dir changes/
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec index --changes-dir changes/
 ```
 
 ### Generate Snapshot
@@ -24,7 +24,7 @@ sdd-system spec index --changes-dir changes/
 Generates `specs/SNAPSHOT.md` compiling all active specs.
 
 ```bash
-sdd-system spec snapshot --specs-dir specs/
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec snapshot --specs-dir specs/
 ```
 
 ### Validate Spec
@@ -33,17 +33,13 @@ Validates spec frontmatter and format.
 
 ```bash
 # Validate single spec
-sdd-system spec validate changes/2026/01/21/my-change/SPEC.md
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate changes/2026/01/21/my-change/SPEC.md
 
 # Validate all specs
-sdd-system spec validate --all --specs-dir specs/
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate --all --specs-dir specs/
 ```
 
 ---
-
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
 
 ## INDEX.md Format
 
@@ -124,13 +120,13 @@ Returns success status and any validation errors or warnings.
 ### After Creating a Spec
 
 1. Merge spec to main
-2. Run `sdd-system spec index` to update INDEX.md
-3. Run `sdd-system spec snapshot` to update SNAPSHOT.md
+2. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec index` to update INDEX.md
+3. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec snapshot` to update SNAPSHOT.md
 4. Commit the updated index and snapshot
 
 ### Before Release
 
-1. Run `sdd-system spec validate --all` to ensure all specs are valid
+1. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate --all` to ensure all specs are valid
 2. Review SNAPSHOT.md for completeness
 3. Verify all active specs have corresponding implementations
 
@@ -159,10 +155,10 @@ jobs:
           node-version: '20'
 
       - name: Validate all specs
-        run: npx sdd-system spec validate --all --changes-dir changes/
+        run: "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate --all --changes-dir changes/
 
       - name: Check index is up-to-date
         run: |
-          npx sdd-system spec index --changes-dir changes/
+          "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec index --changes-dir changes/
           git diff --exit-code changes/INDEX.md
 ```
