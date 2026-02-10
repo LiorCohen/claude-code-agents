@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#117](5-reviewing/117/plan.md): Generic scaffolding engine in system CLI
+(none)
 
 ---
 
@@ -90,6 +90,7 @@
 
 ## Complete
 
+- [#117](6-complete/117/): Generic scaffolding engine in system CLI ✓ (2026-02-10)
 - [#116](6-complete/116/): Fix system CLI standards violations from audit report ✓ (2026-02-10)
 - [#115](6-complete/115/): Create system-cli-standards skill and audit CLI invocation violations ✓ (2026-02-09)
 - [#99](6-complete/99/): sdd-init should ensure sdd-settings are updated during plugin updates ✓ (2026-02-09)

@@ -2,8 +2,9 @@
 id: 117
 title: Generic scaffolding engine in system CLI
 priority: high
-status: reviewing
+status: complete
 created: 2026-02-10
+completed: 2026-02-10
 depends_on: []
 blocks: []
 ---
