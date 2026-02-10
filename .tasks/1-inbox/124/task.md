@@ -16,6 +16,8 @@ Create a critic skill (`.claude/skills/critic/`) that embeds Lior's voice and cr
 
 The critic should activate at each lifecycle transition and force Claude to pause and self-evaluate before presenting work to the user.
 
+The skill must be user-invocable via `/critic`. When called, it should **infer the current phase from context** — what branch are we on, what task status, what was just done, what's about to happen — and apply the appropriate critic checks. It should not require the user to specify a phase. If the context is ambiguous (e.g., no active task, unclear what just happened), ask Lior rather than guessing.
+
 ## Lifecycle Phases to Cover
 
 Each phase needs a "Lior says" section with the kind of critical questions and standards Lior holds:
@@ -51,7 +53,8 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 
 ## Acceptance Criteria
 
-- [ ] Critic skill created at `.claude/skills/critic/`
+- [ ] Critic skill created at `.claude/skills/critic/` and user-invocable via `/critic`
+- [ ] `/critic` infers current lifecycle phase from context (branch, task status, recent actions)
 - [ ] Covers all 9 lifecycle phases listed above
 - [ ] Each phase has specific, actionable self-check questions
 - [ ] Tone matches Lior's direct, skeptical review style
