@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#121](4-implementing/121/plan.md): Fix skills standards violations from audit report
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#121](5-reviewing/121/plan.md): Fix skills standards violations from audit report
 
 ---
 
