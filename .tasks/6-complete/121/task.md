@@ -1,8 +1,9 @@
 ---
 id: 121
 title: Fix skills standards violations from audit report
-status: reviewing
+status: complete
 created: 2026-02-10
+completed: 2026-02-10
 depends_on: []
 blocks: []
 ---

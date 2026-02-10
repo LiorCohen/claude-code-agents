@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#121](5-reviewing/121/plan.md): Fix skills standards violations from audit report
+(none)
 
 ---
 
@@ -90,6 +90,7 @@
 
 ## Complete
 
+- [#121](6-complete/121/): Fix skills standards violations from audit report ✓ (2026-02-10)
 - [#117](6-complete/117/): Generic scaffolding engine in system CLI ✓ (2026-02-10)
 - [#116](6-complete/116/): Fix system CLI standards violations from audit report ✓ (2026-02-10)
 - [#115](6-complete/115/): Create system-cli-standards skill and audit CLI invocation violations ✓ (2026-02-09)
