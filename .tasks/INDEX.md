@@ -10,13 +10,13 @@
 
 ## Ready
 
-- [#122](3-ready/122/plan.md): Fix TypeScript standards violations in plugin/system
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#122](4-implementing/122/plan.md): Fix TypeScript standards violations in plugin/system
 
 ---
 
