@@ -6,8 +6,6 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
-- [#121](2-planning/121/plan.md): Fix skills standards violations from audit report
-
 ---
 
 ## Ready
@@ -18,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#121](4-implementing/121/plan.md): Fix skills standards violations from audit report
 
 ---
 
