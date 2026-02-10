@@ -258,8 +258,6 @@ The skill reads `sdd-settings.yaml`, pre-computes boolean flags, and emits:
   "base_dir": "/path/to/plugin/skills",
   "variables": {
     "PROJECT_NAME": "my-app",
-    "PROJECT_DESCRIPTION": "My application",
-    "PRIMARY_DOMAIN": "Task Management",
     "SERVER_NAME": "task-service"
   },
   "context": {
@@ -303,9 +301,7 @@ The skill reads `sdd-settings.yaml`, pre-computes boolean flags, and emits:
   "target_dir": "/path/to/project",
   "base_dir": "/path/to/plugin/skills",
   "variables": {
-    "PROJECT_NAME": "my-app",
-    "PROJECT_DESCRIPTION": "My application",
-    "PRIMARY_DOMAIN": "Task Management"
+    "PROJECT_NAME": "my-app"
   },
   "operations": [
     {
@@ -333,8 +329,7 @@ The skill reads `sdd-settings.yaml`, pre-computes boolean flags, and emits:
   "target_dir": "/path/to/project",
   "base_dir": "/path/to/plugin/skills",
   "variables": {
-    "PROJECT_NAME": "my-app",
-    "PROJECT_DESCRIPTION": "My application"
+    "PROJECT_NAME": "my-app"
   },
   "operations": [
     {
