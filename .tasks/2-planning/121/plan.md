@@ -39,18 +39,24 @@ Remaining: 1 path inconsistency (widespread), 6 missing output declarations, 2 m
 
 Requires `npm run build:plugin` and `npm test` validation after change.
 
-### Change 2: Add `## Output` sections to 6 scaffolding skills
+### Change 2: Add `output.schema.json` and `## Output` sections to 6 scaffolding skills
 
 | File | Changes |
 |------|---------|
 | `plugin/skills/components/backend/backend-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/backend/backend-scaffolding/schemas/output.schema.json` | New file |
 | `plugin/skills/components/config/config-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/config/config-scaffolding/schemas/output.schema.json` | New file |
 | `plugin/skills/components/contract/contract-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/contract/contract-scaffolding/schemas/output.schema.json` | New file |
 | `plugin/skills/components/database/database-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/database/database-scaffolding/schemas/output.schema.json` | New file |
 | `plugin/skills/components/frontend/frontend-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/frontend/frontend-scaffolding/schemas/output.schema.json` | New file |
 | `plugin/skills/components/helm/helm-scaffolding/SKILL.md` | Add `## Output` section between `## Input` and `## Related Skills` |
+| `plugin/skills/components/helm/helm-scaffolding/schemas/output.schema.json` | New file |
 
-**No `output.schema.json` files needed.** These skills instruct Claude how to build scaffold specs executed by the scaffolding engine CLI. They don't return structured data — the engine creates filesystem artifacts and the parent `scaffolding` skill (which already has `output.schema.json`) reports the aggregate result. Per skills-standards, skills that don't produce structured output should declare this explicitly.
+All 6 skills share the same output schema, matching the scaffolding engine's `EngineResult` type from `plugin/system/src/commands/scaffolding/engine.ts`.
 
 ### Change 3: Minor fixes
 
@@ -77,17 +83,71 @@ The authoritative path is `helm_charts` (underscores), per `project-settings/SKI
 
 Also fix the TypeScript source code (`sync.ts`, `project.ts`) — same inconsistency. Validate with `npm run build:plugin` and `npm test`.
 
-### 2. Add Output sections to 6 scaffolding skills (Priority 2)
+### 2. Add output schemas to 6 scaffolding skills (Priority 2)
+
+Each scaffolding skill produces output via the scaffolding engine (`EngineResult` in `engine.ts`). Create a shared `output.schema.json` for all 6 skills matching this type:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "<component>-scaffolding output",
+  "description": "Result from scaffolding engine execution.",
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether all operations completed without errors"
+    },
+    "created": {
+      "type": "object",
+      "description": "Artifacts created during scaffolding",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths of files created"
+        },
+        "dirs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths of directories created"
+        },
+        "scripts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "package.json script names added"
+        }
+      },
+      "required": ["files", "dirs", "scripts"]
+    },
+    "skipped": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths skipped because they already existed"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Error messages for failed operations"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable summary of operations performed"
+    }
+  },
+  "required": ["success", "created", "skipped", "errors", "summary"]
+}
+```
 
 Add `## Output` section to each SKILL.md (between `## Input` and `## Related Skills`):
 
 ```markdown
 ## Output
 
-No structured output. This skill defines the scaffold spec format for the scaffolding engine. File creation and results are reported by the parent `scaffolding` skill.
-```
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
 
-This follows the same pattern as the 15 standards skills that declare "no input/output", adapted to explain the scaffolding engine delegation.
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+```
 
 ### 3. Clarify component-discovery table references (Priority 3)
 
@@ -110,7 +170,7 @@ Change 1b (TypeScript fixes) must be validated with build + tests before committ
 
 ### Manual Verification
 - [ ] `verify_helm_path_consistency` — grep all plugin prompt files (`**/*.md`) for `helm-charts` in local path context, confirm none remain (external URLs are OK)
-- [ ] `verify_output_sections_exist` — all 6 scaffolding SKILL.md files have an `## Output` section
+- [ ] `verify_output_schemas_exist` — all 6 scaffolding skills have `schemas/output.schema.json` and `## Output` section in SKILL.md
 - [ ] `verify_component_discovery_note` — component-discovery SKILL.md has clarifying note above Available Components table
 - [ ] `verify_spec_writing_code_blocks` — no code block closing fences contain language identifiers in spec-writing SKILL.md
 
@@ -120,7 +180,8 @@ Change 1b (TypeScript fixes) must be validated with build + tests before committ
 - [ ] `npm run build:plugin` passes
 - [ ] `npm test` passes
 - [ ] `project-settings/SKILL.md` is internally consistent (both references use underscores)
-- [ ] All 6 scaffolding skills have `## Output` sections declaring no structured output
+- [ ] All 6 scaffolding skills have `## Output` sections referencing `output.schema.json`
+- [ ] All 6 `output.schema.json` files match the `EngineResult` type from `engine.ts`
 - [ ] `component-discovery` table has informational reference note
 - [ ] `spec-writing` code blocks render correctly in markdown
 - [ ] No new violations introduced (re-audit passes clean)
