@@ -64,6 +64,7 @@
 ---
 
 ## Inbox (unprioritized)
+- [#122](1-inbox/122/): Fix TypeScript standards violations in plugin/system
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
