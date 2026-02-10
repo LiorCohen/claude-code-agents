@@ -95,6 +95,15 @@ Values in `key` are resolved from the spec's `context` object. If a key is not f
 
 All file-creating operations (`template_dir`, `template_file`, `write_file`) **skip existing files** by default. If a file already exists at the destination, it is not overwritten. The engine logs skipped files in its output.
 
+Operations can override this default with the `if_exists` field:
+
+| Value | Behavior | Use Case |
+|-------|----------|----------|
+| `"skip"` (default) | Don't touch existing files | Initial scaffolding — never clobber user work |
+| `"overwrite"` | Replace file completely | Settings sync — skill has already read/merged content and passes the final result |
+
+`if_exists` applies to `template_dir`, `template_file`, and `write_file`. It does not apply to `mkdir` (always idempotent) or `package_json_scripts` (always merges).
+
 `mkdir` is always safe (creates if missing, no-op if exists).
 
 `package_json_scripts` **merges** — it adds new scripts but does not overwrite existing script entries.
@@ -119,6 +128,7 @@ Copy an entire directory of template files with variable substitution.
 |-------|------|----------|-------------|
 | `source` | string | yes | Directory path relative to `base_dir`. |
 | `dest` | string | yes | Directory path relative to `target_dir`. |
+| `if_exists` | `"skip"` \| `"overwrite"` | no | Behavior when destination file exists. Default: `"skip"`. |
 | `when` | condition | no | Conditional execution. |
 
 Behavior:
@@ -127,7 +137,7 @@ Behavior:
 - Applies variable substitution to supported file extensions
 - Copies non-substitutable files as-is
 - Creates intermediate directories as needed
-- Skips files that already exist at destination
+- Skips files that already exist at destination (unless `if_exists: "overwrite"`)
 
 #### 2. `template_file`
 
@@ -145,12 +155,13 @@ Copy a single template file with variable substitution.
 |-------|------|----------|-------------|
 | `source` | string | yes | File path relative to `base_dir`. |
 | `dest` | string | yes | File path relative to `target_dir`. |
+| `if_exists` | `"skip"` \| `"overwrite"` | no | Behavior when destination file exists. Default: `"skip"`. |
 | `when` | condition | no | Conditional execution. |
 
 Behavior:
 - Same substitution rules as `template_dir` but for a single file
 - Creates parent directories as needed
-- Skips if destination file already exists
+- Skips if destination file already exists (unless `if_exists: "overwrite"`)
 
 #### 3. `mkdir`
 
@@ -186,12 +197,13 @@ Write a file with literal content (with variable substitution).
 |-------|------|----------|-------------|
 | `path` | string | yes | File path relative to `target_dir`. |
 | `content` | string | yes | File content. `{{VARIABLE}}` placeholders are substituted. |
+| `if_exists` | `"skip"` \| `"overwrite"` | no | Behavior when destination file exists. Default: `"skip"`. |
 | `when` | condition | no | Conditional execution. |
 
 Behavior:
 - Applies variable substitution to `content`
 - Creates parent directories as needed
-- Skips if file already exists
+- Skips if file already exists (unless `if_exists: "overwrite"`)
 
 #### 5. `package_json_scripts`
 
@@ -554,7 +566,7 @@ The skill pre-computes deployment flags from Helm + server settings:
 
 1. **Spec format** — declarative JSON with simple conditionals (`equals`, `not_empty`)
 2. **Engine primitives** — extracted from existing `project.ts` (template copying, variable substitution, directory creation, file writing, script merging)
-3. **Non-destructive** — skip existing files by default (already implemented in project.ts)
+3. **Non-destructive by default, overridable** — skip existing files by default (`if_exists: "skip"`), but operations can specify `if_exists: "overwrite"` for settings sync and repair scenarios where the skill has already computed the final merged content
 4. **Context, not settings** — the engine does NOT read `sdd-settings.yaml`. Skills pre-compute all needed values into `context` (boolean flags, enum values). This keeps the engine generic and decoupled from SDD project structure.
 5. **No meta-scripts** — drop the cross-component `dev`/`build`/`test`/`start` meta-scripts entirely. Each component spec is self-contained, only adding its own scripts. Eliminates `npm-run-all` dependency and the `generateMetaScripts` logic.
 6. **No `for_each`** — not needed. Component-level iteration (scaffold each server, each webapp) is the orchestrator's job — it calls the engine once per component. Within a single component, all patterns are simple conditionals: a backend has at most one DAL, serves at most one contract (one per type in the future: OpenAPI, AsyncAPI), consumes contracts as a boolean condition. Config section generation is Tier 3 (skill builds content, engine writes it).
@@ -613,5 +625,5 @@ These remain separate concerns, not handled by the engine:
 - [ ] `scaffolding project` refactored to use the engine internally
 - [ ] Meta-scripts removed from project scaffolding
 - [ ] Component skills updated to emit specs instead of describing file creation in prose
-- [ ] Non-destructive behavior preserved (skip existing files)
+- [ ] Non-destructive behavior preserved (skip existing files by default, `if_exists: "overwrite"` supported)
 - [ ] Existing tests pass, new tests cover the engine
