@@ -29,6 +29,7 @@
 ---
 
 ## High Priority
+- [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#118](1-inbox/118/): Upgrade all JSON schemas to latest stable version (2020-12)
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
