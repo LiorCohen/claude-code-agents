@@ -22,24 +22,25 @@ The TypeScript standards skill is missing several patterns that are used through
 3. **Error handling patterns** — Beyond defining Error subclasses: catch blocks, throw vs return null, error wrapping
 4. **`interface` vs `type` rule** — `interface` for function-only contracts, `type` for everything else
 5. **Async/Promise patterns** — Explicit `Promise<T>` return types, `Promise.all`, try/catch in async arrows
+6. **External data validation** — Never trust data from external sources (env vars, CLI args, config files, API responses). Always validate shape and fail explicitly on mismatch.
 
 ### Medium Priority (widely used patterns)
 
-6. **Semantic type aliases** — Use `type Milliseconds = number` to give meaning to primitives rather than raw `number`/`string`
-7. **Generic constraints** — When and how to use `<T extends ...>` bounds
-8. **Null vs undefined semantics** — Convention for when to use each
-9. **`Record<string, never>` for empty objects** — Placeholder/empty type pattern
-10. **Nullish coalescing (`??`) vs logical OR (`||`)** — When each is appropriate
-11. **`import type` for type-only imports** — Separate type imports from value imports
+7. **Semantic type aliases** — Use `type Milliseconds = number` to give meaning to primitives rather than raw `number`/`string`
+8. **Generic constraints** — When and how to use `<T extends ...>` bounds
+9. **Null vs undefined semantics** — Convention for when to use each
+10. **`Record<string, never>` for empty objects** — Placeholder/empty type pattern
+11. **Nullish coalescing (`??`) vs logical OR (`||`)** — When each is appropriate
+12. **`import type` for type-only imports** — Separate type imports from value imports
 
 ### Lower Priority (nice to have)
 
-12. **`keyof` and indexed access types** — For type-safe property access
-13. **`Object.entries`/`Object.fromEntries`** — Immutable object transformation pattern
+13. **`keyof` and indexed access types** — For type-safe property access
+14. **`Object.entries`/`Object.fromEntries`** — Immutable object transformation pattern
 
 ### Correction
 
-14. **Ban `let` entirely** — Remove "let if absolutely necessary" language. Use `const` with `.map`/`.reduce`/recursion instead.
+15. **Ban `let` entirely** — Remove "let if absolutely necessary" language. Use `const` with `.map`/`.reduce`/recursion instead.
 
 ## Acceptance Criteria
 
@@ -50,5 +51,6 @@ The TypeScript standards skill is missing several patterns that are used through
 - [ ] `as const` section shows deriving union types from arrays
 - [ ] Error handling section covers catch blocks, throw vs null, and wrapping
 - [ ] Semantic type aliases section shows primitives with domain meaning
+- [ ] External data validation section shows boundary validation with explicit failure
 - [ ] All examples use patterns from the actual codebase where possible
 - [ ] Summary checklist at the bottom is updated to reflect new rules
