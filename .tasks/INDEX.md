@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#116](5-reviewing/116/plan.md): Fix system CLI standards violations from audit report
+(none)
 
 ---
 
@@ -87,6 +87,7 @@
 
 ## Complete
 
+- [#116](6-complete/116/): Fix system CLI standards violations from audit report ✓ (2026-02-10)
 - [#115](6-complete/115/): Create system-cli-standards skill and audit CLI invocation violations ✓ (2026-02-09)
 - [#99](6-complete/99/): sdd-init should ensure sdd-settings are updated during plugin updates ✓ (2026-02-09)
 - [#112](6-complete/112/): Add sdd-version command showing project and installed plugin versions ✓ (2026-02-09)

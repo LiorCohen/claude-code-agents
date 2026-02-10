@@ -1,8 +1,9 @@
 ---
 id: 116
 title: Fix system CLI standards violations from audit report
-status: reviewing
+status: complete
 created: 2026-02-09
+completed: 2026-02-10
 depends_on: []
 blocks: []
 ---
