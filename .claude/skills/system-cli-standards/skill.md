@@ -20,15 +20,7 @@ The one correct way to call the CLI from a prompt file:
 - `CLAUDE_PLUGIN_ROOT` is set by Claude Code when the plugin loads. It is available in all bash commands executed during a plugin session.
 - Always quote the path: `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"` — paths may contain spaces.
 - `system-run.sh` is the single entry point. It forwards to the compiled CLI via `exec`.
-
-### What NOT to do
-
-| Pattern | Why it's wrong |
-|---------|---------------|
-| `sdd-system <namespace> <action>` | No such binary exists — the package has no `bin` field and is `private: true` |
-| `npx sdd-system ...` | Same reason — `npx` cannot resolve a private package with no bin |
-| `node ... dist/cli.js ...` | Implementation detail — use `system-run.sh` which wraps this |
-| `` `sdd-system` is available in PATH `` | False — it is never in PATH |
+- The system package is `private: true` with no `bin` field, so `system-run.sh` is the only valid way to invoke it.
 
 ---
 
@@ -185,31 +177,20 @@ Before adding a new CLI command, verify:
 
 ## Audit Procedure
 
-### Violation categories
-
-| Category | Description | Example |
-|----------|-------------|---------|
-| **Wrong invocation** | Bare `sdd-system`, `npx sdd-system`, or direct `node ... cli.js` in plugin prompts | `sdd-system config get` in a command file |
-| **Wrong reference** | Claiming CLI is "in PATH" or "available as `sdd-system`" | Prerequisites section saying "`sdd-system` CLI available in PATH" |
-| **Missing CLI usage** | Operations done in prompt text that should be CLI commands | Prompt manually parsing YAML instead of using a CLI validator |
-| **Unclear authority** | Logic duplicated between prompt and CLI with no clear owner | Both a skill and CLI command validating the same schema |
-| **Broken template** | Scaffolded files that emit non-functional CLI references | `package.json` template with `"scripts": { "setup": "sdd-system ..." }` |
-
 ### How to audit
 
 **Use Opus model for audits** — thoroughness matters more than speed here.
 
-1. Run grep searches across `plugin/skills/`, `plugin/agents/`, `plugin/commands/` for:
-   - `sdd-system` (bare command references — in code blocks AND prose)
-   - `npx sdd-system` (npx invocations)
-   - `node.*cli.js` (direct CLI invocations)
-   - `available in PATH` or `in PATH` (wrong reference claims)
-   - `/tmp/sdd` (temp file patterns)
-2. Also search `plugin/skills/*/templates/` for scaffolded files that emit CLI references
-3. For **every** match, record the exact file path, line number, and violating text
-4. Classify each match by violation category
-5. Count violations per file and per category — cross-check totals against grep output to ensure nothing is missed
-6. Write report to `.temp/system-cli-audit-<datetime>.md`
-7. If the user asks to turn the audit into a task, **copy the report file into the task directory** (e.g., `.tasks/1-inbox/116/audit.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
+1. Read every file in `plugin/skills/`, `plugin/agents/`, and `plugin/commands/`
+2. Also read scaffolded templates in `plugin/skills/*/templates/`
+3. For each file, check:
+   - **Invocation correctness**: All CLI references use the canonical `system-run.sh` invocation
+   - **Authority violations**: Prompts performing deterministic operations that belong in the CLI (e.g., YAML/JSON parsing, file generation, schema validation, path resolution). These are candidates for new CLI commands.
+   - **Compliance**: All other standards in this document are followed
+4. Record every finding with exact file path, line number, and description. Categorize as:
+   - **Violation**: Something that is currently broken or wrong
+   - **Authority issue**: A deterministic operation in a prompt that should be a CLI command (improves speed and reliability)
+5. Write report to `.temp/system-cli-audit-<datetime>.md`
+6. Ask the user if they want to turn the audit into a task. If yes, **copy the report file into the task directory** (e.g., `.tasks/1-inbox/116/audit-<datetime>.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
 
 **Note:** `plugin/system/README.md` is the CLI's own documentation and is out of scope for prompt file audits.
