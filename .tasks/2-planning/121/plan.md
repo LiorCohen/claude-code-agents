@@ -29,12 +29,15 @@ Remaining: 1 path inconsistency (widespread), 6 missing output declarations, 2 m
 | `plugin/commands/sdd-config.md` | 1 | ~236 |
 | `plugin/agents/devops.md` | 2 | ~193, ~196 (local path refs only — line 135 is an external URL, leave as-is) |
 
-**Out of scope (TypeScript code — separate task):**
-- `plugin/system/src/settings/sync.ts` line 135: `helm: 'helm-charts'`
-- `plugin/system/src/commands/scaffolding/project.ts` line 26: `helm: 'helm-charts'`
-- `plugin/system/src/commands/env/deploy.ts` lines 7, 91: already uses `helm_charts`
+### Change 1b: Fix `helm-charts` → `helm_charts` in TypeScript source
 
-The TypeScript code has the same inconsistency (`sync.ts`/`project.ts` use hyphens, `deploy.ts` uses underscores). Fixing runtime code requires testing and is out of scope for a skills-standards task — should be a separate task.
+| File | Occurrences | Lines |
+|------|-------------|-------|
+| `plugin/system/src/settings/sync.ts` | 1 | ~135: `helm: 'helm-charts'` → `helm: 'helm_charts'` |
+| `plugin/system/src/commands/scaffolding/project.ts` | 1 | ~26: `helm: 'helm-charts'` → `helm: 'helm_charts'` |
+| `plugin/system/src/commands/env/deploy.ts` | — | Already uses `helm_charts` (no change) |
+
+Requires `npm run build:plugin` and `npm test` validation after change.
 
 ### Change 2: Add `## Output` sections to 6 scaffolding skills
 
@@ -70,8 +73,9 @@ The authoritative path is `helm_charts` (underscores), per `project-settings/SKI
 
 **Important distinctions:**
 - External URLs like `https://kubeshop.github.io/helm-charts` and `https://victoriametrics.github.io/helm-charts/` are NOT local paths — leave these unchanged
-- TypeScript source code (`sync.ts`, `project.ts`) needs fixing too but requires testing — flag as a follow-up task
 - `project-settings/SKILL.md` line 93 uses `helm-charts` while line 202 uses `helm_charts` — fix line 93
+
+Also fix the TypeScript source code (`sync.ts`, `project.ts`) — same inconsistency. Validate with `npm run build:plugin` and `npm test`.
 
 ### 2. Add Output sections to 6 scaffolding skills (Priority 2)
 
@@ -98,16 +102,9 @@ Fix 5 malformed closing fences where the language identifier is incorrectly incl
 - Line 301: ` ```text ` → ` ``` `
 - Line 308: ` ```text ` → ` ``` `
 
-## Follow-up Task (out of scope)
-
-Create a new task to fix the TypeScript code inconsistency:
-- `plugin/system/src/settings/sync.ts` line 135: `helm: 'helm-charts'` → `helm: 'helm_charts'`
-- `plugin/system/src/commands/scaffolding/project.ts` line 26: `helm: 'helm-charts'` → `helm: 'helm_charts'`
-- Requires `npm test` and `npm run build:plugin` validation
-
 ## Dependencies
 
-No sequencing dependencies — all 4 changes are independent.
+Change 1b (TypeScript fixes) must be validated with build + tests before committing. All other changes are independent prompt-file edits with no sequencing dependencies.
 
 ## Tests
 
@@ -119,7 +116,9 @@ No sequencing dependencies — all 4 changes are independent.
 
 ## Verification
 
-- [ ] All local path references to helm directories use `helm_charts` (underscores) in prompt files
+- [ ] All local path references to helm directories use `helm_charts` (underscores) in prompt files and TypeScript source
+- [ ] `npm run build:plugin` passes
+- [ ] `npm test` passes
 - [ ] `project-settings/SKILL.md` is internally consistent (both references use underscores)
 - [ ] All 6 scaffolding skills have `## Output` sections declaring no structured output
 - [ ] `component-discovery` table has informational reference note
