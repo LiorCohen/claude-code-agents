@@ -4,7 +4,6 @@
 
 ## Planning
 
-- [#117](2-planning/117/plan.md): Generic scaffolding engine in system CLI
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
@@ -18,7 +17,7 @@
 
 ## Implementing
 
-(none)
+- [#117](4-implementing/117/plan.md): Generic scaffolding engine in system CLI
 
 ---
 
