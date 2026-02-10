@@ -4,6 +4,7 @@
 
 ## Planning
 
+- [#117](2-planning/117/plan.md): Generic scaffolding engine in system CLI
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
@@ -28,7 +29,6 @@
 ---
 
 ## High Priority
-- [#117](1-inbox/117/): Generic scaffolding engine in system CLI
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
