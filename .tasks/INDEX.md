@@ -27,6 +27,7 @@
 ---
 
 ## High Priority
+- [#122](1-inbox/122/): Fix TypeScript standards violations in plugin/system
 - [#118](1-inbox/118/): Upgrade all JSON schemas to latest stable version (2020-12)
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
@@ -64,7 +65,6 @@
 ---
 
 ## Inbox (unprioritized)
-- [#122](1-inbox/122/): Fix TypeScript standards violations in plugin/system
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding

@@ -2,6 +2,7 @@
 id: 122
 title: Fix TypeScript standards violations in plugin/system
 status: open
+priority: high
 created: 2026-02-10
 depends_on: []
 blocks: []
