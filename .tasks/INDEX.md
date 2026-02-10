@@ -6,6 +6,7 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
+- [#122](2-planning/122/plan.md): Fix TypeScript standards violations in plugin/system
 ---
 
 ## Ready
@@ -27,7 +28,6 @@
 ---
 
 ## High Priority
-- [#122](1-inbox/122/): Fix TypeScript standards violations in plugin/system
 - [#118](1-inbox/118/): Upgrade all JSON schemas to latest stable version (2020-12)
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
