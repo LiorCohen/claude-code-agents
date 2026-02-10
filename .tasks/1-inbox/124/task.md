@@ -46,6 +46,7 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - It should catch the most common Claude failure modes: over-engineering, making assumptions without reading code, drifting from plans, adding unnecessary abstractions, being too agreeable
 - **Anti-grep rule:** Claude over-relies on grep to skim for keywords instead of reading full files. The critic must enforce: "Did you actually READ the files, or did you just grep for a keyword and assume you understand the context? Read the full file. Grep is for finding files, not for understanding them."
 - **Learning feedback loop:** The critic should maintain a `feedback-log.md` file that accumulates Lior's actual feedback over time. When Lior pushes back on a plan, rejects an approach, or corrects Claude's thinking, the critic should capture that pattern and add it to its knowledge base. Over time, the critic gets sharper because it learns from real interactions — not just the initial static prompts. The skill prompt should read this log at each phase and apply any relevant learned patterns.
+- **Feedback log hygiene:** The feedback log must be kept consistent — no contradictions, no duplications. When adding a new entry, check if it overlaps with or contradicts an existing entry. If it overlaps, merge them into one stronger rule. If it contradicts, replace the old one. Keep the log concise — distill patterns into sharp rules, don't just append raw transcripts. Never lose functionality during summarization. If unsure whether a new entry subsumes or conflicts with an existing one, ask Lior before modifying.
 
 ## Acceptance Criteria
 
@@ -59,3 +60,4 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - [ ] `feedback-log.md` file created for accumulating Lior's real feedback patterns
 - [ ] Skill prompt reads feedback log at each lifecycle phase and applies learned patterns
 - [ ] Instructions for when/how to append new feedback entries to the log
+- [ ] Feedback log hygiene rules: no contradictions, no duplications, merge overlaps, ask Lior if unsure
