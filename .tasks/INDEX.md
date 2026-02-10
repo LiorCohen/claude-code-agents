@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#116](4-implementing/116/plan.md): Fix system CLI standards violations from audit report
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#116](5-reviewing/116/plan.md): Fix system CLI standards violations from audit report
 
 ---
 
