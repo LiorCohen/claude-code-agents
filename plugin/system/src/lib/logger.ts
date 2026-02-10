@@ -70,18 +70,22 @@ export const createLogger = (options: GlobalOptions): Logger => {
 /**
  * Simple success/error output for CLI results (non-JSON mode).
  */
-export const success = (message: string): void => {
-  console.log(`${COLORS.green}✓${COLORS.reset} ${message}`);
+export const success = (message: string): string => {
+  const formatted = `${COLORS.green}✓${COLORS.reset} ${message}`;
+  console.log(formatted);
+  return formatted;
 };
 
-export const error = (message: string): void => {
-  console.error(`${COLORS.red}✗${COLORS.reset} ${message}`);
+export const error = (message: string): string => {
+  const formatted = `${COLORS.red}✗${COLORS.reset} ${message}`;
+  console.error(formatted);
+  return formatted;
 };
 
 /**
  * File logger configuration options.
  */
-export interface FileLoggerOptions {
+export type FileLoggerOptions = {
   /** Enable/disable file logging */
   readonly enabled: boolean;
   /** Log level */
@@ -94,6 +98,10 @@ export interface FileLoggerOptions {
   readonly projectRoot?: string;
 }
 
+export type FileLoggerResult =
+  | { readonly created: true; readonly logger: pino.Logger }
+  | { readonly created: false };
+
 /**
  * Create a pino file logger instance that writes to .sdd/system-logs/.
  *
@@ -101,13 +109,13 @@ export interface FileLoggerOptions {
  * and remains completely unchanged. File logging is for system audit/debug.
  *
  * @param options - File logger configuration
- * @returns Pino logger instance, or null if logging is disabled
+ * @returns Result with pino logger instance if created, or { created: false } if disabled/failed
  */
 export const createFileLogger = (
   options: FileLoggerOptions
-): pino.Logger | null => {
+): FileLoggerResult => {
   if (!options.enabled) {
-    return null;
+    return { created: false };
   }
 
   try {
@@ -140,13 +148,13 @@ export const createFileLogger = (
       })
     );
 
-    return logger;
+    return { created: true, logger };
   } catch (err) {
     // Fail silently - don't interrupt command execution
     console.warn(
       `${COLORS.yellow}Warning:${COLORS.reset} Failed to initialize file logger:`,
       err instanceof Error ? err.message : String(err)
     );
-    return null;
+    return { created: false };
   }
 };
