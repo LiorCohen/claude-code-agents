@@ -6,6 +6,7 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
+- [#121](2-planning/121/plan.md): Fix skills standards violations from audit report
 
 ---
 
@@ -65,7 +66,6 @@
 ---
 
 ## Inbox (unprioritized)
-- [#121](1-inbox/121/): Fix skills standards violations from audit report
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
