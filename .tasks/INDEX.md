@@ -28,6 +28,7 @@
 ---
 
 ## High Priority
+- [#118](1-inbox/118/): Upgrade all JSON schemas to latest stable version (2020-12)
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
