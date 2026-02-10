@@ -7,13 +7,13 @@ created: 2026-02-10
 
 ## Problem Summary
 
-The TypeScript standards skill (`SKILL.md`) is missing several foundational patterns used throughout the codebase. It also incorrectly allows `let`. This plan adds 14 new sections with concrete examples and corrects the `let` policy.
+The TypeScript standards skill (`SKILL.md`) is missing several foundational patterns used throughout the codebase. It also incorrectly allows `let`. This plan adds 16 new sections with concrete examples and corrects the `let` policy.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `.claude/skills/typescript-standards/SKILL.md` | Add 14 new sections, correct `let` ban, update summary checklist |
+| `.claude/skills/typescript-standards/SKILL.md` | Add 16 new sections, correct `let` ban, update summary checklist |
 | `plugin/skills/typescript-standards/SKILL.md` | Mirror all changes from the marketplace copy (keep plugin-specific Input/Output footer) |
 
 ## Changes
@@ -193,42 +193,117 @@ const VALID_SPEC_TYPES = ['product', 'tech'];
 type SpecType = 'product' | 'tech';  // Easy to get out of sync
 ```
 
-### 6. New Section: Error Handling Patterns
+### 6. New Section: All Functions Must Return Values
 
-Beyond defining Error subclasses — how to catch, narrow, and propagate errors.
+Every function should return a meaningful value. Void functions are extremely rare and should be avoided — they hide information from callers and make code harder to compose.
 
 ```typescript
-// ✅ GOOD: Narrow unknown errors in catch blocks
-try {
-  await loadConfig(path);
-} catch (err) {
-  const message = err instanceof Error ? err.message : String(err);
-  return { success: false, error: `Failed to load config: ${message}` };
-}
-
-// ✅ GOOD: Wrap errors with context
-try {
-  await writeSettings(filePath, settings);
-} catch (err) {
-  throw new Error(
-    `Failed to write settings to ${filePath}: ${err instanceof Error ? err.message : String(err)}`
-  );
-}
-
-// ✅ GOOD: Return null for expected failures (file not found, parse failure)
-const readConfig = async (path: string): Promise<Config | null> => {
+// ✅ GOOD: Return a result that callers can use
+const saveSettings = async (path: string, settings: SddConfig): Promise<CommandResult> => {
   try {
-    return await readJson<Config>(path);
-  } catch {
-    return null;
+    await writeJson(path, settings);
+    return { success: true, output: `Settings saved to ${path}` };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: `Failed to save settings: ${message}` };
   }
 };
 
-// ❌ BAD: Untyped catch without narrowing
+// ✅ GOOD: Even simple operations can return useful info
+const addToCache = (cache: ReadonlyMap<string, string>, key: string, value: string): ReadonlyMap<string, string> =>
+  new Map([...cache, [key, value]]);
+
+// ❌ BAD: Void function hides outcome from caller
+const saveSettings = async (path: string, settings: SddConfig): Promise<void> => {
+  await writeJson(path, settings);  // Caller can't tell if it worked
+};
+
+// ❌ BAD: Side-effect-only function
+const logMetrics = (data: Metrics): void => {
+  console.log(JSON.stringify(data));
+};
+```
+
+**Rule**: All functions should return values. If a function has nothing meaningful to return, that's a signal the design should be reconsidered.
+
+### 7. New Section: Result Unions Over Null
+
+Prefer discriminated union return types over `T | null`. Null is vague — it hides *why* something failed. A union makes every outcome explicit and forces callers to handle each case.
+
+```typescript
+// ✅ GOOD: Discriminated union result — caller knows exactly what happened
+type CommandResult =
+  | { readonly success: true; readonly output: string }
+  | { readonly success: false; readonly error: string };
+
+const loadConfig = async (path: string): Promise<CommandResult> => {
+  try {
+    const config = await readJson<SddConfig>(path);
+    return { success: true, output: JSON.stringify(config) };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: `Config not found at ${path}: ${message}` };
+  }
+};
+
+// Caller is forced to handle both cases:
+const result = await loadConfig(path);
+if (!result.success) {
+  return { success: false, error: result.error };  // Propagate with context
+}
+// result.output is available here
+
+// ✅ GOOD: Typed validation result
+type ValidationResult<T> =
+  | { readonly valid: true; readonly data: T }
+  | { readonly valid: false; readonly errors: ReadonlyArray<string> };
+
+// ❌ BAD: Null hides the reason for failure
+const loadConfig = async (path: string): Promise<SddConfig | null> => {
+  try {
+    return await readJson<SddConfig>(path);
+  } catch {
+    return null;  // File missing? Parse error? Permission denied? Caller can't tell
+  }
+};
+
+// ❌ BAD: Throwing for expected failures
+const loadConfig = async (path: string): Promise<SddConfig> => {
+  const content = await readText(path);  // Throws on missing file
+  return JSON.parse(content);            // Throws on bad JSON
+  // Caller needs try/catch and has no typed error information
+};
+```
+
+**Rule**: Return discriminated union results instead of null or throwing. Reserve `throw` for true programmer errors and invariant violations only.
+
+### 8. New Section: Error Narrowing in Catch Blocks
+
+When catch blocks are needed (e.g., wrapping third-party calls), always narrow the unknown error type.
+
+```typescript
+// ✅ GOOD: Narrow unknown errors with instanceof
+try {
+  await thirdPartyApi.call(params);
+} catch (err) {
+  const message = err instanceof Error ? err.message : String(err);
+  return { success: false, error: `API call failed: ${message}` };
+}
+
+// ✅ GOOD: Wrap and re-throw with context (rare — only for unrecoverable errors)
+try {
+  await criticalInit();
+} catch (err) {
+  throw new Error(
+    `System initialization failed: ${err instanceof Error ? err.message : String(err)}`
+  );
+}
+
+// ❌ BAD: Accessing properties on unknown
 try {
   await loadConfig(path);
 } catch (err) {
-  console.log(err.message);  // err is unknown, this fails
+  console.log(err.message);  // err is unknown — type error
 }
 
 // ❌ BAD: Swallowing errors silently
@@ -239,11 +314,7 @@ try {
 }
 ```
 
-**When to throw vs return null:**
-- **Throw**: Programmer errors, invariant violations, unrecoverable states
-- **Return null**: Expected failures like missing files, parse failures, optional lookups
-
-### 7. New Section: External Data Validation
+### 9. New Section: External Data Validation
 
 Never assume the shape of data from external sources. Always validate and fail explicitly.
 
@@ -282,7 +353,7 @@ fetch(url, { headers: { Authorization: apiKey } });  // Sends "undefined"
 
 **Rule**: Trust internal types (function-to-function within the codebase). Validate at system boundaries (CLI args, env vars, config files, API responses, YAML/JSON parsing).
 
-### 8. New Section: Async/Promise Patterns
+### 10. New Section: Async/Promise Patterns
 
 ```typescript
 // ✅ GOOD: Explicit Promise<T> return type
@@ -315,7 +386,7 @@ const loadSettings = async (path: string) => {  // Return type unclear
 };
 ```
 
-### 9. New Section: Generic Constraints
+### 11. New Section: Generic Constraints
 
 ```typescript
 // ✅ GOOD: Generic for type-safe JSON parsing
@@ -341,7 +412,7 @@ const readJson = async (filePath: string): Promise<any> => {
 };
 ```
 
-### 10. New Section: Null vs Undefined
+### 12. New Section: Null vs Undefined
 
 ```typescript
 // ✅ GOOD: null for intentional absence ("we looked, it's not there")
@@ -365,7 +436,7 @@ type Config = {
 
 **Rule**: Use `null` for "looked up and absent." Use `undefined` (via `?:`) for "not provided / optional."
 
-### 11. New Section: `Record<string, never>` for Empty Types
+### 13. New Section: `Record<string, never>` for Empty Types
 
 ```typescript
 // ✅ GOOD: Record<string, never> for placeholder types
@@ -381,7 +452,7 @@ type ConfigSettings = {};        // Accepts any non-nullish value
 type ConfigSettings = object;    // Too broad
 ```
 
-### 12. New Section: Nullish Coalescing (`??`) vs Logical OR (`||`)
+### 14. New Section: Nullish Coalescing (`??`) vs Logical OR (`||`)
 
 ```typescript
 // ✅ GOOD: ?? for defaults (preserves 0, '', false)
@@ -399,7 +470,7 @@ const count = config.count || 10;  // count=0 becomes 10 — wrong!
 
 **Rule**: Default to `??`. Only use `||` when you intentionally want to fall through on all falsy values.
 
-### 13. New Section: `import type` for Type-Only Imports
+### 15. New Section: `import type` for Type-Only Imports
 
 ```typescript
 // ✅ GOOD: Separate type imports from value imports
@@ -420,7 +491,7 @@ import { SddConfig } from '@/types/settings';  // Bundler can't tree-shake
 
 **Why**: `import type` is erased at compile time, ensuring types never appear in output bundles. It also makes the intent explicit — readers know immediately this import is for types only.
 
-### 14. New Section: `keyof` and Indexed Access Types
+### 16. New Section: `keyof` and Indexed Access Types
 
 ```typescript
 // ✅ GOOD: keyof for type-safe property access
@@ -444,7 +515,7 @@ const DEFAULTS = { host: 'localhost', port: 3000 } as const;
 type DefaultKey = keyof typeof DEFAULTS;  // 'host' | 'port'
 ```
 
-### 15. New Section: `Object.entries` / `Object.fromEntries`
+### 17. New Section: `Object.entries` / `Object.fromEntries`
 
 ```typescript
 // ✅ GOOD: Object.entries for iterating key-value pairs
@@ -469,7 +540,7 @@ for (const key of Object.keys(config)) {
 }
 ```
 
-### 16. Update Summary Checklist
+### 18. Update Summary Checklist
 
 Add new items to the checklist:
 
@@ -477,6 +548,8 @@ Add new items to the checklist:
 - Semantic type aliases for meaningful primitives
 - Type guards for discriminated union narrowing
 - `as const` for literal arrays; derive union types with `typeof X[number]`
+- All functions return values (no void)
+- Result unions over null — discriminated union return types for failable operations
 - Error catch blocks narrow with `instanceof Error`
 - External data validated at system boundaries
 - Async functions have explicit `Promise<T>` return types
@@ -490,7 +563,7 @@ Remove the old `let` language:
 Replace with:
 > All `const` declarations (never `let`, never `var`)
 
-### 17. Sync Plugin Copy
+### 19. Sync Plugin Copy
 
 After all changes to `.claude/skills/typescript-standards/SKILL.md`, copy the content to `plugin/skills/typescript-standards/SKILL.md`, preserving the plugin-specific Input/Output footer section at the end.
 
@@ -504,7 +577,9 @@ No tests — this is a documentation-only change to a skill file.
 
 ## Verification
 
-- [ ] All 14 new sections have concrete code examples with ✅/❌ patterns
+- [ ] All 16 new sections have concrete code examples with ✅/❌ patterns
+- [ ] "All functions must return values" section shows void alternatives
+- [ ] "Result unions over null" section shows discriminated union return types
 - [ ] `let` is banned in both the Immutability section and Summary Checklist
 - [ ] `interface` vs `type` rule is clear: interface for function contracts, type for everything else
 - [ ] Examples use real patterns from the codebase (settings types, Logger, spec types, etc.)
