@@ -212,23 +212,80 @@ background-worker:
 
 ---
 
+## Scaffold Spec
+
+To scaffold a backend component, build a spec with context flags derived from settings and invoke the engine:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+### Variables
+
+| Variable | Source |
+|----------|--------|
+| `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+| `SERVER_NAME` | Component name |
+| `CONTRACT_PACKAGE` | `@<project-name>/<contract-name>` (from `depends_on`) |
+
+### Context Flags (derived from settings)
+
+| Flag | Derived From |
+|------|-------------|
+| `has_databases` | `settings.databases.length > 0` |
+| `has_provides_contracts` | `settings.provides_contracts.length > 0` |
+| `has_consumes_contracts` | `settings.consumes_contracts.length > 0` |
+
+### Operations
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": {
+    "PROJECT_NAME": "<project-name>",
+    "SERVER_NAME": "<server-name>",
+    "CONTRACT_PACKAGE": "@<project-name>/<contract-name>"
+  },
+  "context": {
+    "has_databases": true,
+    "has_provides_contracts": true,
+    "has_consumes_contracts": false
+  },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "components/backend/backend-scaffolding/templates",
+      "dest": "components/servers/<server-name>"
+    },
+    {
+      "type": "mkdir",
+      "path": "components/servers/<server-name>/src/dal",
+      "when": { "key": "has_databases", "equals": true }
+    },
+    {
+      "type": "mkdir",
+      "path": "components/servers/<server-name>/src/controller/http_handlers",
+      "when": { "key": "has_provides_contracts", "equals": true }
+    },
+    {
+      "type": "package_json_scripts",
+      "scripts": {
+        "<server-name>:dev": "npm run dev -w @<project-name>/<server-name>",
+        "<server-name>:build": "npm run build -w @<project-name>/<server-name>",
+        "<server-name>:start": "npm run start -w @<project-name>/<server-name>",
+        "<server-name>:test": "npm run test -w @<project-name>/<server-name>"
+      }
+    }
+  ]
+}
+```
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts component name, server type, and optional settings for databases, contracts, and Helm chart generation.
-
-## Root Package.json Update
-
-After scaffolding, update the root `package.json`:
-
-1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add component scripts:
-   - `"<name>:dev": "npm run dev -w components/servers/<name>"`
-   - `"<name>:build": "npm run build -w components/servers/<name>"`
-   - `"<name>:start": "npm run start -w components/servers/<name>"`
-   - `"<name>:test": "npm run test -w components/servers/<name>"`
-3. Update meta-scripts (`dev`, `build`, `test`) to include this component
 
 ## Related Skills
 

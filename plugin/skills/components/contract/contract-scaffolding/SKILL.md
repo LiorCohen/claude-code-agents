@@ -73,18 +73,49 @@ skills/components/contract/contract-scaffolding/templates/
 └── openapi.yaml
 ```
 
+## Scaffold Spec
+
+To scaffold a contract component, build a spec and invoke the engine:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+### Variables
+
+| Variable | Source |
+|----------|--------|
+| `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+
+### Operations
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "PROJECT_NAME": "<project-name>" },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "components/contract/contract-scaffolding/templates",
+      "dest": "components/contracts/<contract-name>"
+    },
+    {
+      "type": "write_file",
+      "path": "components/contracts/<contract-name>/.gitignore",
+      "content": "node_modules/\ngenerated/\n"
+    }
+  ]
+}
+```
+
+No conditions needed.
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts contract name and optional project metadata for OpenAPI spec generation.
-
-## Root Package.json Update
-
-After scaffolding, update the root `package.json`:
-
-1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add the contract component as a workspace entry (no component-level scripts needed — contract operations use the system CLI directly)
 
 ## Related Skills
 

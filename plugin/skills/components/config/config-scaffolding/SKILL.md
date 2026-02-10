@@ -192,6 +192,46 @@ When settings change (via `/sdd-settings`), the config component is automaticall
 3. **Contract added to consumes_contracts** → API subsection added
 4. **Existing sections** → Never modified or deleted (preserves user changes)
 
+## Scaffold Spec
+
+The config component uses the engine for base template structure, but config section generation is dynamic (computed from component settings by the skill).
+
+### Base structure via engine
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "PROJECT_NAME": "<project-name>" },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "components/config/config-scaffolding/templates",
+      "dest": "components/config"
+    }
+  ]
+}
+```
+
+### Dynamic config sections (skill computes content)
+
+For each component, the skill computes the YAML config section content and writes it via `write_file` with `if_exists: "skip"` (additive only — never clobber existing sections). The skill builds the YAML content itself, then passes it to the engine.
+
+```json
+{
+  "type": "write_file",
+  "path": "components/config/envs/default/config.yaml",
+  "content": "<computed-yaml-content>",
+  "if_exists": "overwrite"
+}
+```
+
+**Split:** Use the engine for the component directory structure. Compute config sections yourself (from component settings) and write them via `write_file`.
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)

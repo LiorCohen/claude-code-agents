@@ -38,6 +38,54 @@ Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
 
 Returns success status, list of scaffolded components, and next steps.
 
+## Scaffolding Engine
+
+All scaffolding operations are executed by the generic scaffolding engine. Component skills define a declarative JSON spec that the engine executes.
+
+### Invocation
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec <path-to-spec.json> [--dry-run]
+```
+
+### Spec Format
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "PROJECT_NAME": "my-app", "...": "..." },
+  "context": { "has_databases": true, "...": "..." },
+  "operations": [
+    { "type": "template_dir", "source": "...", "dest": "..." },
+    { "type": "template_file", "source": "...", "dest": "...", "when": { "key": "flag", "equals": true } },
+    { "type": "mkdir", "path": "...", "gitkeep": true },
+    { "type": "write_file", "path": "...", "content": "...", "if_exists": "skip" },
+    { "type": "package_json_scripts", "scripts": { "name:dev": "..." } }
+  ]
+}
+```
+
+### Workflow
+
+For each component to scaffold:
+
+1. **Compute context flags** from component settings (e.g., `has_databases`, `has_ingress`)
+2. **Build a spec JSON** following the component skill's documented spec format
+3. **Write the spec** to a temp file
+4. **Invoke the engine** with `scaffolding apply --spec <path>`
+5. **For hybrid components** (e.g., config): run the engine for base structure, then compute dynamic content and invoke additional `write_file` operations
+
+See each component's `SKILL.md` for the complete spec format and context flag derivation.
+
+## Project Scaffolding
+
+The `scaffolding project` command uses the engine internally — it builds a spec from the project config and executes it.
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding project --config <config.json>
+```
+
 ## Usage
 
 After gathering project configuration in `/sdd-init`, run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding project` with a config JSON file containing the project settings. The config must include:

@@ -2,28 +2,20 @@
  * Project scaffolding command.
  *
  * Creates project structure from templates with variable substitution.
+ * Builds a scaffold spec and delegates to the generic engine.
  *
  * Usage:
  *   sdd-system scaffolding project --config config.json
  */
 
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { CommandResult } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
-import { exists, readText, writeText, ensureDir, walkDir, copyFile } from '@/lib/fs';
+import { exists, readText } from '@/lib/fs';
 import type { ScaffoldingConfig, ComponentEntry, ScaffoldingResult } from '@/types/component';
 import { getSkillsDir } from '@/lib/config';
-
-interface CreatedItems {
-  readonly files: readonly string[];
-  readonly dirs: readonly string[];
-}
-
-const mergeItems = (...items: readonly CreatedItems[]): CreatedItems => ({
-  files: items.flatMap((i) => i.files),
-  dirs: items.flatMap((i) => i.dirs),
-});
+import { executeSpec } from './engine';
+import type { ScaffoldSpec, ScaffoldOperation } from './engine';
 
 /**
  * Pluralize a component type for directory naming.
@@ -53,542 +45,62 @@ const getComponentsByType = (
 ): readonly ComponentEntry[] => components.filter((c) => c.type === componentType);
 
 /**
- * Replace template variables with config values.
+ * Generate per-component npm scripts.
  */
-const substituteVariables = (
-  content: string,
-  config: ScaffoldingConfig,
-  component?: ComponentEntry
-): string => {
-  const replacements: Readonly<Record<string, string>> = {
-    '{{PROJECT_NAME}}': config.project_name,
-    '{{PROJECT_DESCRIPTION}}': config.project_description,
-    '{{PRIMARY_DOMAIN}}': config.primary_domain,
-    ...(component?.depends_on
-      ? { '{{CONTRACT_PACKAGE}}': `@${config.project_name}/${component.depends_on[0] ?? ''}` }
-      : {}),
-  };
-
-  return Object.entries(replacements).reduce(
-    (result, [variable, value]) => result.replaceAll(variable, value),
-    content
-  );
-};
-
-const SUBSTITUTABLE_EXTENSIONS = [
-  '.md',
-  '.json',
-  '.yaml',
-  '.yml',
-  '.ts',
-  '.tsx',
-  '.html',
-  '.css',
-  '.js',
-] as const;
-
-/**
- * Copy a template file, optionally substituting variables.
- */
-const copyTemplateFile = async (
-  src: string,
-  dest: string,
-  config: ScaffoldingConfig,
-  component?: ComponentEntry,
-  substitute = true
-): Promise<string> => {
-  await ensureDir(path.dirname(dest));
-
-  const ext = path.extname(src);
-  if (substitute && (SUBSTITUTABLE_EXTENSIONS as readonly string[]).includes(ext)) {
-    const content = await readText(src);
-    const substituted = substituteVariables(content, config, component);
-    await writeText(dest, substituted);
-  } else {
-    await copyFile(src, dest);
-  }
-
-  const relativePath = path.relative(config.target_dir, dest);
-  console.log(`  Created: ${relativePath}`);
-  return relativePath;
-};
-
-/**
- * Create a directory if it doesn't exist.
- */
-const createDirectory = async (dirPath: string, config: ScaffoldingConfig): Promise<string> => {
-  await ensureDir(dirPath);
-  const relativePath = path.relative(config.target_dir, dirPath);
-  console.log(`  Created: ${relativePath}/`);
-  return relativePath;
-};
-
-/**
- * Create multiple directories.
- */
-const createDirectories = async (
-  dirs: readonly string[],
-  target: string,
-  config: ScaffoldingConfig
-): Promise<CreatedItems> => {
-  const created = await Promise.all(
-    dirs.map(async (d) => createDirectory(path.join(target, d), config))
-  );
-  return { files: [], dirs: created };
-};
-
-/**
- * Check if a directory exists (sync version for template checks).
- */
-const directoryExists = (dirPath: string): boolean => {
-  try {
-    return fs.statSync(dirPath).isDirectory();
-  } catch {
-    return false;
-  }
-};
-
-/**
- * Copy template files from a directory if it exists.
- */
-const copyTemplateDir = async (
-  templatesDir: string,
-  destDir: string,
-  config: ScaffoldingConfig,
-  component?: ComponentEntry
-): Promise<readonly string[]> => {
-  if (!directoryExists(templatesDir)) return [];
-
-  const srcFiles = await walkDir(templatesDir);
-  const results = await Promise.all(
-    srcFiles.map(async (srcFile) => {
-      const relPath = path.relative(templatesDir, srcFile);
-      const destFile = path.join(destDir, relPath);
-      await copyTemplateFile(srcFile, destFile, config, component);
-      return path.relative(config.target_dir, destFile);
-    })
-  );
-
-  return results;
-};
-
-/**
- * Generate component scripts and categorize components.
- */
-interface ComponentScripts {
-  readonly scripts: Readonly<Record<string, string>>;
-  readonly contracts: readonly string[];
-  readonly servers: readonly string[];
-  readonly webapps: readonly string[];
-  readonly databases: readonly string[];
-}
-
 const generateComponentScripts = (
   components: readonly ComponentEntry[],
-  config: ScaffoldingConfig
-): ComponentScripts => {
-  const initial: ComponentScripts = {
-    scripts: {},
-    contracts: [],
-    servers: [],
-    webapps: [],
-    databases: [],
-  };
+  projectName: string
+): Readonly<Record<string, string>> => {
+  const scripts: Record<string, string> = {};
 
-  return components.reduce((acc, component) => {
-    const workspace = `-w @${config.project_name}/${component.name}`;
+  for (const component of components) {
+    const workspace = `-w @${projectName}/${component.name}`;
 
     switch (component.type) {
       case 'contract':
-        console.log(`  Added: ${component.name}:generate, ${component.name}:validate`);
-        return {
-          ...acc,
-          contracts: [...acc.contracts, component.name],
-          scripts: {
-            ...acc.scripts,
-            [`${component.name}:generate`]: `npm run generate:types ${workspace}`,
-            [`${component.name}:validate`]: `npm run validate ${workspace}`,
-          },
-        };
+        scripts[`${component.name}:generate`] = `npm run generate:types ${workspace}`;
+        scripts[`${component.name}:validate`] = `npm run validate ${workspace}`;
+        break;
 
       case 'server':
-        console.log(
-          `  Added: ${component.name}:dev, ${component.name}:build, ${component.name}:start, ${component.name}:test`
-        );
-        return {
-          ...acc,
-          servers: [...acc.servers, component.name],
-          scripts: {
-            ...acc.scripts,
-            [`${component.name}:dev`]: `npm run dev ${workspace}`,
-            [`${component.name}:build`]: `npm run build ${workspace}`,
-            [`${component.name}:start`]: `npm run start ${workspace}`,
-            [`${component.name}:test`]: `npm run test ${workspace}`,
-          },
-        };
+        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
+        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
+        scripts[`${component.name}:start`] = `npm run start ${workspace}`;
+        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
+        break;
 
       case 'webapp':
-        console.log(
-          `  Added: ${component.name}:dev, ${component.name}:build, ${component.name}:preview, ${component.name}:test`
-        );
-        return {
-          ...acc,
-          webapps: [...acc.webapps, component.name],
-          scripts: {
-            ...acc.scripts,
-            [`${component.name}:dev`]: `npm run dev ${workspace}`,
-            [`${component.name}:build`]: `npm run build ${workspace}`,
-            [`${component.name}:preview`]: `npm run preview ${workspace}`,
-            [`${component.name}:test`]: `npm run test ${workspace}`,
-          },
-        };
+        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
+        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
+        scripts[`${component.name}:preview`] = `npm run preview ${workspace}`;
+        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
+        break;
 
       case 'database':
-        console.log(
-          `  Added: ${component.name}:setup, ${component.name}:teardown, ${component.name}:migrate, ${component.name}:seed, ${component.name}:reset, ${component.name}:port-forward, ${component.name}:psql`
-        );
-        return {
-          ...acc,
-          databases: [...acc.databases, component.name],
-          scripts: {
-            ...acc.scripts,
-            [`${component.name}:setup`]: `npm run setup ${workspace}`,
-            [`${component.name}:teardown`]: `npm run teardown ${workspace}`,
-            [`${component.name}:migrate`]: `npm run migrate ${workspace}`,
-            [`${component.name}:seed`]: `npm run seed ${workspace}`,
-            [`${component.name}:reset`]: `npm run reset ${workspace}`,
-            [`${component.name}:port-forward`]: `npm run port-forward ${workspace}`,
-            [`${component.name}:psql`]: `npm run psql ${workspace}`,
-          },
-        };
+        scripts[`${component.name}:setup`] = `npm run setup ${workspace}`;
+        scripts[`${component.name}:teardown`] = `npm run teardown ${workspace}`;
+        scripts[`${component.name}:migrate`] = `npm run migrate ${workspace}`;
+        scripts[`${component.name}:seed`] = `npm run seed ${workspace}`;
+        scripts[`${component.name}:reset`] = `npm run reset ${workspace}`;
+        scripts[`${component.name}:port-forward`] = `npm run port-forward ${workspace}`;
+        scripts[`${component.name}:psql`] = `npm run psql ${workspace}`;
+        break;
 
-      case 'helm': {
-        const dirName = componentDirName(component);
-        console.log(`  Added: ${component.name}:lint`);
-        return {
-          ...acc,
-          scripts: {
-            ...acc.scripts,
-            [`${component.name}:lint`]: `helm lint components/${dirName}`,
-          },
-        };
-      }
-
-      default:
-        return acc;
+      case 'helm':
+        scripts[`${component.name}:lint`] = `helm lint components/${componentDirName(component)}`;
+        break;
     }
-  }, initial);
-};
-
-/**
- * Generate meta-scripts for orchestration.
- */
-const generateMetaScripts = (
-  componentScripts: ComponentScripts
-): Readonly<Record<string, string>> => {
-  const { contracts, servers, webapps } = componentScripts;
-
-  if (contracts.length === 0 && servers.length === 0 && webapps.length === 0) {
-    return {};
   }
 
-  console.log('  Adding meta-scripts...');
-
-  const scriptEntries: readonly (readonly [string, string])[] = [
-    // Generate script for contracts
-    ...(contracts.length > 0
-      ? ([
-          ['generate', `npm-run-all ${contracts.map((c) => `${c}:generate`).join(' ')}`],
-        ] as const)
-      : []),
-
-    // Dev script
-    ...([...servers, ...webapps].length > 0
-      ? ([
-          [
-            'dev',
-            contracts.length > 0
-              ? `npm-run-all generate --parallel ${[...servers, ...webapps].map((c) => `${c}:dev`).join(' ')}`
-              : `npm-run-all --parallel ${[...servers, ...webapps].map((c) => `${c}:dev`).join(' ')}`,
-          ],
-        ] as const)
-      : []),
-
-    // Build script
-    ...([...servers, ...webapps].length > 0
-      ? ([
-          [
-            'build',
-            contracts.length > 0
-              ? `npm-run-all generate --parallel ${[...servers, ...webapps].map((c) => `${c}:build`).join(' ')}`
-              : `npm-run-all --parallel ${[...servers, ...webapps].map((c) => `${c}:build`).join(' ')}`,
-          ],
-        ] as const)
-      : []),
-
-    // Test script
-    ...([...servers, ...webapps].length > 0
-      ? ([
-          [
-            'test',
-            contracts.length > 0
-              ? `npm-run-all generate --parallel ${[...servers, ...webapps].map((c) => `${c}:test`).join(' ')}`
-              : `npm-run-all --parallel ${[...servers, ...webapps].map((c) => `${c}:test`).join(' ')}`,
-          ],
-        ] as const)
-      : []),
-
-    // Start script
-    ...(servers.length > 0 || webapps.length > 0
-      ? ([
-          [
-            'start',
-            `npm-run-all --parallel ${[
-              ...servers.map((c) => `${c}:start`),
-              ...webapps.map((c) => `${c}:preview`),
-            ].join(' ')}`,
-          ],
-        ] as const)
-      : []),
-  ];
-
-  console.log('  Added: generate, dev, build, test, start');
-
-  return Object.fromEntries(scriptEntries);
+  return scripts;
 };
 
 /**
- * Create the complete project structure.
+ * Build the architecture overview content.
  */
-const runScaffolding = async (config: ScaffoldingConfig): Promise<ScaffoldingResult> => {
-  const target = config.target_dir;
-  const skillsDir = config.skills_dir;
-  const components = config.components;
-
-  // Template locations (colocated with skills)
-  const projectTemplates = path.join(skillsDir, 'project-scaffolding', 'templates');
-  const backendTemplates = path.join(skillsDir, 'components', 'backend', 'backend-scaffolding', 'templates');
-  const frontendTemplates = path.join(skillsDir, 'components', 'frontend', 'frontend-scaffolding', 'templates');
-  const contractTemplates = path.join(skillsDir, 'components', 'contract', 'contract-scaffolding', 'templates');
-  const databaseTemplates = path.join(skillsDir, 'components', 'database', 'database-scaffolding', 'templates');
-  const configTemplates = path.join(skillsDir, 'components', 'config', 'config-scaffolding', 'templates');
-
-  // Group components by type
-  const contractComponents = getComponentsByType(components, 'contract');
-  const serverComponents = getComponentsByType(components, 'server');
-  const webappComponents = getComponentsByType(components, 'webapp');
-  const databaseComponents = getComponentsByType(components, 'database');
-  const helmComponents = getComponentsByType(components, 'helm');
-  const testingComponents = getComponentsByType(components, 'testing');
-  const cicdComponents = getComponentsByType(components, 'cicd');
-
-  // Create target directory
-  await ensureDir(target);
-
-  // Build display string for components
-  const componentDisplay = components.map((c) =>
-    c.type === c.name ? c.type : `${c.type}:${c.name}`
-  );
-
-  console.log(`\nScaffolding project: ${config.project_name}`);
-  console.log(`Target: ${target}`);
-  console.log(`Components: ${componentDisplay.join(', ')}`);
-  console.log();
-
-  // Step 1: Create root .gitignore
-  console.log('Creating root files...');
-  const gitignore = path.join(target, '.gitignore');
-  await writeText(
-    gitignore,
-    `node_modules/
-.env
-.DS_Store
-dist/
-*.log
-`
-  );
-  console.log('  Created: .gitignore');
-  const rootFilesCreated: CreatedItems = { files: ['.gitignore'], dirs: [] };
-
-  // Step 2: Create directory structure
-  console.log('\nCreating directory structure...');
-
-  // Always create specs directories
-  const specsDirs = [
-    'specs',
-    'specs/domain',
-    'specs/domain/definitions',
-    'specs/domain/use-cases',
-    'specs/architecture',
-  ];
-  const specsDirsCreated = await createDirectories(specsDirs, target, config);
-
-  // Separate directories at project root
-  const rootDirs = ['changes', 'archive'];
-  const rootDirsCreated = await createDirectories(rootDirs, target, config);
-
-  // Create .gitkeep files for empty directories
-  const emptyDirs = [
-    'specs/domain/definitions',
-    'specs/domain/use-cases',
-    'specs/architecture',
-    'changes',
-    'archive',
-  ];
-  const gitkeepFiles = await Promise.all(
-    emptyDirs.map(async (dir) => {
-      const gitkeepPath = path.join(target, dir, '.gitkeep');
-      await writeText(gitkeepPath, '# This file ensures the directory is tracked by git\n');
-      console.log(`  Created: ${dir}/.gitkeep`);
-      return `${dir}/.gitkeep`;
-    })
-  );
-  const gitkeepCreated: CreatedItems = { files: gitkeepFiles, dirs: [] };
-
-  // Create .claudeignore
-  const claudeignore = path.join(target, '.claudeignore');
-  await writeText(claudeignore, 'archive/\n');
-  console.log('  Created: .claudeignore');
-  const claudeignoreCreated: CreatedItems = { files: ['.claudeignore'], dirs: [] };
-
-  // Config component directories (mandatory singleton - no plural folder)
-  const configDirs = [
-    'components/config',
-    'components/config/envs',
-    'components/config/envs/default',
-    'components/config/envs/local',
-    'components/config/schemas',
-    'components/config/types',
-  ];
-  const configDirsCreated = await createDirectories(configDirs, target, config);
-
-  // Contract component directories
-  const contractDirs = contractComponents.map((c) => `components/${componentDirName(c)}`);
-  const contractDirsCreated = await createDirectories(contractDirs, target, config);
-
-  // Server component directories
-  const serverDirs = serverComponents.flatMap((server) => {
-    const dirName = componentDirName(server);
-    return [
-      `components/${dirName}/src/operator`,
-      `components/${dirName}/src/config`,
-      `components/${dirName}/src/controller/http_handlers`,
-      `components/${dirName}/src/model/definitions`,
-      `components/${dirName}/src/model/use-cases`,
-      `components/${dirName}/src/dal`,
-    ];
-  });
-  const serverDirsCreated = await createDirectories(serverDirs, target, config);
-
-  // Webapp component directories
-  const webappDirs = webappComponents.flatMap((webapp) => {
-    const dirName = componentDirName(webapp);
-    return [
-      `components/${dirName}/src/pages`,
-      `components/${dirName}/src/components`,
-      `components/${dirName}/src/viewmodels`,
-      `components/${dirName}/src/models`,
-      `components/${dirName}/src/services`,
-      `components/${dirName}/src/stores`,
-      `components/${dirName}/src/types`,
-      `components/${dirName}/src/utils`,
-    ];
-  });
-  const webappDirsCreated = await createDirectories(webappDirs, target, config);
-
-  // Helm component directories
-  const helmDirs = helmComponents.map((c) => `components/${componentDirName(c)}`);
-  const helmDirsCreated = await createDirectories(helmDirs, target, config);
-
-  // Testing component directories
-  const testingDirs = testingComponents.flatMap((testing) => {
-    const dirName = componentDirName(testing);
-    return [
-      `components/${dirName}/tests/integration`,
-      `components/${dirName}/tests/component`,
-      `components/${dirName}/tests/e2e`,
-      `components/${dirName}/testsuites`,
-    ];
-  });
-  const testingDirsCreated = await createDirectories(testingDirs, target, config);
-
-  // CI/CD component directories
-  const cicdDirs = cicdComponents.flatMap((c) => [
-    `components/${componentDirName(c)}`,
-    '.github/workflows',
-  ]);
-  const cicdDirsCreated = await createDirectories(cicdDirs, target, config);
-
-  // Database component directories
-  const databaseDirs = databaseComponents.flatMap((database) => {
-    const dirName = componentDirName(database);
-    return [
-      `components/${dirName}`,
-      `components/${dirName}/migrations`,
-      `components/${dirName}/seeds`,
-      `components/${dirName}/scripts`,
-    ];
-  });
-  const databaseDirsCreated = await createDirectories(databaseDirs, target, config);
-
-  // Step 3: Copy and customize template files
-  console.log('\nCopying template files...');
-
-  // Root project files
-  const projectFilesDir = path.join(projectTemplates, 'project');
-  const projectFilesCreated = directoryExists(projectFilesDir)
-    ? await Promise.all(
-        ['README.md', 'CLAUDE.md', 'package.json']
-          .filter((f) => fs.existsSync(path.join(projectFilesDir, f)))
-          .map(async (f) => {
-            await copyTemplateFile(path.join(projectFilesDir, f), path.join(target, f), config);
-            return f;
-          })
-      )
-    : [];
-
-  // Spec files (SNAPSHOT.md, glossary.md go in specs/)
-  const specsFilesDir = path.join(projectTemplates, 'specs');
-  const specFilesList: ReadonlyArray<readonly [string, string]> = [
-    ['SNAPSHOT.md', 'specs/SNAPSHOT.md'],
-    ['glossary.md', 'specs/domain/glossary.md'],
-  ];
-  const specFilesCreated = directoryExists(specsFilesDir)
-    ? await Promise.all(
-        specFilesList
-          .filter(([srcName]) => fs.existsSync(path.join(specsFilesDir, srcName)))
-          .map(async ([srcName, destPath]) => {
-            await copyTemplateFile(
-              path.join(specsFilesDir, srcName),
-              path.join(target, destPath),
-              config
-            );
-            return destPath;
-          })
-      )
-    : [];
-
-  // INDEX.md goes in changes/ (not specs/)
-  const changesFilesDir = path.join(projectTemplates, 'changes');
-  const changesFilesList: ReadonlyArray<readonly [string, string]> = [
-    ['INDEX.md', 'changes/INDEX.md'],
-  ];
-  const changesFilesCreated = directoryExists(changesFilesDir)
-    ? await Promise.all(
-        changesFilesList
-          .filter(([srcName]) => fs.existsSync(path.join(changesFilesDir, srcName)))
-          .map(async ([srcName, destPath]) => {
-            await copyTemplateFile(
-              path.join(changesFilesDir, srcName),
-              path.join(target, destPath),
-              config
-            );
-            return destPath;
-          })
-      )
-    : [];
-
-  // Architecture overview
+const buildArchitectureContent = (
+  config: ScaffoldingConfig
+): string => {
   const typeDescriptions: Readonly<Record<string, string>> = {
     contract: 'OpenAPI specifications and type generation',
     server: 'Node.js/TypeScript backend with CMDO architecture',
@@ -599,14 +111,14 @@ dist/
     cicd: 'CI/CD workflow definitions',
   };
 
-  const componentLines = components.map((component) => {
+  const componentLines = config.components.map((component) => {
     const dirName = componentDirName(component);
     const displayName = component.name.charAt(0).toUpperCase() + component.name.slice(1);
     const description = typeDescriptions[component.type] ?? component.type;
     return `- **${displayName}** (\`components/${dirName}/\`): ${description}`;
   });
 
-  const archContent = `# Architecture Overview
+  return `# Architecture Overview
 
 This document describes the architecture of ${config.project_name}.
 
@@ -615,101 +127,12 @@ This document describes the architecture of ${config.project_name}.
 - **Config** (\`components/config/\`): YAML-based configuration management
 ${componentLines.join('\n')}
 `;
+};
 
-  const archOverview = path.join(target, 'specs/architecture/overview.md');
-  await writeText(archOverview, archContent);
-  console.log('  Created: specs/architecture/overview.md');
-
-  // Config component files (using config-scaffolding templates)
-  const configFilesCreated = directoryExists(configTemplates)
-    ? await copyTemplateDir(configTemplates, path.join(target, 'components/config'), config)
-    : [];
-
-  // Contract component files
-  const contractFilesCreated = directoryExists(contractTemplates)
-    ? (
-        await Promise.all(
-          contractComponents.map(async (contract) => {
-            const dirName = componentDirName(contract);
-            const destDir = path.join(target, `components/${dirName}`);
-
-            const templateFiles = await Promise.all(
-              ['package.json', 'openapi.yaml']
-                .filter((f) => fs.existsSync(path.join(contractTemplates, f)))
-                .map(async (f) => {
-                  await copyTemplateFile(
-                    path.join(contractTemplates, f),
-                    path.join(destDir, f),
-                    config,
-                    contract
-                  );
-                  return `components/${dirName}/${f}`;
-                })
-            );
-
-            // Create contract .gitignore
-            const contractGitignore = path.join(destDir, '.gitignore');
-            await writeText(contractGitignore, 'node_modules/\ngenerated/\n');
-            console.log(`  Created: components/${dirName}/.gitignore`);
-
-            return [...templateFiles, `components/${dirName}/.gitignore`];
-          })
-        )
-      ).flat()
-    : [];
-
-  // Server component files
-  const serverFilesCreated = directoryExists(backendTemplates)
-    ? (
-        await Promise.all(
-          serverComponents.map(async (server) => {
-            const dirName = componentDirName(server);
-            return copyTemplateDir(
-              backendTemplates,
-              path.join(target, `components/${dirName}`),
-              config,
-              server
-            );
-          })
-        )
-      ).flat()
-    : [];
-
-  // Webapp component files
-  const webappFilesCreated = directoryExists(frontendTemplates)
-    ? (
-        await Promise.all(
-          webappComponents.map(async (webapp) => {
-            const dirName = componentDirName(webapp);
-            return copyTemplateDir(
-              frontendTemplates,
-              path.join(target, `components/${dirName}`),
-              config,
-              webapp
-            );
-          })
-        )
-      ).flat()
-    : [];
-
-  // Database component files
-  const databaseFilesCreated = directoryExists(databaseTemplates)
-    ? (
-        await Promise.all(
-          databaseComponents.map(async (database) => {
-            const dirName = componentDirName(database);
-            return copyTemplateDir(
-              databaseTemplates,
-              path.join(target, `components/${dirName}`),
-              config
-            );
-          })
-        )
-      ).flat()
-    : [];
-
-  // CI/CD workflows
-  const ciContent = `name: CI
+/**
+ * Build CI/CD workflow content.
+ */
+const CI_WORKFLOW_CONTENT = `name: CI
 
 on:
   push:
@@ -746,82 +169,215 @@ jobs:
         run: npm run build
 `;
 
-  const cicdFilesCreated = (
-    await Promise.all(
-      cicdComponents.map(async (cicd) => {
-        const dirName = componentDirName(cicd);
-        const ciWorkflow = path.join(target, `components/${dirName}/ci.yaml`);
-        await writeText(ciWorkflow, ciContent);
-        console.log(`  Created: components/${dirName}/ci.yaml`);
+/**
+ * Build a scaffold spec from the existing project config.
+ */
+const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
+  const components = config.components;
+  const operations: ScaffoldOperation[] = [];
 
-        const deployedWorkflow = path.join(target, '.github/workflows/ci.yaml');
-        await writeText(deployedWorkflow, ciContent);
-        console.log('  Created: .github/workflows/ci.yaml');
+  // -- Root files --
+  operations.push({
+    type: 'write_file',
+    path: '.gitignore',
+    content: 'node_modules/\n.env\n.DS_Store\ndist/\n*.log\n',
+  });
+  operations.push({
+    type: 'write_file',
+    path: '.claudeignore',
+    content: 'archive/\n',
+  });
 
-        return [`components/${dirName}/ci.yaml`, '.github/workflows/ci.yaml'];
-      })
-    )
-  ).flat();
+  // -- Project template files --
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/project/README.md',
+    dest: 'README.md',
+  });
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/project/CLAUDE.md',
+    dest: 'CLAUDE.md',
+  });
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/project/package.json',
+    dest: 'package.json',
+  });
 
-  // Step 4: Generate component-specific npm scripts in root package.json
-  console.log('\nGenerating npm scripts...');
+  // -- Spec files --
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/specs/SNAPSHOT.md',
+    dest: 'specs/SNAPSHOT.md',
+  });
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/specs/glossary.md',
+    dest: 'specs/domain/glossary.md',
+  });
+  operations.push({
+    type: 'template_file',
+    source: 'project-scaffolding/templates/changes/INDEX.md',
+    dest: 'changes/INDEX.md',
+  });
 
-  const pkgPath = path.join(target, 'package.json');
-  if (await exists(pkgPath)) {
-    const pkgContent = await readText(pkgPath);
-    const pkg = JSON.parse(pkgContent) as { scripts: Record<string, string> };
-
-    const componentScripts = generateComponentScripts(components, config);
-    const metaScripts = generateMetaScripts(componentScripts);
-
-    pkg.scripts = { ...componentScripts.scripts, ...metaScripts };
-    await writeText(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+  // -- Specs directories with .gitkeep --
+  const gitkeepDirs = [
+    'specs/domain/definitions',
+    'specs/domain/use-cases',
+    'specs/architecture',
+    'changes',
+    'archive',
+  ];
+  for (const dir of gitkeepDirs) {
+    operations.push({ type: 'mkdir', path: dir, gitkeep: true });
   }
 
-  // Collect all created items
-  const allDirsCreated = mergeItems(
-    specsDirsCreated,
-    rootDirsCreated,
-    configDirsCreated,
-    contractDirsCreated,
-    serverDirsCreated,
-    webappDirsCreated,
-    helmDirsCreated,
-    testingDirsCreated,
-    cicdDirsCreated,
-    databaseDirsCreated
-  );
+  // -- Architecture overview (computed content) --
+  operations.push({
+    type: 'write_file',
+    path: 'specs/architecture/overview.md',
+    content: buildArchitectureContent(config),
+  });
 
-  const allFilesCreated: readonly string[] = [
-    ...rootFilesCreated.files,
-    ...gitkeepCreated.files,
-    ...claudeignoreCreated.files,
-    ...projectFilesCreated,
-    ...specFilesCreated,
-    ...changesFilesCreated,
-    'specs/architecture/overview.md',
-    ...configFilesCreated,
-    ...contractFilesCreated,
-    ...serverFilesCreated,
-    ...webappFilesCreated,
-    ...databaseFilesCreated,
-    ...cicdFilesCreated,
-  ];
+  // -- Config component (mandatory singleton) --
+  operations.push({
+    type: 'template_dir',
+    source: 'components/config/config-scaffolding/templates',
+    dest: 'components/config',
+  });
 
-  // Summary
+  // -- Contract components --
+  const contractComponents = getComponentsByType(components, 'contract');
+  for (const contract of contractComponents) {
+    const dirName = componentDirName(contract);
+    operations.push({
+      type: 'template_dir',
+      source: 'components/contract/contract-scaffolding/templates',
+      dest: `components/${dirName}`,
+    });
+    operations.push({
+      type: 'write_file',
+      path: `components/${dirName}/.gitignore`,
+      content: 'node_modules/\ngenerated/\n',
+    });
+  }
+
+  // -- Server components --
+  const serverComponents = getComponentsByType(components, 'server');
+  for (const server of serverComponents) {
+    const dirName = componentDirName(server);
+    operations.push({
+      type: 'template_dir',
+      source: 'components/backend/backend-scaffolding/templates',
+      dest: `components/${dirName}`,
+    });
+  }
+
+  // -- Webapp components --
+  const webappComponents = getComponentsByType(components, 'webapp');
+  for (const webapp of webappComponents) {
+    const dirName = componentDirName(webapp);
+    operations.push({
+      type: 'template_dir',
+      source: 'components/frontend/frontend-scaffolding/templates',
+      dest: `components/${dirName}`,
+    });
+  }
+
+  // -- Database components --
+  const databaseComponents = getComponentsByType(components, 'database');
+  for (const database of databaseComponents) {
+    const dirName = componentDirName(database);
+    operations.push({
+      type: 'template_dir',
+      source: 'components/database/database-scaffolding/templates',
+      dest: `components/${dirName}`,
+    });
+    // Additional directories for database component
+    operations.push({ type: 'mkdir', path: `components/${dirName}/migrations` });
+    operations.push({ type: 'mkdir', path: `components/${dirName}/seeds` });
+    operations.push({ type: 'mkdir', path: `components/${dirName}/scripts` });
+  }
+
+  // -- Helm component directories --
+  const helmComponents = getComponentsByType(components, 'helm');
+  for (const helm of helmComponents) {
+    const dirName = componentDirName(helm);
+    operations.push({ type: 'mkdir', path: `components/${dirName}` });
+  }
+
+  // -- Testing component directories --
+  const testingComponents = getComponentsByType(components, 'testing');
+  for (const testing of testingComponents) {
+    const dirName = componentDirName(testing);
+    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/integration` });
+    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/component` });
+    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/e2e` });
+    operations.push({ type: 'mkdir', path: `components/${dirName}/testsuites` });
+  }
+
+  // -- CI/CD components --
+  const cicdComponents = getComponentsByType(components, 'cicd');
+  for (const cicd of cicdComponents) {
+    const dirName = componentDirName(cicd);
+    operations.push({
+      type: 'write_file',
+      path: `components/${dirName}/ci.yaml`,
+      content: CI_WORKFLOW_CONTENT,
+    });
+    operations.push({
+      type: 'write_file',
+      path: '.github/workflows/ci.yaml',
+      content: CI_WORKFLOW_CONTENT,
+    });
+  }
+
+  // -- Component scripts (no meta-scripts) --
+  const scripts = generateComponentScripts(components, config.project_name);
+  if (Object.keys(scripts).length > 0) {
+    operations.push({ type: 'package_json_scripts', scripts });
+  }
+
+  // Build variables with per-component contract package support
+  const variables: Record<string, string> = {
+    PROJECT_NAME: config.project_name,
+    PROJECT_DESCRIPTION: config.project_description,
+    PRIMARY_DOMAIN: config.primary_domain,
+  };
+
+  return {
+    target_dir: config.target_dir,
+    base_dir: config.skills_dir,
+    variables,
+    operations,
+  };
+};
+
+/**
+ * Run scaffolding by building a spec and executing it through the engine.
+ */
+const runScaffolding = async (config: ScaffoldingConfig): Promise<ScaffoldingResult> => {
+  console.log(`\nScaffolding project: ${config.project_name}`);
+  console.log(`Target: ${config.target_dir}`);
+  console.log();
+
+  const spec = buildProjectSpec(config);
+  const result = await executeSpec(spec);
+
   console.log(`\n${'='.repeat(60)}`);
   console.log('Scaffolding complete!');
   console.log(`${'='.repeat(60)}`);
-  console.log(`Created ${allDirsCreated.dirs.length} directories`);
-  console.log(`Created ${allFilesCreated.length} files`);
-  console.log(`Location: ${target}`);
+  console.log(result.summary);
 
   return {
-    success: true,
-    target_dir: target,
-    created_dirs: allDirsCreated.dirs.length,
-    created_files: allFilesCreated.length,
-    files: allFilesCreated,
+    success: result.success,
+    target_dir: config.target_dir,
+    created_dirs: result.created.dirs.length,
+    created_files: result.created.files.length,
+    files: result.created.files,
+    ...(result.errors.length > 0 ? { error: result.errors.join('; ') } : {}),
   };
 };
 

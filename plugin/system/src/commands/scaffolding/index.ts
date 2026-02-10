@@ -4,13 +4,14 @@
  * Commands:
  *   project   Create new SDD project structure
  *   domain    Populate domain specs from config
+ *   apply     Apply a declarative scaffold spec
  */
 
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import type { CommandSchema } from '@/lib/schema-validator';
 import { validateArgs, formatValidationErrors } from '@/lib/schema-validator';
 
-const ACTIONS = ['project', 'domain'] as const;
+const ACTIONS = ['project', 'domain', 'apply'] as const;
 type Action = (typeof ACTIONS)[number];
 
 /**
@@ -61,6 +62,10 @@ export const handleScaffolding = async (
     case 'domain':
       const { populateDomain } = await import('./domain');
       return populateDomain(args);
+
+    case 'apply':
+      const { applyScaffoldSpec } = await import('./apply');
+      return applyScaffoldSpec(args);
 
     default:
       return { success: false, error: `Unhandled action: ${validatedArgs.action}` };

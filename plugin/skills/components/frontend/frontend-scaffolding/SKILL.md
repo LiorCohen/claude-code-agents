@@ -164,23 +164,53 @@ webapp-{name}:
 
 ---
 
+## Scaffold Spec
+
+To scaffold a frontend component, build a spec and invoke the engine:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+```
+
+### Variables
+
+| Variable | Source |
+|----------|--------|
+| `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+
+### Operations
+
+```json
+{
+  "target_dir": "<project-root>",
+  "base_dir": "<plugin-root>/skills",
+  "variables": { "PROJECT_NAME": "<project-name>" },
+  "operations": [
+    {
+      "type": "template_dir",
+      "source": "components/frontend/frontend-scaffolding/templates",
+      "dest": "components/webapps/<webapp-name>"
+    },
+    {
+      "type": "package_json_scripts",
+      "scripts": {
+        "<webapp-name>:dev": "npm run dev -w @<project-name>/<webapp-name>",
+        "<webapp-name>:build": "npm run build -w @<project-name>/<webapp-name>",
+        "<webapp-name>:preview": "npm run preview -w @<project-name>/<webapp-name>",
+        "<webapp-name>:test": "npm run test -w @<project-name>/<webapp-name>"
+      }
+    }
+  ]
+}
+```
+
+No conditions needed.
+
 ## Input
 
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts webapp name, project metadata, and optional contract list for API client generation.
-
-## Root Package.json Update
-
-After scaffolding, update the root `package.json`:
-
-1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add component scripts:
-   - `"<name>:dev": "npm run dev -w components/webapps/<name>"`
-   - `"<name>:build": "npm run build -w components/webapps/<name>"`
-   - `"<name>:preview": "npm run preview -w components/webapps/<name>"`
-   - `"<name>:test": "npm run test -w components/webapps/<name>"`
-3. Update meta-scripts (`dev`, `build`, `test`) to include this component
 
 ## Related Skills
 

@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/cli.js",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json -f",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json -f && cp src/commands/scaffolding/scaffold-spec.schema.json dist/commands/scaffolding/",
     "dev": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit"
   },
