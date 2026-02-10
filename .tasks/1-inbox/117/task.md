@@ -55,9 +55,13 @@ Skills remain the domain experts (they know what a backend component needs, whic
 
 ### Variable Substitution
 
-Variables use `{{VARIABLE_NAME}}` syntax. Substitution is applied to file **contents** only (not paths) for these extensions: `.md`, `.json`, `.yaml`, `.yml`, `.ts`, `.tsx`, `.html`, `.css`, `.js`. Binary and other files are copied as-is.
+Variables use `{{VARIABLE_NAME}}` syntax. Substitution is applied to file **contents** only (not paths) for these extensions: `.md`, `.json`, `.yaml`, `.yml`, `.ts`, `.tsx`, `.html`, `.css`, `.js`, `.sql`. Binary and other files are copied as-is.
 
 `write_file` content also supports variable substitution.
+
+**Built-in variable:** The engine provides `{{DATE}}` (current date in YYYY-MM-DD format) automatically. Used by project-scaffolding (SNAPSHOT.md, INDEX.md) and database-scaffolding (migration/seed files). All other variables must be provided in the `variables` field.
+
+**Derived variables:** Some variables are computed from component relationships. For example, `{{CONTRACT_PACKAGE}}` is `@project-name/contract-name` — derived from a component's `depends_on` field. Skills compute these and pass them as regular entries in `variables`.
 
 ### Condition System (`when`)
 
@@ -258,7 +262,8 @@ The skill reads `sdd-settings.yaml`, pre-computes boolean flags, and emits:
   "base_dir": "/path/to/plugin/skills",
   "variables": {
     "PROJECT_NAME": "my-app",
-    "SERVER_NAME": "task-service"
+    "SERVER_NAME": "task-service",
+    "CONTRACT_PACKAGE": "@my-app/public-api"
   },
   "context": {
     "has_databases": true,
@@ -555,6 +560,21 @@ The skill pre-computes deployment flags from Helm + server settings:
 6. **No `for_each`** — not needed. Component-level iteration (scaffold each server, each webapp) is the orchestrator's job — it calls the engine once per component. Within a single component, all patterns are simple conditionals: a backend has at most one DAL, serves at most one contract (one per type in the future: OpenAPI, AsyncAPI), consumes contracts as a boolean condition. Config section generation is Tier 3 (skill builds content, engine writes it).
 7. **AND conditions only** — `when` as an array means all conditions must be true. No OR, no nesting. Complex logic is pre-computed by the skill into simple boolean flags.
 8. **Dry-run support** — `--dry-run` returns the same output structure without creating files.
+9. **One built-in variable** — `{{DATE}}` is provided by the engine (YYYY-MM-DD). All other variables are computed by skills and passed explicitly.
+10. **Domain population is out of scope** — `scaffolding domain` (entity stubs, glossary, SNAPSHOT updates) stays as its own CLI command. It's content generation with deduplication logic, not file scaffolding.
+11. **Settings sync uses the same engine** — when `/sdd-settings` changes settings, the command diffs old vs new, determines affected artifacts, and emits a narrow spec covering only the incremental changes. The engine is the same; the spec is just smaller.
+
+## Invocation Pattern (Migration)
+
+**Current flow:** Skills describe scaffolding in prose → LLM reads skill → LLM creates files directly.
+
+**New flow:** Skills define a spec (or instruct the LLM how to build one from context) → LLM invokes CLI with spec → engine creates files deterministically.
+
+**Consumers of the engine:**
+- `/sdd-init` Phase 3 → emits project structure spec + config component spec
+- `/sdd-change new` Step 5 → emits per-component specs for each missing component
+- `/sdd-settings` sync → emits narrow spec for incremental changes only
+- `scaffolding project` (existing CLI) → refactored internally to use engine
 
 ## Complexity Tiers
 
@@ -571,6 +591,16 @@ The skill pre-computes deployment flags from Helm + server settings:
 ### Tier 3: Dynamic generation (skills handle, engine assists)
 - **Config sections** — generated dynamically per component from settings (not template-based). Skills build the YAML content, pass it via `write_file` with append-only semantics.
 - **Architecture overview** — generated from component list. Skill builds content, passes via `write_file`.
+
+## Out of Scope
+
+These remain separate concerns, not handled by the engine:
+
+- **Domain population** (`scaffolding domain`) — entity/use-case stubs, glossary updates, SNAPSHOT updates. Stays as its own CLI command.
+- **Settings diffing** — determining what changed when settings are modified. Handled by the command/skill that invokes the engine.
+- **Config section generation logic** — determining what YAML to write for a server's config section. Skill computes the content, engine writes it via `write_file`.
+- **Pluralization** — `server` → `servers/`, `helm` → `helm-charts/`. Orchestrator resolves paths before building the spec.
+- **Component discovery** — deciding which components are needed. Handled by `/sdd-change` workflow.
 
 ## Acceptance Criteria
 
