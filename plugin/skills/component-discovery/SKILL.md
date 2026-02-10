@@ -117,6 +117,8 @@ Use the following skills for reference:
 
 ## Available Components
 
+The Scaffolding Skill column shows which skill handles scaffolding for each component type. These are informational references — this skill does not invoke them.
+
 | Component | Description | Scaffolding Skill | Multi-Instance |
 |-----------|-------------|-------------------|----------------|
 | `config` | YAML configuration (MANDATORY) | `config-scaffolding` | No (singleton) |

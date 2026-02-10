@@ -287,6 +287,12 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts component name, server type, and optional settings for databases, contracts, and Helm chart generation.
 
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for server component settings schema, defaults, and validation rules.

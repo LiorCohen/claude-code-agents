@@ -18,7 +18,7 @@
 | Server | `components/servers/{name}/` | Backend (CMDO architecture) |
 | Webapp | `components/webapps/{name}/` | React frontend (MVVM) |
 | Database | `components/databases/{name}/` | PostgreSQL migrations and seeds |
-| Helm | `components/helm-charts/{name}/` | Kubernetes deployment |
+| Helm | `components/helm_charts/{name}/` | Kubernetes deployment |
 | Testing | `components/testing/{name}/` | Testkube test definitions |
 
 Component directories follow the pattern `components/{type-plural}/{name}/` (e.g., `components/contracts/public-api/`, `components/servers/main/`).

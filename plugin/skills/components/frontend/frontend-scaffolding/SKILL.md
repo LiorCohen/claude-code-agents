@@ -212,6 +212,12 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts webapp name, project metadata, and optional contract list for API client generation.
 
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+
 ## Related Skills
 
 - `frontend-standards` — Generated frontend code must follow these standards. Defines MVVM architecture with TanStack Router/Query, component structure, and state management patterns.

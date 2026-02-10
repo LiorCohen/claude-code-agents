@@ -233,7 +233,7 @@ SDD_CONFIG_PATH=./local-config.yaml npm start
 /sdd-config generate --env production --component task-service --output production-config.yaml
 
 # 2. Deploy with Helm
-helm install my-release ./components/helm-charts/task-service \
+helm install my-release ./components/helm_charts/task-service \
   -f values-production.yaml \
   --set-file config=production-config.yaml
 ```

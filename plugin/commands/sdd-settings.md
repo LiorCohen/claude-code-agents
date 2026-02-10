@@ -128,8 +128,8 @@ Result:
 ```
 
 Result:
-- Adds [templates/ingress.yaml](components/helm-charts/main-server-api/templates/ingress.yaml) to the helm chart
-- Updates [values.yaml](components/helm-charts/main-server-api/values.yaml) with ingress configuration
+- Adds [templates/ingress.yaml](components/helm_charts/main-server-api/templates/ingress.yaml) to the helm chart
+- Updates [values.yaml](components/helm_charts/main-server-api/values.yaml) with ingress configuration
 
 ### Convert Server to Hybrid
 

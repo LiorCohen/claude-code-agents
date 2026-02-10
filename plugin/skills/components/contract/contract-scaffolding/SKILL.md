@@ -117,6 +117,12 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts contract name and optional project metadata for OpenAPI spec generation.
 
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for contract component settings schema and directory mappings.

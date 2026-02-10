@@ -190,10 +190,10 @@ jobs:
       - name: Deploy to test namespace
         run: |
           # Check .sdd/sdd-settings.yaml for helm component path
-          helm upgrade --install myapp-${{ github.sha }} ./components/helm-charts/myapp \
+          helm upgrade --install myapp-${{ github.sha }} ./components/helm_charts/myapp \
             --namespace test-${{ github.sha }} \
             --create-namespace \
-            -f ./components/helm-charts/myapp/values-testing.yaml \
+            -f ./components/helm_charts/myapp/values-testing.yaml \
             --set server.image.tag=${{ github.sha }} \
             --set webapp.image.tag=${{ github.sha }}
 

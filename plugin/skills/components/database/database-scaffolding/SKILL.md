@@ -197,6 +197,12 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts database name and optional project name for migration and seed template generation.
 
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+
 ## Related Skills
 
 - `project-settings` — Authoritative source for database component settings schema and directory mappings.

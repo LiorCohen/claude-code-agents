@@ -266,15 +266,15 @@ See the full Helm chart spec example in the task description. Each template file
     "has_ingress": true
   },
   "operations": [
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/Chart.yaml", "dest": "components/helm-charts/<chart-name>/Chart.yaml" },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/values.yaml", "dest": "components/helm-charts/<chart-name>/values.yaml" },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/_helpers.tpl", "dest": "components/helm-charts/<chart-name>/templates/_helpers.tpl" },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/configmap.yaml", "dest": "components/helm-charts/<chart-name>/templates/configmap.yaml" },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/servicemonitor.yaml", "dest": "components/helm-charts/<chart-name>/templates/servicemonitor.yaml" },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/deployment.yaml", "dest": "components/helm-charts/<chart-name>/templates/deployment.yaml", "when": [{ "key": "is_hybrid", "equals": false }, { "key": "is_cron_only", "equals": false }] },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/service.yaml", "dest": "components/helm-charts/<chart-name>/templates/service.yaml", "when": { "key": "needs_service", "equals": true } },
-    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/ingress.yaml", "dest": "components/helm-charts/<chart-name>/templates/ingress.yaml", "when": { "key": "has_ingress", "equals": true } },
-    { "type": "package_json_scripts", "scripts": { "<chart-name>:lint": "helm lint components/helm-charts/<chart-name>" } }
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/Chart.yaml", "dest": "components/helm_charts/<chart-name>/Chart.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/values.yaml", "dest": "components/helm_charts/<chart-name>/values.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/_helpers.tpl", "dest": "components/helm_charts/<chart-name>/templates/_helpers.tpl" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/configmap.yaml", "dest": "components/helm_charts/<chart-name>/templates/configmap.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/servicemonitor.yaml", "dest": "components/helm_charts/<chart-name>/templates/servicemonitor.yaml" },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/deployment.yaml", "dest": "components/helm_charts/<chart-name>/templates/deployment.yaml", "when": [{ "key": "is_hybrid", "equals": false }, { "key": "is_cron_only", "equals": false }] },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/service.yaml", "dest": "components/helm_charts/<chart-name>/templates/service.yaml", "when": { "key": "needs_service", "equals": true } },
+    { "type": "template_file", "source": "components/helm/helm-scaffolding/templates-server/templates/ingress.yaml", "dest": "components/helm_charts/<chart-name>/templates/ingress.yaml", "when": { "key": "has_ingress", "equals": true } },
+    { "type": "package_json_scripts", "scripts": { "<chart-name>:lint": "helm lint components/helm_charts/<chart-name>" } }
   ]
 }
 ```
@@ -284,6 +284,12 @@ See the full Helm chart spec example in the task description. Each template file
 Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts chart name, deploy target, deployment type, and optional settings for modes, ingress, and webapp assets.
+
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
 
 ## Related Skills
 

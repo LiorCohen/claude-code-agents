@@ -23,7 +23,7 @@ import type { ScaffoldSpec, ScaffoldOperation } from './engine';
  */
 const pluralizeType = (type: string): string => {
   const custom: Readonly<Record<string, string>> = {
-    helm: 'helm-charts',
+    helm: 'helm_charts',
     testing: 'testing',
   };
   return custom[type] ?? `${type}s`;
