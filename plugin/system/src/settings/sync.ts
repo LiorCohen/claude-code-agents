@@ -132,7 +132,7 @@ export const generateComponentPath = (
   const typeDirMap: Record<ComponentType, string> = {
     server: 'servers',
     webapp: 'webapps',
-    helm: 'helm-charts',
+    helm: 'helm_charts',
     testing: 'testing',
     database: 'databases',
     contract: 'contracts',

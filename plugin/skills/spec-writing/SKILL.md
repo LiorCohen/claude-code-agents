@@ -240,12 +240,12 @@ sdd_version: [X.Y.Z]
 **Request:**
 ```json
 { "field": "type" }
-```json
+```
 
 **Response (2XX):**
 ```json
 { "data": { "field": "type" } }
-```json
+```
 
 **Errors:**
 | Status | Code | Condition |
@@ -277,7 +277,7 @@ sdd_version: [X.Y.Z]
 
 ```text
 [Entity A] ──── [relationship] ───→ [Entity B]
-```text
+```
 
 ### Glossary
 
@@ -298,14 +298,14 @@ sdd_version: [X.Y.Z]
 ```text
 specs/
 └── [current structure]
-```text
+```
 
 ### After
 
 ```text
 specs/
 └── [new structure with comments: # NEW, # MODIFIED]
-```text
+```
 
 ### Changes Summary
 

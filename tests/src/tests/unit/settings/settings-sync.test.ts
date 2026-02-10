@@ -90,8 +90,8 @@ describe('component directory mapping', () => {
     expect(content).toContain("webapp: 'webapps'");
   });
 
-  it('maps helm type to helm-charts directory', () => {
-    expect(content).toContain("helm: 'helm-charts'");
+  it('maps helm type to helm_charts directory', () => {
+    expect(content).toContain("helm: 'helm_charts'");
   });
 
   it('maps database type to databases directory', () => {

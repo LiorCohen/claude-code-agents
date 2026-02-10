@@ -136,7 +136,7 @@ components:
   - type: database
     name: task-db                    # -> components/databases/task-db/
   - type: helm
-    name: task-service               # -> components/helm-charts/task-service/
+    name: task-service               # -> components/helm_charts/task-service/
   - type: testing
     name: e2e                        # -> components/testing/e2e/
   - type: cicd
@@ -167,7 +167,7 @@ components:
 | `{type: server, name: order-service}` | `components/servers/order-service/` |
 | `{type: webapp, name: admin-portal}` | `components/webapps/admin-portal/` |
 | `{type: contract, name: public-api}` | `components/contracts/public-api/` |
-| `{type: helm, name: main}` | `components/helm-charts/main/` |
+| `{type: helm, name: main}` | `components/helm_charts/main/` |
 
 ### Rules
 

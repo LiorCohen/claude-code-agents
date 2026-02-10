@@ -90,7 +90,7 @@ components:
 
   - name: main-server-api
     type: helm
-    path: components/helm-charts/main-server-api
+    path: components/helm_charts/main-server-api
     settings:
       deploys: main-server
       deploy_type: server

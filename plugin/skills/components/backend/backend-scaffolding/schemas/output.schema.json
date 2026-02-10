@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "backend-scaffolding output",
+  "description": "Result from scaffolding engine execution.",
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether all operations completed without errors"
+    },
+    "created": {
+      "type": "object",
+      "description": "Artifacts created during scaffolding",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths of files created"
+        },
+        "dirs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths of directories created"
+        },
+        "scripts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "package.json script names added"
+        }
+      },
+      "required": ["files", "dirs", "scripts"]
+    },
+    "skipped": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths skipped because they already existed"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Error messages for failed operations"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable summary of operations performed"
+    }
+  },
+  "required": ["success", "created", "skipped", "errors", "summary"]
+}

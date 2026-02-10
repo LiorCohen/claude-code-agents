@@ -238,6 +238,12 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts the full list of project components whose settings drive dynamic config section generation.
 
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns the scaffolding engine result: created files, directories, and scripts; skipped paths; errors; and a human-readable summary.
+
 ## Related Skills
 
 - `config-standards` — Generated config files must follow these standards. Defines naming conventions, validation patterns, environment-specific overrides, and TypeScript type generation rules.
