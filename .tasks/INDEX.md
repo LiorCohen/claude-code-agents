@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#117](4-implementing/117/plan.md): Generic scaffolding engine in system CLI
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#117](5-reviewing/117/plan.md): Generic scaffolding engine in system CLI
 
 ---
 
