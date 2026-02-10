@@ -226,6 +226,8 @@ const logMetrics = (data: Metrics): void => {
 
 **Rule**: All functions should return values. If a function has nothing meaningful to return, that's a signal the design should be reconsidered.
 
+**Exception**: Callback signatures in interface contracts (like `Logger`) may use `void` return types, since the caller doesn't consume the return value. This is the only acceptable use of `void`.
+
 ### 7. New Section: Result Unions Over Null
 
 Prefer discriminated union return types over `T | null`. Null is vague — it hides *why* something failed. A union makes every outcome explicit and forces callers to handle each case.
@@ -357,7 +359,7 @@ fetch(url, { headers: { Authorization: apiKey } });  // Sends "undefined"
 
 ```typescript
 // ✅ GOOD: Explicit Promise<T> return type
-const loadSettings = async (path: string): Promise<SddConfig | null> => {
+const loadSettings = async (path: string): Promise<CommandResult> => {
   // ...
 };
 
@@ -414,27 +416,41 @@ const readJson = async (filePath: string): Promise<any> => {
 
 ### 12. New Section: Null vs Undefined
 
-```typescript
-// ✅ GOOD: null for intentional absence ("we looked, it's not there")
-const findComponent = (name: string): Component | null => {
-  const match = components.find(c => c.name === name);
-  return match ?? null;
-};
+For function return types, prefer result unions (see section 7). This section covers the distinction between null and undefined in type fields and when interacting with external APIs.
 
-// ✅ GOOD: undefined for optional/unset ("not provided")
+```typescript
+// ✅ GOOD: undefined via optional fields ("not provided")
 type HelmServerSettings = {
   readonly deploy_modes?: ReadonlyArray<ServerMode>;  // Optional = may be undefined
 };
 
-// ❌ BAD: Mixing null and undefined for the same concept
+// ✅ GOOD: Handling undefined from native APIs
+const first = items.find(i => i.active);  // Returns T | undefined natively
+if (first === undefined) {
+  return { success: false, error: 'No active items found' };
+}
+
+// ✅ GOOD: Handling null from external/DOM APIs
+const element = document.getElementById('root');  // Returns HTMLElement | null
+if (element === null) {
+  return { success: false, error: 'Root element not found' };
+}
+
+// ❌ BAD: Mixing null and undefined in your own types
 type Config = {
   readonly host: string | null;     // Sometimes null
   readonly port: string | undefined; // Sometimes undefined
-  // Confusing — pick one convention
+  // Inconsistent — use optional fields (undefined) for "not provided"
+};
+
+// ❌ BAD: Returning null from your own functions
+const findComponent = (name: string): Component | null => {
+  return components.find(c => c.name === name) ?? null;
+  // Use a result union instead (see Result Unions Over Null)
 };
 ```
 
-**Rule**: Use `null` for "looked up and absent." Use `undefined` (via `?:`) for "not provided / optional."
+**Rule**: Use `undefined` (via `?:`) for optional type fields. Handle `null`/`undefined` from external APIs by converting to result unions. Never return `null` from your own functions — use result unions instead.
 
 ### 13. New Section: `Record<string, never>` for Empty Types
 
@@ -584,6 +600,8 @@ No tests — this is a documentation-only change to a skill file.
 - [ ] `interface` vs `type` rule is clear: interface for function contracts, type for everything else
 - [ ] Examples use real patterns from the codebase (settings types, Logger, spec types, etc.)
 - [ ] Summary checklist reflects all new rules
+- [ ] No `T | null` return types in any GOOD examples (result unions used instead)
+- [ ] Logger void exception is explicitly noted in "All Functions Must Return Values"
 - [ ] No existing sections are broken or removed
 - [ ] Plugin copy mirrors marketplace copy (with Input/Output footer preserved)
 - [ ] Document reads coherently top-to-bottom
