@@ -223,10 +223,10 @@ Behavior:
 
 ```bash
 # Apply a scaffold spec
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --config spec.json
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
 
 # Dry run (show what would be created without writing)
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --config spec.json --dry-run
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json --dry-run
 ```
 
 ### Engine Output
@@ -581,8 +581,8 @@ The skill pre-computes deployment flags from Helm + server settings:
 
 - [ ] Generic scaffolding engine extracted from project.ts into shared module
 - [ ] Declarative spec schema defined (JSON Schema)
-- [ ] `scaffolding apply --config spec.json` command works
-- [ ] `scaffolding apply --config spec.json --dry-run` command works
+- [ ] `scaffolding apply --spec spec.json` command works
+- [ ] `scaffolding apply --spec spec.json --dry-run` command works
 - [ ] All operation types implemented: `template_dir`, `template_file`, `mkdir`, `write_file`, `package_json_scripts`
 - [ ] Conditional operations work (`when` with `equals` and `not_empty`, single and AND)
 - [ ] `scaffolding project` refactored to use the engine internally
