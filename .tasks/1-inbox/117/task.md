@@ -59,7 +59,12 @@ Variables use `{{VARIABLE_NAME}}` syntax. Substitution is applied to file **cont
 
 `write_file` content also supports variable substitution.
 
-**Built-in variable:** The engine provides `{{DATE}}` (current date in YYYY-MM-DD format) automatically. Used by project-scaffolding (SNAPSHOT.md, INDEX.md) and database-scaffolding (migration/seed files). All other variables must be provided in the `variables` field.
+**Built-in variables:** The engine provides these automatically. All other variables must be provided in the `variables` field.
+
+| Variable | Format | Example |
+|----------|--------|---------|
+| `{{DATE}}` | YYYY-MM-DD | `2026-02-10` |
+| `{{DATE_TIME}}` | YYYY-MM-DDTHH:mm:ss | `2026-02-10T14:30:00` |
 
 **Derived variables:** Some variables are computed from component relationships. For example, `{{CONTRACT_PACKAGE}}` is `@project-name/contract-name` — derived from a component's `depends_on` field. Skills compute these and pass them as regular entries in `variables`.
 
@@ -572,7 +577,7 @@ The skill pre-computes deployment flags from Helm + server settings:
 6. **No `for_each`** — not needed. Component-level iteration (scaffold each server, each webapp) is the orchestrator's job — it calls the engine once per component. Within a single component, all patterns are simple conditionals: a backend has at most one DAL, serves at most one contract (one per type in the future: OpenAPI, AsyncAPI), consumes contracts as a boolean condition. Config section generation is Tier 3 (skill builds content, engine writes it).
 7. **AND conditions only** — `when` as an array means all conditions must be true. No OR, no nesting. Complex logic is pre-computed by the skill into simple boolean flags.
 8. **Dry-run support** — `--dry-run` returns the same output structure without creating files.
-9. **One built-in variable** — `{{DATE}}` is provided by the engine (YYYY-MM-DD). All other variables are computed by skills and passed explicitly.
+9. **Two built-in variables** — `{{DATE}}` (YYYY-MM-DD) and `{{DATE_TIME}}` (YYYY-MM-DDTHH:mm:ss) are provided by the engine. All other variables are computed by skills and passed explicitly.
 10. **Domain population is out of scope** — `scaffolding domain` (entity stubs, glossary, SNAPSHOT updates) stays as its own CLI command. It's content generation with deduplication logic, not file scaffolding.
 11. **Settings sync uses the same engine** — when `/sdd-settings` changes settings, the command diffs old vs new, determines affected artifacts, and emits a narrow spec covering only the incremental changes. The engine is the same; the spec is just smaller.
 
