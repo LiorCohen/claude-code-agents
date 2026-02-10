@@ -39,6 +39,7 @@
 
 ## Medium Priority
 
+- [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
 - [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#82](1-inbox/82/): Reorganize archive into .sdd directory
