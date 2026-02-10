@@ -30,7 +30,7 @@ export const loadConfig = (): Config => {
 
   const config = parse(readFileSync(configPath, 'utf-8')) as Config;
 
-  // Validate against schema if present (schema placed alongside config by sdd-system)
+  // Validate against schema if present (schema placed alongside config by the system CLI)
   const schemaPath = configPath.replace(/\.yaml$/, '.schema.json');
   if (existsSync(schemaPath)) {
     const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as object;

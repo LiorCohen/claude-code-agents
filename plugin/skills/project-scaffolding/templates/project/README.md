@@ -20,16 +20,19 @@ This will guide you through:
 Once you have features implemented:
 
 ```bash
-# Start local database (requires local Kubernetes cluster)
-npm run database:setup
-npm run database:port-forward
-
-# Install dependencies and generate types
+# Install dependencies
 npm install
-npm run generate
 
 # Start development servers
 npm run dev
+```
+
+Database and contract operations are performed via SDD commands:
+
+```
+/sdd-run database setup        # Deploy local database (requires K8s)
+/sdd-run database port-forward  # Forward database port
+/sdd-run contract generate-types # Generate TypeScript types from OpenAPI
 ```
 
 ## Project Structure

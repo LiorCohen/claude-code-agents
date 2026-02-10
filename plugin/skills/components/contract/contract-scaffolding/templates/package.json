@@ -9,10 +9,6 @@
       "default": "./generated/api-types.ts"
     }
   },
-  "scripts": {
-    "generate:types": "sdd-system contract generate-types {{COMPONENT_NAME}}",
-    "validate": "sdd-system contract validate {{COMPONENT_NAME}}"
-  },
   "devDependencies": {
     "openapi-typescript": "^6.7.0",
     "@stoplight/spectral-cli": "^6.11.0"

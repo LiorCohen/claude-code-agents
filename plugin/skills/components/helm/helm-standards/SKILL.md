@@ -16,10 +16,6 @@ Use the following skills for reference:
 
 Each deployment configuration gets its own helm chart. A single server can have multiple helm charts (e.g., one for API mode with ingress, one for worker mode without). Refer to the `project-settings` skill for the complete helm settings schema and how `deploy_modes`, `ingress`, and `assets` affect chart structure.
 
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
-
 ## Directory Structure
 
 Helm charts live at `components/helm_charts/<name>/`:
@@ -256,7 +252,7 @@ Config is injected into HTML at deploy time:
 
 ```bash
 # Generate config for production environment
-sdd-system config generate --env production --component main-server \
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env production --component main-server \
   --output helm-values-config.yaml
 
 # Deploy with config

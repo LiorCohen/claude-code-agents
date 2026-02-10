@@ -368,7 +368,7 @@ When implementing a new feature, follow this order to minimize rework and ensure
 Start in `components/contract/`:
 
 1. **Define the endpoint** in `openapi.yaml` - request/response schemas
-2. **Generate types** with `npm run generate:types`
+2. **Generate types** via the system CLI (`contract generate-types`)
 3. **Import types** into server via workspace package
 
 This ensures types flow from contract → server → frontend.

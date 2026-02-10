@@ -40,7 +40,7 @@ Returns success status, list of scaffolded components, and next steps.
 
 ## Usage
 
-After gathering project configuration in `/sdd-init`, call `sdd-system scaffolding project` with a config JSON file containing the project settings. The config must include:
+After gathering project configuration in `/sdd-init`, run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding project` with a config JSON file containing the project settings. The config must include:
 
 ```json
 {

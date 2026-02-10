@@ -14,7 +14,7 @@ The directory path depends on the component name as defined in `.sdd/sdd-setting
 
 ```text
 components/database[-<name>]/
-├── package.json              # npm scripts (call sdd-system CLI)
+├── package.json              # Component package metadata
 ├── README.md                 # Component documentation
 ├── migrations/
 │   └── 001_initial_schema.sql
@@ -38,31 +38,19 @@ Use when your project needs:
 
 ## Usage
 
-After scaffolding, the database component provides npm scripts that call the sdd-system CLI:
+After scaffolding, database operations are performed via the system CLI:
 
 ```bash
-# From components/database/ (path depends on component name)
-npm run setup        # Deploy PostgreSQL to k8s
-npm run teardown     # Remove PostgreSQL from k8s
-npm run migrate      # Run all migrations in order
-npm run seed         # Run all seed files in order
-npm run reset        # Full reset: teardown + setup + migrate + seed
-npm run port-forward # Port forward to local
-npm run psql         # Open psql shell
-```
-
-Or use the CLI directly:
-
-```bash
-sdd-system database setup <component-name>
-sdd-system database migrate <component-name>
-sdd-system database seed <component-name>
-sdd-system database reset <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database setup <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database teardown <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database seed <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database reset <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database port-forward <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>
 ```
 
 ## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
 
 The CLI commands require:
 - PostgreSQL 14+ (client tools: `psql`, `createdb`, `dropdb`)
@@ -181,11 +169,7 @@ Accepts database name and optional project name for migration and seed template 
 After scaffolding, update the root `package.json`:
 
 1. If root `package.json` doesn't exist, create it from the `project-scaffolding` skill template (`templates/project/package.json`)
-2. Add component scripts:
-   - `"<name>:setup": "npm run setup -w components/databases/<name>"`
-   - `"<name>:migrate": "npm run migrate -w components/databases/<name>"`
-   - `"<name>:seed": "npm run seed -w components/databases/<name>"`
-   - `"<name>:reset": "npm run reset -w components/databases/<name>"`
+2. Add the database component as a workspace entry (no component-level scripts needed — database operations use the system CLI directly)
 
 ## Related Skills
 

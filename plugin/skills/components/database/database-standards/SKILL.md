@@ -20,15 +20,11 @@ Database components manage schema evolution and seed data:
 
 ---
 
-## Prerequisites
-
-- `sdd-system` CLI available in PATH (installed via the SDD plugin's npm package)
-
 ## Directory Structure
 
 ```text
 components/database[-{name}]/
-├── package.json              # npm scripts (call sdd-system CLI)
+├── package.json              # Component package metadata
 ├── migrations/               # Schema migrations (numbered)
 │   ├── 001_initial_schema.sql
 │   ├── 002_add_users_table.sql
@@ -220,9 +216,8 @@ When adding database changes:
 ### Step 3: Test Migration
 
 ```bash
-cd components/database
-npm run migrate
-npm run psql  # Verify schema
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>  # Verify schema
 ```
 
 ### Step 4: Add Seeds (if needed)
@@ -239,14 +234,13 @@ The backend DAL layer must follow `backend-standards` — it defines CMDO archit
 ## Database Commands
 
 ```bash
-# From components/database/ (path depends on component name)
-npm run setup        # Deploy PostgreSQL to k8s
-npm run teardown     # Remove PostgreSQL from k8s
-npm run migrate      # Run all migrations
-npm run seed         # Run all seeds
-npm run reset        # Full reset: teardown + setup + migrate + seed
-npm run port-forward # Port forward to local
-npm run psql         # Open psql shell
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database setup <component-name>        # Deploy PostgreSQL to k8s
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database teardown <component-name>     # Remove PostgreSQL from k8s
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>      # Run all migrations
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database seed <component-name>         # Run all seeds
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database reset <component-name>        # Full reset: teardown + setup + migrate + seed
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database port-forward <component-name> # Port forward to local
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>         # Open psql shell
 ```
 
 ---

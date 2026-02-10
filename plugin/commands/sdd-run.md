@@ -226,7 +226,7 @@ This is typically invoked during `/sdd-init` but can be run manually to refresh 
 When you invoke `/sdd-run`, execute the following:
 
 ```bash
-node --enable-source-maps "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js" <namespace> <action> [args] [options]
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action> [args] [options]
 ```
 
 Where `CLAUDE_PLUGIN_ROOT` is the path to the SDD plugin directory.
