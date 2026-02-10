@@ -7,13 +7,15 @@ From a 36-file scaffolding tool to a full spec-driven development platform — i
 ## v6 — One Command to Rule Them All
 *Feb 5 – present*
 
-Three separate commands (`/sdd-new-change`, `/sdd-implement-change`, `/sdd-verify-change`) collapsed into a single **`/sdd-change`** with subcommands. But the real shift was deeper: all workflow state now lives in `.sdd/workflows/`, meaning **any new session can pick up exactly where you left off** — no conversation history needed.
+Three separate commands collapsed into a single **`/sdd-change`** with subcommands, but the real shift was architectural: all workflow state now lives in `.sdd/workflows/`, meaning **any new session can pick up exactly where you left off** — no conversation history needed. Then the plugin kept going and basically rebuilt itself from the inside out.
 
+- **Declarative scaffolding engine** — `scaffolding apply --spec` replaces imperative file creation with 5 operation types, conditionals, dry-run, and variable substitution
 - **Two-stage approval gates** — spec review, then plan review, before a single line of implementation runs
-- **9-step spec solicitation** — guided requirements gathering that captures context, user stories, edge cases, and test strategy
+- **Settings reconciliation** — plugin upgrades automatically migrate old `sdd-settings.yaml` formats to latest schema
+- **System CLI standards** — `system-run.sh` as single entry point; 47 legacy invocation patterns eliminated in one commit
 - **35 skills audited** — every skill brought into compliance with colocated JSON schemas
 - **Structured logging** — pino-based system logs to `.sdd/system-logs/` with session tracking
-- **Standards wired into agents** — skills are now preloaded into agent context at startup, not just referenced by name
+- **7 agents, down from 8** — ci-dev merged into devops because the boundary was imaginary
 
 ---
 
@@ -79,6 +81,10 @@ The initial release shipped with **10 agents**, **4 skills**, and **5 commands**
 | [v3.md](v3.md) | 3.0.0 – 3.10.0 | CMDO architecture, change abstraction |
 | [v2.md](v2.md) | 2.0.0 – 2.3.0 | Scaffolding speed, external spec decomposition |
 | [v1.md](v1.md) | 1.0.0 – 1.10.29 | Initial release |
+
+## Lost?
+
+If you ended up here from the root [`CHANGELOG.md`](../CHANGELOG.md) — congratulations, you found the real changelog. That file is just a doorman.
 
 ## Adding New Entries
 
