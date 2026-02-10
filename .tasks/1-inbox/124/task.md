@@ -50,6 +50,11 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - **Learning feedback loop:** The `.crit/` directory at the repo root stores the critic's learned knowledge, organized by topic into separate files. When Lior pushes back on a plan, rejects an approach, or corrects Claude's thinking, the critic captures that pattern and files it into the appropriate topic file. Over time, the critic gets sharper because it learns from real interactions — not just the initial static prompts. The skill prompt should read the relevant `.crit/*.md` files at each phase and apply learned patterns.
 - **`.crit/` directory structure:** Organize feedback by topic, not chronologically. Example files: `planning.md` (planning mistakes and corrections), `implementation.md` (coding patterns and anti-patterns), `scope.md` (over/under-engineering feedback), `communication.md` (how to present work). Each file is a concise set of rules, not a raw transcript. New topics get new files. The skill reads all files at startup but focuses on phase-relevant ones.
 - **Feedback log hygiene:** Each `.crit/` file must be kept consistent — no contradictions, no duplications. When adding a new entry, check if it overlaps with or contradicts an existing entry in the same or another file. If it overlaps, merge into one stronger rule. If it contradicts, replace the old one. Keep files concise — distill patterns into sharp rules. Never lose functionality during summarization. If unsure whether a new entry subsumes or conflicts with an existing one, ask Lior before modifying.
+- **Counter-sycophancy protocol:** When Lior pushes back, the critic must enforce: "Is Lior right, or are you just agreeing? If your original approach was correct, defend it with evidence." And the reverse: if Lior suggests something that contradicts the standards or the plan, flag it — don't silently comply. The critic should make Claude comfortable disagreeing when it has evidence.
+- **Diff audit before commit:** Before submitting for review, the critic must enforce a concrete "review your own diff" step. Compare files touched vs files the plan said to touch. If there's a mismatch, stop. If there are changes you can't justify line-by-line, revert them. No silent scope additions.
+- **Confidence calibration:** Force Claude to rate its own confidence (high/medium/low) on each check and flag low-confidence areas to Lior explicitly. "I'm 60% sure this is the right approach because I haven't seen how X interacts with Y" is more useful than silently proceeding. Low confidence = ask, don't guess.
+- **"Did you actually run it?" gate:** Before submitting for review, enforce: Did the build pass? Did tests pass? Did you verify with your own eyes, or are you assuming? Not "I think it works" — show the output. No claims of completion without evidence.
+- **Escalation rules:** Each check has a severity level. **Hard blocks** (stop and ask Lior): scope mismatch between plan and diff, low confidence on architectural decisions, contradicting standards, breaking existing tests. **Soft warnings** (note but continue): minor style deviations, optional improvements noticed, non-critical edge cases. The skill must clearly label which checks are which.
 
 ## Acceptance Criteria
 
@@ -66,3 +71,8 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - [ ] Skill prompt reads relevant `.crit/*.md` files at each lifecycle phase
 - [ ] Instructions for when/how to add entries and when to create new topic files
 - [ ] Feedback log hygiene rules: no contradictions, no duplications, merge overlaps, ask Lior if unsure
+- [ ] Counter-sycophancy protocol: defend correct work with evidence, flag when user contradicts standards
+- [ ] Diff audit step: compare files touched vs plan, revert unjustified changes
+- [ ] Confidence calibration: rate confidence per check, flag low-confidence areas explicitly
+- [ ] "Did you run it?" gate: require build/test output evidence before claiming completion
+- [ ] Escalation rules: each check labeled as hard block or soft warning with clear criteria
