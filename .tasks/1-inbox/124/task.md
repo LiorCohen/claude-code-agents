@@ -44,6 +44,7 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - It should output its checks as a self-evaluation before presenting to the user
 - The tone should be direct, skeptical, and constructive — Lior's actual review style
 - It should catch the most common Claude failure modes: over-engineering, making assumptions without reading code, drifting from plans, adding unnecessary abstractions, being too agreeable
+- **Anti-grep rule:** Claude over-relies on grep to skim for keywords instead of reading full files. The critic must enforce: "Did you actually READ the files, or did you just grep for a keyword and assume you understand the context? Read the full file. Grep is for finding files, not for understanding them."
 
 ## Acceptance Criteria
 
@@ -53,3 +54,4 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 - [ ] Tone matches Lior's direct, skeptical review style
 - [ ] Tasks skill references the critic at each transition point
 - [ ] Critic catches common Claude failure modes (over-engineering, assumptions, drift, gold-plating)
+- [ ] Anti-grep rule included: grep is for finding files, not understanding them — read full files
