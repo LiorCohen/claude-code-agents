@@ -73,7 +73,7 @@ A `scaffolding apply` command that accepts a declarative spec:
 3. **Non-destructive** — skip existing files by default (already implemented in project.ts)
 4. **Settings integration** — engine reads `sdd-settings.yaml` for conditional evaluation
 5. **No meta-scripts** — drop the cross-component `dev`/`build`/`test`/`start` meta-scripts entirely. Each component spec is self-contained, only adding its own scripts. Eliminates `npm-run-all` dependency and the `generateMetaScripts` logic. Users compose their own orchestration if needed.
-6. **Repeating elements** — support `for_each` for settings arrays (e.g., one DAL directory per database, one config section per contract)
+6. **No `for_each`** — not needed. Component-level iteration (scaffold each server, each webapp) is the orchestrator's job — it calls the engine once per component. Within a single component, all patterns are simple conditionals: a backend has at most one DAL, serves at most one contract (one per type in the future: OpenAPI, AsyncAPI), consumes contracts as a boolean condition. Config section generation is Tier 3 (skill builds content, engine writes it).
 7. **Template set selection** — support choosing between template directories based on settings (e.g., Helm picks `templates-server/` vs `templates-webapp/` based on component type)
 
 ## Operation Types
@@ -94,8 +94,8 @@ A `scaffolding apply` command that accepts a declarative spec:
 - **Database** — template copy, no conditionals
 - **Project structure** — directories, root files, .gitkeep files
 
-### Tier 2: Conditional (engine handles with `when` + `for_each`)
-- **Backend** — base structure always, DAL per database, HTTP handlers per contract
+### Tier 2: Conditional (engine handles with `when`)
+- **Backend** — base structure always, DAL conditional on databases, HTTP handlers conditional on provides_contracts, API clients conditional on consumes_contracts (all simple boolean conditionals — one DAL, one contract per type)
 - **Helm** — template set selection based on deployment type, conditional ingress/service
 
 ### Tier 3: Dynamic generation (skills handle, engine assists)
@@ -109,7 +109,6 @@ A `scaffolding apply` command that accepts a declarative spec:
 - [ ] `scaffolding apply --spec spec.json` command works
 - [ ] All operation types implemented: `template_dir`, `template_file`, `mkdir`, `write_file`, `package_json_scripts`
 - [ ] Conditional operations work (`when` clauses based on settings)
-- [ ] `for_each` support for repeating elements
 - [ ] Template set selection support
 - [ ] `scaffolding project` refactored to use the engine internally
 - [ ] Meta-scripts removed from project scaffolding
