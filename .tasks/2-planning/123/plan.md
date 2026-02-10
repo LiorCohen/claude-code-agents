@@ -14,10 +14,11 @@ The TypeScript standards skill (`SKILL.md`) is missing several foundational patt
 | File | Changes |
 |------|---------|
 | `.claude/skills/typescript-standards/SKILL.md` | Add 14 new sections, correct `let` ban, update summary checklist |
+| `plugin/skills/typescript-standards/SKILL.md` | Mirror all changes from the marketplace copy (keep plugin-specific Input/Output footer) |
 
 ## Changes
 
-All changes target a single file: `.claude/skills/typescript-standards/SKILL.md`.
+Changes are made to `.claude/skills/typescript-standards/SKILL.md` (marketplace copy), then mirrored to `plugin/skills/typescript-standards/SKILL.md` (plugin copy). The plugin copy preserves its Input/Output footer.
 
 New sections are inserted **after** "Prefer Readonly Types" and **before** "Summary Checklist". The existing sections remain unchanged except for the `let` correction in "Immutability" and the updated checklist.
 
@@ -489,9 +490,13 @@ Remove the old `let` language:
 Replace with:
 > All `const` declarations (never `let`, never `var`)
 
+### 17. Sync Plugin Copy
+
+After all changes to `.claude/skills/typescript-standards/SKILL.md`, copy the content to `plugin/skills/typescript-standards/SKILL.md`, preserving the plugin-specific Input/Output footer section at the end.
+
 ## Dependencies
 
-None. Single-file change with no code dependencies.
+None. No code dependencies.
 
 ## Tests
 
@@ -505,4 +510,5 @@ No tests — this is a documentation-only change to a skill file.
 - [ ] Examples use real patterns from the codebase (settings types, Logger, spec types, etc.)
 - [ ] Summary checklist reflects all new rules
 - [ ] No existing sections are broken or removed
+- [ ] Plugin copy mirrors marketplace copy (with Input/Output footer preserved)
 - [ ] Document reads coherently top-to-bottom
