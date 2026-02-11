@@ -19,7 +19,7 @@ import type { ScaffoldSpec, ScaffoldOperation } from './engine';
 
 /**
  * Pluralize a component type for directory naming.
- * e.g., "contract" → "contracts", "database" → "databases"
+ * e.g., "contract" -> "contracts", "database" -> "databases"
  */
 const pluralizeType = (type: string): string => {
   const custom: Readonly<Record<string, string>> = {
@@ -50,50 +50,58 @@ const getComponentsByType = (
 const generateComponentScripts = (
   components: readonly ComponentEntry[],
   projectName: string
-): Readonly<Record<string, string>> => {
-  const scripts: Record<string, string> = {};
-
-  for (const component of components) {
+): Readonly<Record<string, string>> =>
+  components.reduce<Readonly<Record<string, string>>>((scripts, component) => {
     const workspace = `-w @${projectName}/${component.name}`;
 
     switch (component.type) {
       case 'contract':
-        scripts[`${component.name}:generate`] = `npm run generate:types ${workspace}`;
-        scripts[`${component.name}:validate`] = `npm run validate ${workspace}`;
-        break;
+        return {
+          ...scripts,
+          [`${component.name}:generate`]: `npm run generate:types ${workspace}`,
+          [`${component.name}:validate`]: `npm run validate ${workspace}`,
+        };
 
       case 'server':
-        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
-        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
-        scripts[`${component.name}:start`] = `npm run start ${workspace}`;
-        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
-        break;
+        return {
+          ...scripts,
+          [`${component.name}:dev`]: `npm run dev ${workspace}`,
+          [`${component.name}:build`]: `npm run build ${workspace}`,
+          [`${component.name}:start`]: `npm run start ${workspace}`,
+          [`${component.name}:test`]: `npm run test ${workspace}`,
+        };
 
       case 'webapp':
-        scripts[`${component.name}:dev`] = `npm run dev ${workspace}`;
-        scripts[`${component.name}:build`] = `npm run build ${workspace}`;
-        scripts[`${component.name}:preview`] = `npm run preview ${workspace}`;
-        scripts[`${component.name}:test`] = `npm run test ${workspace}`;
-        break;
+        return {
+          ...scripts,
+          [`${component.name}:dev`]: `npm run dev ${workspace}`,
+          [`${component.name}:build`]: `npm run build ${workspace}`,
+          [`${component.name}:preview`]: `npm run preview ${workspace}`,
+          [`${component.name}:test`]: `npm run test ${workspace}`,
+        };
 
       case 'database':
-        scripts[`${component.name}:setup`] = `npm run setup ${workspace}`;
-        scripts[`${component.name}:teardown`] = `npm run teardown ${workspace}`;
-        scripts[`${component.name}:migrate`] = `npm run migrate ${workspace}`;
-        scripts[`${component.name}:seed`] = `npm run seed ${workspace}`;
-        scripts[`${component.name}:reset`] = `npm run reset ${workspace}`;
-        scripts[`${component.name}:port-forward`] = `npm run port-forward ${workspace}`;
-        scripts[`${component.name}:psql`] = `npm run psql ${workspace}`;
-        break;
+        return {
+          ...scripts,
+          [`${component.name}:setup`]: `npm run setup ${workspace}`,
+          [`${component.name}:teardown`]: `npm run teardown ${workspace}`,
+          [`${component.name}:migrate`]: `npm run migrate ${workspace}`,
+          [`${component.name}:seed`]: `npm run seed ${workspace}`,
+          [`${component.name}:reset`]: `npm run reset ${workspace}`,
+          [`${component.name}:port-forward`]: `npm run port-forward ${workspace}`,
+          [`${component.name}:psql`]: `npm run psql ${workspace}`,
+        };
 
       case 'helm':
-        scripts[`${component.name}:lint`] = `helm lint components/${componentDirName(component)}`;
-        break;
-    }
-  }
+        return {
+          ...scripts,
+          [`${component.name}:lint`]: `helm lint components/${componentDirName(component)}`,
+        };
 
-  return scripts;
-};
+      default:
+        return scripts;
+    }
+  }, {});
 
 /**
  * Build the architecture overview content.
@@ -174,53 +182,58 @@ jobs:
  */
 const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
   const components = config.components;
-  const operations: ScaffoldOperation[] = [];
 
   // -- Root files --
-  operations.push({
-    type: 'write_file',
-    path: '.gitignore',
-    content: 'node_modules/\n.env\n.DS_Store\ndist/\n*.log\n',
-  });
-  operations.push({
-    type: 'write_file',
-    path: '.claudeignore',
-    content: 'archive/\n',
-  });
+  const rootFileOps: ReadonlyArray<ScaffoldOperation> = [
+    {
+      type: 'write_file',
+      path: '.gitignore',
+      content: 'node_modules/\n.env\n.DS_Store\ndist/\n*.log\n',
+    },
+    {
+      type: 'write_file',
+      path: '.claudeignore',
+      content: 'archive/\n',
+    },
+  ];
 
   // -- Project template files --
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/project/README.md',
-    dest: 'README.md',
-  });
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/project/CLAUDE.md',
-    dest: 'CLAUDE.md',
-  });
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/project/package.json',
-    dest: 'package.json',
-  });
+  const projectTemplateOps: ReadonlyArray<ScaffoldOperation> = [
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/project/README.md',
+      dest: 'README.md',
+    },
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/project/CLAUDE.md',
+      dest: 'CLAUDE.md',
+    },
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/project/package.json',
+      dest: 'package.json',
+    },
+  ];
 
   // -- Spec files --
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/specs/SNAPSHOT.md',
-    dest: 'specs/SNAPSHOT.md',
-  });
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/specs/glossary.md',
-    dest: 'specs/domain/glossary.md',
-  });
-  operations.push({
-    type: 'template_file',
-    source: 'project-scaffolding/templates/changes/INDEX.md',
-    dest: 'changes/INDEX.md',
-  });
+  const specFileOps: ReadonlyArray<ScaffoldOperation> = [
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/specs/SNAPSHOT.md',
+      dest: 'specs/SNAPSHOT.md',
+    },
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/specs/glossary.md',
+      dest: 'specs/domain/glossary.md',
+    },
+    {
+      type: 'template_file',
+      source: 'project-scaffolding/templates/changes/INDEX.md',
+      dest: 'changes/INDEX.md',
+    },
+  ];
 
   // -- Specs directories with .gitkeep --
   const gitkeepDirs = [
@@ -230,118 +243,149 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     'changes',
     'archive',
   ];
-  for (const dir of gitkeepDirs) {
-    operations.push({ type: 'mkdir', path: dir, gitkeep: true });
-  }
+  const gitkeepOps: ReadonlyArray<ScaffoldOperation> = gitkeepDirs.map((dir) => ({
+    type: 'mkdir' as const,
+    path: dir,
+    gitkeep: true,
+  }));
 
   // -- Architecture overview (computed content) --
-  operations.push({
-    type: 'write_file',
-    path: 'specs/architecture/overview.md',
-    content: buildArchitectureContent(config),
-  });
+  const architectureOps: ReadonlyArray<ScaffoldOperation> = [
+    {
+      type: 'write_file',
+      path: 'specs/architecture/overview.md',
+      content: buildArchitectureContent(config),
+    },
+  ];
 
   // -- Config component (mandatory singleton) --
-  operations.push({
-    type: 'template_dir',
-    source: 'components/config/config-scaffolding/templates',
-    dest: 'components/config',
-  });
+  const configOps: ReadonlyArray<ScaffoldOperation> = [
+    {
+      type: 'template_dir',
+      source: 'components/config/config-scaffolding/templates',
+      dest: 'components/config',
+    },
+  ];
 
   // -- Contract components --
   const contractComponents = getComponentsByType(components, 'contract');
-  for (const contract of contractComponents) {
+  const contractOps: ReadonlyArray<ScaffoldOperation> = contractComponents.flatMap((contract) => {
     const dirName = componentDirName(contract);
-    operations.push({
-      type: 'template_dir',
-      source: 'components/contract/contract-scaffolding/templates',
-      dest: `components/${dirName}`,
-    });
-    operations.push({
-      type: 'write_file',
-      path: `components/${dirName}/.gitignore`,
-      content: 'node_modules/\ngenerated/\n',
-    });
-  }
+    return [
+      {
+        type: 'template_dir' as const,
+        source: 'components/contract/contract-scaffolding/templates',
+        dest: `components/${dirName}`,
+      },
+      {
+        type: 'write_file' as const,
+        path: `components/${dirName}/.gitignore`,
+        content: 'node_modules/\ngenerated/\n',
+      },
+    ];
+  });
 
   // -- Server components --
   const serverComponents = getComponentsByType(components, 'server');
-  for (const server of serverComponents) {
+  const serverOps: ReadonlyArray<ScaffoldOperation> = serverComponents.map((server) => {
     const dirName = componentDirName(server);
-    operations.push({
-      type: 'template_dir',
+    return {
+      type: 'template_dir' as const,
       source: 'components/backend/backend-scaffolding/templates',
       dest: `components/${dirName}`,
-    });
-  }
+    };
+  });
 
   // -- Webapp components --
   const webappComponents = getComponentsByType(components, 'webapp');
-  for (const webapp of webappComponents) {
+  const webappOps: ReadonlyArray<ScaffoldOperation> = webappComponents.map((webapp) => {
     const dirName = componentDirName(webapp);
-    operations.push({
-      type: 'template_dir',
+    return {
+      type: 'template_dir' as const,
       source: 'components/frontend/frontend-scaffolding/templates',
       dest: `components/${dirName}`,
-    });
-  }
+    };
+  });
 
   // -- Database components --
   const databaseComponents = getComponentsByType(components, 'database');
-  for (const database of databaseComponents) {
+  const databaseOps: ReadonlyArray<ScaffoldOperation> = databaseComponents.flatMap((database) => {
     const dirName = componentDirName(database);
-    operations.push({
-      type: 'template_dir',
-      source: 'components/database/database-scaffolding/templates',
-      dest: `components/${dirName}`,
-    });
-    // Additional directories for database component
-    operations.push({ type: 'mkdir', path: `components/${dirName}/migrations` });
-    operations.push({ type: 'mkdir', path: `components/${dirName}/seeds` });
-    operations.push({ type: 'mkdir', path: `components/${dirName}/scripts` });
-  }
+    return [
+      {
+        type: 'template_dir' as const,
+        source: 'components/database/database-scaffolding/templates',
+        dest: `components/${dirName}`,
+      },
+      { type: 'mkdir' as const, path: `components/${dirName}/migrations` },
+      { type: 'mkdir' as const, path: `components/${dirName}/seeds` },
+      { type: 'mkdir' as const, path: `components/${dirName}/scripts` },
+    ];
+  });
 
   // -- Helm component directories --
   const helmComponents = getComponentsByType(components, 'helm');
-  for (const helm of helmComponents) {
+  const helmOps: ReadonlyArray<ScaffoldOperation> = helmComponents.map((helm) => {
     const dirName = componentDirName(helm);
-    operations.push({ type: 'mkdir', path: `components/${dirName}` });
-  }
+    return { type: 'mkdir' as const, path: `components/${dirName}` };
+  });
 
   // -- Testing component directories --
   const testingComponents = getComponentsByType(components, 'testing');
-  for (const testing of testingComponents) {
+  const testingOps: ReadonlyArray<ScaffoldOperation> = testingComponents.flatMap((testing) => {
     const dirName = componentDirName(testing);
-    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/integration` });
-    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/component` });
-    operations.push({ type: 'mkdir', path: `components/${dirName}/tests/e2e` });
-    operations.push({ type: 'mkdir', path: `components/${dirName}/testsuites` });
-  }
+    return [
+      { type: 'mkdir' as const, path: `components/${dirName}/tests/integration` },
+      { type: 'mkdir' as const, path: `components/${dirName}/tests/component` },
+      { type: 'mkdir' as const, path: `components/${dirName}/tests/e2e` },
+      { type: 'mkdir' as const, path: `components/${dirName}/testsuites` },
+    ];
+  });
 
   // -- CI/CD components --
   const cicdComponents = getComponentsByType(components, 'cicd');
-  for (const cicd of cicdComponents) {
+  const cicdOps: ReadonlyArray<ScaffoldOperation> = cicdComponents.flatMap((cicd) => {
     const dirName = componentDirName(cicd);
-    operations.push({
-      type: 'write_file',
-      path: `components/${dirName}/ci.yaml`,
-      content: CI_WORKFLOW_CONTENT,
-    });
-    operations.push({
-      type: 'write_file',
-      path: '.github/workflows/ci.yaml',
-      content: CI_WORKFLOW_CONTENT,
-    });
-  }
+    return [
+      {
+        type: 'write_file' as const,
+        path: `components/${dirName}/ci.yaml`,
+        content: CI_WORKFLOW_CONTENT,
+      },
+      {
+        type: 'write_file' as const,
+        path: '.github/workflows/ci.yaml',
+        content: CI_WORKFLOW_CONTENT,
+      },
+    ];
+  });
 
   // -- Component scripts (no meta-scripts) --
   const scripts = generateComponentScripts(components, config.project_name);
-  if (Object.keys(scripts).length > 0) {
-    operations.push({ type: 'package_json_scripts', scripts });
-  }
+  const scriptOps: ReadonlyArray<ScaffoldOperation> =
+    Object.keys(scripts).length > 0
+      ? [{ type: 'package_json_scripts' as const, scripts }]
+      : [];
+
+  const operations: ReadonlyArray<ScaffoldOperation> = [
+    ...rootFileOps,
+    ...projectTemplateOps,
+    ...specFileOps,
+    ...gitkeepOps,
+    ...architectureOps,
+    ...configOps,
+    ...contractOps,
+    ...serverOps,
+    ...webappOps,
+    ...databaseOps,
+    ...helmOps,
+    ...testingOps,
+    ...cicdOps,
+    ...scriptOps,
+  ];
 
   // Build variables with per-component contract package support
-  const variables: Record<string, string> = {
+  const variables: Readonly<Record<string, string>> = {
     PROJECT_NAME: config.project_name,
     PROJECT_DESCRIPTION: config.project_description,
     PRIMARY_DOMAIN: config.primary_domain,

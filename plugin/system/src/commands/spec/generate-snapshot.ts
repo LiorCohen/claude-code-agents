@@ -34,12 +34,12 @@ const generateSnapshotContent = async (specsDir: string): Promise<string> => {
     });
 
   // Group by domain using reduce
-  const byDomain: Readonly<Record<string, readonly ActiveSpec[]>> = specs.reduce(
+  const byDomain: Readonly<Record<string, ReadonlyArray<ActiveSpec>>> = specs.reduce<Readonly<Record<string, ReadonlyArray<ActiveSpec>>>>(
     (acc, spec) => ({
       ...acc,
       [spec.domain]: [...(acc[spec.domain] ?? []), spec],
     }),
-    {} as Record<string, readonly ActiveSpec[]>
+    {}
   );
 
   const today = new Date().toISOString().split('T')[0];

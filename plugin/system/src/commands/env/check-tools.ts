@@ -12,7 +12,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 
-interface ToolCheck {
+type ToolCheck = {
   readonly name: string;
   readonly command: string;
   readonly parseVersion: (output: string) => string;
@@ -20,24 +20,28 @@ interface ToolCheck {
   readonly fallbackUrl: string;
 }
 
-interface ToolResult {
+type ToolResult = {
   readonly name: string;
   readonly installed: boolean;
-  readonly version: string | null;
-  readonly installHint: string | null;
+  readonly version?: string;
+  readonly installHint?: string;
 }
 
-interface CheckToolsData {
+type CheckToolsData = {
   readonly platform: string;
-  readonly packageManager: string | null;
-  readonly tools: readonly ToolResult[];
+  readonly packageManager?: PackageManager;
+  readonly tools: ReadonlyArray<ToolResult>;
   readonly allInstalled: boolean;
-  readonly missing: readonly string[];
+  readonly missing: ReadonlyArray<string>;
 }
 
 type PackageManager = 'brew' | 'apt-get' | 'dnf' | 'yum';
 
-const TOOL_CHECKS: readonly ToolCheck[] = [
+type PackageManagerResult =
+  | { readonly found: true; readonly manager: PackageManager }
+  | { readonly found: false };
+
+const TOOL_CHECKS: ReadonlyArray<ToolCheck> = [
   {
     name: 'node',
     command: 'node --version',
@@ -135,37 +139,37 @@ const TOOL_CHECKS: readonly ToolCheck[] = [
     },
     fallbackUrl: 'https://helm.sh/docs/intro/install/',
   },
-] as const;
+];
 
 /**
  * Detect the system's package manager based on platform.
  */
-const detectPackageManager = (): PackageManager | null => {
+const detectPackageManager = (): PackageManagerResult => {
   const platform = process.platform;
 
   if (platform === 'darwin') {
     try {
       execSync('which brew', { timeout: 5000, stdio: 'pipe' });
-      return 'brew';
+      return { found: true, manager: 'brew' };
     } catch {
-      return null;
+      return { found: false };
     }
   }
 
   if (platform === 'linux') {
-    const managers: readonly PackageManager[] = ['apt-get', 'dnf', 'yum'];
+    const managers: ReadonlyArray<PackageManager> = ['apt-get', 'dnf', 'yum'];
     for (const mgr of managers) {
       try {
         execSync(`which ${mgr}`, { timeout: 5000, stdio: 'pipe' });
-        return mgr;
+        return { found: true, manager: mgr };
       } catch {
         // Try next
       }
     }
-    return null;
+    return { found: false };
   }
 
-  return null;
+  return { found: false };
 };
 
 /**
@@ -203,7 +207,7 @@ const getEffectivePlatform = (): { platform: string; supported: boolean } => {
 /**
  * Check a single tool's installation status.
  */
-const checkTool = (tool: ToolCheck, packageManager: PackageManager | null): ToolResult => {
+const checkTool = (tool: ToolCheck, packageManager: PackageManagerResult): ToolResult => {
   try {
     const output = execSync(tool.command, {
       timeout: 5000,
@@ -214,17 +218,15 @@ const checkTool = (tool: ToolCheck, packageManager: PackageManager | null): Tool
       name: tool.name,
       installed: true,
       version: tool.parseVersion(output),
-      installHint: null,
     };
   } catch {
-    const installHint = packageManager
-      ? (tool.installHints[packageManager] ?? tool.fallbackUrl)
+    const installHint = packageManager.found
+      ? (tool.installHints[packageManager.manager] ?? tool.fallbackUrl)
       : tool.fallbackUrl;
 
     return {
       name: tool.name,
       installed: false,
-      version: null,
       installHint,
     };
   }
@@ -233,7 +235,7 @@ const checkTool = (tool: ToolCheck, packageManager: PackageManager | null): Tool
 /**
  * Format tool results as human-readable output.
  */
-const formatHumanReadable = (tools: readonly ToolResult[]): string => {
+const formatHumanReadable = (tools: ReadonlyArray<ToolResult>): string => {
   const lines = tools.map((tool) => {
     if (tool.installed) {
       return `  \u2713 ${tool.name} (${tool.version})`;
@@ -256,14 +258,14 @@ export const checkTools = async (
     return { success: false, error };
   }
 
-  const packageManager = detectPackageManager();
-  const toolResults = TOOL_CHECKS.map((tool) => checkTool(tool, packageManager));
+  const packageManagerResult = detectPackageManager();
+  const toolResults = TOOL_CHECKS.map((tool) => checkTool(tool, packageManagerResult));
   const missing = toolResults.filter((t) => !t.installed).map((t) => t.name);
   const allInstalled = missing.length === 0;
 
   const data: CheckToolsData = {
     platform,
-    packageManager,
+    ...(packageManagerResult.found ? { packageManager: packageManagerResult.manager } : {}),
     tools: toolResults,
     allInstalled,
     missing,

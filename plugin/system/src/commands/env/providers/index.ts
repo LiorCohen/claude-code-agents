@@ -21,7 +21,7 @@ const providers: Readonly<Record<ClusterProvider, ClusterProviderOps>> = {
 const STATE_DIR = path.join(os.homedir(), '.sdd');
 const STATE_FILE = path.join(STATE_DIR, 'clusters.json');
 
-interface ClusterState {
+type ClusterState = {
   readonly clusters: Readonly<Record<string, ClusterProvider>>;
 }
 
@@ -36,11 +36,16 @@ const readState = (): ClusterState => {
   return { clusters: {} };
 };
 
-const writeState = (state: ClusterState): void => {
+/**
+ * Write cluster state to disk.
+ * Returns the path where state was written.
+ */
+const writeState = (state: ClusterState): string => {
   if (!fs.existsSync(STATE_DIR)) {
     fs.mkdirSync(STATE_DIR, { recursive: true });
   }
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2), 'utf-8');
+  return STATE_FILE;
 };
 
 /**
@@ -52,33 +57,46 @@ export const getProvider = (name: ClusterProvider): ClusterProviderOps => {
 
 /**
  * Get the provider used to create a cluster (from persisted state).
- * Returns null if cluster is not tracked.
+ * Returns a result union indicating whether the cluster is tracked.
  */
-export const getClusterProvider = (clusterName: string): ClusterProvider | null => {
+type ClusterProviderResult =
+  | { readonly found: true; readonly provider: ClusterProvider }
+  | { readonly found: false };
+
+export const getClusterProvider = (clusterName: string): ClusterProviderResult => {
   const state = readState();
-  return state.clusters[clusterName] ?? null;
+  const provider = state.clusters[clusterName];
+  return provider !== undefined
+    ? { found: true, provider }
+    : { found: false };
 };
 
 /**
  * Persist the provider used for a cluster (called after create).
+ * Returns the updated cluster state.
  */
-export const persistClusterProvider = (clusterName: string, provider: ClusterProvider): void => {
+export const persistClusterProvider = (clusterName: string, provider: ClusterProvider): ClusterState => {
   const state = readState();
-  writeState({ clusters: { ...state.clusters, [clusterName]: provider } });
+  const newState: ClusterState = { clusters: { ...state.clusters, [clusterName]: provider } };
+  writeState(newState);
+  return newState;
 };
 
 /**
  * Remove cluster from persisted state (called after destroy).
+ * Returns the updated cluster state.
  */
-export const removeClusterProvider = (clusterName: string): void => {
+export const removeClusterProvider = (clusterName: string): ClusterState => {
   const state = readState();
   const { [clusterName]: _, ...rest } = state.clusters;
-  writeState({ clusters: rest });
+  const newState: ClusterState = { clusters: rest };
+  writeState(newState);
+  return newState;
 };
 
 /**
  * Auto-detect the best available provider for creating a new cluster.
- * Order: docker-desktop (if running) → minikube (if installed) → kind (default)
+ * Order: docker-desktop (if running) -> minikube (if installed) -> kind (default)
  */
 export const detectProvider = async (): Promise<ClusterProvider> => {
   // 1. Check if Docker Desktop k8s is available and running
@@ -104,29 +122,24 @@ export const detectProvider = async (): Promise<ClusterProvider> => {
 /**
  * Check prerequisites for running env commands.
  */
-export const checkPrerequisites = (): { ok: boolean; missing: readonly string[] } => {
-  const missing: string[] = [];
+export const checkPrerequisites = (): { ok: boolean; missing: ReadonlyArray<string> } => {
+  const tools: ReadonlyArray<{ readonly name: string; readonly command: string }> = [
+    { name: 'docker', command: 'docker version' },
+    { name: 'kubectl', command: 'kubectl version --client' },
+    { name: 'helm', command: 'helm version' },
+  ];
 
-  // Check docker
-  try {
-    execSync('docker version', { stdio: 'pipe' });
-  } catch {
-    missing.push('docker');
-  }
-
-  // Check kubectl
-  try {
-    execSync('kubectl version --client', { stdio: 'pipe' });
-  } catch {
-    missing.push('kubectl');
-  }
-
-  // Check helm
-  try {
-    execSync('helm version', { stdio: 'pipe' });
-  } catch {
-    missing.push('helm');
-  }
+  const missing: ReadonlyArray<string> = tools.reduce<ReadonlyArray<string>>(
+    (acc, tool) => {
+      try {
+        execSync(tool.command, { stdio: 'pipe' });
+        return acc;
+      } catch {
+        return [...acc, tool.name];
+      }
+    },
+    []
+  );
 
   return { ok: missing.length === 0, missing };
 };

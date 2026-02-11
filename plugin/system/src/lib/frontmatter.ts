@@ -2,42 +2,49 @@
  * Frontmatter parsing utilities for spec files.
  */
 
-export interface Frontmatter {
+export type Frontmatter = {
   readonly [key: string]: string | undefined;
-}
+};
 
-export interface ParsedSpec {
-  readonly frontmatter: Frontmatter | null;
+export type FrontmatterResult =
+  | { readonly found: true; readonly data: Frontmatter }
+  | { readonly found: false };
+
+export type ParsedSpec = {
+  readonly frontmatter?: Frontmatter;
   readonly content: string;
-}
+};
 
 /**
  * Extract YAML frontmatter from markdown content.
- * Returns null if no frontmatter found.
  */
-export const parseFrontmatter = (content: string): Frontmatter | null => {
+export const parseFrontmatter = (content: string): FrontmatterResult => {
   const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!match?.[1]) return null;
+  if (!match?.[1]) return { found: false };
 
-  const frontmatter: Record<string, string> = {};
-  for (const line of match[1].split('\n')) {
-    const colonIndex = line.indexOf(':');
-    if (colonIndex > 0) {
-      const key = line.slice(0, colonIndex).trim();
-      const value = line.slice(colonIndex + 1).trim();
-      frontmatter[key] = value;
-    }
-  }
-  return frontmatter;
+  const frontmatter: Readonly<Record<string, string>> = Object.fromEntries(
+    match[1]
+      .split('\n')
+      .map((line) => {
+        const colonIndex = line.indexOf(':');
+        return colonIndex > 0
+          ? [line.slice(0, colonIndex).trim(), line.slice(colonIndex + 1).trim()]
+          : undefined;
+      })
+      .filter((entry): entry is [string, string] => entry !== undefined)
+  );
+  return { found: true, data: frontmatter };
 };
 
 /**
  * Parse spec file returning frontmatter and body content.
  */
 export const parseSpec = (content: string): ParsedSpec => {
-  const frontmatter = parseFrontmatter(content);
+  const result = parseFrontmatter(content);
   const bodyContent = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n?/, '');
-  return { frontmatter, content: bodyContent };
+  return result.found
+    ? { frontmatter: result.data, content: bodyContent }
+    : { content: bodyContent };
 };
 
 /**

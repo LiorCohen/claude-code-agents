@@ -13,27 +13,27 @@ import { parseNamedArgs } from '@/lib/args';
 import { DEFAULT_CLUSTER_NAME, type ClusterProvider } from './types';
 import { getProvider, getClusterProvider } from './providers';
 
-interface ClusterStatus {
+type ClusterStatus = {
   readonly cluster: string;
-  readonly provider: ClusterProvider | null;
+  readonly provider?: ClusterProvider;
   readonly running: boolean;
   readonly exists: boolean;
-  readonly nodes: readonly NodeStatus[];
-  readonly namespaces: readonly NamespaceStatus[];
+  readonly nodes: ReadonlyArray<NodeStatus>;
+  readonly namespaces: ReadonlyArray<NamespaceStatus>;
 }
 
-interface NodeStatus {
+type NodeStatus = {
   readonly name: string;
   readonly status: string;
 }
 
-interface NamespaceStatus {
+type NamespaceStatus = {
   readonly name: string;
   readonly pods: number;
   readonly ready: number;
 }
 
-interface KubeNode {
+type KubeNode = {
   readonly metadata: { readonly name: string };
   readonly status: {
     readonly conditions: ReadonlyArray<{
@@ -43,11 +43,11 @@ interface KubeNode {
   };
 }
 
-interface KubeNamespace {
+type KubeNamespace = {
   readonly metadata: { readonly name: string };
 }
 
-interface KubePod {
+type KubePod = {
   readonly status?: {
     readonly conditions?: ReadonlyArray<{
       readonly type: string;
@@ -65,15 +65,14 @@ export const status = async (
 
   try {
     // Get provider for this cluster (from persisted state)
-    const providerName = getClusterProvider(clusterName);
+    const providerResult = getClusterProvider(clusterName);
 
-    if (!providerName) {
+    if (!providerResult.found) {
       return {
         success: true,
         message: `Cluster '${clusterName}' does not exist (no provider found)`,
         data: {
           cluster: clusterName,
-          provider: null,
           running: false,
           exists: false,
           nodes: [],
@@ -82,6 +81,7 @@ export const status = async (
       };
     }
 
+    const providerName = providerResult.provider;
     const provider = getProvider(providerName);
 
     // Check if cluster exists
@@ -120,8 +120,8 @@ export const status = async (
 
     // Get node status
     const nodesJson = execSync('kubectl get nodes -o json', { encoding: 'utf-8' });
-    const nodes = JSON.parse(nodesJson) as { items: readonly KubeNode[] };
-    const nodeStatuses: NodeStatus[] = nodes.items.map((node) => ({
+    const nodes = JSON.parse(nodesJson) as { items: ReadonlyArray<KubeNode> };
+    const nodeStatuses: ReadonlyArray<NodeStatus> = nodes.items.map((node) => ({
       name: node.metadata.name,
       status:
         node.status.conditions.find((c) => c.type === 'Ready')?.status === 'True'
@@ -131,24 +131,20 @@ export const status = async (
 
     // Get namespace pod counts
     const namespacesJson = execSync('kubectl get namespaces -o json', { encoding: 'utf-8' });
-    const namespaces = JSON.parse(namespacesJson) as { items: readonly KubeNamespace[] };
-    const namespaceStatuses: NamespaceStatus[] = [];
-
-    for (const ns of namespaces.items) {
-      const nsName = ns.metadata.name;
-      if (nsName.startsWith('kube-')) continue; // Skip system namespaces
-
-      const podsJson = execSync(`kubectl get pods -n ${nsName} -o json`, { encoding: 'utf-8' });
-      const pods = JSON.parse(podsJson) as { items: readonly KubePod[] };
-      const total = pods.items.length;
-      const ready = pods.items.filter(
-        (p) => p.status?.conditions?.find((c) => c.type === 'Ready')?.status === 'True'
-      ).length;
-
-      if (total > 0) {
-        namespaceStatuses.push({ name: nsName, pods: total, ready });
-      }
-    }
+    const namespaces = JSON.parse(namespacesJson) as { items: ReadonlyArray<KubeNamespace> };
+    const namespaceStatuses: ReadonlyArray<NamespaceStatus> = namespaces.items
+      .filter((ns) => !ns.metadata.name.startsWith('kube-'))
+      .map((ns) => {
+        const nsName = ns.metadata.name;
+        const podsJson = execSync(`kubectl get pods -n ${nsName} -o json`, { encoding: 'utf-8' });
+        const pods = JSON.parse(podsJson) as { items: ReadonlyArray<KubePod> };
+        const total = pods.items.length;
+        const ready = pods.items.filter(
+          (p) => p.status?.conditions?.find((c) => c.type === 'Ready')?.status === 'True'
+        ).length;
+        return { name: nsName, pods: total, ready };
+      })
+      .filter((ns) => ns.pods > 0);
 
     const statusData: ClusterStatus = {
       cluster: clusterName,
@@ -160,15 +156,17 @@ export const status = async (
     };
 
     // Format output
-    let output = `Cluster: ${clusterName} (running, provider: ${providerName})\n\n`;
-    output += 'Nodes:\n';
-    for (const node of nodeStatuses) {
-      output += `  ${node.name}: ${node.status}\n`;
-    }
-    output += '\nNamespaces:\n';
-    for (const ns of namespaceStatuses) {
-      output += `  ${ns.name}: ${ns.ready}/${ns.pods} pods ready\n`;
-    }
+    const nodeLines = nodeStatuses.map((node) => `  ${node.name}: ${node.status}`);
+    const nsLines = namespaceStatuses.map((ns) => `  ${ns.name}: ${ns.ready}/${ns.pods} pods ready`);
+    const output = [
+      `Cluster: ${clusterName} (running, provider: ${providerName})`,
+      '',
+      'Nodes:',
+      ...nodeLines,
+      '',
+      'Namespaces:',
+      ...nsLines,
+    ].join('\n');
 
     return {
       success: true,

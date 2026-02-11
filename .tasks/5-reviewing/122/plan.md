@@ -22,7 +22,7 @@ A line-by-line audit of all 73 TypeScript files in `plugin/system/src/` against 
 | `let` declarations | ~35 | Should be `const` with functional patterns |
 | Direct property mutation | ~25 | `obj[key] = value`, `obj.prop = value` |
 | Mutable `Record<K,V>` | ~30 | Should be `Readonly<Record<K,V>>` |
-| `void` / `Promise<void>` returns | ~20 | Functions must return values |
+| `void` / `Promise<void>` returns | ~32 | Functions must return values (includes 12 in provider implementations) |
 | `T \| null` returns / fields | ~15 | Use result unions or optional fields |
 | `as` casts circumventing readonly | ~15 | Casting to mutable types to enable mutation |
 | `delete` operator | 4 | Banned — use destructuring rest |
@@ -32,11 +32,15 @@ A line-by-line audit of all 73 TypeScript files in `plugin/system/src/` against 
 | `.sort()` on non-spread arrays | ~2 | Use `[...arr].sort()` or `.toSorted()` |
 | Index files with logic | 12 | Should be pure re-exports |
 
-### Files with violations: 50 of 73
+### Files with violations: 55 of 73
 
-### Clean files: 23 of 73
+### Clean files: 18 of 73
 
-**Confirmed clean rules (zero violations across entire codebase):** `function` keyword, `class` keyword, `export default`, `require()`, `var`, `any` types, file extensions in imports, deep relative imports, utility library imports, `import type` compliance, `??` vs `||` usage. All interface properties have 100% `readonly`.
+**Confirmed clean rules (zero violations across entire codebase):** `function` keyword, `class` keyword, `export default`, `require()`, `var`, `any` types, file extensions in imports, deep relative imports, utility library imports, `import type` compliance. All interface properties have 100% `readonly`.
+
+**Confirmed clean mutation patterns (zero matches):** `.pop()`, `.shift()`, `.unshift()`, `.splice()`, `.reverse()`, `.fill()`, `Map.delete()`, `Map.clear()`, `Set.delete()`, `Set.clear()`.
+
+**Edge case:** `lib/logger.ts:132` uses `process.env.CLAUDE_SESSION_ID || undefined` — `||` instead of `??`. Intentional: treats empty string as "not set" for pino session config. Not a violation.
 
 ## Violation Categories
 
@@ -96,7 +100,7 @@ All other ~105 interfaces across ~30 files must become `type`.
 
 The standard bans `void` return types except in callback signatures within interface contracts (like `Logger`). Standalone functions must return meaningful values.
 
-Affected standalone functions (~20):
+Affected standalone functions (~20, plus ~12 cascading in provider implementations):
 - `lib/fs.ts`: writeText, writeJson, copyFile, ensureDir → return path written
 - `lib/logger.ts`: success, error → return message
 - `lib/args.ts`: outputResult → return formatted string
@@ -132,16 +136,13 @@ Type fields with `| null` (~5):
 
 ## Complete Per-File Audit
 
-### 100% CLEAN — No violations (23 files)
+### 100% CLEAN — No violations (18 files)
 
 **Settings (3 files):**
 - `settings/defaults.ts`, `settings/schema.ts`, `settings/index.ts`
 
-**Commands — env (8 files):**
+**Commands — env (5 files):**
 - `env/destroy.ts`, `env/start.ts`, `env/stop.ts`, `env/restart.ts`, `env/infra.ts`
-- `env/providers/kind.ts`, `env/providers/minikube.ts`, `env/providers/docker-desktop.ts`
-
-Note: Provider files implement `ClusterProviderOps` which has `Promise<void>` methods. The violation is in the interface definition (`env/types.ts`); implementations will update to match when the interface changes.
 
 **Commands — database (5 files):**
 - `database/port-forward.ts`, `database/psql.ts`, `database/setup.ts`, `database/teardown.ts`, `database/reset.ts`
@@ -151,6 +152,16 @@ Note: Provider files implement `ClusterProviderOps` which has `Promise<void>` me
 
 **Commands — other (1 file):**
 - `config/add-env.ts`
+
+**Note:** `settings/index.ts` verified as pure re-exports — genuinely clean.
+
+### CASCADING VIOLATIONS — Provider implementations (3 files)
+
+These files have explicit `Promise<void>` return types (4 each, 12 total) that must change when `ClusterProviderOps` is updated:
+
+- `env/providers/kind.ts` — (M) create, destroy, start, stop all return `Promise<void>`
+- `env/providers/minikube.ts` — (M) create, destroy, start, stop all return `Promise<void>`
+- `env/providers/docker-desktop.ts` — (M) create, destroy, start, stop all return `Promise<void>`
 
 ### FILES WITH VIOLATIONS — Complete list
 
@@ -458,7 +469,7 @@ Convert to functional patterns with `.reduce()`, `.map()` with index, or `Array.
 
 `Set.add()` → `new Set([...set, item])`. `Map.set()` → `new Map([...map, [key, value]])`.
 
-### 10. Replace `void` / `Promise<void>` return types (M) — ~20 edits across ~7 files
+### 10. Replace `void` / `Promise<void>` return types (M) — ~32 edits across ~10 files
 
 Standalone void functions must return meaningful values:
 - File utility functions → return the path written or a success indicator

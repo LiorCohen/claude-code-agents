@@ -17,7 +17,7 @@ export type ServerMode = 'api' | 'worker' | 'cron';
 export type ServerType = ServerMode | 'hybrid';
 
 /** Settings for server components */
-export interface ServerSettings {
+export type ServerSettings = {
   /** Communication pattern(s) - determines Operator lifecycle(s) */
   readonly server_type: ServerType;
   /** Required when server_type is 'hybrid' (2+ modes) */
@@ -37,7 +37,7 @@ export interface ServerSettings {
 // =============================================================================
 
 /** Settings for webapp components */
-export interface WebappSettings {
+export type WebappSettings = {
   /** Contract components this webapp uses (generates API clients) (default: []) */
   readonly contracts?: readonly string[];
   /** Whether this webapp needs a helm chart for deployment (default: false) */
@@ -52,7 +52,7 @@ export interface WebappSettings {
 export type HelmAssets = 'bundled' | 'entrypoint';
 
 /** Helm chart settings for deploying a server */
-export interface HelmServerSettings {
+export type HelmServerSettings = {
   /** Server component name to deploy */
   readonly deploys: string;
   /** Type of component being deployed */
@@ -64,7 +64,7 @@ export interface HelmServerSettings {
 }
 
 /** Helm chart settings for deploying a webapp */
-export interface HelmWebappSettings {
+export type HelmWebappSettings = {
   /** Webapp component name to deploy */
   readonly deploys: string;
   /** Type of component being deployed */
@@ -86,7 +86,7 @@ export type HelmSettings = HelmServerSettings | HelmWebappSettings;
 export type DatabaseProvider = 'postgresql';
 
 /** Settings for database components */
-export interface DatabaseSettings {
+export type DatabaseSettings = {
   /** Database provider (currently only postgresql) */
   readonly provider: DatabaseProvider;
   /** Whether this database needs its own server (false = can colocate in local dev) */
@@ -101,7 +101,7 @@ export interface DatabaseSettings {
 export type ContractVisibility = 'public' | 'internal';
 
 /** Settings for contract components */
-export interface ContractSettings {
+export type ContractSettings = {
   /** public = external consumers, internal = project-only */
   readonly visibility: ContractVisibility;
 }
@@ -135,7 +135,7 @@ export type CicdSettings = Record<string, never>;
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 /** Logging settings */
-export interface LoggingSettings {
+export type LoggingSettings = {
   /** Enable/disable file logging */
   readonly enabled: boolean;
   /** Log level */
@@ -143,7 +143,7 @@ export interface LoggingSettings {
 }
 
 /** SDD CLI system settings */
-export interface SystemSettings {
+export type SystemSettings = {
   /** Logging configuration */
   readonly logging: LoggingSettings;
 }
@@ -164,7 +164,7 @@ export type ComponentType =
   | 'cicd';
 
 /** Mapping of component types to their settings */
-export interface ComponentSettingsMap {
+export type ComponentSettingsMap = {
   readonly server: ServerSettings;
   readonly webapp: WebappSettings;
   readonly helm: HelmSettings;
@@ -183,7 +183,7 @@ export type ComponentSettings = ComponentSettingsMap[ComponentType];
 // =============================================================================
 
 /** Base component interface */
-export interface ComponentBase {
+export type ComponentBase = {
   /** Unique component name (lowercase, hyphenated) */
   readonly name: string;
   /** Component type */
@@ -193,49 +193,49 @@ export interface ComponentBase {
 }
 
 /** Server component */
-export interface ServerComponent extends ComponentBase {
+export type ServerComponent = ComponentBase & {
   readonly type: 'server';
   readonly settings: ServerSettings;
 }
 
 /** Webapp component */
-export interface WebappComponent extends ComponentBase {
+export type WebappComponent = ComponentBase & {
   readonly type: 'webapp';
   readonly settings: WebappSettings;
 }
 
 /** Helm chart component */
-export interface HelmComponent extends ComponentBase {
+export type HelmComponent = ComponentBase & {
   readonly type: 'helm';
   readonly settings: HelmSettings;
 }
 
 /** Database component */
-export interface DatabaseComponent extends ComponentBase {
+export type DatabaseComponent = ComponentBase & {
   readonly type: 'database';
   readonly settings: DatabaseSettings;
 }
 
 /** Contract component */
-export interface ContractComponent extends ComponentBase {
+export type ContractComponent = ComponentBase & {
   readonly type: 'contract';
   readonly settings: ContractSettings;
 }
 
 /** Config component */
-export interface ConfigComponent extends ComponentBase {
+export type ConfigComponent = ComponentBase & {
   readonly type: 'config';
   readonly settings: ConfigSettings;
 }
 
 /** Testing component */
-export interface TestingComponent extends ComponentBase {
+export type TestingComponent = ComponentBase & {
   readonly type: 'testing';
   readonly settings: TestingSettings;
 }
 
 /** CI/CD component */
-export interface CicdComponent extends ComponentBase {
+export type CicdComponent = ComponentBase & {
   readonly type: 'cicd';
   readonly settings: CicdSettings;
 }
@@ -302,7 +302,7 @@ export const isHelmWebappSettings = (
 // =============================================================================
 
 /** SDD metadata in settings file */
-export interface SddMetadata {
+export type SddMetadata = {
   /** Plugin version that first created this project (immutable after init) */
   readonly initialized_by_plugin_version: string;
   /** Plugin version that last reconciled settings */
@@ -314,7 +314,7 @@ export interface SddMetadata {
 }
 
 /** Project metadata in settings file */
-export interface ProjectMetadata {
+export type ProjectMetadata = {
   /** Project name (lowercase, hyphens) */
   readonly name: string;
   /** Project description */
@@ -322,7 +322,7 @@ export interface ProjectMetadata {
 }
 
 /** Complete settings file schema */
-export interface SettingsFile {
+export type SettingsFile = {
   readonly sdd: SddMetadata;
   readonly project: ProjectMetadata;
   readonly components: readonly Component[];

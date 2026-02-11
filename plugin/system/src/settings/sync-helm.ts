@@ -14,12 +14,12 @@ import type {
 import { isServerComponent, isHelmComponent, isHelmServerSettings } from '../types/settings';
 
 /** Templates that should be included based on settings */
-export interface HelmTemplateSet {
+export type HelmTemplateSet = {
   /** Base templates (always included) */
   readonly base: readonly string[];
   /** Conditional templates based on settings */
   readonly conditional: readonly string[];
-}
+};
 
 /**
  * Determine which templates should be included in a server helm chart.
@@ -29,7 +29,6 @@ export const getServerHelmTemplates = (
   serverSettings: ServerSettings
 ): HelmTemplateSet => {
   const base = ['_helpers.tpl', 'configmap.yaml', 'servicemonitor.yaml'];
-  const conditional: string[] = [];
 
   // Determine deployment templates based on modes
   const availableModes =
@@ -39,37 +38,32 @@ export const getServerHelmTemplates = (
 
   const deployModes = helmSettings.deploy_modes ?? availableModes;
 
-  if (deployModes.length > 1) {
-    // Multiple modes = separate deployments per mode
-    if (deployModes.includes('api')) {
-      conditional.push('deployment-api.yaml');
-    }
-    if (deployModes.includes('worker')) {
-      conditional.push('deployment-worker.yaml');
-    }
-    if (deployModes.includes('cron')) {
-      conditional.push('cronjob.yaml');
-    }
-  } else if (deployModes.length === 1) {
-    if (deployModes[0] === 'cron') {
-      conditional.push('cronjob.yaml');
-    } else {
-      conditional.push('deployment.yaml');
-    }
-  }
+  const deployTemplates: readonly string[] =
+    deployModes.length > 1
+      ? [
+          ...(deployModes.includes('api') ? ['deployment-api.yaml'] : []),
+          ...(deployModes.includes('worker') ? ['deployment-worker.yaml'] : []),
+          ...(deployModes.includes('cron') ? ['cronjob.yaml'] : []),
+        ]
+      : deployModes.length === 1
+        ? deployModes[0] === 'cron'
+          ? ['cronjob.yaml']
+          : ['deployment.yaml']
+        : [];
 
   // Service only if deploying api mode and server provides contracts
-  if (
+  const serviceTemplates: readonly string[] =
     deployModes.includes('api') &&
     (serverSettings.provides_contracts ?? []).length > 0
-  ) {
-    conditional.push('service.yaml');
-  }
+      ? ['service.yaml']
+      : [];
 
   // Ingress from helm settings
-  if (helmSettings.ingress) {
-    conditional.push('ingress.yaml');
-  }
+  const ingressTemplates: readonly string[] = helmSettings.ingress
+    ? ['ingress.yaml']
+    : [];
+
+  const conditional = [...deployTemplates, ...serviceTemplates, ...ingressTemplates];
 
   return { base, conditional };
 };
@@ -81,11 +75,10 @@ export const getWebappHelmTemplates = (
   helmSettings: HelmSettings & { deploy_type: 'webapp' }
 ): HelmTemplateSet => {
   const base = ['_helpers.tpl', 'deployment.yaml', 'service.yaml', 'configmap.yaml'];
-  const conditional: string[] = [];
 
-  if (helmSettings.ingress) {
-    conditional.push('ingress.yaml');
-  }
+  const conditional: readonly string[] = helmSettings.ingress
+    ? ['ingress.yaml']
+    : [];
 
   return { base, conditional };
 };
@@ -124,8 +117,8 @@ export const generateServerHelmValues = (
   chartName: string,
   helmSettings: HelmServerSettings,
   serverSettings: ServerSettings
-): Record<string, unknown> => {
-  const values: Record<string, unknown> = {
+): Readonly<Record<string, unknown>> => {
+  const baseValues: Readonly<Record<string, unknown>> = {
     nodeEnv: 'development',
     image: {
       repository: chartName,
@@ -169,54 +162,62 @@ export const generateServerHelmValues = (
 
   const deployModes = helmSettings.deploy_modes ?? availableModes;
 
-  if (deployModes.length > 1) {
-    // Hybrid mode - separate config per mode
-    for (const mode of deployModes) {
-      values[mode] = {
-        enabled: true,
-        replicaCount: 1,
-        resources: {
-          limits: { cpu: '500m', memory: '512Mi' },
-          requests: { cpu: '100m', memory: '128Mi' },
-        },
-      };
-    }
-  } else {
-    // Single mode
-    values['replicaCount'] = 1;
-    values['resources'] = {
-      limits: { cpu: '500m', memory: '512Mi' },
-      requests: { cpu: '100m', memory: '128Mi' },
-    };
-  }
+  const modeValues: Readonly<Record<string, unknown>> =
+    deployModes.length > 1
+      ? // Hybrid mode - separate config per mode
+        deployModes.reduce<Readonly<Record<string, unknown>>>(
+          (acc, mode) => ({
+            ...acc,
+            [mode]: {
+              enabled: true,
+              replicaCount: 1,
+              resources: {
+                limits: { cpu: '500m', memory: '512Mi' },
+                requests: { cpu: '100m', memory: '128Mi' },
+              },
+            },
+          }),
+          {}
+        )
+      : // Single mode
+        {
+          replicaCount: 1,
+          resources: {
+            limits: { cpu: '500m', memory: '512Mi' },
+            requests: { cpu: '100m', memory: '128Mi' },
+          },
+        };
 
   // Service config if provides contracts
-  if (
+  const serviceValues: Readonly<Record<string, unknown>> =
     deployModes.includes('api') &&
     (serverSettings.provides_contracts ?? []).length > 0
-  ) {
-    values['service'] = {
-      type: 'ClusterIP',
-      port: 3000,
-    };
-  }
+      ? {
+          service: {
+            type: 'ClusterIP',
+            port: 3000,
+          },
+        }
+      : {};
 
   // Ingress config
-  if (helmSettings.ingress) {
-    values['ingress'] = {
-      enabled: true,
-      className: 'nginx',
-      hosts: [
-        {
-          host: `${chartName}.example.com`,
-          paths: [{ path: '/', pathType: 'Prefix' }],
+  const ingressValues: Readonly<Record<string, unknown>> = helmSettings.ingress
+    ? {
+        ingress: {
+          enabled: true,
+          className: 'nginx',
+          hosts: [
+            {
+              host: `${chartName}.example.com`,
+              paths: [{ path: '/', pathType: 'Prefix' }],
+            },
+          ],
+          tls: [],
         },
-      ],
-      tls: [],
-    };
-  }
+      }
+    : {};
 
-  return values;
+  return { ...baseValues, ...modeValues, ...serviceValues, ...ingressValues };
 };
 
 /**
@@ -225,8 +226,8 @@ export const generateServerHelmValues = (
 export const generateWebappHelmValues = (
   chartName: string,
   helmSettings: HelmSettings & { deploy_type: 'webapp' }
-): Record<string, unknown> => {
-  const values: Record<string, unknown> = {
+): Readonly<Record<string, unknown>> => {
+  const baseValues: Readonly<Record<string, unknown>> = {
     nodeEnv: 'development',
     replicaCount: 1,
     image: {
@@ -266,21 +267,23 @@ export const generateWebappHelmValues = (
   };
 
   // Ingress config
-  if (helmSettings.ingress) {
-    values['ingress'] = {
-      enabled: true,
-      className: 'nginx',
-      hosts: [
-        {
-          host: `${chartName}.example.com`,
-          paths: [{ path: '/', pathType: 'Prefix' }],
+  const ingressValues: Readonly<Record<string, unknown>> = helmSettings.ingress
+    ? {
+        ingress: {
+          enabled: true,
+          className: 'nginx',
+          hosts: [
+            {
+              host: `${chartName}.example.com`,
+              paths: [{ path: '/', pathType: 'Prefix' }],
+            },
+          ],
+          tls: [],
         },
-      ],
-      tls: [],
-    };
-  }
+      }
+    : {};
 
-  return values;
+  return { ...baseValues, ...ingressValues };
 };
 
 /**

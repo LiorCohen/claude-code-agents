@@ -16,15 +16,15 @@ import type {
 import { isServerComponent, isHelmComponent } from '../types/settings';
 
 /** Result of a sync operation */
-export interface SyncResult {
+export type SyncResult = {
   readonly success: boolean;
   readonly filesCreated: readonly string[];
   readonly filesUpdated: readonly string[];
   readonly errors: readonly string[];
-}
+};
 
 /** Diff between old and new settings */
-export interface SettingsDiff {
+export type SettingsDiff = {
   readonly addedComponents: readonly Component[];
   readonly removedComponents: readonly Component[];
   readonly modifiedComponents: readonly {
@@ -32,7 +32,7 @@ export interface SettingsDiff {
     readonly type: string;
     readonly changes: readonly string[];
   }[];
-}
+};
 
 /**
  * Compare two settings files and return the differences.
@@ -41,49 +41,55 @@ export const diffSettings = (
   oldSettings: SettingsFile,
   newSettings: SettingsFile
 ): SettingsDiff => {
-  const oldByKey = new Map(
+  const oldByKey: ReadonlyMap<string, Component> = new Map(
     oldSettings.components.map((c) => [`${c.type}:${c.name}`, c])
   );
-  const newByKey = new Map(
+  const newByKey: ReadonlyMap<string, Component> = new Map(
     newSettings.components.map((c) => [`${c.type}:${c.name}`, c])
   );
 
-  const addedComponents: Component[] = [];
-  const removedComponents: Component[] = [];
-  const modifiedComponents: Array<{
-    readonly name: string;
-    readonly type: string;
-    readonly changes: readonly string[];
-  }> = [];
-
   // Find added and modified components
-  for (const [key, newComp] of newByKey) {
-    const oldComp = oldByKey.get(key);
-    if (!oldComp) {
-      addedComponents.push(newComp);
-    } else {
+  const { added, modified } = Array.from(newByKey).reduce<{
+    readonly added: readonly Component[];
+    readonly modified: readonly {
+      readonly name: string;
+      readonly type: string;
+      readonly changes: readonly string[];
+    }[];
+  }>(
+    (acc, [key, newComp]) => {
+      const oldComp = oldByKey.get(key);
+      if (!oldComp) {
+        return { ...acc, added: [...acc.added, newComp] };
+      }
       const changes = diffComponentSettings(oldComp, newComp);
       if (changes.length > 0) {
-        modifiedComponents.push({
-          name: newComp.name,
-          type: newComp.type,
-          changes: changes as readonly string[],
-        });
+        return {
+          ...acc,
+          modified: [
+            ...acc.modified,
+            {
+              name: newComp.name,
+              type: newComp.type,
+              changes,
+            },
+          ],
+        };
       }
-    }
-  }
+      return acc;
+    },
+    { added: [], modified: [] }
+  );
 
   // Find removed components
-  for (const [key, oldComp] of oldByKey) {
-    if (!newByKey.has(key)) {
-      removedComponents.push(oldComp);
-    }
-  }
+  const removed = Array.from(oldByKey)
+    .filter(([key]) => !newByKey.has(key))
+    .map(([, oldComp]) => oldComp);
 
   return {
-    addedComponents: addedComponents as readonly Component[],
-    removedComponents: removedComponents as readonly Component[],
-    modifiedComponents: modifiedComponents as SettingsDiff['modifiedComponents'],
+    addedComponents: added,
+    removedComponents: removed,
+    modifiedComponents: modified,
   };
 };
 
@@ -94,25 +100,20 @@ const diffComponentSettings = (
   oldComp: Component,
   newComp: Component
 ): readonly string[] => {
-  const changes: string[] = [];
-  const oldSettings = oldComp.settings as Record<string, unknown>;
-  const newSettings = newComp.settings as Record<string, unknown>;
+  const oldSettings = oldComp.settings as Readonly<Record<string, unknown>>;
+  const newSettings = newComp.settings as Readonly<Record<string, unknown>>;
 
   // Get all keys from both
-  const allKeys = new Set([
+  const allKeys: ReadonlySet<string> = new Set([
     ...Object.keys(oldSettings),
     ...Object.keys(newSettings),
   ]);
 
-  for (const key of allKeys) {
+  return Array.from(allKeys).filter((key) => {
     const oldVal = JSON.stringify(oldSettings[key]);
     const newVal = JSON.stringify(newSettings[key]);
-    if (oldVal !== newVal) {
-      changes.push(key);
-    }
-  }
-
-  return changes;
+    return oldVal !== newVal;
+  });
 };
 
 /**
@@ -129,7 +130,7 @@ export const generateComponentPath = (
   type: ComponentType,
   name: string
 ): string => {
-  const typeDirMap: Record<ComponentType, string> = {
+  const typeDirMap: Readonly<Record<ComponentType, string>> = {
     server: 'servers',
     webapp: 'webapps',
     helm: 'helm_charts',
@@ -170,83 +171,161 @@ export const previewSync = (
   readonly filesToCreate: readonly string[];
   readonly filesToUpdate: readonly string[];
 } => {
-  const filesToCreate: string[] = [];
-  const filesToUpdate: string[] = [];
-  const descriptions: string[] = [];
-
   // Added components
-  for (const comp of diff.addedComponents) {
-    const dir = getComponentDir(comp);
-    descriptions.push(`Add ${comp.type} component "${comp.name}" at ${dir}/`);
+  const addedResult = diff.addedComponents.reduce<{
+    readonly filesToCreate: readonly string[];
+    readonly filesToUpdate: readonly string[];
+    readonly descriptions: readonly string[];
+  }>(
+    (acc, comp) => {
+      const dir = getComponentDir(comp);
+      const desc = `Add ${comp.type} component "${comp.name}" at ${dir}/`;
 
-    if (comp.type === 'server') {
-      filesToCreate.push(`${dir}/package.json`);
-      filesToCreate.push(`${dir}/src/index.ts`);
-      // Add config section
-      filesToUpdate.push('components/config/envs/default/config.yaml');
-    } else if (comp.type === 'webapp') {
-      filesToCreate.push(`${dir}/package.json`);
-      filesToCreate.push(`${dir}/src/main.tsx`);
-      filesToUpdate.push('components/config/envs/default/config.yaml');
-    } else if (comp.type === 'helm') {
-      filesToCreate.push(`${dir}/Chart.yaml`);
-      filesToCreate.push(`${dir}/values.yaml`);
-      filesToCreate.push(`${dir}/templates/deployment.yaml`);
-    }
-  }
+      if (comp.type === 'server') {
+        return {
+          descriptions: [...acc.descriptions, desc],
+          filesToCreate: [
+            ...acc.filesToCreate,
+            `${dir}/package.json`,
+            `${dir}/src/index.ts`,
+          ],
+          filesToUpdate: [
+            ...acc.filesToUpdate,
+            'components/config/envs/default/config.yaml',
+          ],
+        };
+      }
+
+      if (comp.type === 'webapp') {
+        return {
+          descriptions: [...acc.descriptions, desc],
+          filesToCreate: [
+            ...acc.filesToCreate,
+            `${dir}/package.json`,
+            `${dir}/src/main.tsx`,
+          ],
+          filesToUpdate: [
+            ...acc.filesToUpdate,
+            'components/config/envs/default/config.yaml',
+          ],
+        };
+      }
+
+      if (comp.type === 'helm') {
+        return {
+          descriptions: [...acc.descriptions, desc],
+          filesToCreate: [
+            ...acc.filesToCreate,
+            `${dir}/Chart.yaml`,
+            `${dir}/values.yaml`,
+            `${dir}/templates/deployment.yaml`,
+          ],
+          filesToUpdate: acc.filesToUpdate,
+        };
+      }
+
+      return { ...acc, descriptions: [...acc.descriptions, desc] };
+    },
+    { filesToCreate: [], filesToUpdate: [], descriptions: [] }
+  );
 
   // Modified components
-  for (const mod of diff.modifiedComponents) {
-    const comp = allComponents.find(
-      (c) => c.type === mod.type && c.name === mod.name
-    );
-    if (!comp) continue;
+  const modifiedResult = diff.modifiedComponents.reduce<{
+    readonly filesToCreate: readonly string[];
+    readonly filesToUpdate: readonly string[];
+    readonly descriptions: readonly string[];
+  }>(
+    (acc, mod) => {
+      const comp = allComponents.find(
+        (c) => c.type === mod.type && c.name === mod.name
+      );
+      if (!comp) return acc;
 
-    const dir = getComponentDir(comp);
+      const dir = getComponentDir(comp);
 
-    for (const change of mod.changes) {
-      if (isServerComponent(comp)) {
-        if (change === 'databases') {
-          descriptions.push(
-            `Update ${mod.name}: databases changed - will update DAL layer and config`
-          );
-          filesToUpdate.push('components/config/envs/default/config.yaml');
-        }
-        if (change === 'provides_contracts') {
-          descriptions.push(
-            `Update ${mod.name}: provides_contracts changed - will update routes`
-          );
-        }
-        if (change === 'consumes_contracts') {
-          descriptions.push(
-            `Update ${mod.name}: consumes_contracts changed - will update API clients`
-          );
-          filesToUpdate.push('components/config/envs/default/config.yaml');
-        }
-      }
-
-      if (isHelmComponent(comp)) {
-        if (change === 'ingress') {
-          const settings = comp.settings as HelmSettings;
-          if (settings.ingress) {
-            descriptions.push(
-              `Update ${mod.name}: ingress enabled - will add ingress.yaml`
-            );
-            filesToCreate.push(`${dir}/templates/ingress.yaml`);
-          } else {
-            descriptions.push(
-              `Update ${mod.name}: ingress disabled - ingress.yaml will be kept but disabled`
-            );
+      return mod.changes.reduce<{
+        readonly filesToCreate: readonly string[];
+        readonly filesToUpdate: readonly string[];
+        readonly descriptions: readonly string[];
+      }>((innerAcc, change) => {
+        if (isServerComponent(comp)) {
+          if (change === 'databases') {
+            return {
+              ...innerAcc,
+              descriptions: [
+                ...innerAcc.descriptions,
+                `Update ${mod.name}: databases changed - will update DAL layer and config`,
+              ],
+              filesToUpdate: [
+                ...innerAcc.filesToUpdate,
+                'components/config/envs/default/config.yaml',
+              ],
+            };
+          }
+          if (change === 'provides_contracts') {
+            return {
+              ...innerAcc,
+              descriptions: [
+                ...innerAcc.descriptions,
+                `Update ${mod.name}: provides_contracts changed - will update routes`,
+              ],
+            };
+          }
+          if (change === 'consumes_contracts') {
+            return {
+              ...innerAcc,
+              descriptions: [
+                ...innerAcc.descriptions,
+                `Update ${mod.name}: consumes_contracts changed - will update API clients`,
+              ],
+              filesToUpdate: [
+                ...innerAcc.filesToUpdate,
+                'components/config/envs/default/config.yaml',
+              ],
+            };
           }
         }
-      }
+
+        if (isHelmComponent(comp)) {
+          if (change === 'ingress') {
+            const helmSettings = comp.settings as HelmSettings;
+            if (helmSettings.ingress) {
+              return {
+                ...innerAcc,
+                descriptions: [
+                  ...innerAcc.descriptions,
+                  `Update ${mod.name}: ingress enabled - will add ingress.yaml`,
+                ],
+                filesToCreate: [
+                  ...innerAcc.filesToCreate,
+                  `${dir}/templates/ingress.yaml`,
+                ],
+              };
+            }
+            return {
+              ...innerAcc,
+              descriptions: [
+                ...innerAcc.descriptions,
+                `Update ${mod.name}: ingress disabled - ingress.yaml will be kept but disabled`,
+              ],
+            };
+          }
+        }
+
+        return innerAcc;
+      }, acc);
+    },
+    {
+      filesToCreate: addedResult.filesToCreate,
+      filesToUpdate: addedResult.filesToUpdate,
+      descriptions: addedResult.descriptions,
     }
-  }
+  );
 
   return {
-    description: descriptions.join('\n'),
-    filesToCreate: [...new Set(filesToCreate)],
-    filesToUpdate: [...new Set(filesToUpdate)],
+    description: modifiedResult.descriptions.join('\n'),
+    filesToCreate: [...new Set(modifiedResult.filesToCreate)],
+    filesToUpdate: [...new Set(modifiedResult.filesToUpdate)],
   };
 };
 
@@ -256,53 +335,61 @@ export const previewSync = (
 export const generateServerConfigSection = (
   name: string,
   settings: ServerSettings
-): Record<string, unknown> => {
-  const config: Record<string, unknown> = {
+): Readonly<Record<string, unknown>> => {
+  const baseConfig: Readonly<Record<string, unknown>> = {
     probesPort: 9090,
     logLevel: 'info',
   };
 
   // Add port if provides contracts (API server)
-  if ((settings.provides_contracts ?? []).length > 0) {
-    config['port'] = 3000;
-  }
+  const portConfig: Readonly<Record<string, unknown>> =
+    (settings.provides_contracts ?? []).length > 0
+      ? { port: 3000 }
+      : {};
 
   // Add queue config for worker
-  if (
+  const queueConfig: Readonly<Record<string, unknown>> =
     settings.server_type === 'worker' ||
     (settings.server_type === 'hybrid' && settings.modes?.includes('worker'))
-  ) {
-    config['queue'] = {
-      url: 'amqp://localhost:5672',
-    };
-  }
+      ? { queue: { url: 'amqp://localhost:5672' } }
+      : {};
 
   // Add database sections
-  if ((settings.databases ?? []).length > 0) {
-    const databases: Record<string, unknown> = {};
-    for (const db of settings.databases ?? []) {
-      databases[db] = {
-        host: 'localhost',
-        port: 5432,
-        name: name.replace(/-/g, '_'),
-        ssl: false,
-      };
-    }
-    config['databases'] = databases;
-  }
+  const databasesConfig: Readonly<Record<string, unknown>> =
+    (settings.databases ?? []).length > 0
+      ? {
+          databases: (settings.databases ?? []).reduce<Readonly<Record<string, unknown>>>(
+            (acc, db) => ({
+              ...acc,
+              [db]: {
+                host: 'localhost',
+                port: 5432,
+                name: name.replace(/-/g, '_'),
+                ssl: false,
+              },
+            }),
+            {}
+          ),
+        }
+      : {};
 
   // Add API sections for consumed contracts
-  if ((settings.consumes_contracts ?? []).length > 0) {
-    const apis: Record<string, unknown> = {};
-    for (const contract of settings.consumes_contracts ?? []) {
-      apis[contract] = {
-        base_url: `http://${contract}:3000`,
-      };
-    }
-    config['apis'] = apis;
-  }
+  const apisConfig: Readonly<Record<string, unknown>> =
+    (settings.consumes_contracts ?? []).length > 0
+      ? {
+          apis: (settings.consumes_contracts ?? []).reduce<Readonly<Record<string, unknown>>>(
+            (acc, contract) => ({
+              ...acc,
+              [contract]: {
+                base_url: `http://${contract}:3000`,
+              },
+            }),
+            {}
+          ),
+        }
+      : {};
 
-  return config;
+  return { ...baseConfig, ...portConfig, ...queueConfig, ...databasesConfig, ...apisConfig };
 };
 
 /**
@@ -311,21 +398,24 @@ export const generateServerConfigSection = (
 export const generateWebappConfigSection = (
   _name: string,
   settings: WebappSettings
-): Record<string, unknown> => {
-  const config: Record<string, unknown> = {};
-
+): Readonly<Record<string, unknown>> => {
   // Add API sections for consumed contracts
-  if ((settings.contracts ?? []).length > 0) {
-    const apis: Record<string, unknown> = {};
-    for (const contract of settings.contracts ?? []) {
-      apis[contract] = {
-        base_url: `http://localhost:3000`,
-      };
-    }
-    config['apis'] = apis;
-  }
+  const apisConfig: Readonly<Record<string, unknown>> =
+    (settings.contracts ?? []).length > 0
+      ? {
+          apis: (settings.contracts ?? []).reduce<Readonly<Record<string, unknown>>>(
+            (acc, contract) => ({
+              ...acc,
+              [contract]: {
+                base_url: `http://localhost:3000`,
+              },
+            }),
+            {}
+          ),
+        }
+      : {};
 
-  return config;
+  return { ...apisConfig };
 };
 
 /**
@@ -336,33 +426,33 @@ export const formatSyncPreview = (preview: {
   readonly filesToCreate: readonly string[];
   readonly filesToUpdate: readonly string[];
 }): string => {
-  const lines: string[] = [];
+  const changeLines: readonly string[] = preview.description
+    ? [
+        'Changes:',
+        preview.description
+          .split('\n')
+          .map((l) => `  - ${l}`)
+          .join('\n'),
+        '',
+      ]
+    : [];
 
-  if (preview.description) {
-    lines.push('Changes:');
-    lines.push(
-      preview.description
-        .split('\n')
-        .map((l) => `  - ${l}`)
-        .join('\n')
-    );
-    lines.push('');
-  }
+  const createLines: readonly string[] =
+    preview.filesToCreate.length > 0
+      ? [
+          'Files to create:',
+          ...preview.filesToCreate.map((file) => `  + ${file}`),
+          '',
+        ]
+      : [];
 
-  if (preview.filesToCreate.length > 0) {
-    lines.push('Files to create:');
-    for (const file of preview.filesToCreate) {
-      lines.push(`  + ${file}`);
-    }
-    lines.push('');
-  }
+  const updateLines: readonly string[] =
+    preview.filesToUpdate.length > 0
+      ? [
+          'Files to update:',
+          ...preview.filesToUpdate.map((file) => `  ~ ${file}`),
+        ]
+      : [];
 
-  if (preview.filesToUpdate.length > 0) {
-    lines.push('Files to update:');
-    for (const file of preview.filesToUpdate) {
-      lines.push(`  ~ ${file}`);
-    }
-  }
-
-  return lines.join('\n');
+  return [...changeLines, ...createLines, ...updateLines].join('\n');
 };

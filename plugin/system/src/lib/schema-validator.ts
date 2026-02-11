@@ -8,7 +8,7 @@
 /**
  * JSON Schema property definition.
  */
-export interface SchemaProperty {
+export type SchemaProperty = {
   readonly type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   readonly description?: string;
   readonly enum?: readonly string[];
@@ -24,7 +24,7 @@ export interface SchemaProperty {
 /**
  * JSON Schema definition for command arguments.
  */
-export interface CommandSchema {
+export type CommandSchema = {
   readonly $schema?: string;
   readonly type: 'object';
   readonly properties: Readonly<Record<string, SchemaProperty>>;
@@ -35,21 +35,30 @@ export interface CommandSchema {
 /**
  * Validation error details.
  */
-export interface ValidationError {
+export type ValidationError = {
   readonly field: string;
   readonly message: string;
   readonly expected?: string;
   readonly received?: string;
-}
+};
+
+export type PropertyValidationResult =
+  | { readonly valid: true }
+  | { readonly valid: false; readonly error: ValidationError };
 
 /**
  * Validation result.
  */
-export interface ValidationResult<T> {
-  readonly valid: boolean;
-  readonly data?: T;
-  readonly errors?: readonly ValidationError[];
-}
+export type ValidationResult<T> =
+  | { readonly valid: true; readonly data: T }
+  | { readonly valid: false; readonly errors: readonly ValidationError[] };
+
+const VALID: PropertyValidationResult = { valid: true } as const;
+
+const invalid = (error: ValidationError): PropertyValidationResult => ({
+  valid: false,
+  error,
+});
 
 /**
  * Validate a value against a schema property.
@@ -58,120 +67,118 @@ const validateProperty = (
   value: unknown,
   property: SchemaProperty,
   fieldName: string
-): ValidationError | null => {
+): PropertyValidationResult => {
   // Type check
   if (property.type === 'string') {
     if (typeof value !== 'string') {
-      return {
+      return invalid({
         field: fieldName,
         message: `Expected string, got ${typeof value}`,
         expected: 'string',
         received: typeof value,
-      };
+      });
     }
 
     // Enum check
     if (property.enum && !property.enum.includes(value)) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Invalid value. Must be one of: ${property.enum.join(', ')}`,
         expected: property.enum.join(' | '),
         received: value,
-      };
+      });
     }
 
     // Pattern check
     if (property.pattern && !new RegExp(property.pattern).test(value)) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Value does not match pattern: ${property.pattern}`,
         expected: property.pattern,
         received: value,
-      };
+      });
     }
 
     // Length checks
     if (property.minLength !== undefined && value.length < property.minLength) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Value too short. Minimum length: ${property.minLength}`,
         expected: `>= ${property.minLength} characters`,
         received: `${value.length} characters`,
-      };
+      });
     }
 
     if (property.maxLength !== undefined && value.length > property.maxLength) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Value too long. Maximum length: ${property.maxLength}`,
         expected: `<= ${property.maxLength} characters`,
         received: `${value.length} characters`,
-      };
+      });
     }
   }
 
   if (property.type === 'number') {
     if (typeof value !== 'number' || isNaN(value)) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Expected number, got ${typeof value}`,
         expected: 'number',
         received: typeof value,
-      };
+      });
     }
 
     if (property.minimum !== undefined && value < property.minimum) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Value too small. Minimum: ${property.minimum}`,
         expected: `>= ${property.minimum}`,
         received: String(value),
-      };
+      });
     }
 
     if (property.maximum !== undefined && value > property.maximum) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Value too large. Maximum: ${property.maximum}`,
         expected: `<= ${property.maximum}`,
         received: String(value),
-      };
+      });
     }
   }
 
   if (property.type === 'boolean') {
     if (typeof value !== 'boolean') {
-      return {
+      return invalid({
         field: fieldName,
         message: `Expected boolean, got ${typeof value}`,
         expected: 'boolean',
         received: typeof value,
-      };
+      });
     }
   }
 
   if (property.type === 'array') {
     if (!Array.isArray(value)) {
-      return {
+      return invalid({
         field: fieldName,
         message: `Expected array, got ${typeof value}`,
         expected: 'array',
         received: typeof value,
-      };
+      });
     }
 
     // Validate array items if schema provided
     if (property.items) {
-      for (let i = 0; i < value.length; i++) {
-        const itemError = validateProperty(value[i], property.items, `${fieldName}[${i}]`);
-        if (itemError) {
-          return itemError;
-        }
-      }
+      const itemError = (value as readonly unknown[])
+        .map((item, i) => validateProperty(item, property.items!, `${fieldName}[${i}]`))
+        .find((r) => !r.valid);
+      if (itemError) return itemError;
     }
   }
 
-  return null;
+  return VALID;
 };
 
 /**
@@ -185,49 +192,38 @@ export const validateArgs = <T>(
   args: Readonly<Record<string, unknown>>,
   schema: CommandSchema
 ): ValidationResult<T> => {
-  const errors: ValidationError[] = [];
-
   // Check required fields
-  if (schema.required) {
-    for (const field of schema.required) {
-      if (args[field] === undefined || args[field] === null || args[field] === '') {
-        const property = schema.properties[field];
-        const description = property?.description ? ` (${property.description})` : '';
-        errors.push({
-          field,
-          message: `Required field missing${description}`,
-          expected: property?.type ?? 'value',
-        });
-      }
-    }
-  }
+  const requiredErrors: readonly ValidationError[] = (schema.required ?? [])
+    .filter((field) => args[field] === undefined || args[field] === null || args[field] === '')
+    .map((field) => {
+      const property = schema.properties[field];
+      const description = property?.description ? ` (${property.description})` : '';
+      return {
+        field,
+        message: `Required field missing${description}`,
+        expected: property?.type ?? 'value',
+      };
+    });
 
   // Validate each provided field
-  for (const [field, value] of Object.entries(args)) {
+  const fieldErrors: readonly ValidationError[] = Object.entries(args).flatMap(([field, value]) => {
     const property = schema.properties[field];
 
-    // Skip unknown fields if additionalProperties is not explicitly false
+    // Unknown fields
     if (!property) {
-      if (schema.additionalProperties === false) {
-        errors.push({
-          field,
-          message: `Unknown field`,
-          received: field,
-        });
-      }
-      continue;
+      return schema.additionalProperties === false
+        ? [{ field, message: `Unknown field`, received: field }]
+        : [];
     }
 
     // Skip undefined/null values (handled by required check)
-    if (value === undefined || value === null) {
-      continue;
-    }
+    if (value === undefined || value === null) return [];
 
-    const error = validateProperty(value, property, field);
-    if (error) {
-      errors.push(error);
-    }
-  }
+    const result = validateProperty(value, property, field);
+    return result.valid ? [] : [result.error];
+  });
+
+  const errors = [...requiredErrors, ...fieldErrors];
 
   if (errors.length > 0) {
     return { valid: false, errors };
@@ -242,13 +238,11 @@ export const validateArgs = <T>(
 export const formatValidationErrors = (errors: readonly ValidationError[]): string => {
   return errors
     .map((e) => {
-      const parts = [`  ${e.field}: ${e.message}`];
-      if (e.expected) {
-        parts.push(`    Expected: ${e.expected}`);
-      }
-      if (e.received) {
-        parts.push(`    Received: ${e.received}`);
-      }
+      const parts: readonly string[] = [
+        `  ${e.field}: ${e.message}`,
+        ...(e.expected ? [`    Expected: ${e.expected}`] : []),
+        ...(e.received ? [`    Received: ${e.received}`] : []),
+      ];
       return parts.join('\n');
     })
     .join('\n');
@@ -258,34 +252,36 @@ export const formatValidationErrors = (errors: readonly ValidationError[]): stri
  * Generate help text from a schema definition.
  */
 export const generateSchemaHelp = (schema: CommandSchema, commandName: string): string => {
-  const lines: string[] = [`Usage: ${commandName} [options]`, ''];
-
-  const requiredSet = new Set(schema.required ?? []);
+  const requiredSet: ReadonlySet<string> = new Set(schema.required ?? []);
 
   // Arguments section
-  const args = Object.entries(schema.properties).filter(([key]) => requiredSet.has(key));
-  if (args.length > 0) {
-    lines.push('Arguments:');
-    for (const [key, prop] of args) {
-      const enumStr = prop.enum ? ` (${prop.enum.join('|')})` : '';
-      const desc = prop.description ?? '';
-      lines.push(`  <${key}>${enumStr}  ${desc}`);
-    }
-    lines.push('');
-  }
+  const argEntries = Object.entries(schema.properties).filter(([key]) => requiredSet.has(key));
+  const argsSection: readonly string[] = argEntries.length > 0
+    ? [
+        'Arguments:',
+        ...argEntries.map(([key, prop]) => {
+          const enumStr = prop.enum ? ` (${prop.enum.join('|')})` : '';
+          const desc = prop.description ?? '';
+          return `  <${key}>${enumStr}  ${desc}`;
+        }),
+        '',
+      ]
+    : [];
 
   // Options section
-  const opts = Object.entries(schema.properties).filter(([key]) => !requiredSet.has(key));
-  if (opts.length > 0) {
-    lines.push('Options:');
-    for (const [key, prop] of opts) {
-      const enumStr = prop.enum ? ` (${prop.enum.join('|')})` : '';
-      const defaultStr = prop.default !== undefined ? ` [default: ${prop.default}]` : '';
-      const desc = prop.description ?? '';
-      lines.push(`  --${key}${enumStr}  ${desc}${defaultStr}`);
-    }
-    lines.push('');
-  }
+  const optEntries = Object.entries(schema.properties).filter(([key]) => !requiredSet.has(key));
+  const optsSection: readonly string[] = optEntries.length > 0
+    ? [
+        'Options:',
+        ...optEntries.map(([key, prop]) => {
+          const enumStr = prop.enum ? ` (${prop.enum.join('|')})` : '';
+          const defaultStr = prop.default !== undefined ? ` [default: ${prop.default}]` : '';
+          const desc = prop.description ?? '';
+          return `  --${key}${enumStr}  ${desc}${defaultStr}`;
+        }),
+        '',
+      ]
+    : [];
 
-  return lines.join('\n');
+  return [`Usage: ${commandName} [options]`, '', ...argsSection, ...optsSection].join('\n');
 };

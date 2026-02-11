@@ -27,17 +27,17 @@ describe('validate.ts source file', () => {
     expect(content.length).toBeGreaterThan(0);
   });
 
-  it('exports SettingsValidationError interface', () => {
+  it('exports SettingsValidationError type', () => {
     const content = readFile(VALIDATE_PATH);
-    expect(content).toContain('export interface SettingsValidationError');
+    expect(content).toContain('export type SettingsValidationError =');
     expect(content).toContain('readonly component?: string');
     expect(content).toContain('readonly field?: string');
     expect(content).toContain('readonly message: string');
   });
 
-  it('exports SettingsValidationResult interface', () => {
+  it('exports SettingsValidationResult type', () => {
     const content = readFile(VALIDATE_PATH);
-    expect(content).toContain('export interface SettingsValidationResult');
+    expect(content).toContain('export type SettingsValidationResult =');
     expect(content).toContain('readonly valid: boolean');
     expect(content).toContain('readonly errors: readonly SettingsValidationError[]');
     expect(content).toContain('readonly warnings: readonly SettingsValidationError[]');

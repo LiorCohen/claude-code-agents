@@ -8,7 +8,7 @@ import { readJson, exists } from './fs';
 /**
  * SDD project configuration from .sdd/sdd-settings.yaml or package.json.
  */
-export interface SddConfig {
+export type SddConfig = {
   readonly projectName: string;
   readonly specsDir: string;
   readonly componentsDir: string;
@@ -42,22 +42,29 @@ export const getSkillsDir = (): string => {
 /**
  * Load project configuration from the target directory.
  */
-export const loadProjectConfig = async (targetDir: string): Promise<SddConfig | null> => {
+export type ConfigResult =
+  | { readonly found: true; readonly config: SddConfig }
+  | { readonly found: false };
+
+export const loadProjectConfig = async (targetDir: string): Promise<ConfigResult> => {
   const packageJsonPath = path.join(targetDir, 'package.json');
 
   if (!(await exists(packageJsonPath))) {
-    return null;
+    return { found: false };
   }
 
   try {
     const pkg = await readJson<{ name?: string }>(packageJsonPath);
     return {
-      projectName: pkg.name ?? path.basename(targetDir),
-      specsDir: path.join(targetDir, 'specs'),
-      componentsDir: path.join(targetDir, 'components'),
+      found: true,
+      config: {
+        projectName: pkg.name ?? path.basename(targetDir),
+        specsDir: path.join(targetDir, 'specs'),
+        componentsDir: path.join(targetDir, 'components'),
+      },
     };
   } catch {
-    return null;
+    return { found: false };
   }
 };
 
@@ -65,18 +72,23 @@ export const loadProjectConfig = async (targetDir: string): Promise<SddConfig | 
  * Find the project root by looking for package.json or .sdd/sdd-settings.yaml.
  * Checks .sdd/sdd-settings.yaml first (new location), then falls back to legacy root location.
  */
-export const findProjectRoot = async (startDir: string = process.cwd()): Promise<string | null> => {
-  let currentDir = startDir;
-  const root = path.parse(currentDir).root;
+export type ProjectRootResult =
+  | { readonly found: true; readonly path: string }
+  | { readonly found: false };
 
-  while (currentDir !== root) {
-    const packageJsonPath = path.join(currentDir, 'package.json');
-    const sddSettingsPath = path.join(currentDir, '.sdd', 'sdd-settings.yaml');
-    const legacySettingsPath = path.join(currentDir, 'sdd-settings.yaml');
+export const findProjectRoot = async (startDir: string = process.cwd()): Promise<ProjectRootResult> => {
+  const root = path.parse(startDir).root;
+
+  const search = async (dir: string): Promise<ProjectRootResult> => {
+    if (dir === root) return { found: false };
+
+    const packageJsonPath = path.join(dir, 'package.json');
+    const sddSettingsPath = path.join(dir, '.sdd', 'sdd-settings.yaml');
+    const legacySettingsPath = path.join(dir, 'sdd-settings.yaml');
 
     // Check package.json or new .sdd/ location
     if ((await exists(packageJsonPath)) || (await exists(sddSettingsPath))) {
-      return currentDir;
+      return { found: true, path: dir };
     }
 
     // Legacy fallback: sdd-settings.yaml at project root
@@ -85,11 +97,11 @@ export const findProjectRoot = async (startDir: string = process.cwd()): Promise
         '[SDD] Deprecation warning: sdd-settings.yaml at project root is deprecated. ' +
           'Move it to .sdd/sdd-settings.yaml: mkdir -p .sdd && mv sdd-settings.yaml .sdd/'
       );
-      return currentDir;
+      return { found: true, path: dir };
     }
 
-    currentDir = path.dirname(currentDir);
-  }
+    return search(path.dirname(dir));
+  };
 
-  return null;
+  return search(startDir);
 };

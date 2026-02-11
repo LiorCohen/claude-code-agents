@@ -85,31 +85,34 @@ export const readJson = async <T>(filePath: string): Promise<T> => {
 /**
  * Write text to a file, creating parent directories if needed.
  */
-export const writeText = async (filePath: string, content: string): Promise<void> => {
+export const writeText = async (filePath: string, content: string): Promise<string> => {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, content);
+  return filePath;
 };
 
 /**
  * Write JSON to a file, creating parent directories if needed.
  */
-export const writeJson = async (filePath: string, data: unknown): Promise<void> => {
-  await writeText(filePath, JSON.stringify(data, null, 2) + '\n');
+export const writeJson = async (filePath: string, data: unknown): Promise<string> => {
+  return writeText(filePath, JSON.stringify(data, null, 2) + '\n');
 };
 
 /**
  * Copy a file, creating parent directories if needed.
  */
-export const copyFile = async (src: string, dest: string): Promise<void> => {
+export const copyFile = async (src: string, dest: string): Promise<string> => {
   await fs.mkdir(path.dirname(dest), { recursive: true });
   await fs.copyFile(src, dest);
+  return dest;
 };
 
 /**
  * Ensure a directory exists.
  */
-export const ensureDir = async (dirPath: string): Promise<void> => {
+export const ensureDir = async (dirPath: string): Promise<string> => {
   await fs.mkdir(dirPath, { recursive: true });
+  return dirPath;
 };
 
 /**

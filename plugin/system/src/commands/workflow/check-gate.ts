@@ -49,45 +49,46 @@ const hasStaleDepdendencies = (item: WorkflowItem): boolean => item.spec_status 
 /**
  * Flatten hierarchical items (extract children from epics).
  */
-const flattenItems = (items: readonly WorkflowItem[]): readonly WorkflowItem[] => {
-  const result: WorkflowItem[] = [];
-
-  const processItem = (item: WorkflowItem & { children?: readonly WorkflowItem[] }): void => {
-    if (item.type === 'epic' && item.children) {
-      item.children.forEach(processItem);
-    } else {
-      result.push(item);
-    }
-  };
-
-  items.forEach(processItem);
-  return result;
-};
+const flattenItems = (items: readonly WorkflowItem[]): readonly WorkflowItem[] =>
+  items.flatMap((item: WorkflowItem & { children?: readonly WorkflowItem[] }) =>
+    item.type === 'epic' && item.children
+      ? flattenItems(item.children)
+      : [item]
+  );
 
 /**
  * Check phase gate for plan phase (all specs must be approved).
  */
 const checkPlanGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
   const flatItems = flattenItems(items);
-  const blockingItems: BlockingItem[] = [];
-
-  for (const item of flatItems) {
-    if (hasStaleDepdendencies(item)) {
-      blockingItems.push({
-        change_id: item.change_id,
-        title: item.title,
-        current_status: item.spec_status,
-        reason: 'Spec needs re-review (upstream dependency changed)',
-      });
-    } else if (!isSpecApproved(item)) {
-      blockingItems.push({
-        change_id: item.change_id,
-        title: item.title,
-        current_status: item.spec_status,
-        reason: `Spec not approved (status: ${item.spec_status})`,
-      });
-    }
-  }
+  const blockingItems: readonly BlockingItem[] = flatItems.reduce<readonly BlockingItem[]>(
+    (acc, item) => {
+      if (hasStaleDepdendencies(item)) {
+        return [
+          ...acc,
+          {
+            change_id: item.change_id,
+            title: item.title,
+            current_status: item.spec_status,
+            reason: 'Spec needs re-review (upstream dependency changed)',
+          },
+        ];
+      }
+      if (!isSpecApproved(item)) {
+        return [
+          ...acc,
+          {
+            change_id: item.change_id,
+            title: item.title,
+            current_status: item.spec_status,
+            reason: `Spec not approved (status: ${item.spec_status})`,
+          },
+        ];
+      }
+      return acc;
+    },
+    []
+  );
 
   if (blockingItems.length > 0) {
     return {
@@ -109,18 +110,21 @@ const checkPlanGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
  */
 const checkImplementGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
   const flatItems = flattenItems(items);
-  const blockingItems: BlockingItem[] = [];
-
-  for (const item of flatItems) {
-    if (!isPlanApproved(item)) {
-      blockingItems.push({
-        change_id: item.change_id,
-        title: item.title,
-        current_status: item.plan_status,
-        reason: `Plan not approved (status: ${item.plan_status})`,
-      });
-    }
-  }
+  const blockingItems: readonly BlockingItem[] = flatItems.reduce<readonly BlockingItem[]>(
+    (acc, item) =>
+      !isPlanApproved(item)
+        ? [
+            ...acc,
+            {
+              change_id: item.change_id,
+              title: item.title,
+              current_status: item.plan_status,
+              reason: `Plan not approved (status: ${item.plan_status})`,
+            },
+          ]
+        : acc,
+    []
+  );
 
   if (blockingItems.length > 0) {
     return {
@@ -142,18 +146,21 @@ const checkImplementGate = (items: readonly WorkflowItem[]): PhaseGateResult => 
  */
 const checkReviewGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
   const flatItems = flattenItems(items);
-  const blockingItems: BlockingItem[] = [];
-
-  for (const item of flatItems) {
-    if (!isImplComplete(item)) {
-      blockingItems.push({
-        change_id: item.change_id,
-        title: item.title,
-        current_status: item.impl_status,
-        reason: `Implementation not complete (status: ${item.impl_status})`,
-      });
-    }
-  }
+  const blockingItems: readonly BlockingItem[] = flatItems.reduce<readonly BlockingItem[]>(
+    (acc, item) =>
+      !isImplComplete(item)
+        ? [
+            ...acc,
+            {
+              change_id: item.change_id,
+              title: item.title,
+              current_status: item.impl_status,
+              reason: `Implementation not complete (status: ${item.impl_status})`,
+            },
+          ]
+        : acc,
+    []
+  );
 
   if (blockingItems.length > 0) {
     return {
@@ -175,18 +182,21 @@ const checkReviewGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
  */
 const checkCompletionGate = (items: readonly WorkflowItem[]): PhaseGateResult => {
   const flatItems = flattenItems(items);
-  const blockingItems: BlockingItem[] = [];
-
-  for (const item of flatItems) {
-    if (!isReviewApproved(item)) {
-      blockingItems.push({
-        change_id: item.change_id,
-        title: item.title,
-        current_status: item.review_status,
-        reason: `Review not approved (status: ${item.review_status})`,
-      });
-    }
-  }
+  const blockingItems: readonly BlockingItem[] = flatItems.reduce<readonly BlockingItem[]>(
+    (acc, item) =>
+      !isReviewApproved(item)
+        ? [
+            ...acc,
+            {
+              change_id: item.change_id,
+              title: item.title,
+              current_status: item.review_status,
+              reason: `Review not approved (status: ${item.review_status})`,
+            },
+          ]
+        : acc,
+    []
+  );
 
   if (blockingItems.length > 0) {
     return {

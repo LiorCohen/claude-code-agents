@@ -6,13 +6,13 @@ export const DEFAULT_CLUSTER_NAME = 'sdd-local';
 
 export type ClusterProvider = 'kind' | 'minikube' | 'docker-desktop';
 
-export interface EnvironmentConfig {
+export type EnvironmentConfig = {
   readonly clusterName: string;
   readonly provider: ClusterProvider;
   readonly namespace: string;
 }
 
-export interface InfrastructureConfig {
+export type InfrastructureConfig = {
   readonly metricsEnabled: boolean;
   readonly logsEnabled: boolean;
   readonly metricsRetention: string;
@@ -31,10 +31,10 @@ export const DEFAULT_INFRA_CONFIG: InfrastructureConfig = {
  */
 export interface ClusterProviderOps {
   readonly name: ClusterProvider;
-  readonly create: (clusterName: string) => Promise<void>;
-  readonly destroy: (clusterName: string) => Promise<void>;
-  readonly start: (clusterName: string) => Promise<void>;
-  readonly stop: (clusterName: string) => Promise<void>;
+  readonly create: (clusterName: string) => Promise<string>;
+  readonly destroy: (clusterName: string) => Promise<string>;
+  readonly start: (clusterName: string) => Promise<string>;
+  readonly stop: (clusterName: string) => Promise<string>;
   readonly exists: (clusterName: string) => Promise<boolean>;
   readonly isRunning: (clusterName: string) => Promise<boolean>;
 }

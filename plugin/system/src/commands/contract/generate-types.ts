@@ -21,13 +21,14 @@ export const generateTypes = async (
   const { named } = parseNamedArgs(args);
 
   // Find project root
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const projectRootResult = await findProjectRoot();
+  if (!projectRootResult.found) {
     return {
       success: false,
       error: 'Could not find project root (no package.json found)',
     };
   }
+  const projectRoot = projectRootResult.path;
 
   // Find component directory
   const componentDir = path.join(projectRoot, 'components', componentName);

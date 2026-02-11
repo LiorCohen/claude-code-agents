@@ -14,7 +14,7 @@ import * as yaml from 'yaml';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
 
-interface SddSettings {
+type SddSettings = {
   readonly name?: string;
   readonly components?: ReadonlyArray<{
     readonly name: string;
@@ -30,7 +30,7 @@ interface SddSettings {
   }>;
 }
 
-interface LocalConfigUrls {
+type LocalConfigUrls = {
   readonly databases: Readonly<Record<string, { host: string; port: number }>>;
   readonly services: Readonly<Record<string, string>>;
 }
@@ -39,10 +39,11 @@ export const config = async (
   _args: readonly string[],
   _options: GlobalOptions
 ): Promise<CommandResult> => {
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const rootResult = await findProjectRoot();
+  if (!rootResult.found) {
     return { success: false, error: 'Could not find project root (no package.json found)' };
   }
+  const projectRoot = rootResult.path;
 
   const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
   const localEnvDir = path.join(projectRoot, 'components', 'config', 'envs', 'local');
@@ -62,61 +63,61 @@ export const config = async (
     const helmComponents = settings.components?.filter((c) => c.type === 'helm') ?? [];
 
     // Build local URLs based on port forward assignments
-    const urls: LocalConfigUrls = {
-      databases: {},
-      services: {},
-    };
 
     // Database URLs (ports start at 5432)
-    let dbPort = 5432;
-    const dbMutable: Record<string, { host: string; port: number }> = {};
-    for (const db of databaseComponents) {
-      dbMutable[db.name] = {
-        host: 'localhost',
-        port: dbPort++,
-      };
-    }
-    urls.databases satisfies typeof urls.databases;
-    Object.assign(urls, { databases: dbMutable });
+    const databases: Readonly<Record<string, { host: string; port: number }>> =
+      Object.fromEntries(
+        databaseComponents.map((db, index) => [
+          db.name,
+          { host: 'localhost', port: 5432 + index },
+        ])
+      );
 
     // Service URLs (ports start at 8080)
-    let servicePort = 8080;
-    const svcMutable: Record<string, string> = {};
-    for (const component of helmComponents) {
-      const helmSettings = component.settings;
-      if (helmSettings?.deploy_type === 'server' || helmSettings?.deploy_type === 'webapp') {
-        const serviceName = helmSettings.deploys ?? component.name;
-        svcMutable[serviceName] = `http://localhost:${servicePort++}`;
-      }
-    }
-    Object.assign(urls, { services: svcMutable });
+    const services: Readonly<Record<string, string>> = Object.fromEntries(
+      helmComponents
+        .filter((component) => {
+          const helmSettings = component.settings;
+          return helmSettings?.deploy_type === 'server' || helmSettings?.deploy_type === 'webapp';
+        })
+        .map((component, index) => {
+          const serviceName = component.settings?.deploys ?? component.name;
+          return [serviceName, `http://localhost:${8080 + index}`];
+        })
+    );
+
+    const urls: LocalConfigUrls = { databases, services };
 
     // Build the local config overlay
-    const localConfig: Record<string, unknown> = {};
+    const dbEntries: ReadonlyArray<readonly [string, unknown]> = Object.entries(urls.databases).map(
+      ([dbName, dbConfig]) => {
+        const db = databaseComponents.find((c) => c.name === dbName);
+        const dbSettings = db?.settings ?? {};
+        return [
+          dbName,
+          {
+            host: dbConfig.host,
+            port: dbConfig.port,
+            database: dbSettings.database ?? dbName.replace(/-/g, '_'),
+            user: dbSettings.user ?? 'postgres',
+            password: dbSettings.password ?? 'postgres',
+          },
+        ] as const;
+      }
+    );
 
-    // Add database connection strings
-    for (const [dbName, dbConfig] of Object.entries(urls.databases)) {
-      const db = databaseComponents.find((c) => c.name === dbName);
-      const dbSettings = db?.settings ?? {};
-      localConfig[dbName] = {
-        host: dbConfig.host,
-        port: dbConfig.port,
-        database: dbSettings.database ?? dbName.replace(/-/g, '_'),
-        user: dbSettings.user ?? 'postgres',
-        password: dbSettings.password ?? 'postgres',
-      };
-    }
+    const svcEntries: ReadonlyArray<readonly [string, unknown]> = Object.entries(urls.services).map(
+      ([serviceName, url]) => [serviceName, { url }] as const
+    );
 
-    // Add service URLs
-    for (const [serviceName, url] of Object.entries(urls.services)) {
-      localConfig[serviceName] = { url };
-    }
-
-    // Add telemetry URLs
-    localConfig['telemetry'] = {
-      metrics_url: 'http://localhost:9090',
-      logs_url: 'http://localhost:9428',
-    };
+    const localConfig: Readonly<Record<string, unknown>> = Object.fromEntries([
+      ...dbEntries,
+      ...svcEntries,
+      ['telemetry', {
+        metrics_url: 'http://localhost:9090',
+        logs_url: 'http://localhost:9428',
+      }],
+    ]);
 
     // Ensure directory exists
     if (!fs.existsSync(localEnvDir)) {

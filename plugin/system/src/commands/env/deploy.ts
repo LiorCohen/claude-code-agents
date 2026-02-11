@@ -18,7 +18,7 @@ import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
 
-interface SddSettings {
+type SddSettings = {
   readonly name?: string;
   readonly components?: ReadonlyArray<{
     readonly name: string;
@@ -36,13 +36,15 @@ interface SddSettings {
 
 /**
  * Wait for database pod to be ready.
+ * Returns the release name that was waited on.
  */
-const waitForDatabase = async (releaseName: string, namespace: string): Promise<void> => {
+const waitForDatabase = async (releaseName: string, namespace: string): Promise<string> => {
   console.log(`  Waiting for ${releaseName} to be ready...`);
   execSync(
     `kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=${releaseName} -n ${namespace} --timeout=120s`,
     { stdio: 'inherit' }
   );
+  return releaseName;
 };
 
 /**
@@ -79,13 +81,14 @@ export const deploy = async (
   const specificChart = positional[0]; // Optional: deploy specific chart only
 
   // Find project root
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const rootResult = await findProjectRoot();
+  if (!rootResult.found) {
     return {
       success: false,
       error: 'Could not find project root (no package.json found)',
     };
   }
+  const projectRoot = rootResult.path;
 
   const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
   const helmChartsDir = path.join(projectRoot, 'components', 'helm_charts');
@@ -130,35 +133,42 @@ export const deploy = async (
     });
 
     // Step 1: Set up databases (unless --skip-db)
-    const deployedDbs: string[] = [];
-    if (!skipDb && databaseComponents.length > 0) {
-      console.log('\n=== Setting up databases ===\n');
-      for (const db of databaseComponents) {
-        console.log(`Setting up database: ${db.name}...`);
-        try {
-          // Call existing database setup command
-          const { setup } = await import('../database/setup');
-          const result = await setup(db.name, [`--namespace=${namespace}`]);
-          if (result.success) {
-            deployedDbs.push(db.name);
-            // Wait for database pod to be ready before continuing
-            await waitForDatabase(`${db.name}-db`, namespace);
-          } else {
-            console.warn(`Warning: Database ${db.name} setup failed: ${result.error}`);
-          }
-        } catch (err) {
-          console.warn(`Warning: Database ${db.name} setup failed: ${String(err)}`);
-        }
+    const deployedDbs: ReadonlyArray<string> = await (async () => {
+      if (skipDb || databaseComponents.length === 0) {
+        return [];
       }
 
-      // Step 2: Run migrations (unless --skip-migrate)
-      // Requires port-forward to each database
-      if (!skipMigrate && deployedDbs.length > 0) {
-        console.log('\n=== Running migrations ===\n');
-        let dbPort = 5432;
-        for (const dbName of deployedDbs) {
+      console.log('\n=== Setting up databases ===\n');
+      const results = await Promise.all(
+        databaseComponents.map(async (db) => {
+          console.log(`Setting up database: ${db.name}...`);
+          try {
+            // Call existing database setup command
+            const { setup } = await import('../database/setup');
+            const result = await setup(db.name, [`--namespace=${namespace}`]);
+            if (result.success) {
+              // Wait for database pod to be ready before continuing
+              await waitForDatabase(`${db.name}-db`, namespace);
+              return db.name;
+            }
+            console.warn(`Warning: Database ${db.name} setup failed: ${result.error}`);
+            return undefined;
+          } catch (err) {
+            console.warn(`Warning: Database ${db.name} setup failed: ${String(err)}`);
+            return undefined;
+          }
+        })
+      );
+      return results.filter((name): name is string => name !== undefined);
+    })();
+
+    // Step 2: Run migrations (unless --skip-migrate)
+    if (!skipMigrate && deployedDbs.length > 0) {
+      console.log('\n=== Running migrations ===\n');
+      await Promise.all(
+        deployedDbs.map(async (dbName, index) => {
           console.log(`Migrating database: ${dbName}...`);
-          const localPort = dbPort++;
+          const localPort = 5432 + index;
           const serviceName = `${dbName}-db-postgresql`;
 
           try {
@@ -176,8 +186,8 @@ export const deploy = async (
           } catch (err) {
             console.warn(`Warning: Migration for ${dbName} failed: ${String(err)}`);
           }
-        }
-      }
+        })
+      );
     }
 
     // Step 3: Deploy helm charts
@@ -219,14 +229,17 @@ export const deploy = async (
     }
 
     // Deploy each helm chart
-    const deployedCharts: string[] = [];
-    if (toDeploy.length > 0) {
+    const deployedCharts: ReadonlyArray<string> = (() => {
+      if (toDeploy.length === 0) {
+        return [];
+      }
+
       console.log('\n=== Deploying helm charts ===\n');
-      for (const component of toDeploy) {
+      return toDeploy.reduce<ReadonlyArray<string>>((acc, component) => {
         const chartPath = path.join(helmChartsDir, component.name);
         if (!fs.existsSync(chartPath)) {
           console.warn(`Warning: Chart directory not found: ${chartPath}`);
-          continue;
+          return acc;
         }
 
         console.log(`Deploying ${component.name}...`);
@@ -236,9 +249,9 @@ export const deploy = async (
             --wait --timeout 5m`,
           { stdio: 'inherit' }
         );
-        deployedCharts.push(component.name);
-      }
-    }
+        return [...acc, component.name];
+      }, []);
+    })();
 
     // Step 4: Generate local config (unless --with-config=false)
     if (withConfig) {
@@ -247,13 +260,14 @@ export const deploy = async (
       await config([], options);
     }
 
-    const summary: string[] = [];
-    if (deployedDbs.length > 0) {
-      summary.push(`${deployedDbs.length} database(s): ${deployedDbs.join(', ')}`);
-    }
-    if (deployedCharts.length > 0) {
-      summary.push(`${deployedCharts.length} chart(s): ${deployedCharts.join(', ')}`);
-    }
+    const summary: ReadonlyArray<string> = [
+      ...(deployedDbs.length > 0
+        ? [`${deployedDbs.length} database(s): ${deployedDbs.join(', ')}`]
+        : []),
+      ...(deployedCharts.length > 0
+        ? [`${deployedCharts.length} chart(s): ${deployedCharts.join(', ')}`]
+        : []),
+    ];
 
     return {
       success: true,

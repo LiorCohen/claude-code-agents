@@ -21,13 +21,15 @@ export const migrate = async (
   const { named } = parseNamedArgs(args);
 
   // Find project root
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const projectRootResult = await findProjectRoot();
+  if (!projectRootResult.found) {
     return {
       success: false,
       error: 'Could not find project root (no package.json found)',
     };
   }
+
+  const projectRoot = projectRootResult.path;
 
   // Find component directory
   const componentDir = path.join(projectRoot, 'components', componentName);
@@ -81,30 +83,41 @@ export const migrate = async (
   }
 
   console.log('Running migrations...');
-  const migrationsRun: string[] = [];
 
-  try {
-    for (const migrationFile of migrationFiles) {
-      const fileName = path.basename(migrationFile);
-      console.log(`  ${fileName}`);
+  const runMigrations = (
+    files: ReadonlyArray<string>,
+    completed: ReadonlyArray<string>
+  ): { readonly completed: ReadonlyArray<string>; readonly error?: string } => {
+    const migrationFile = files[0];
+    if (migrationFile === undefined) return { completed };
+    const rest = files.slice(1);
+    const fileName = path.basename(migrationFile);
+    console.log(`  ${fileName}`);
+    try {
       execSync(`psql -f "${migrationFile}"`, { stdio: 'inherit', env });
-      migrationsRun.push(fileName);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      return { completed, error: errorMessage };
     }
+    return runMigrations(rest, [...completed, fileName]);
+  };
 
-    console.log('');
-    console.log('Migrations complete');
+  const result = runMigrations(migrationFiles, []);
 
-    return {
-      success: true,
-      message: `Ran ${migrationsRun.length} migrations`,
-      data: { migrationsRun },
-    };
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
+  if (result.error) {
     return {
       success: false,
-      error: `Migration failed: ${errorMessage}`,
-      data: { migrationsRun },
+      error: `Migration failed: ${result.error}`,
+      data: { migrationsRun: result.completed },
     };
   }
+
+  console.log('');
+  console.log('Migrations complete');
+
+  return {
+    success: true,
+    message: `Ran ${result.completed.length} migrations`,
+    data: { migrationsRun: result.completed },
+  };
 };

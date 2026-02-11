@@ -77,7 +77,8 @@ export const create = async (
     if (!skipInfra) {
       // Install infrastructure stack
       console.log('Installing observability infrastructure...');
-      await installInfrastructure();
+      const infraResult = await installInfrastructure();
+      console.log(infraResult);
     }
 
     return {
@@ -91,7 +92,11 @@ export const create = async (
   }
 };
 
-const installInfrastructure = async (): Promise<void> => {
+/**
+ * Install observability infrastructure.
+ * Returns a summary of installed components.
+ */
+const installInfrastructure = async (): Promise<string> => {
   // Add helm repos
   execSync('helm repo add vm https://victoriametrics.github.io/helm-charts/', { stdio: 'inherit' });
   execSync('helm repo update', { stdio: 'inherit' });
@@ -132,4 +137,6 @@ const installInfrastructure = async (): Promise<void> => {
       --wait --timeout 2m`,
     { stdio: 'inherit' }
   );
+
+  return 'Infrastructure installed: victoria-metrics, victoria-logs, log-collector';
 };

@@ -2,12 +2,12 @@
  * Type definitions for spec-related operations.
  */
 
-export interface ValidationError {
+export type ValidationError = {
   readonly file: string;
   readonly message: string;
 }
 
-export interface SpecEntry {
+export type SpecEntry = {
   readonly title: string;
   readonly type: string;
   readonly path: string;
@@ -18,7 +18,7 @@ export interface SpecEntry {
   readonly spec_type?: SpecType;
 }
 
-export interface ActiveSpec {
+export type ActiveSpec = {
   readonly title: string;
   readonly path: string;
   readonly domain: string;
@@ -27,10 +27,10 @@ export interface ActiveSpec {
 }
 
 // Spec types: product specs (external, WHAT/WHY) vs tech specs (internal, HOW)
-export type SpecType = 'product' | 'tech';
+export type SpecType = (typeof VALID_SPEC_TYPES)[number];
 
 // Change types for tech specs
-export type ChangeType = 'feature' | 'bugfix' | 'refactor' | 'epic';
+export type ChangeType = (typeof VALID_CHANGE_TYPES)[number];
 
 // Required fields vary by spec_type
 export const PRODUCT_SPEC_REQUIRED_FIELDS = [

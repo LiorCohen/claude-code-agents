@@ -3,17 +3,18 @@
  */
 
 import { walkDir, readText, isDirectory } from './fs';
-import { parseFrontmatter, type Frontmatter } from './frontmatter';
+import { parseFrontmatter } from './frontmatter';
+import type { Frontmatter } from './frontmatter';
 import * as path from 'node:path';
 
 export const EXCLUDED_FILES = ['INDEX.md', 'SNAPSHOT.md', 'glossary.md'] as const;
 
-export interface SpecFile {
+export type SpecFile = {
   readonly path: string;
   readonly relativePath: string;
   readonly content: string;
-  readonly frontmatter: Frontmatter | null;
-}
+  readonly frontmatter?: Frontmatter;
+};
 
 /**
  * Check if a file should be excluded from spec processing.
@@ -31,11 +32,12 @@ export const findSpecFiles = async (specsDir: string): Promise<readonly SpecFile
     .filter((filePath) => !isExcludedFile(path.basename(filePath)))
     .map(async (filePath): Promise<SpecFile> => {
       const content = await readText(filePath);
+      const fmResult = parseFrontmatter(content);
       return {
         path: filePath,
         relativePath: path.relative(specsDir, filePath),
         content,
-        frontmatter: parseFrontmatter(content),
+        ...(fmResult.found ? { frontmatter: fmResult.data } : {}),
       };
     });
 

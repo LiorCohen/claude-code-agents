@@ -2,13 +2,13 @@
  * Type definitions for component-related operations.
  */
 
-export interface ComponentEntry {
+export type ComponentEntry = {
   readonly type: string;
   readonly name: string;
   readonly depends_on?: readonly string[];
 }
 
-export interface ScaffoldingConfig {
+export type ScaffoldingConfig = {
   readonly project_name: string;
   readonly project_description: string;
   readonly primary_domain: string;
@@ -17,7 +17,7 @@ export interface ScaffoldingConfig {
   readonly skills_dir: string;
 }
 
-export interface ScaffoldingResult {
+export type ScaffoldingResult = {
   readonly success: boolean;
   readonly target_dir: string;
   readonly created_dirs: number;
@@ -26,7 +26,7 @@ export interface ScaffoldingResult {
   readonly error?: string;
 }
 
-export interface DomainConfig {
+export type DomainConfig = {
   readonly target_dir: string;
   readonly primary_domain: string;
   readonly product_description: string;
@@ -35,12 +35,12 @@ export interface DomainConfig {
   readonly domain_entities: readonly string[];
 }
 
-export interface UserPersona {
+export type UserPersona = {
   readonly type: string;
   readonly actions: string;
 }
 
-export interface PopulationResult {
+export type PopulationResult = {
   readonly success: boolean;
   readonly files_updated: readonly string[];
   readonly entity_definitions_created: number;
