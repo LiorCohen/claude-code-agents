@@ -19,14 +19,21 @@ type BumpType = (typeof BUMP_TYPES)[number];
 /**
  * Parse a version string into components.
  */
-const parseVersion = (version: string): VersionInfo | null => {
+type ParseVersionResult =
+  | { readonly parsed: true; readonly version: VersionInfo }
+  | { readonly parsed: false };
+
+const parseVersion = (version: string): ParseVersionResult => {
   const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  if (!match) return null;
+  if (!match) return { parsed: false };
 
   return {
-    major: parseInt(match[1] ?? '0', 10),
-    minor: parseInt(match[2] ?? '0', 10),
-    patch: parseInt(match[3] ?? '0', 10),
+    parsed: true,
+    version: {
+      major: parseInt(match[1] ?? '0', 10),
+      minor: parseInt(match[2] ?? '0', 10),
+      patch: parseInt(match[3] ?? '0', 10),
+    },
   };
 };
 
@@ -93,8 +100,8 @@ export const bumpVersion = async (args: readonly string[]): Promise<CommandResul
     };
   }
 
-  const parsed = parseVersion(currentVersion);
-  if (!parsed) {
+  const parseResult = parseVersion(currentVersion);
+  if (!parseResult.parsed) {
     return {
       success: false,
       error: `Invalid version format: ${currentVersion}`,
@@ -102,7 +109,7 @@ export const bumpVersion = async (args: readonly string[]): Promise<CommandResul
   }
 
   // Calculate new version
-  const newVersionInfo = bumpVersionNumber(parsed, bumpType as BumpType);
+  const newVersionInfo = bumpVersionNumber(parseResult.version, bumpType as BumpType);
   const newVersion = formatVersion(newVersionInfo);
 
   console.log(`Current version: ${currentVersion}`);

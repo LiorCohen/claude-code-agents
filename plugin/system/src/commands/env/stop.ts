@@ -21,7 +21,8 @@ export const stop = async (
 
   // Get provider from persisted state (or explicit override)
   const explicitProvider = named['provider'] as ClusterProvider | undefined;
-  const providerName = explicitProvider ?? getClusterProvider(clusterName);
+  const providerResult = getClusterProvider(clusterName);
+  const providerName = explicitProvider ?? (providerResult.found ? providerResult.provider : undefined);
 
   if (!providerName) {
     return {

@@ -27,10 +27,10 @@ export type ActiveSpec = {
 }
 
 // Spec types: product specs (external, WHAT/WHY) vs tech specs (internal, HOW)
-export type SpecType = 'product' | 'tech';
+export type SpecType = (typeof VALID_SPEC_TYPES)[number];
 
 // Change types for tech specs
-export type ChangeType = 'feature' | 'bugfix' | 'refactor' | 'epic';
+export type ChangeType = (typeof VALID_CHANGE_TYPES)[number];
 
 // Required fields vary by spec_type
 export const PRODUCT_SPEC_REQUIRED_FIELDS = [

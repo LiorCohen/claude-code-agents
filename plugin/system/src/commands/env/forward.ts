@@ -15,7 +15,7 @@ import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
 
-interface SddSettings {
+type SddSettings = {
   readonly name?: string;
   readonly components?: ReadonlyArray<{
     readonly name: string;
@@ -28,7 +28,7 @@ interface SddSettings {
   }>;
 }
 
-interface ForwardConfig {
+type ForwardConfig = {
   readonly service: string;
   readonly namespace: string;
   readonly localPort: number;
@@ -52,10 +52,11 @@ export const forward = async (
     }
 
     // action === 'start' - read settings and start port forwards
-    const projectRoot = await findProjectRoot();
-    if (!projectRoot) {
+    const rootResult = await findProjectRoot();
+    if (!rootResult.found) {
       return { success: false, error: 'Could not find project root (no package.json found)' };
     }
+    const projectRoot = rootResult.path;
 
     const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
     if (!fs.existsSync(settingsPath)) {
@@ -81,46 +82,52 @@ export const forward = async (
     const helmComponents = settings.components?.filter((c) => c.type === 'helm') ?? [];
 
     // Build forward configs
-    const forwards: ForwardConfig[] = [];
 
     // Database forwards (for hybrid local development)
     // Service name follows setup.ts convention: ${componentName}-db-postgresql
-    let dbPort = 5432;
-    for (const db of databaseComponents) {
-      forwards.push({
-        service: `${db.name}-db-postgresql`, // bitnami chart service name
-        namespace,
-        localPort: dbPort++,
-        remotePort: 5432,
-      });
-    }
+    const dbForwards: ReadonlyArray<ForwardConfig> = databaseComponents.map((db, index) => ({
+      service: `${db.name}-db-postgresql`, // bitnami chart service name
+      namespace,
+      localPort: 5432 + index,
+      remotePort: 5432,
+    }));
 
     // Helm service forwards
-    let nextPort = 8080;
-    for (const component of helmComponents) {
-      const helmSettings = component.settings;
-      if (helmSettings?.deploy_type === 'server' && helmSettings?.ingress) {
-        // API servers get port forward
-        forwards.push({
-          service: component.name,
-          namespace,
-          localPort: nextPort++,
-          remotePort: 3000,
-        });
-      }
-      if (helmSettings?.deploy_type === 'webapp' && helmSettings?.ingress) {
-        // Webapps get port forward
-        forwards.push({
-          service: component.name,
-          namespace,
-          localPort: nextPort++,
-          remotePort: 80,
-        });
-      }
-    }
+    const helmForwards: ReadonlyArray<ForwardConfig> = helmComponents.reduce<ReadonlyArray<ForwardConfig>>(
+      (acc, component) => {
+        const helmSettings = component.settings;
+        const nextPort = 8080 + acc.length;
+        if (helmSettings?.deploy_type === 'server' && helmSettings?.ingress) {
+          // API servers get port forward
+          return [
+            ...acc,
+            {
+              service: component.name,
+              namespace,
+              localPort: nextPort,
+              remotePort: 3000,
+            },
+          ];
+        }
+        if (helmSettings?.deploy_type === 'webapp' && helmSettings?.ingress) {
+          // Webapps get port forward
+          return [
+            ...acc,
+            {
+              service: component.name,
+              namespace,
+              localPort: nextPort,
+              remotePort: 80,
+            },
+          ];
+        }
+        return acc;
+      },
+      []
+    );
 
     // Telemetry forwards
-    forwards.push(
+    const telemetryForwards: ReadonlyArray<ForwardConfig> = [
       {
         service: 'vmstack-victoria-metrics-k8s-stack',
         namespace: 'telemetry',
@@ -132,43 +139,49 @@ export const forward = async (
         namespace: 'telemetry',
         localPort: 9428,
         remotePort: 9428,
-      }
-    );
+      },
+    ];
+
+    const forwards: ReadonlyArray<ForwardConfig> = [
+      ...dbForwards,
+      ...helmForwards,
+      ...telemetryForwards,
+    ];
 
     // Start port forwards
-    const started: string[] = [];
-    for (const fwd of forwards) {
-      try {
-        // Check if service exists
-        execSync(`kubectl get svc ${fwd.service} -n ${fwd.namespace}`, { stdio: 'pipe' });
+    const started: ReadonlyArray<string> = forwards.reduce<ReadonlyArray<string>>(
+      (acc, fwd) => {
+        try {
+          // Check if service exists
+          execSync(`kubectl get svc ${fwd.service} -n ${fwd.namespace}`, { stdio: 'pipe' });
 
-        // Start port-forward in background
-        const child = spawn(
-          'kubectl',
-          [
-            'port-forward',
-            `svc/${fwd.service}`,
-            `${fwd.localPort}:${fwd.remotePort}`,
-            '-n',
-            fwd.namespace,
-          ],
-          {
-            detached: true,
-            stdio: 'ignore',
-          }
-        );
-        child.unref();
+          // Start port-forward in background
+          const child = spawn(
+            'kubectl',
+            [
+              'port-forward',
+              `svc/${fwd.service}`,
+              `${fwd.localPort}:${fwd.remotePort}`,
+              '-n',
+              fwd.namespace,
+            ],
+            {
+              detached: true,
+              stdio: 'ignore',
+            }
+          );
+          child.unref();
 
-        started.push(`${fwd.service} -> localhost:${fwd.localPort}`);
-      } catch {
-        console.warn(`Warning: Service ${fwd.service} not found, skipping`);
-      }
-    }
+          return [...acc, `${fwd.service} -> localhost:${fwd.localPort}`];
+        } catch {
+          console.warn(`Warning: Service ${fwd.service} not found, skipping`);
+          return acc;
+        }
+      },
+      []
+    );
 
-    let message = 'Port forwards started:\n';
-    for (const s of started) {
-      message += `  ${s}\n`;
-    }
+    const message = `Port forwards started:\n${started.map((s) => `  ${s}`).join('\n')}\n`;
 
     return {
       success: true,

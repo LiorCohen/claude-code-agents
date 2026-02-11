@@ -41,12 +41,12 @@ const generateIndexContent = async (specsDir: string): Promise<string> => {
   });
 
   // Group by status using reduce
-  const byStatus = entries.reduce(
+  const byStatus = entries.reduce<Readonly<Record<string, ReadonlyArray<SpecEntry>>>>(
     (acc, entry) => ({
       ...acc,
       [entry.status]: [...(acc[entry.status] ?? []), entry],
     }),
-    {} as Readonly<Record<string, readonly SpecEntry[]>>
+    {}
   );
 
   const activeSpecs = byStatus['active'] ?? [];

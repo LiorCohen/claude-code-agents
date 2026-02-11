@@ -27,24 +27,24 @@ describe('reconcile.ts source file', () => {
     expect(content.length).toBeGreaterThan(0);
   });
 
-  it('exports ReconciliationChange interface', () => {
+  it('exports ReconciliationChange type', () => {
     const content = readFile(RECONCILE_PATH);
-    expect(content).toContain('export interface ReconciliationChange');
+    expect(content).toContain('export type ReconciliationChange =');
     expect(content).toContain("readonly type: 'migrated' | 'added' | 'removed'");
     expect(content).toContain('readonly field: string');
     expect(content).toContain('readonly detail: string');
   });
 
-  it('exports ReconciliationWarning interface', () => {
+  it('exports ReconciliationWarning type', () => {
     const content = readFile(RECONCILE_PATH);
-    expect(content).toContain('export interface ReconciliationWarning');
+    expect(content).toContain('export type ReconciliationWarning =');
     expect(content).toContain('readonly component?: string');
     expect(content).toContain('readonly message: string');
   });
 
-  it('exports ReconciliationResult interface', () => {
+  it('exports ReconciliationResult type', () => {
     const content = readFile(RECONCILE_PATH);
-    expect(content).toContain('export interface ReconciliationResult');
+    expect(content).toContain('export type ReconciliationResult =');
     expect(content).toContain('readonly settings: SettingsFile');
     expect(content).toContain('readonly changes: readonly ReconciliationChange[]');
     expect(content).toContain('readonly warnings: readonly ReconciliationWarning[]');
@@ -79,7 +79,7 @@ describe('sdd metadata migration', () => {
   it('preserves existing initialized_by_plugin_version', () => {
     expect(content).toContain('existingInitVersion');
     // Should not overwrite if already set
-    expect(content).toContain('if (existingInitVersion)');
+    expect(content).toContain('= existingInitVersion');
   });
 
   it('converts date-only initialized_at to UTC datetime', () => {
@@ -142,7 +142,7 @@ describe('component path reconciliation', () => {
 
   it('preserves existing component path', () => {
     expect(content).toContain('compPath');
-    expect(content).toContain('if (compPath)');
+    expect(content).toContain('? { path: compPath');
   });
 
   it('infers flat path from filesystem', () => {

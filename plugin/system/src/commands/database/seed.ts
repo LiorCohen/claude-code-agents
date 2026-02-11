@@ -21,13 +21,15 @@ export const seed = async (
   const { named } = parseNamedArgs(args);
 
   // Find project root
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const projectRootResult = await findProjectRoot();
+  if (!projectRootResult.found) {
     return {
       success: false,
       error: 'Could not find project root (no package.json found)',
     };
   }
+
+  const projectRoot = projectRootResult.path;
 
   // Find component directory
   const componentDir = path.join(projectRoot, 'components', componentName);
@@ -80,30 +82,41 @@ export const seed = async (
   }
 
   console.log('Running seeds...');
-  const seedsRun: string[] = [];
 
-  try {
-    for (const seedFile of seedFiles) {
-      const fileName = path.basename(seedFile);
-      console.log(`  ${fileName}`);
+  const runSeeds = (
+    files: ReadonlyArray<string>,
+    completed: ReadonlyArray<string>
+  ): { readonly completed: ReadonlyArray<string>; readonly error?: string } => {
+    const seedFile = files[0];
+    if (seedFile === undefined) return { completed };
+    const rest = files.slice(1);
+    const fileName = path.basename(seedFile);
+    console.log(`  ${fileName}`);
+    try {
       execSync(`psql -f "${seedFile}"`, { stdio: 'inherit', env });
-      seedsRun.push(fileName);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      return { completed, error: errorMessage };
     }
+    return runSeeds(rest, [...completed, fileName]);
+  };
 
-    console.log('');
-    console.log('Seeding complete');
+  const result = runSeeds(seedFiles, []);
 
-    return {
-      success: true,
-      message: `Ran ${seedsRun.length} seed files`,
-      data: { seedsRun },
-    };
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
+  if (result.error) {
     return {
       success: false,
-      error: `Seeding failed: ${errorMessage}`,
-      data: { seedsRun },
+      error: `Seeding failed: ${result.error}`,
+      data: { seedsRun: result.completed },
     };
   }
+
+  console.log('');
+  console.log('Seeding complete');
+
+  return {
+    success: true,
+    message: `Ran ${result.completed.length} seed files`,
+    data: { seedsRun: result.completed },
+  };
 };

@@ -15,7 +15,7 @@ import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
 
-interface SddSettings {
+type SddSettings = {
   readonly name?: string;
   readonly components?: ReadonlyArray<{
     readonly name: string;
@@ -33,10 +33,11 @@ export const undeploy = async (
   const { positional, named } = parseNamedArgs(args);
   const specificChart = positional[0];
 
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const rootResult = await findProjectRoot();
+  if (!rootResult.found) {
     return { success: false, error: 'Could not find project root (no package.json found)' };
   }
+  const projectRoot = rootResult.path;
   const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
 
   try {
@@ -71,16 +72,19 @@ export const undeploy = async (
       };
     }
 
-    const undeployed: string[] = [];
-    for (const component of toUndeploy) {
-      console.log(`Undeploying ${component.name}...`);
-      try {
-        execSync(`helm uninstall ${component.name} -n ${namespace}`, { stdio: 'inherit' });
-        undeployed.push(component.name);
-      } catch {
-        console.warn(`Warning: ${component.name} was not deployed or already removed`);
-      }
-    }
+    const undeployed: ReadonlyArray<string> = toUndeploy.reduce<ReadonlyArray<string>>(
+      (acc, component) => {
+        console.log(`Undeploying ${component.name}...`);
+        try {
+          execSync(`helm uninstall ${component.name} -n ${namespace}`, { stdio: 'inherit' });
+          return [...acc, component.name];
+        } catch {
+          console.warn(`Warning: ${component.name} was not deployed or already removed`);
+          return acc;
+        }
+      },
+      []
+    );
 
     return {
       success: true,

@@ -11,7 +11,7 @@ import type { ClusterProviderOps } from '../types';
 export const kindProvider: ClusterProviderOps = {
   name: 'kind',
 
-  create: async (clusterName: string): Promise<void> => {
+  create: async (clusterName: string): Promise<string> => {
     const kindConfig = `
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -28,20 +28,24 @@ nodes:
     execSync(`echo '${kindConfig}' | kind create cluster --name ${clusterName} --config=-`, {
       stdio: 'inherit',
     });
+    return `Kind cluster '${clusterName}' created`;
   },
 
-  destroy: async (clusterName: string): Promise<void> => {
+  destroy: async (clusterName: string): Promise<string> => {
     execSync(`kind delete cluster --name ${clusterName}`, { stdio: 'inherit' });
+    return `Kind cluster '${clusterName}' destroyed`;
   },
 
-  start: async (clusterName: string): Promise<void> => {
+  start: async (clusterName: string): Promise<string> => {
     const containerName = `${clusterName}-control-plane`;
     execSync(`docker start ${containerName}`, { stdio: 'inherit' });
+    return `Kind cluster '${clusterName}' started`;
   },
 
-  stop: async (clusterName: string): Promise<void> => {
+  stop: async (clusterName: string): Promise<string> => {
     const containerName = `${clusterName}-control-plane`;
     execSync(`docker stop ${containerName}`, { stdio: 'inherit' });
+    return `Kind cluster '${clusterName}' stopped`;
   },
 
   exists: async (clusterName: string): Promise<boolean> => {

@@ -17,17 +17,20 @@ import { exists, readText, isDirectory } from '@/lib/fs';
 import { executeSpec } from './engine';
 import type { ScaffoldSpec } from './engine';
 
-/** Load and compile the JSON Schema validator (lazy singleton). */
-let _validate: ReturnType<Ajv['compile']> | undefined;
-const getSchemaValidator = (): ReturnType<Ajv['compile']> => {
-  if (!_validate) {
+/** Load and compile the JSON Schema validator (lazy singleton via Map). */
+const getSchemaValidator = (() => {
+  const cache = new Map<string, ReturnType<Ajv['compile']>>();
+  return (): ReturnType<Ajv['compile']> => {
+    const existing = cache.get('validator');
+    if (existing) return existing;
     const schemaPath = join(dirname(fileURLToPath(import.meta.url)), 'scaffold-spec.schema.json');
-    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Record<string, unknown>;
+    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
     const ajv = new Ajv({ allErrors: true });
-    _validate = ajv.compile(schema);
-  }
-  return _validate;
-};
+    const validate = ajv.compile(schema);
+    cache.set('validator', validate);
+    return validate;
+  };
+})();
 
 /**
  * Validate a parsed spec: first manual checks for clean error messages,
@@ -36,7 +39,7 @@ const getSchemaValidator = (): ReturnType<Ajv['compile']> => {
 const validateSpec = (
   raw: Record<string, unknown>
 ): { readonly valid: true; readonly spec: ScaffoldSpec } | { readonly valid: false; readonly error: string } => {
-  // Manual checks — give clean error messages for common issues
+  // Manual checks -- give clean error messages for common issues
   const required = ['target_dir', 'base_dir', 'variables', 'operations'] as const;
   const missing = required.filter((f) => !(f in raw));
   if (missing.length > 0) {
@@ -58,14 +61,20 @@ const validateSpec = (
 
   // Validate each operation has a valid type
   const validTypes = ['template_dir', 'template_file', 'mkdir', 'write_file', 'package_json_scripts'];
-  for (let i = 0; i < (raw['operations'] as readonly unknown[]).length; i++) {
-    const op = (raw['operations'] as readonly Record<string, unknown>[])[i];
+  const operations = raw['operations'] as readonly Record<string, unknown>[];
+  const operationError = operations.reduce<string | undefined>((err, op, i) => {
+    if (err) return err;
     if (!op || typeof op !== 'object') {
-      return { valid: false, error: `operations[${i}]: must be an object` };
+      return `operations[${i}]: must be an object`;
     }
     if (!validTypes.includes(op['type'] as string)) {
-      return { valid: false, error: `operations[${i}]: unknown type "${op['type'] as string}"` };
+      return `operations[${i}]: unknown type "${op['type'] as string}"`;
     }
+    return undefined;
+  }, undefined);
+
+  if (operationError) {
+    return { valid: false, error: operationError };
   }
 
   // JSON Schema validation for structural completeness (per-operation fields, when conditions)
@@ -101,16 +110,23 @@ export const applyScaffoldSpec = async (args: readonly string[]): Promise<Comman
 
   // Parse JSON
   const specContent = await readText(specPath);
-  let raw: Record<string, unknown>;
-  try {
-    raw = JSON.parse(specContent) as Record<string, unknown>;
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+  const parseResult = (() => {
+    try {
+      return { parsed: true as const, raw: JSON.parse(specContent) as Record<string, unknown> };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return { parsed: false as const, error: message };
+    }
+  })();
+
+  if (!parseResult.parsed) {
     return {
       success: false,
-      error: `Failed to parse spec JSON: ${message}`,
+      error: `Failed to parse spec JSON: ${parseResult.error}`,
     };
   }
+
+  const raw = parseResult.raw;
 
   // Validate spec structure
   const validation = validateSpec(raw);

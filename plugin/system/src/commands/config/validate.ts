@@ -14,11 +14,11 @@ import Ajv, { type ErrorObject } from 'ajv';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 
-interface ValidationResult {
+type ValidationResult = {
   readonly env: string;
   readonly valid: boolean;
-  readonly errors?: readonly string[];
-}
+  readonly errors?: ReadonlyArray<string>;
+};
 
 export const validate = async (
   args: readonly string[],
@@ -50,22 +50,28 @@ export const validate = async (
   }
 
   // Load schema
-  let schema: Record<string, unknown>;
-  try {
-    schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
-    // Remove $schema property as ajv doesn't need it for validation
-    // and default ajv doesn't support 2020-12 draft
-    delete schema['$schema'];
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
+  const schema = (() => {
+    try {
+      const rawSchema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
+      // Remove $schema property as ajv doesn't need it for validation
+      // and default ajv doesn't support 2020-12 draft
+      const { ['$schema']: _, ...rest } = rawSchema;
+      return { success: true as const, value: rest };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      return { success: false as const, error: errorMessage };
+    }
+  })();
+
+  if (!schema.success) {
     return {
       success: false,
-      error: `Failed to parse schema: ${errorMessage}`,
+      error: `Failed to parse schema: ${schema.error}`,
     };
   }
 
   const ajv = new Ajv({ allErrors: true, strict: false });
-  const validateFn = ajv.compile(schema);
+  const validateFn = ajv.compile(schema.value);
 
   // Get environments to validate
   const envDirs = targetEnv
@@ -75,20 +81,15 @@ export const validate = async (
         return statSync(envPath).isDirectory();
       });
 
-  const results: ValidationResult[] = [];
-  let hasErrors = false;
-
-  for (const env of envDirs) {
+  const results: ReadonlyArray<ValidationResult> = envDirs.map((env) => {
     const configPath = join(envsDir, env, 'config.yaml');
 
     if (!existsSync(configPath)) {
-      results.push({
+      return {
         env,
         valid: false,
         errors: [`Config file not found: ${configPath}`],
-      });
-      hasErrors = true;
-      continue;
+      };
     }
 
     try {
@@ -97,21 +98,21 @@ export const validate = async (
       if (!validateFn(config)) {
         const errors =
           validateFn.errors?.map((e: ErrorObject) => `${e.instancePath || '/'}: ${e.message}`) ?? [];
-        results.push({ env, valid: false, errors });
-        hasErrors = true;
+        return { env, valid: false, errors };
       } else {
-        results.push({ env, valid: true });
+        return { env, valid: true };
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      results.push({
+      return {
         env,
         valid: false,
         errors: [`Failed to parse YAML: ${errorMessage}`],
-      });
-      hasErrors = true;
+      };
     }
-  }
+  });
+
+  const hasErrors = results.some((r) => !r.valid);
 
   if (options.json) {
     return {

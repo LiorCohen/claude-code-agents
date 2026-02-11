@@ -37,9 +37,9 @@ describe('settings.ts source file', () => {
     expect(content).toContain('export type ServerType = ServerMode | \'hybrid\'');
   });
 
-  it('exports ServerSettings interface', () => {
+  it('exports ServerSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface ServerSettings');
+    expect(content).toContain('export type ServerSettings =');
     expect(content).toContain('readonly server_type: ServerType');
     expect(content).toContain('readonly databases?: readonly string[]');
     expect(content).toContain('readonly provides_contracts?: readonly string[]');
@@ -47,37 +47,37 @@ describe('settings.ts source file', () => {
     expect(content).toContain('readonly helm?: boolean');
   });
 
-  it('exports WebappSettings interface', () => {
+  it('exports WebappSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface WebappSettings');
+    expect(content).toContain('export type WebappSettings =');
     expect(content).toContain('readonly contracts?: readonly string[]');
   });
 
-  it('exports HelmServerSettings interface', () => {
+  it('exports HelmServerSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface HelmServerSettings');
+    expect(content).toContain('export type HelmServerSettings =');
     expect(content).toContain('readonly deploys: string');
     expect(content).toContain("readonly deploy_type: 'server'");
     expect(content).toContain('readonly ingress: boolean');
   });
 
-  it('exports HelmWebappSettings interface', () => {
+  it('exports HelmWebappSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface HelmWebappSettings');
+    expect(content).toContain('export type HelmWebappSettings =');
     expect(content).toContain("readonly deploy_type: 'webapp'");
     expect(content).toContain('readonly assets: HelmAssets');
   });
 
-  it('exports DatabaseSettings interface', () => {
+  it('exports DatabaseSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface DatabaseSettings');
+    expect(content).toContain('export type DatabaseSettings =');
     expect(content).toContain('readonly provider: DatabaseProvider');
     expect(content).toContain('readonly dedicated: boolean');
   });
 
-  it('exports ContractSettings interface', () => {
+  it('exports ContractSettings type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface ContractSettings');
+    expect(content).toContain('export type ContractSettings =');
     expect(content).toContain('readonly visibility: ContractVisibility');
   });
 
@@ -108,9 +108,9 @@ describe('settings.ts source file', () => {
     expect(content).toContain('export const isHelmWebappSettings');
   });
 
-  it('exports SddMetadata interface with split version fields', () => {
+  it('exports SddMetadata type with split version fields', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface SddMetadata');
+    expect(content).toContain('export type SddMetadata =');
     expect(content).toContain('readonly initialized_by_plugin_version: string');
     expect(content).toContain('readonly updated_by_plugin_version: string');
     expect(content).toContain('readonly initialized_at: string');
@@ -119,14 +119,14 @@ describe('settings.ts source file', () => {
 
   it('exports ProjectMetadata with name required and description optional', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface ProjectMetadata');
+    expect(content).toContain('export type ProjectMetadata =');
     expect(content).toContain('readonly name: string');
     expect(content).toContain('readonly description?: string');
   });
 
-  it('exports SettingsFile interface', () => {
+  it('exports SettingsFile type', () => {
     const content = readFile(SETTINGS_TYPES_PATH);
-    expect(content).toContain('export interface SettingsFile');
+    expect(content).toContain('export type SettingsFile =');
     expect(content).toContain('readonly sdd: SddMetadata');
     expect(content).toContain('readonly project: ProjectMetadata');
     expect(content).toContain('readonly components: readonly Component[]');

@@ -2,14 +2,14 @@
  * Type definitions for workflow operations.
  */
 
-// Status field types
-export type SpecStatus = 'pending' | 'in_progress' | 'ready_for_review' | 'approved' | 'needs_rereview';
-export type PlanStatus = 'pending' | 'in_progress' | 'approved';
-export type ImplStatus = 'pending' | 'in_progress' | 'complete';
-export type ReviewStatus = 'pending' | 'ready_for_review' | 'approved' | 'changes_requested';
+// Status field types — derived from const arrays below
+export type SpecStatus = (typeof VALID_SPEC_STATUSES)[number];
+export type PlanStatus = (typeof VALID_PLAN_STATUSES)[number];
+export type ImplStatus = (typeof VALID_IMPL_STATUSES)[number];
+export type ReviewStatus = (typeof VALID_REVIEW_STATUSES)[number];
 
 // Workflow phases
-export type WorkflowPhase = 'spec' | 'plan' | 'implement' | 'review';
+export type WorkflowPhase = (typeof VALID_WORKFLOW_PHASES)[number];
 
 // Workflow item with four-field status model
 export type WorkflowItem = {
@@ -70,7 +70,7 @@ export type OpenQuestion = {
 }
 
 // Valid status values
-export const VALID_SPEC_STATUSES: readonly SpecStatus[] = [
+export const VALID_SPEC_STATUSES = [
   'pending',
   'in_progress',
   'ready_for_review',
@@ -78,15 +78,15 @@ export const VALID_SPEC_STATUSES: readonly SpecStatus[] = [
   'needs_rereview',
 ] as const;
 
-export const VALID_PLAN_STATUSES: readonly PlanStatus[] = ['pending', 'in_progress', 'approved'] as const;
+export const VALID_PLAN_STATUSES = ['pending', 'in_progress', 'approved'] as const;
 
-export const VALID_IMPL_STATUSES: readonly ImplStatus[] = ['pending', 'in_progress', 'complete'] as const;
+export const VALID_IMPL_STATUSES = ['pending', 'in_progress', 'complete'] as const;
 
-export const VALID_REVIEW_STATUSES: readonly ReviewStatus[] = [
+export const VALID_REVIEW_STATUSES = [
   'pending',
   'ready_for_review',
   'approved',
   'changes_requested',
 ] as const;
 
-export const VALID_WORKFLOW_PHASES: readonly WorkflowPhase[] = ['spec', 'plan', 'implement', 'review'] as const;
+export const VALID_WORKFLOW_PHASES = ['spec', 'plan', 'implement', 'review'] as const;

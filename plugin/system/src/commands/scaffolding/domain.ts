@@ -148,12 +148,7 @@ This glossary defines key terms and concepts in the ${domain} domain.
 |------|------------|---------------|
 `;
 
-  let content: string;
-  try {
-    content = await readText(glossaryPath);
-  } catch {
-    content = defaultContent;
-  }
+  const content: string = await readText(glossaryPath).catch(() => defaultContent);
 
   // Check which entities already exist using reduce to collect existing terms
   const lines = content.split('\n');
@@ -197,7 +192,7 @@ This glossary defines key terms and concepts in the ${domain} domain.
 /**
  * Update SNAPSHOT.md with product overview.
  */
-const updateSnapshot = async (config: DomainConfig, targetDir: string): Promise<void> => {
+const updateSnapshot = async (config: DomainConfig, targetDir: string): Promise<{ readonly updated: boolean }> => {
   const snapshotPath = path.join(targetDir, 'specs/SNAPSHOT.md');
 
   const defaultContent = `# Project Snapshot
@@ -206,16 +201,11 @@ Current state of the project specifications.
 
 `;
 
-  let content: string;
-  try {
-    content = await readText(snapshotPath);
-  } catch {
-    content = defaultContent;
-  }
+  const content: string = await readText(snapshotPath).catch(() => defaultContent);
 
   // Check if Product Overview already exists
   if (content.includes('## Product Overview')) {
-    return;
+    return { updated: false };
   }
 
   // Build the overview section using array join
@@ -241,6 +231,7 @@ Current state of the project specifications.
 
   const updatedContent = content + sections.join('\n');
   await writeText(snapshotPath, updatedContent);
+  return { updated: true };
 };
 
 /**

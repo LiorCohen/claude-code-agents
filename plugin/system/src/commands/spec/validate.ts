@@ -41,66 +41,73 @@ const getRequiredFields = (specType: SpecType | undefined): readonly string[] =>
 /**
  * Validate a single spec file. Returns list of errors.
  */
-const validateSpecFile = async (specPath: string): Promise<readonly ValidationError[]> => {
+const validateSpecFile = async (specPath: string): Promise<ReadonlyArray<ValidationError>> => {
   if (!(await exists(specPath))) {
     return [{ file: specPath, message: 'File not found' }];
   }
 
   const content = await readText(specPath);
-  const fm = parseFrontmatter(content);
+  const fmResult = parseFrontmatter(content);
 
-  if (!fm) {
+  if (!fmResult.found) {
     return [{ file: specPath, message: 'Missing frontmatter' }];
   }
 
-  const errors: ValidationError[] = [];
+  const fm = fmResult.data;
 
   // Check spec_type validity if present
   const specType = fm['spec_type'] as SpecType | undefined;
-  if (specType && !(VALID_SPEC_TYPES as readonly string[]).includes(specType)) {
-    errors.push({
-      file: specPath,
-      message: `Invalid spec_type '${specType}'. Must be one of: ${VALID_SPEC_TYPES.join(', ')}`,
-    });
-  }
+  const specTypeErrors: ReadonlyArray<ValidationError> =
+    specType && !(VALID_SPEC_TYPES as readonly string[]).includes(specType)
+      ? [{
+          file: specPath,
+          message: `Invalid spec_type '${specType}'. Must be one of: ${VALID_SPEC_TYPES.join(', ')}`,
+        }]
+      : [];
 
   // Check required fields based on spec_type
   const requiredFields = getRequiredFields(specType);
-  const missingFieldErrors: readonly ValidationError[] = requiredFields
+  const missingFieldErrors: ReadonlyArray<ValidationError> = requiredFields
     .filter((field) => !fm[field])
     .map((field) => ({ file: specPath, message: `Missing required field '${field}'` }));
-  errors.push(...missingFieldErrors);
 
   // Check change type validity for tech specs
   const changeType = fm['type'];
-  if (specType === 'tech' && changeType) {
-    if (!(VALID_CHANGE_TYPES as readonly string[]).includes(changeType)) {
-      errors.push({
-        file: specPath,
-        message: `Invalid type '${changeType}'. Must be one of: ${VALID_CHANGE_TYPES.join(', ')}`,
-      });
-    }
-  }
+  const changeTypeErrors: ReadonlyArray<ValidationError> =
+    specType === 'tech' && changeType && !(VALID_CHANGE_TYPES as readonly string[]).includes(changeType)
+      ? [{
+          file: specPath,
+          message: `Invalid type '${changeType}'. Must be one of: ${VALID_CHANGE_TYPES.join(', ')}`,
+        }]
+      : [];
 
   // Check status validity
   const status = fm['status'];
-  if (status && !(VALID_STATUSES as readonly string[]).includes(status)) {
-    errors.push({
-      file: specPath,
-      message: `Invalid status '${status}'. Must be one of: ${VALID_STATUSES.join(', ')}`,
-    });
-  }
+  const statusErrors: ReadonlyArray<ValidationError> =
+    status && !(VALID_STATUSES as readonly string[]).includes(status)
+      ? [{
+          file: specPath,
+          message: `Invalid status '${status}'. Must be one of: ${VALID_STATUSES.join(', ')}`,
+        }]
+      : [];
 
   // Check issue placeholder (only for tech specs or legacy specs with issue field)
   const issue = fm['issue'];
-  if (issue && (PLACEHOLDER_ISSUES as readonly string[]).includes(issue)) {
-    errors.push({
-      file: specPath,
-      message: 'Issue field is placeholder. Must reference actual issue.',
-    });
-  }
+  const issueErrors: ReadonlyArray<ValidationError> =
+    issue && (PLACEHOLDER_ISSUES as readonly string[]).includes(issue)
+      ? [{
+          file: specPath,
+          message: 'Issue field is placeholder. Must reference actual issue.',
+        }]
+      : [];
 
-  return errors;
+  return [
+    ...specTypeErrors,
+    ...missingFieldErrors,
+    ...changeTypeErrors,
+    ...statusErrors,
+    ...issueErrors,
+  ];
 };
 
 export const validateSpec = async (args: readonly string[]): Promise<CommandResult> => {

@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { PLUGIN_DIR, joinPath, readFile } from '@/lib';
 
 const CHECK_TOOLS_PATH = joinPath(PLUGIN_DIR, 'system', 'src', 'commands', 'env', 'check-tools.ts');
-const ENV_INDEX_PATH = joinPath(PLUGIN_DIR, 'system', 'src', 'commands', 'env', 'index.ts');
+const ENV_HANDLER_PATH = joinPath(PLUGIN_DIR, 'system', 'src', 'commands', 'env', 'handler.ts');
 const CLI_PATH = joinPath(PLUGIN_DIR, 'system', 'src', 'cli.ts');
 
 /**
@@ -23,8 +23,8 @@ describe('check-tools command files', () => {
     expect(content.length).toBeGreaterThan(0);
   });
 
-  it('env/index.ts registers check-tools action', () => {
-    const content = readFile(ENV_INDEX_PATH);
+  it('env/handler.ts registers check-tools action', () => {
+    const content = readFile(ENV_HANDLER_PATH);
     expect(content).toContain("'check-tools'");
     expect(content).toContain("case 'check-tools'");
   });
@@ -66,12 +66,12 @@ describe('check-tools data shape', () => {
 
   it('defines CheckToolsData interface with packageManager field', () => {
     const content = readFile(CHECK_TOOLS_PATH);
-    expect(content).toContain('readonly packageManager: string | null');
+    expect(content).toContain('readonly packageManager?: PackageManager');
   });
 
   it('defines CheckToolsData interface with tools array', () => {
     const content = readFile(CHECK_TOOLS_PATH);
-    expect(content).toContain('readonly tools: readonly ToolResult[]');
+    expect(content).toContain('readonly tools: ReadonlyArray<ToolResult>');
   });
 
   it('defines CheckToolsData interface with allInstalled field', () => {
@@ -81,15 +81,15 @@ describe('check-tools data shape', () => {
 
   it('defines CheckToolsData interface with missing array', () => {
     const content = readFile(CHECK_TOOLS_PATH);
-    expect(content).toContain('readonly missing: readonly string[]');
+    expect(content).toContain('readonly missing: ReadonlyArray<string>');
   });
 
   it('defines ToolResult with name, installed, version, installHint', () => {
     const content = readFile(CHECK_TOOLS_PATH);
     expect(content).toContain('readonly name: string');
     expect(content).toContain('readonly installed: boolean');
-    expect(content).toContain('readonly version: string | null');
-    expect(content).toContain('readonly installHint: string | null');
+    expect(content).toContain('readonly version?: string');
+    expect(content).toContain('readonly installHint?: string');
   });
 });
 
@@ -232,10 +232,10 @@ describe('package manager detection', () => {
     expect(content).toContain("'yum'");
   });
 
-  it('falls back to null when no package manager found', () => {
+  it('returns not-found result when no package manager detected', () => {
     const content = readFile(CHECK_TOOLS_PATH);
     // detectPackageManager returns null as fallback
-    expect(content).toContain('return null');
+    expect(content).toContain('return { found: false }');
   });
 });
 

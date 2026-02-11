@@ -70,22 +70,22 @@ const block = (reason: string): PreToolUseHookOutput => ({
   },
 });
 
+type BlockedPatternResult =
+  | { readonly matched: true; readonly pattern: string }
+  | { readonly matched: false };
+
 /**
  * Check if a file path matches any blocked pattern.
  */
-const matchesBlockedPattern = (filePath: string): string | null => {
-  for (const pattern of BLOCKED_PATTERNS) {
-    // Handle wildcard patterns
+const matchesBlockedPattern = (filePath: string): BlockedPatternResult => {
+  const match = BLOCKED_PATTERNS.find((pattern) => {
     if (pattern.startsWith('*')) {
       const suffix = pattern.slice(1);
-      if (filePath.endsWith(suffix)) {
-        return pattern;
-      }
-    } else if (filePath.includes(pattern)) {
-      return pattern;
+      return filePath.endsWith(suffix);
     }
-  }
-  return null;
+    return filePath.includes(pattern);
+  });
+  return match ? { matched: true, pattern: match } : { matched: false };
 };
 
 /**
@@ -103,21 +103,17 @@ const isSafeRootFile = (filePath: string): boolean => {
 };
 
 /**
- * Read JSON input from stdin.
+ * Read all data from stdin as a string.
+ * Collects chunks via event-based accumulation, joins at end.
  */
-const readStdin = async (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    let data = '';
+const readStdin = (): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const chunks: string[] = [];
     process.stdin.setEncoding('utf8');
-    process.stdin.on('data', (chunk) => {
-      data += chunk;
-    });
-    process.stdin.on('end', () => {
-      resolve(data);
-    });
+    process.stdin.on('data', (chunk: string) => { chunks.push(chunk); });
+    process.stdin.on('end', () => { resolve(chunks.join('')); });
     process.stdin.on('error', reject);
   });
-};
 
 export const validateWrite = async (): Promise<CommandResult> => {
   try {
@@ -146,10 +142,10 @@ export const validateWrite = async (): Promise<CommandResult> => {
     }
 
     // Check blocked patterns first (highest priority)
-    const blockedPattern = matchesBlockedPattern(filePath);
-    if (blockedPattern) {
+    const blockedResult = matchesBlockedPattern(filePath);
+    if (blockedResult.matched) {
       const output = block(
-        `SDD hook: Blocked write to sensitive path containing '${blockedPattern}': ${filePath}`
+        `SDD hook: Blocked write to sensitive path containing '${blockedResult.pattern}': ${filePath}`
       );
       console.log(JSON.stringify(output));
       return { success: true, data: output };

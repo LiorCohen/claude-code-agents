@@ -10,26 +10,30 @@ import type { ClusterProviderOps } from '../types';
 export const minikubeProvider: ClusterProviderOps = {
   name: 'minikube',
 
-  create: async (clusterName: string): Promise<void> => {
+  create: async (clusterName: string): Promise<string> => {
     execSync(`minikube start --profile=${clusterName}`, { stdio: 'inherit' });
+    return `Minikube cluster '${clusterName}' created`;
   },
 
-  destroy: async (clusterName: string): Promise<void> => {
+  destroy: async (clusterName: string): Promise<string> => {
     execSync(`minikube delete --profile=${clusterName}`, { stdio: 'inherit' });
+    return `Minikube cluster '${clusterName}' destroyed`;
   },
 
-  start: async (clusterName: string): Promise<void> => {
+  start: async (clusterName: string): Promise<string> => {
     execSync(`minikube start --profile=${clusterName}`, { stdio: 'inherit' });
+    return `Minikube cluster '${clusterName}' started`;
   },
 
-  stop: async (clusterName: string): Promise<void> => {
+  stop: async (clusterName: string): Promise<string> => {
     execSync(`minikube stop --profile=${clusterName}`, { stdio: 'inherit' });
+    return `Minikube cluster '${clusterName}' stopped`;
   },
 
   exists: async (clusterName: string): Promise<boolean> => {
     try {
       const profiles = execSync('minikube profile list -o json', { encoding: 'utf-8' });
-      const data = JSON.parse(profiles) as { valid?: Array<{ Name: string }> };
+      const data = JSON.parse(profiles) as { valid?: ReadonlyArray<{ Name: string }> };
       return data.valid?.some((p) => p.Name === clusterName) ?? false;
     } catch {
       return false;

@@ -49,11 +49,9 @@ export type PropertyValidationResult =
 /**
  * Validation result.
  */
-export type ValidationResult<T> = {
-  readonly valid: boolean;
-  readonly data?: T;
-  readonly errors?: readonly ValidationError[];
-}
+export type ValidationResult<T> =
+  | { readonly valid: true; readonly data: T }
+  | { readonly valid: false; readonly errors: readonly ValidationError[] };
 
 const VALID: PropertyValidationResult = { valid: true } as const;
 
@@ -240,13 +238,11 @@ export const validateArgs = <T>(
 export const formatValidationErrors = (errors: readonly ValidationError[]): string => {
   return errors
     .map((e) => {
-      const parts = [`  ${e.field}: ${e.message}`];
-      if (e.expected) {
-        parts.push(`    Expected: ${e.expected}`);
-      }
-      if (e.received) {
-        parts.push(`    Received: ${e.received}`);
-      }
+      const parts: readonly string[] = [
+        `  ${e.field}: ${e.message}`,
+        ...(e.expected ? [`    Expected: ${e.expected}`] : []),
+        ...(e.received ? [`    Received: ${e.received}`] : []),
+      ];
       return parts.join('\n');
     })
     .join('\n');
@@ -256,7 +252,7 @@ export const formatValidationErrors = (errors: readonly ValidationError[]): stri
  * Generate help text from a schema definition.
  */
 export const generateSchemaHelp = (schema: CommandSchema, commandName: string): string => {
-  const requiredSet = new Set(schema.required ?? []);
+  const requiredSet: ReadonlySet<string> = new Set(schema.required ?? []);
 
   // Arguments section
   const argEntries = Object.entries(schema.properties).filter(([key]) => requiredSet.has(key));

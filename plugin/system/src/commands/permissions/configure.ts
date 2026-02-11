@@ -11,16 +11,17 @@ import * as path from 'node:path';
 import type { CommandResult } from '@/lib/args';
 import { exists, readJson, writeJson, copyFile, ensureDir } from '@/lib/fs';
 import { getPluginRoot, findProjectRoot } from '@/lib/config';
+import type { ProjectRootResult } from '@/lib/config';
 
 /**
  * Permission settings structure.
  */
-interface PermissionSettings {
+type PermissionSettings = {
   readonly permissions?: {
     readonly allow?: readonly string[];
     readonly deny?: readonly string[];
   };
-}
+};
 
 /**
  * Deep merge permission arrays, deduplicating entries.
@@ -29,14 +30,9 @@ const mergePermissionArrays = (
   existing: readonly string[] | undefined,
   incoming: readonly string[] | undefined
 ): readonly string[] => {
-  const existingSet = new Set(existing ?? []);
+  const existingItems = existing ?? [];
   const incomingItems = incoming ?? [];
-
-  for (const item of incomingItems) {
-    existingSet.add(item);
-  }
-
-  return [...existingSet];
+  return [...new Set([...existingItems, ...incomingItems])];
 };
 
 /**
@@ -62,14 +58,15 @@ const mergePermissions = (
 
 export const configurePermissions = async (): Promise<CommandResult> => {
   // Find project root
-  const projectRoot = await findProjectRoot();
-  if (!projectRoot) {
+  const projectRootResult: ProjectRootResult = await findProjectRoot();
+  if (!projectRootResult.found) {
     return {
       success: false,
       error:
         'No SDD project found. Run this command from within an SDD project directory, or run /sdd-init first.',
     };
   }
+  const projectRoot = projectRootResult.path;
 
   // Paths
   const claudeDir = path.join(projectRoot, '.claude');
@@ -89,35 +86,49 @@ export const configurePermissions = async (): Promise<CommandResult> => {
   }
 
   // Read SDD recommended permissions
-  let sddPermissions: PermissionSettings;
-  try {
-    sddPermissions = await readJson<PermissionSettings>(recommendedPermissionsPath);
-  } catch (err) {
-    return {
-      success: false,
-      error: `Failed to read recommended permissions: ${err instanceof Error ? err.message : String(err)}`,
-    };
+  const sddPermissionsResult = await (async (): Promise<
+    { readonly ok: true; readonly value: PermissionSettings } | { readonly ok: false; readonly error: string }
+  > => {
+    try {
+      const value = await readJson<PermissionSettings>(recommendedPermissionsPath);
+      return { ok: true, value };
+    } catch (err) {
+      return { ok: false, error: `Failed to read recommended permissions: ${err instanceof Error ? err.message : String(err)}` };
+    }
+  })();
+
+  if (!sddPermissionsResult.ok) {
+    return { success: false, error: sddPermissionsResult.error };
   }
+
+  const sddPermissions = sddPermissionsResult.value;
 
   // Ensure .claude directory exists
   await ensureDir(claudeDir);
 
   // Read existing settings or create empty object
-  let existingSettings: PermissionSettings = {};
-  if (await exists(settingsPath)) {
-    try {
-      // Backup existing file first
-      await copyFile(settingsPath, backupPath);
-      console.log(`Backed up existing settings to ${backupPath}`);
-
-      existingSettings = await readJson<PermissionSettings>(settingsPath);
-    } catch (err) {
-      return {
-        success: false,
-        error: `Failed to read existing settings: ${err instanceof Error ? err.message : String(err)}`,
-      };
+  const existingSettingsResult = await (async (): Promise<
+    { readonly ok: true; readonly value: PermissionSettings } | { readonly ok: false; readonly error: string }
+  > => {
+    if (await exists(settingsPath)) {
+      try {
+        // Backup existing file first
+        await copyFile(settingsPath, backupPath);
+        console.log(`Backed up existing settings to ${backupPath}`);
+        const value = await readJson<PermissionSettings>(settingsPath);
+        return { ok: true, value };
+      } catch (err) {
+        return { ok: false, error: `Failed to read existing settings: ${err instanceof Error ? err.message : String(err)}` };
+      }
     }
+    return { ok: true, value: {} };
+  })();
+
+  if (!existingSettingsResult.ok) {
+    return { success: false, error: existingSettingsResult.error };
   }
+
+  const existingSettings = existingSettingsResult.value;
 
   // Merge permissions
   const mergedSettings = mergePermissions(existingSettings, sddPermissions);
@@ -136,7 +147,7 @@ export const configurePermissions = async (): Promise<CommandResult> => {
 
   return {
     success: true,
-    message: `✓ Permissions configured in .claude/settings.local.json${backupNote}`,
+    message: `Permissions configured in .claude/settings.local.json${backupNote}`,
     data: {
       settingsPath,
       backupPath: (await exists(backupPath)) ? backupPath : null,

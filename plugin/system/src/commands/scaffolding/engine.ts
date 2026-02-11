@@ -14,16 +14,16 @@ import { exists, readText, writeText, ensureDir, walkDir, copyFile, readJson, wr
 // ---------------------------------------------------------------------------
 
 /** Condition that checks a context value with `equals`. */
-export interface EqualsCondition {
+export type EqualsCondition = {
   readonly key: string;
   readonly equals: unknown;
-}
+};
 
 /** Condition that checks a context value is non-empty. */
-export interface NotEmptyCondition {
+export type NotEmptyCondition = {
   readonly key: string;
   readonly not_empty: true;
-}
+};
 
 /** A single condition. */
 export type SingleCondition = EqualsCondition | NotEmptyCondition;
@@ -32,41 +32,41 @@ export type SingleCondition = EqualsCondition | NotEmptyCondition;
 export type WhenCondition = SingleCondition | readonly SingleCondition[];
 
 /** Base fields shared by operations that create files. */
-interface FileOperationBase {
+type FileOperationBase = {
   readonly when?: WhenCondition;
   readonly if_exists?: 'skip' | 'overwrite';
-}
+};
 
-export interface TemplateDirOp extends FileOperationBase {
+export type TemplateDirOp = FileOperationBase & {
   readonly type: 'template_dir';
   readonly source: string;
   readonly dest: string;
-}
+};
 
-export interface TemplateFileOp extends FileOperationBase {
+export type TemplateFileOp = FileOperationBase & {
   readonly type: 'template_file';
   readonly source: string;
   readonly dest: string;
-}
+};
 
-export interface MkdirOp {
+export type MkdirOp = {
   readonly type: 'mkdir';
   readonly path: string;
   readonly gitkeep?: boolean;
   readonly when?: WhenCondition;
-}
+};
 
-export interface WriteFileOp extends FileOperationBase {
+export type WriteFileOp = FileOperationBase & {
   readonly type: 'write_file';
   readonly path: string;
   readonly content: string;
-}
+};
 
-export interface PackageJsonScriptsOp {
+export type PackageJsonScriptsOp = {
   readonly type: 'package_json_scripts';
   readonly scripts: Readonly<Record<string, string>>;
   readonly when?: WhenCondition;
-}
+};
 
 export type ScaffoldOperation =
   | TemplateDirOp
@@ -75,15 +75,15 @@ export type ScaffoldOperation =
   | WriteFileOp
   | PackageJsonScriptsOp;
 
-export interface ScaffoldSpec {
+export type ScaffoldSpec = {
   readonly target_dir: string;
   readonly base_dir: string;
   readonly variables: Readonly<Record<string, string>>;
   readonly context?: Readonly<Record<string, unknown>>;
   readonly operations: readonly ScaffoldOperation[];
-}
+};
 
-export interface EngineResult {
+export type EngineResult = {
   readonly success: boolean;
   readonly created: {
     readonly files: readonly string[];
@@ -93,7 +93,7 @@ export interface EngineResult {
   readonly skipped: readonly string[];
   readonly errors: readonly string[];
   readonly summary: string;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Pure helpers
@@ -139,9 +139,9 @@ export const substituteVariables = (
 /**
  * Evaluate a `when` condition against a context object.
  *
- * - `undefined` → true (no condition = always execute)
- * - Single condition → evaluate it
- * - Array → AND (all must be true)
+ * - `undefined` -> true (no condition = always execute)
+ * - Single condition -> evaluate it
+ * - Array -> AND (all must be true)
  */
 export const evaluateCondition = (
   when: WhenCondition | undefined,
@@ -156,7 +156,7 @@ export const evaluateCondition = (
   return conditions.every((cond) => {
     const value = context[cond.key];
 
-    // Missing key → false
+    // Missing key -> false
     if (value === undefined) return false;
 
     if ('equals' in cond) {
@@ -177,13 +177,13 @@ export const evaluateCondition = (
 // Operation handlers
 // ---------------------------------------------------------------------------
 
-interface OpResult {
+type OpResult = {
   readonly files: readonly string[];
   readonly dirs: readonly string[];
   readonly scripts: readonly string[];
   readonly skipped: readonly string[];
   readonly errors: readonly string[];
-}
+};
 
 const emptyResult: OpResult = { files: [], dirs: [], scripts: [], skipped: [], errors: [] };
 
@@ -235,21 +235,24 @@ export const handleTemplateDir = async (
   }
 
   const srcFiles = await walkDir(srcDir);
-  const files: string[] = [];
-  const skipped: string[] = [];
+  const { files, skipped } = await srcFiles.reduce(
+    async (accPromise, srcFile) => {
+      const acc = await accPromise;
+      const relPath = path.relative(srcDir, srcFile);
+      const destFile = path.join(destDir, relPath);
+      const relDest = path.relative(spec.target_dir, destFile);
 
-  for (const srcFile of srcFiles) {
-    const relPath = path.relative(srcDir, srcFile);
-    const destFile = path.join(destDir, relPath);
-    const relDest = path.relative(spec.target_dir, destFile);
-
-    const result = await copySingleFile(srcFile, destFile, spec.variables, ifExists, dryRun);
-    if (result.created) {
-      files.push(relDest);
-    } else if (result.skipped) {
-      skipped.push(relDest);
-    }
-  }
+      const result = await copySingleFile(srcFile, destFile, spec.variables, ifExists, dryRun);
+      if (result.created) {
+        return { files: [...acc.files, relDest], skipped: acc.skipped };
+      }
+      if (result.skipped) {
+        return { files: acc.files, skipped: [...acc.skipped, relDest] };
+      }
+      return acc;
+    },
+    Promise.resolve({ files: [] as readonly string[], skipped: [] as readonly string[] })
+  );
 
   return { ...emptyResult, files, skipped };
 };
@@ -292,17 +295,16 @@ export const handleMkdir = async (
   }
 
   const dirs: readonly string[] = [relDir];
-  const files: string[] = [];
 
   if (op.gitkeep) {
     const gitkeepPath = path.join(dirPath, '.gitkeep');
     if (!dryRun) {
       await writeText(gitkeepPath, '');
     }
-    files.push(`${relDir}/.gitkeep`);
+    return { ...emptyResult, dirs, files: [`${relDir}/.gitkeep`] };
   }
 
-  return { ...emptyResult, dirs, files };
+  return { ...emptyResult, dirs, files: [] };
 };
 
 export const handleWriteFile = async (
@@ -337,20 +339,18 @@ export const handlePackageJsonScripts = async (
   const pkgPath = path.join(spec.target_dir, 'package.json');
 
   if (!(await exists(pkgPath))) {
-    return { ...emptyResult, errors: ['package.json not found in target_dir — skipping script merge'] };
+    return { ...emptyResult, errors: ['package.json not found in target_dir -- skipping script merge'] };
   }
 
-  const pkg = await readJson<{ scripts?: Record<string, string> }>(pkgPath);
-  const existingScripts: Record<string, string> = pkg.scripts ?? {};
-  const addedScripts: string[] = [];
+  const pkg = await readJson<{ scripts?: Readonly<Record<string, string>> }>(pkgPath);
+  const existingScripts: Readonly<Record<string, string>> = pkg.scripts ?? {};
 
-  const merged = { ...existingScripts };
-  for (const [key, value] of Object.entries(op.scripts)) {
-    if (!(key in existingScripts)) {
-      merged[key] = value;
-      addedScripts.push(key);
-    }
-  }
+  const newEntries = Object.entries(op.scripts).filter(([key]) => !(key in existingScripts));
+  const addedScripts: readonly string[] = newEntries.map(([key]) => key);
+  const merged: Readonly<Record<string, string>> = {
+    ...existingScripts,
+    ...Object.fromEntries(newEntries),
+  };
 
   if (!dryRun && addedScripts.length > 0) {
     await writeJson(pkgPath, { ...pkg, scripts: merged });
@@ -370,62 +370,69 @@ export const executeSpec = async (
 ): Promise<EngineResult> => {
   const context: Readonly<Record<string, unknown>> = spec.context ?? {};
 
-  const allFiles: string[] = [];
-  const allDirs: string[] = [];
-  const allScripts: string[] = [];
-  const allSkipped: string[] = [];
-  const allErrors: string[] = [];
+  const initialAcc = {
+    files: [] as readonly string[],
+    dirs: [] as readonly string[],
+    scripts: [] as readonly string[],
+    skipped: [] as readonly string[],
+    errors: [] as readonly string[],
+  };
 
-  for (const op of spec.operations) {
-    // Evaluate condition
-    if (!evaluateCondition(op.when, context)) {
-      continue;
-    }
+  const accumulated = await spec.operations.reduce(
+    async (accPromise, op) => {
+      const acc = await accPromise;
 
-    let result: OpResult;
+      // Evaluate condition
+      if (!evaluateCondition(op.when, context)) {
+        return acc;
+      }
 
-    switch (op.type) {
-      case 'template_dir':
-        result = await handleTemplateDir(op, spec, dryRun);
-        break;
-      case 'template_file':
-        result = await handleTemplateFile(op, spec, dryRun);
-        break;
-      case 'mkdir':
-        result = await handleMkdir(op, spec, dryRun);
-        break;
-      case 'write_file':
-        result = await handleWriteFile(op, spec, dryRun);
-        break;
-      case 'package_json_scripts':
-        result = await handlePackageJsonScripts(op, spec, dryRun);
-        break;
-      default:
-        allErrors.push(`Unknown operation type: ${(op as { type: string }).type}`);
-        continue;
-    }
+      const result: OpResult = await ((): Promise<OpResult> => {
+        switch (op.type) {
+          case 'template_dir':
+            return handleTemplateDir(op, spec, dryRun);
+          case 'template_file':
+            return handleTemplateFile(op, spec, dryRun);
+          case 'mkdir':
+            return handleMkdir(op, spec, dryRun);
+          case 'write_file':
+            return handleWriteFile(op, spec, dryRun);
+          case 'package_json_scripts':
+            return handlePackageJsonScripts(op, spec, dryRun);
+          default:
+            return Promise.resolve({
+              ...emptyResult,
+              errors: [`Unknown operation type: ${(op as { type: string }).type}`],
+            });
+        }
+      })();
 
-    allFiles.push(...result.files);
-    allDirs.push(...result.dirs);
-    allScripts.push(...result.scripts);
-    allSkipped.push(...result.skipped);
-    allErrors.push(...result.errors);
-  }
+      return {
+        files: [...acc.files, ...result.files],
+        dirs: [...acc.dirs, ...result.dirs],
+        scripts: [...acc.scripts, ...result.scripts],
+        skipped: [...acc.skipped, ...result.skipped],
+        errors: [...acc.errors, ...result.errors],
+      };
+    },
+    Promise.resolve(initialAcc)
+  );
 
-  const parts: string[] = [];
-  if (allFiles.length > 0) parts.push(`Created ${allFiles.length} files`);
-  if (allDirs.length > 0) parts.push(`${allDirs.length} directories`);
-  if (allScripts.length > 0) parts.push(`${allScripts.length} scripts`);
-  if (allSkipped.length > 0) parts.push(`Skipped ${allSkipped.length} existing`);
-  if (allErrors.length > 0) parts.push(`${allErrors.length} errors`);
+  const parts: readonly string[] = [
+    ...(accumulated.files.length > 0 ? [`Created ${accumulated.files.length} files`] : []),
+    ...(accumulated.dirs.length > 0 ? [`${accumulated.dirs.length} directories`] : []),
+    ...(accumulated.scripts.length > 0 ? [`${accumulated.scripts.length} scripts`] : []),
+    ...(accumulated.skipped.length > 0 ? [`Skipped ${accumulated.skipped.length} existing`] : []),
+    ...(accumulated.errors.length > 0 ? [`${accumulated.errors.length} errors`] : []),
+  ];
 
   const summary = parts.length > 0 ? parts.join('. ') + '.' : 'No operations executed.';
 
   return {
-    success: allErrors.length === 0,
-    created: { files: allFiles, dirs: allDirs, scripts: allScripts },
-    skipped: allSkipped,
-    errors: allErrors,
+    success: accumulated.errors.length === 0,
+    created: { files: accumulated.files, dirs: accumulated.dirs, scripts: accumulated.scripts },
+    skipped: accumulated.skipped,
+    errors: accumulated.errors,
     summary,
   };
 };

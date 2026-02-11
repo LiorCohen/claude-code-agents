@@ -34,17 +34,17 @@ describe('sync.ts source file', () => {
     expect(content.length).toBeGreaterThan(0);
   });
 
-  it('exports SyncResult interface', () => {
+  it('exports SyncResult type', () => {
     const content = readFile(SYNC_PATH);
-    expect(content).toContain('export interface SyncResult');
+    expect(content).toContain('export type SyncResult =');
     expect(content).toContain('readonly success: boolean');
     expect(content).toContain('readonly filesCreated: readonly string[]');
     expect(content).toContain('readonly filesUpdated: readonly string[]');
   });
 
-  it('exports SettingsDiff interface', () => {
+  it('exports SettingsDiff type', () => {
     const content = readFile(SYNC_PATH);
-    expect(content).toContain('export interface SettingsDiff');
+    expect(content).toContain('export type SettingsDiff =');
     expect(content).toContain('readonly addedComponents');
     expect(content).toContain('readonly removedComponents');
     expect(content).toContain('readonly modifiedComponents');
@@ -124,25 +124,25 @@ describe('config section generation', () => {
 
   it('generates port only when provides_contracts is non-empty', () => {
     expect(content).toContain('(settings.provides_contracts ?? []).length > 0');
-    expect(content).toContain("config['port'] = 3000");
+    expect(content).toContain('port: 3000');
   });
 
   it('generates queue config for workers', () => {
     expect(content).toContain("server_type === 'worker'");
-    expect(content).toContain("config['queue']");
+    expect(content).toContain('queue: { url:');
     expect(content).toContain('amqp://localhost:5672');
   });
 
   it('generates database sections per database', () => {
     expect(content).toContain('(settings.databases ?? []).length > 0');
-    expect(content).toContain("config['databases']");
+    expect(content).toContain('databases: (settings.databases');
     expect(content).toContain('host');
     expect(content).toContain('port: 5432');
   });
 
   it('generates API sections for consumed contracts', () => {
     expect(content).toContain('(settings.consumes_contracts ?? []).length > 0');
-    expect(content).toContain("config['apis']");
+    expect(content).toContain('apis: (settings.consumes_contracts');
     expect(content).toContain('base_url');
   });
 });
@@ -157,9 +157,9 @@ describe('sync-helm.ts source file', () => {
     expect(content.length).toBeGreaterThan(0);
   });
 
-  it('exports HelmTemplateSet interface', () => {
+  it('exports HelmTemplateSet type', () => {
     const content = readFile(SYNC_HELM_PATH);
-    expect(content).toContain('export interface HelmTemplateSet');
+    expect(content).toContain('export type HelmTemplateSet =');
     expect(content).toContain('readonly base: readonly string[]');
     expect(content).toContain('readonly conditional: readonly string[]');
   });

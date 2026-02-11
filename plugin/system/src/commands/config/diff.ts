@@ -13,63 +13,65 @@ import { parse } from 'yaml';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 
-interface DiffEntry {
+type DiffEntry = {
   readonly path: string;
   readonly type: 'added' | 'removed' | 'changed';
   readonly env1Value?: unknown;
   readonly env2Value?: unknown;
-}
+};
 
-type ConfigObject = Record<string, unknown>;
+type ConfigObject = Readonly<Record<string, unknown>>;
 
 /**
  * Deep merge two objects (for generating merged configs).
  */
 const deepMerge = (base: ConfigObject, override: ConfigObject): ConfigObject => {
-  const result: ConfigObject = { ...base };
-
-  for (const [key, value] of Object.entries(override)) {
-    if (value === null) {
-      delete result[key];
-    } else if (
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      typeof result[key] === 'object' &&
-      !Array.isArray(result[key]) &&
-      result[key] !== null
-    ) {
-      result[key] = deepMerge(
-        result[key] as ConfigObject,
-        value as ConfigObject
-      );
-    } else {
-      result[key] = value;
-    }
-  }
-
-  return result;
+  return Object.entries(override).reduce<ConfigObject>(
+    (acc, [key, value]) => {
+      if (value === null) {
+        const { [key]: _, ...rest } = acc;
+        return rest;
+      } else if (
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        typeof acc[key] === 'object' &&
+        !Array.isArray(acc[key]) &&
+        acc[key] !== null
+      ) {
+        return {
+          ...acc,
+          [key]: deepMerge(
+            acc[key] as ConfigObject,
+            value as ConfigObject
+          ),
+        };
+      } else {
+        return { ...acc, [key]: value };
+      }
+    },
+    { ...base }
+  );
 };
 
 /**
  * Recursively compare two objects and collect differences.
  */
 const compareObjects = (
-  obj1: Record<string, unknown>,
-  obj2: Record<string, unknown>,
+  obj1: Readonly<Record<string, unknown>>,
+  obj2: Readonly<Record<string, unknown>>,
   path: string = ''
-): readonly DiffEntry[] => {
-  const diffs: DiffEntry[] = [];
-  const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+): ReadonlyArray<DiffEntry> => {
+  const allKeys: ReadonlySet<string> = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
 
-  for (const key of allKeys) {
+  return [...allKeys].reduce<ReadonlyArray<DiffEntry>>((diffs, key) => {
     const currentPath = path ? `${path}.${key}` : key;
     const val1 = obj1[key];
     const val2 = obj2[key];
 
     if (!(key in obj1)) {
-      diffs.push({ path: currentPath, type: 'added', env2Value: val2 });
+      return [...diffs, { path: currentPath, type: 'added' as const, env2Value: val2 }];
     } else if (!(key in obj2)) {
-      diffs.push({ path: currentPath, type: 'removed', env1Value: val1 });
+      return [...diffs, { path: currentPath, type: 'removed' as const, env1Value: val1 }];
     } else if (
       typeof val1 === 'object' &&
       typeof val2 === 'object' &&
@@ -79,19 +81,20 @@ const compareObjects = (
       val2 !== null
     ) {
       // Recurse into nested objects
-      diffs.push(
+      return [
+        ...diffs,
         ...compareObjects(
-          val1 as Record<string, unknown>,
-          val2 as Record<string, unknown>,
+          val1 as Readonly<Record<string, unknown>>,
+          val2 as Readonly<Record<string, unknown>>,
           currentPath
-        )
-      );
+        ),
+      ];
     } else if (JSON.stringify(val1) !== JSON.stringify(val2)) {
-      diffs.push({ path: currentPath, type: 'changed', env1Value: val1, env2Value: val2 });
+      return [...diffs, { path: currentPath, type: 'changed' as const, env1Value: val1, env2Value: val2 }];
     }
-  }
 
-  return diffs;
+    return diffs;
+  }, []);
 };
 
 const formatValue = (value: unknown): string => {

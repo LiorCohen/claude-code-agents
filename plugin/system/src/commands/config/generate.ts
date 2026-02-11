@@ -14,7 +14,7 @@ import Ajv, { type ErrorObject } from 'ajv';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
 
-type ConfigObject = Record<string, unknown>;
+type ConfigObject = Readonly<Record<string, unknown>>;
 
 /**
  * Deep merge two objects.
@@ -24,31 +24,34 @@ type ConfigObject = Record<string, unknown>;
  * - Null: removes the key
  */
 const deepMerge = (base: ConfigObject, override: ConfigObject): ConfigObject => {
-  const result: ConfigObject = { ...base };
-
-  for (const [key, value] of Object.entries(override)) {
-    if (value === null) {
-      // Null removes the key
-      delete result[key];
-    } else if (
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      typeof result[key] === 'object' &&
-      !Array.isArray(result[key]) &&
-      result[key] !== null
-    ) {
-      // Recursively merge objects
-      result[key] = deepMerge(
-        result[key] as ConfigObject,
-        value as ConfigObject
-      );
-    } else {
-      // Replace arrays and primitives
-      result[key] = value;
-    }
-  }
-
-  return result;
+  return Object.entries(override).reduce<ConfigObject>(
+    (acc, [key, value]) => {
+      if (value === null) {
+        // Null removes the key
+        const { [key]: _, ...rest } = acc;
+        return rest;
+      } else if (
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        typeof acc[key] === 'object' &&
+        !Array.isArray(acc[key]) &&
+        acc[key] !== null
+      ) {
+        // Recursively merge objects
+        return {
+          ...acc,
+          [key]: deepMerge(
+            acc[key] as ConfigObject,
+            value as ConfigObject
+          ),
+        };
+      } else {
+        // Replace arrays and primitives
+        return { ...acc, [key]: value };
+      }
+    },
+    { ...base }
+  );
 };
 
 export const generate = async (
@@ -96,41 +99,48 @@ export const generate = async (
     // Load and merge configs
     const defaultConfig = parse(readFileSync(defaultConfigPath, 'utf-8')) ?? {};
     const envConfig = parse(readFileSync(envConfigPath, 'utf-8')) ?? {};
-    let mergedConfig = deepMerge(defaultConfig, envConfig);
+    const mergedConfig = (() => {
+      const base = deepMerge(defaultConfig, envConfig);
 
-    // Validate against schema if it exists
-    if (existsSync(schemaPath)) {
-      const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Record<string, unknown>;
-      // Remove $schema property as ajv doesn't need it for validation
-      // and default ajv doesn't support 2020-12 draft
-      delete schema['$schema'];
-      const ajv = new Ajv({ allErrors: true, strict: false });
-      const validate = ajv.compile(schema);
+      // Validate against schema if it exists
+      if (existsSync(schemaPath)) {
+        const rawSchema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
+        // Remove $schema property as ajv doesn't need it for validation
+        // and default ajv doesn't support 2020-12 draft
+        const { ['$schema']: _, ...schema } = rawSchema;
+        const ajv = new Ajv({ allErrors: true, strict: false });
+        const validate = ajv.compile(schema);
 
-      if (!validate(mergedConfig)) {
-        const errors = validate.errors
-          ?.map((e: ErrorObject) => `  - ${e.instancePath || '/'}: ${e.message}`)
-          .join('\n');
-        return {
-          success: false,
-          error: `Config validation failed:\n${errors}`,
-        };
+        if (!validate(base)) {
+          const errors = validate.errors
+            ?.map((e: ErrorObject) => `  - ${e.instancePath || '/'}: ${e.message}`)
+            .join('\n');
+          return { valid: false as const, error: `Config validation failed:\n${errors}` };
+        }
       }
+
+      // Extract component section if specified
+      if (component) {
+        if (!(component in base)) {
+          return {
+            valid: false as const,
+            error: `Component '${component}' not found in config. Available: ${Object.keys(base).join(', ')}`,
+          };
+        }
+        return { valid: true as const, config: base[component] as ConfigObject };
+      }
+
+      return { valid: true as const, config: base };
+    })();
+
+    if (!mergedConfig.valid) {
+      return { success: false, error: mergedConfig.error };
     }
 
-    // Extract component section if specified
-    if (component) {
-      if (!(component in mergedConfig)) {
-        return {
-          success: false,
-          error: `Component '${component}' not found in config. Available: ${Object.keys(mergedConfig).join(', ')}`,
-        };
-      }
-      mergedConfig = mergedConfig[component] as typeof mergedConfig;
-    }
+    const finalConfig = mergedConfig.config;
 
     // Output result
-    const yamlOutput = stringify(mergedConfig);
+    const yamlOutput = stringify(finalConfig);
 
     if (outputPath) {
       writeFileSync(outputPath, yamlOutput, 'utf-8');
@@ -145,7 +155,7 @@ export const generate = async (
       if (options.json) {
         return {
           success: true,
-          data: { outputPath, config: mergedConfig },
+          data: { outputPath, config: finalConfig },
         };
       }
 
@@ -156,7 +166,7 @@ export const generate = async (
     if (options.json) {
       return {
         success: true,
-        data: { config: mergedConfig },
+        data: { config: finalConfig },
       };
     }
 

@@ -24,16 +24,16 @@ const createOutput = (tool: string, fileName: string, contextDir: string): PostT
   };
 };
 
+type MatchingDirResult =
+  | { readonly found: true; readonly dir: string }
+  | { readonly found: false };
+
 /**
  * Check if a file path is in an SDD-managed directory.
  */
-const findMatchingDir = (filePath: string): string | null => {
-  for (const dir of SDD_DIRS) {
-    if (filePath.startsWith(dir)) {
-      return dir;
-    }
-  }
-  return null;
+const findMatchingDir = (filePath: string): MatchingDirResult => {
+  const matched = SDD_DIRS.find((dir) => filePath.startsWith(dir));
+  return matched ? { found: true, dir: matched } : { found: false };
 };
 
 /**
@@ -60,21 +60,17 @@ const basename = (filePath: string): string => {
 };
 
 /**
- * Read JSON input from stdin.
+ * Read all data from stdin as a string.
+ * Collects chunks via event-based accumulation, joins at end.
  */
-const readStdin = async (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    let data = '';
+const readStdin = (): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const chunks: string[] = [];
     process.stdin.setEncoding('utf8');
-    process.stdin.on('data', (chunk) => {
-      data += chunk;
-    });
-    process.stdin.on('end', () => {
-      resolve(data);
-    });
+    process.stdin.on('data', (chunk: string) => { chunks.push(chunk); });
+    process.stdin.on('end', () => { resolve(chunks.join('')); });
     process.stdin.on('error', reject);
   });
-};
 
 export const promptCommit = async (): Promise<CommandResult> => {
   try {
@@ -98,14 +94,14 @@ export const promptCommit = async (): Promise<CommandResult> => {
     }
 
     // Check if file is in an SDD-managed directory
-    const matchedDir = findMatchingDir(filePath);
-    if (!matchedDir) {
+    const matchResult = findMatchingDir(filePath);
+    if (!matchResult.found) {
       // Exit silently if not an SDD-managed file
       return { success: true };
     }
 
     // Determine context directory
-    const contextDir = getContextDir(filePath, matchedDir);
+    const contextDir = getContextDir(filePath, matchResult.dir);
 
     // Output message to Claude
     const output = createOutput(tool, basename(filePath), contextDir);

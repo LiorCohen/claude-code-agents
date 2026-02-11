@@ -137,7 +137,7 @@ export const createFileLogger = (
         // Base context included in every log entry
         base: {
           pid: process.pid,
-          sessionId: process.env.CLAUDE_SESSION_ID || undefined,
+          sessionId: process.env['CLAUDE_SESSION_ID'] ?? undefined,
           command: options.command,
           args: options.args,
         },
