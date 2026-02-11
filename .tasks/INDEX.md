@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#122](4-implementing/122/plan.md): Fix TypeScript standards violations in plugin/system
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#122](5-reviewing/122/plan.md): Fix TypeScript standards violations in plugin/system
 
 ---
 
