@@ -2,13 +2,13 @@
 
 **Branch:** `feature/task-122-ts-standards-violations`
 **Commits:** 4
-**Files changed:** 72 (+2506 / -2032 lines)
+**Files changed:** 90 (+3284 / -2866 lines)
 
 ---
 
 ## Summary
 
-Fixed ~530 TypeScript standards violations across 55+ source files in `plugin/system/src/`. Converted all `interface` declarations to `type` (except `Logger` and `ClusterProviderOps`), replaced `T | null` returns with discriminated unions, eliminated all mutable patterns (`let`, `.push()`, `Object.assign`, bracket mutation, `delete`, `++/--`), applied `Readonly<Record<>>` and `readonly T[]` everywhere, and updated 5 test files with 35+ assertion changes. Version bumped 6.7.2 to 6.7.3.
+Fixed ~530 TypeScript standards violations across 55+ source files in `plugin/system/src/`. Converted all `interface` declarations to `type` (except `Logger` and `ClusterProviderOps`), replaced `T | null` returns with discriminated unions, eliminated all mutable patterns (`let`, `.push()`, `Object.assign`, bracket mutation, `delete`, `++/--`), applied `Readonly<Record<>>` and `readonly T[]` everywhere, and updated 5 test files with 35+ assertion changes. Additionally, extracted dispatch logic from all 11 command `index.ts` files into separate `handler.ts` and `schema.ts` files, enforcing the standard that index files must contain only re-exports. Final audit pass fixed remaining violations: derived union types from `as const` arrays, `ReadonlySet`/`ReadonlyMap` for all `Set`/`Map` variables, discriminated union for `ValidationResult<T>` (eliminating `!` non-null assertions in all 11 handlers), bracket notation for `process.env`, and `??` over `||`. Version bumped 6.7.2 to 6.7.3.
 
 ---
 
@@ -573,7 +573,108 @@ Added `[6.7.3]` changelog entry documenting all violation categories fixed with 
 
 ---
 
+### Command Handler Extraction (index.ts -> handler.ts + schema.ts)
+
+All 11 command namespaces had their dispatch logic extracted from `index.ts` into separate `handler.ts` and `schema.ts` files. Each `index.ts` now contains only pure re-exports.
+
+#### Pattern Applied to All 11 Commands
+
+**New `schema.ts`:** Exports `ACTIONS` constant, `CommandSchema`, and `Args` type.
+**New `handler.ts`:** Exports `handleX` function with validation + switch dispatch.
+**Modified `index.ts`:** Pure re-exports only (e.g., `export { handleConfig } from './handler'`).
+
+Commands: `config`, `contract`, `database`, `env`, `hook`, `permissions`, `scaffolding`, `settings`, `spec`, `version`, `workflow` (22 new files + 11 modified index.ts files).
+
+---
+
+### Test Fix
+
+#### 82. [`tests/src/tests/unit/commands/env/check-tools.test.ts`](tests/src/tests/unit/commands/env/check-tools.test.ts)
+Updated test to check `handler.ts` instead of `index.ts` for action registration (dispatch logic moved).
+
+---
+
 ### Plan Update
 
-#### 81. [`.tasks/4-implementing/122/plan.md`](.tasks/4-implementing/122/plan.md)
+#### 83. [`.tasks/4-implementing/122/plan.md`](.tasks/4-implementing/122/plan.md)
 Updated plan with corrected file counts and provider-layer violations.
+
+---
+
+### Final Audit Pass — Remaining Violations
+
+Exhaustive file-by-file audit of all 95 `.ts` files caught additional violations missed in the initial batch fixes.
+
+#### 84. [`plugin/system/src/types/spec.ts`](plugin/system/src/types/spec.ts)
+Derived union types from `as const` arrays instead of manual duplication.
+
+```ts
+-export type SpecType = 'product' | 'tech';
+-export type ChangeType = 'feature' | 'bugfix' | 'refactor' | 'epic';
++export type SpecType = (typeof VALID_SPEC_TYPES)[number];
++export type ChangeType = (typeof VALID_CHANGE_TYPES)[number];
+```
+
+#### 85. [`plugin/system/src/types/workflow.ts`](plugin/system/src/types/workflow.ts)
+Derived 5 union types from `as const` arrays + removed redundant type annotations on const arrays.
+
+```ts
+-export type SpecStatus = 'pending' | 'in_progress' | 'ready_for_review' | 'approved' | 'needs_rereview';
+-export const VALID_SPEC_STATUSES: readonly SpecStatus[] = [...] as const;
++export const VALID_SPEC_STATUSES = [...] as const;
++export type SpecStatus = (typeof VALID_SPEC_STATUSES)[number];
+```
+
+#### 86. [`plugin/system/src/lib/logger.ts`](plugin/system/src/lib/logger.ts)
+Bracket notation for `process.env` + `??` instead of `||`.
+
+```ts
+-sessionId: process.env.CLAUDE_SESSION_ID || undefined,
++sessionId: process.env['CLAUDE_SESSION_ID'] ?? undefined,
+```
+
+#### 87. [`plugin/system/src/lib/schema-validator.ts`](plugin/system/src/lib/schema-validator.ts)
+Converted `ValidationResult<T>` to discriminated union + `ReadonlySet` for `requiredSet`.
+
+```ts
+-export type ValidationResult<T> = {
+-  readonly valid: boolean;
+-  readonly data?: T;
+-  readonly errors?: readonly ValidationError[];
+-}
++export type ValidationResult<T> =
++  | { readonly valid: true; readonly data: T }
++  | { readonly valid: false; readonly errors: readonly ValidationError[] };
+
+-const requiredSet = new Set(schema.required ?? []);
++const requiredSet: ReadonlySet<string> = new Set(schema.required ?? []);
+```
+
+#### 88. [`plugin/system/src/commands/config/diff.ts`](plugin/system/src/commands/config/diff.ts)
+`ReadonlySet` for `allKeys`.
+
+```ts
+-const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
++const allKeys: ReadonlySet<string> = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+```
+
+#### 89. [`plugin/system/src/commands/settings/reconcile.ts`](plugin/system/src/commands/settings/reconcile.ts) (command)
+`ReadonlySet` for `trackedPaths`.
+
+#### 90. [`plugin/system/src/settings/sync.ts`](plugin/system/src/settings/sync.ts)
+`ReadonlyMap` for `oldByKey`/`newByKey` + `ReadonlySet` for `allKeys`.
+
+#### 91. [`plugin/system/src/settings/validate.ts`](plugin/system/src/settings/validate.ts)
+`ReadonlySet` (x6) for name sets + `ReadonlyMap` (x2) for settings maps with proper value types (`ServerSettings`, `{ readonly helm?: boolean }`).
+
+#### 92-102. All 11 `handler.ts` files
+Removed `!` non-null assertions — now unnecessary due to `ValidationResult<T>` discriminated union enabling TypeScript narrowing.
+
+```ts
+-formatValidationErrors(validation.errors!)
+-const validatedArgs = validation.data!;
++formatValidationErrors(validation.errors)
++const validatedArgs = validation.data;
+```
+
+Commands affected: `config`, `contract`, `database`, `env`, `hook`, `permissions`, `scaffolding`, `settings`, `spec`, `version`, `workflow`.
