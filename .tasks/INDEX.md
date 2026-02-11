@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#122](5-reviewing/122/plan.md): Fix TypeScript standards violations in plugin/system
+(none)
 
 ---
 
@@ -90,6 +90,7 @@
 
 ## Complete
 
+- [#122](6-complete/122/): Fix TypeScript standards violations in plugin/system ✓ (2026-02-11)
 - [#123](6-complete/123/): Update TypeScript standards with missing patterns and corrections ✓ (2026-02-10)
 - [#121](6-complete/121/): Fix skills standards violations from audit report ✓ (2026-02-10)
 - [#117](6-complete/117/): Generic scaffolding engine in system CLI ✓ (2026-02-10)

@@ -1,7 +1,8 @@
 ---
 id: 122
 title: Fix TypeScript standards violations in plugin/system
-status: reviewing
+status: complete
+completed: 2026-02-11
 priority: high
 created: 2026-02-10
 depends_on: [123]
