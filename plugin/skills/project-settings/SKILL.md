@@ -208,7 +208,7 @@ Components are organized by type:
 
 ## Validation Rules
 
-- **Config required**: Every project must have exactly one config component
+- **Config mandatory singleton**: Every project must have exactly one config component
 - **Database references**: `databases` must reference existing database components
 - **Contract references**: `provides_contracts`, `consumes_contracts`, `contracts` must reference existing contract components
 - **Helm references**: `deploys` must reference component with `helm: true`

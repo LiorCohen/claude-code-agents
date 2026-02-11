@@ -1047,3 +1047,9 @@ Before committing TypeScript code, verify:
 - [ ] `import type` for type-only imports
 - [ ] `??` for defaults (not `||`)
 - [ ] No `let` — use `const` with `.map`/`.reduce`/ternaries
+
+---
+
+## Input / Output
+
+This skill defines no input parameters or structured output.

@@ -313,7 +313,7 @@ Initialize SDD project: <project-name>
 - Config component ready
 - Spec registry initialized
 
-Components will be scaffolded on-demand as changes are created.
+Components (Server, Webapp, Database, Contract) will be scaffolded on-demand as changes are created.
 
 Co-Authored-By: SDD Plugin vX.Y.Z
 EOF
@@ -352,5 +352,6 @@ NEXT STEPS:
   Or import an existing spec:
     /sdd-change new --spec path/to/requirements.md
 
-  Components will be scaffolded on-demand when your changes need them.
+  Components (server, webapp, database, contract, testing, cicd)
+  will be scaffolded on-demand when your changes need them.
 ```
