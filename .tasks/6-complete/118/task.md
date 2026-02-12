@@ -1,13 +1,14 @@
 ---
 id: 118
 title: Upgrade all JSON schemas to latest stable version (2020-12)
-status: reviewing
+status: complete
 priority: high
 created: 2026-02-10 11:47 UTC
+completed: 2026-02-12 12:30 UTC
 tags: [technical-debt, schema, standards]
 ---
 
-# Task 118: Upgrade all JSON schemas to latest stable version (2020-12)
+# Task 118: Upgrade all JSON schemas to latest stable version (2020-12) ✓
 
 ## Problem
 

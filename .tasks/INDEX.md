@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#118](5-reviewing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
+(none)
 
 ---
 
@@ -86,6 +86,7 @@
 
 ## Complete
 
+- [#118](6-complete/118/): Upgrade all JSON schemas to latest stable version (2020-12) ✓ (2026-02-12)
 - [#122](6-complete/122/): Fix TypeScript standards violations in plugin/system ✓ (2026-02-11)
 - [#123](6-complete/123/): Update TypeScript standards with missing patterns and corrections ✓ (2026-02-10)
 - [#121](6-complete/121/): Fix skills standards violations from audit report ✓ (2026-02-10)
