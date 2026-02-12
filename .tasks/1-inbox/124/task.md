@@ -42,6 +42,7 @@ Each phase needs a "Lior says" section with the kind of critical questions and s
 
 ## Design Considerations
 
+- **Must use `context: fork` frontmatter** to run as a subagent with fresh context. Same-context self-review inherits all original reasoning biases — a forked subagent sees the code with fresh eyes, which is what makes self-review actually valuable.
 - The skill should be referenced by the tasks skill at each lifecycle transition
 - It should output its checks as a self-evaluation before presenting to the user
 - The tone should be direct, skeptical, and constructive — Lior's actual review style
