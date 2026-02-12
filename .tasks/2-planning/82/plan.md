@@ -1,7 +1,7 @@
 ---
 title: Reorganize archive into .sdd directory
 created: 2026-02-12 14:00 UTC
-updated: 2026-02-12 15:00 UTC
+updated: 2026-02-12 16:00 UTC
 ---
 
 # Plan: Reorganize archive into .sdd directory
@@ -13,8 +13,9 @@ The `.sdd/archive/` directory structure is fully documented across skills, comma
 1. Project scaffolding still creates a top-level `archive/` directory
 2. The `.claudeignore` template references the old path
 3. No system CLI command exists for archiving — skills do file operations directly, leading to inconsistent naming and paths
-4. The output schema for external-spec-integration is missing an `archived_path` field
-5. Date format examples across skills/docs use `yyyymmdd` but should be `yyyymmdd-HHmm`
+4. Archive naming conventions are inconsistent across types: external-specs use datetime-prefix (`20260205-name`), regressions use date-suffix (`a1b2-1-impl-20260205/`), and `sdd-change.md` uses a nested structure (`a1b2-1/20260205-120000/`)
+5. The output schema for external-spec-integration is missing an `archived_path` field
+6. Date format examples across skills/docs use `yyyymmdd` but should be `yyyymmdd-HHmm`
 
 This task adds an `archive` namespace to the system CLI so archiving is a reliable, consistent operation (datetime-prefix, lowercase, correct target directory), and aligns the scaffolding and all documentation with the actual design.
 
@@ -30,8 +31,8 @@ This task adds an `archive` namespace to the system CLI so archiving is a reliab
 | `plugin/system/src/commands/scaffolding/project.ts` | Replace `archive` gitkeep with `.sdd/archive/` subdirs; fix `.claudeignore` |
 | `plugin/skills/external-spec-integration/schemas/output.schema.json` | Add `archived_path` property |
 | `plugin/skills/external-spec-integration/SKILL.md` | Update archiving step to invoke system CLI; update date format to `yyyymmdd-HHmm` |
-| `plugin/skills/workflow-state/SKILL.md` | Update all `yyyymmdd` format examples to `yyyymmdd-HHmm` |
-| `plugin/commands/sdd-change.md` | Update archive step to invoke system CLI; update date format |
+| `plugin/skills/workflow-state/SKILL.md` | Update all archive path examples to datetime-prefix format; update `regress` and `revise_decomposition` to invoke system CLI |
+| `plugin/commands/sdd-change.md` | Update external-spec archive step and `regress` action to invoke system CLI; standardize archive path format |
 | `docs/external-specs.md` | Update archive naming examples to `yyyymmdd-HHmm` format |
 | `tests/src/tests/commands/archive.test.ts` | New — unit tests for archive command |
 | `tests/src/tests/workflows/sdd-change-new-external.test.ts` | Strengthen archive file naming assertion |
@@ -125,18 +126,30 @@ Add `archived_path` (string) to `output.schema.json` as a required property. Thi
 
 ### 6. Skill and command updates — CLI invocation
 
-Update `external-spec-integration/SKILL.md` Step 1 (archiving) to invoke the system CLI:
+All three archive flows should invoke the system CLI instead of doing manual file operations.
+
+**External spec archiving** — `external-spec-integration/SKILL.md` Step 1 and `sdd-change.md` Step 4:
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <external-spec-path> --type external-spec --json
 ```
+This replaces the manual file copy + rename instructions with a single CLI call. Update both single-file and directory archiving instructions.
 
-This replaces the manual file copy + rename instructions with a single CLI call. Update both the single-file and directory archiving instructions.
+**Regression archiving** — `sdd-change.md` `regress` action (line 1036) and `workflow-state/SKILL.md` `regress` side effects (line 486):
+The prompt-based flow still prepares the archive content (git patches, stash, metadata.yaml, source files gathered into a temp directory). The final step invokes the CLI to place it in the archive:
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type regression --json
+```
+Update `sdd-change.md` regress flow step 2 and output example (line 1049) to reference the CLI and standardized path format.
 
-Update `sdd-change.md` Step 4 (archive external spec) to invoke the same command.
+**Revised-spec archiving** — `workflow-state/SKILL.md` `revise_decomposition` side effects (line 648):
+When merging decomposition items, the removed spec directory is archived:
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <draft-dir> --type revised-spec --json
+```
 
-### 7. Date format updates across skills and docs
+### 7. Standardize archive naming across all types
 
-All `yyyymmdd` format references become `yyyymmdd-HHmm`. Files affected:
+All archive types use a consistent **datetime-prefix** format: `yyyymmdd-HHmm-lowercased-name`. This fixes the pre-existing inconsistency where external-specs used datetime-prefix but regressions and revised-specs used date-suffix naming.
 
 **`external-spec-integration/SKILL.md`:**
 - Line 14: `yyyymmdd-filename` → `yyyymmdd-HHmm-filename`
@@ -144,14 +157,19 @@ All `yyyymmdd` format references become `yyyymmdd-HHmm`. Files affected:
 - Line 66: Example `20260205-feature-spec.md` → `20260205-1430-feature-spec.md`
 - Line 69: Directory format `yyyymmdd-dirname/` → `yyyymmdd-HHmm-dirname/`
 
-**`workflow-state/SKILL.md`:**
-- Line 35: `20260205-feature-spec.md` with comment → update format
-- Line 67: Regression path `a1b2-1-impl-20260205/` → `a1b2-1-impl-20260205-1430/`
-- Line 194, 477, 638: Similar regression/revised-spec path examples
+**`workflow-state/SKILL.md`** — standardize all archive path examples to datetime-prefix format:
+- Line 35: `20260205-feature-spec.md` → `20260205-1430-feature-spec.md`; comment → `yyyymmdd-HHmm-lowercased-filename.md`
+- Line 37: `a1b2c3-03-password-reset-20260205/` → `20260205-1430-a1b2c3-03-password-reset/` (revised-spec: date moves to prefix)
+- Line 40: `a1b2-1-impl-20260205/` → `20260205-1430-a1b2-1-impl/` (regression: date moves to prefix)
+- Line 67: `a1b2-1-impl-20260205/metadata.yaml` → `20260205-1430-a1b2-1-impl/metadata.yaml`
+- Line 194: `02-auth-impl-20260205/` → `20260205-1430-02-auth-impl/`
+- Line 477: `a1b2-1-impl-20260205/` → `20260205-1430-a1b2-1-impl/`
+- Line 638: `a1b2c3-03-password-reset-20260205/` → `20260205-1430-a1b2c3-03-password-reset/`
 
 **`sdd-change.md`:**
 - Line 262: `yyyymmdd-lowercased-filename.md` → `yyyymmdd-HHmm-lowercased-filename.md`
 - Line 265: Example filename
+- Line 1049: `a1b2-1/20260205-120000/PLAN.md` → `20260205-1200-a1b2-1-impl/PLAN.md` (flatten nested structure, standardize to prefix format)
 
 **`docs/external-specs.md`:**
 - Line 50: Example `20260205-feature-requirements.md` → `20260205-1430-feature-requirements.md`
