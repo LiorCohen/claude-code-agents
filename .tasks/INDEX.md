@@ -4,6 +4,7 @@
 
 ## Planning
 
+- [#126](2-planning/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
@@ -31,7 +32,6 @@
 
 ### High Priority
 
-- [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#125](1-inbox/125/): Fix skills standards violations from audit report
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior

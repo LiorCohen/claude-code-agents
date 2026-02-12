@@ -1,7 +1,7 @@
 ---
 id: 126
 title: Implement hook system — skill auto-activation and objective Stop checks
-status: inbox
+status: planning
 priority: high
 created: 2026-02-12 18:00 UTC
 depends_on: []
