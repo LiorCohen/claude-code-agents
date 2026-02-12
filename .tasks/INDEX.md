@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#125](4-implementing/125/): Fix skills standards violations from audit report
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#125](5-reviewing/125/): Fix skills standards violations from audit report
 
 ---
 
