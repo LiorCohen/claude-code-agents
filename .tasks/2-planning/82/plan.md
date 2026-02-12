@@ -14,8 +14,9 @@ The `.sdd/archive/` directory structure is fully documented across skills, comma
 2. The `.claudeignore` template references the old path
 3. No system CLI command exists for archiving — skills do file operations directly, leading to inconsistent naming and paths
 4. Archive naming conventions are inconsistent across types: external-specs use datetime-prefix (`20260205-name`), regressions use date-suffix (`a1b2-1-impl-20260205/`), and `sdd-change.md` uses a nested structure (`a1b2-1/20260205-120000/`)
-5. The output schema for external-spec-integration is missing an `archived_path` field
-6. Date format examples across skills/docs use `yyyymmdd` but should be `yyyymmdd-HHmm`
+5. The `regressions/` subdirectory name is ambiguous — could mean test regressions; rename to `workflow-regressions/`
+6. The output schema for external-spec-integration is missing an `archived_path` field
+7. Date format examples across skills/docs use `yyyymmdd` but should be `yyyymmdd-HHmm`
 
 This task adds an `archive` namespace to the system CLI so archiving is a reliable, consistent operation (datetime-prefix, lowercase, correct target directory), and aligns the scaffolding and all documentation with the actual design.
 
@@ -64,7 +65,7 @@ Add a new `archive` namespace following the standard command pattern:
 - Copy all files preserving internal structure
 - Return archived directory path and file count in `CommandResult.data`
 
-**Supported types:** `external-spec`, `revised-spec`, `regression` (maps to subdirectory names `external-specs`, `revised-specs`, `regressions`)
+**Supported types:** `external-spec`, `revised-spec`, `workflow-regression` (maps to subdirectory names `external-specs`, `revised-specs`, `workflow-regressions`)
 
 **File result:**
 ```json
@@ -112,7 +113,7 @@ In `cli.ts`:
 In `project.ts`, replace `'archive'` in `gitkeepDirs` with:
 - `.sdd/archive/external-specs`
 - `.sdd/archive/revised-specs`
-- `.sdd/archive/regressions`
+- `.sdd/archive/workflow-regressions`
 
 Note: These gitkeep dirs are only used in full-mode scaffolding. Minimal mode (`/sdd-init`) does not create them. The `archive store` command creates directories on-demand via `ensureDir`, so this is fine.
 
@@ -137,7 +138,7 @@ This replaces the manual file copy + rename instructions with a single CLI call.
 **Regression archiving** — `sdd-change.md` `regress` action (line 1036) and `workflow-state/SKILL.md` `regress` side effects (line 486):
 The prompt-based flow still prepares the archive content (git patches, stash, metadata.yaml, source files gathered into a temp directory). The final step invokes the CLI to place it in the archive:
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type regression --json
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type workflow-regression --json
 ```
 Update `sdd-change.md` regress flow step 2 and output example (line 1049) to reference the CLI and standardized path format.
 
@@ -149,7 +150,7 @@ When merging decomposition items, the removed spec directory is archived:
 
 ### 7. Standardize archive naming across all types
 
-All archive types use a consistent **datetime-prefix** format: `yyyymmdd-HHmm-lowercased-name`. This fixes the pre-existing inconsistency where external-specs used datetime-prefix but regressions and revised-specs used date-suffix naming.
+All archive types use a consistent **datetime-prefix** format: `yyyymmdd-HHmm-lowercased-name`. This fixes the pre-existing inconsistency where external-specs used datetime-prefix but regressions and revised-specs used date-suffix naming. Additionally, rename `regressions/` → `workflow-regressions/` throughout all files to avoid ambiguity with test regressions.
 
 **`external-spec-integration/SKILL.md`:**
 - Line 14: `yyyymmdd-filename` → `yyyymmdd-HHmm-filename`
@@ -160,16 +161,20 @@ All archive types use a consistent **datetime-prefix** format: `yyyymmdd-HHmm-lo
 **`workflow-state/SKILL.md`** — standardize all archive path examples to datetime-prefix format:
 - Line 35: `20260205-feature-spec.md` → `20260205-1430-feature-spec.md`; comment → `yyyymmdd-HHmm-lowercased-filename.md`
 - Line 37: `a1b2c3-03-password-reset-20260205/` → `20260205-1430-a1b2c3-03-password-reset/` (revised-spec: date moves to prefix)
-- Line 40: `a1b2-1-impl-20260205/` → `20260205-1430-a1b2-1-impl/` (regression: date moves to prefix)
-- Line 67: `a1b2-1-impl-20260205/metadata.yaml` → `20260205-1430-a1b2-1-impl/metadata.yaml`
-- Line 194: `02-auth-impl-20260205/` → `20260205-1430-02-auth-impl/`
-- Line 477: `a1b2-1-impl-20260205/` → `20260205-1430-a1b2-1-impl/`
+- Line 39: `regressions/` → `workflow-regressions/` (directory rename + comment update)
+- Line 40: `a1b2-1-impl-20260205/` → `20260205-1430-a1b2-1-impl/` (workflow-regression: date moves to prefix)
+- Line 67: `regressions/a1b2-1-impl-20260205/metadata.yaml` → `workflow-regressions/20260205-1430-a1b2-1-impl/metadata.yaml`
+- Line 194: `.sdd/archive/regressions/02-auth-impl-20260205/` → `.sdd/archive/workflow-regressions/20260205-1430-02-auth-impl/`
+- Line 243: `regressions` → `workflow-regressions`
+- Line 477: `.sdd/archive/regressions/a1b2-1-impl-20260205/` → `.sdd/archive/workflow-regressions/20260205-1430-a1b2-1-impl/`
+- Line 486: `.sdd/archive/regressions/` → `.sdd/archive/workflow-regressions/`
 - Line 638: `a1b2c3-03-password-reset-20260205/` → `20260205-1430-a1b2c3-03-password-reset/`
 
 **`sdd-change.md`:**
 - Line 262: `yyyymmdd-lowercased-filename.md` → `yyyymmdd-HHmm-lowercased-filename.md`
 - Line 265: Example filename
-- Line 1049: `a1b2-1/20260205-120000/PLAN.md` → `20260205-1200-a1b2-1-impl/PLAN.md` (flatten nested structure, standardize to prefix format)
+- Line 1036: `.sdd/archive/regressions/` → `.sdd/archive/workflow-regressions/`
+- Line 1049: `.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md` → `.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md` (flatten nested structure, rename dir, standardize to prefix format)
 
 **`docs/external-specs.md`:**
 - Line 50: Example `20260205-feature-requirements.md` → `20260205-1430-feature-requirements.md`
@@ -191,8 +196,8 @@ All archive types use a consistent **datetime-prefix** format: `yyyymmdd-HHmm-lo
 - [ ] `test_archive_store_handles_directory_source` — copies all files from directory preserving structure, returns `is_directory: true` and `file_count`
 - [ ] `test_archive_store_fails_on_missing_source` — returns error when source path doesn't exist
 - [ ] `test_archive_store_fails_on_invalid_type` — returns error for unsupported archive type
-- [ ] `test_archive_store_type_mapping` — `external-spec` maps to `external-specs/`, `revised-spec` to `revised-specs/`, `regression` to `regressions/`
-- [ ] `test_scaffolding_creates_sdd_archive_subdirectories` — scaffolding creates `.sdd/archive/external-specs/`, `.sdd/archive/revised-specs/`, `.sdd/archive/regressions/` (not top-level `archive/`)
+- [ ] `test_archive_store_type_mapping` — `external-spec` maps to `external-specs/`, `revised-spec` to `revised-specs/`, `workflow-regression` to `workflow-regressions/`
+- [ ] `test_scaffolding_creates_sdd_archive_subdirectories` — scaffolding creates `.sdd/archive/external-specs/`, `.sdd/archive/revised-specs/`, `.sdd/archive/workflow-regressions/` (not top-level `archive/`)
 - [ ] `test_scaffolding_claudeignore_references_sdd_archive` — `.claudeignore` content is `.sdd/archive/\n`
 
 ### Integration Tests
