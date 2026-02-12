@@ -1,0 +1,70 @@
+rules:
+  - skill: typescript-standards
+    description: TypeScript coding standards for strict, immutable, type-safe code
+    triggers:
+      keywords: [typescript, ts file, type error, typecheck, strict mode]
+      patterns: ["\\.(ts|tsx)\\b"]
+      file_paths: ["**/*.ts", "**/*.tsx"]
+
+  - skill: plugin-testing-standards
+    description: Testing methodology for plugins
+    triggers:
+      keywords: [test, spec, vitest, coverage]
+      patterns: ["\\btest|spec|describe\\(|it\\("]
+      file_paths: ["tests/**", "**/*.test.*", "**/*.spec.*"]
+
+  - skill: system-cli-standards
+    description: Standards for CLI invocation from prompt files
+    triggers:
+      keywords: [cli, system cli, sdd command, sdd-]
+      patterns: ["\\bsdd-[a-z]"]
+      file_paths: ["plugin/system/**", "plugin/commands/**"]
+
+  - skill: skills-standards
+    description: Standards for authoring SDD plugin skills
+    triggers:
+      keywords: [skill, create skill, new skill, skill standard]
+      patterns: ["\\bskill"]
+      file_paths: ["plugin/skills/**", ".claude/skills/**"]
+
+  - skill: agents-standards
+    description: Standards for authoring SDD plugin agents
+    triggers:
+      keywords: [agent, create agent, new agent, agent standard]
+      patterns: ["\\bagent"]
+      file_paths: ["plugin/agents/**"]
+
+  - skill: commands-standards
+    description: Standards for authoring SDD plugin commands
+    triggers:
+      keywords: [command, create command, new command, command standard]
+      patterns: ["\\bcommand"]
+      file_paths: ["plugin/commands/**"]
+
+  - skill: critic
+    description: Self-review at every task lifecycle phase
+    triggers:
+      keywords: [review, complete, plan, implement, critic]
+      patterns: ["\\b/tasks\\s+(review|complete|plan|implement)"]
+      file_paths: []
+
+  - skill: docs-standards
+    description: Documentation standards for the SDD plugin
+    triggers:
+      keywords: [documentation, docs, readme, getting started]
+      patterns: ["\\bdocs?\\b"]
+      file_paths: ["docs/**", "README.md", "plugin/README.md"]
+
+  - skill: manifest-validation
+    description: Validate plugin and marketplace manifest files
+    triggers:
+      keywords: [manifest, plugin.json, marketplace]
+      patterns: ["\\bmanifest|plugin\\.json"]
+      file_paths: ["plugin/.claude-plugin/**", ".claude-plugin/**"]
+
+  - skill: plugin-product-standards
+    description: Plugin DX review and product quality assessment
+    triggers:
+      keywords: [product review, dx, developer experience, plugin quality]
+      patterns: ["\\bDX\\b|developer experience|product quality"]
+      file_paths: []
