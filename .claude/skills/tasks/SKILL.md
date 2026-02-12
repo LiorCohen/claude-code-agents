@@ -50,7 +50,7 @@ Each task is a folder named by its ID containing:
 /tasks list
 ```
 
-Run the colocated script and output its stdout as-is — do not modify, summarize, or truncate:
+Run the colocated script and display its stdout **in full** — never truncate, summarize, or collapse any section. Show every task in every section. Output every line exactly as produced by the script:
 
 ```bash
 bash .claude/skills/tasks/list-backlog.sh
