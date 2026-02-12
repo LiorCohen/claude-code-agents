@@ -4,14 +4,13 @@
 
 ## Planning
 
-- [#82](2-planning/82/plan.md): Reorganize archive into .sdd directory
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 ---
 
 ## Ready
 
-(none)
+- [#82](3-ready/82/plan.md): Reorganize archive into .sdd directory
 
 ---
 
