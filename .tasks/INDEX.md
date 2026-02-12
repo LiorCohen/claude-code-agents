@@ -17,13 +17,13 @@
 
 ## Implementing
 
-- [#126](4-implementing/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#126](5-reviewing/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
 
 ---
 
