@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#126](5-reviewing/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
+(none)
 
 ---
 
@@ -84,6 +84,7 @@
 
 ## Complete
 
+- [#126](6-complete/126/): Implement hook system — skill auto-activation and objective Stop checks ✓ (2026-02-12)
 - [#124](6-complete/124/): Add critic skill for self-checking at every task lifecycle phase ✓ (2026-02-12)
 - [#82](6-complete/82/): Reorganize archive into .sdd directory ✓ (2026-02-12)
 - [#118](6-complete/118/): Upgrade all JSON schemas to latest stable version (2020-12) ✓ (2026-02-12)
