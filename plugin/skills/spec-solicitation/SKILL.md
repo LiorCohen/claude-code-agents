@@ -497,8 +497,8 @@ User: Given valid credentials, when user submits login form, then they receive a
 ## Dependencies
 
 This skill uses:
-- `workflow-state` skill - for state management
-- `spec-writing` skill - for spec template and formatting
+- `workflow-state` skill — delegates for persistent state: reads item context via `get_context(change_id)`, saves generated SPEC.md via `save_spec(change_id, content)`, updates item status via `update_status(change_id, status)`
+- `spec-writing` skill — validates output against SPEC.md section requirements (not a runtime dependency)
 
 ## Notes
 

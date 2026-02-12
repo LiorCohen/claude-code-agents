@@ -19,7 +19,7 @@ Use when creating Helm chart components. Creates Helm charts that integrate with
 
 ## Settings-Driven Scaffolding
 
-Helm charts are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Refer to the `project-settings` skill for the complete helm settings schema and defaults.
+Helm charts are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the complete helm settings schema and defaults — it returns `deploys` (server reference), `deploy_type`, `deploy_modes` (array of mode strings), `ingress` (boolean), and `assets` (static file configuration).
 
 ### Template Selection Logic
 

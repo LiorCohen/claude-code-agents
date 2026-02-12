@@ -10,7 +10,7 @@ Creates database component structure for PostgreSQL-based projects.
 
 ## What It Creates
 
-The directory path depends on the component name as defined in `.sdd/sdd-settings.yaml` (refer to the `project-settings` skill for directory mappings). Database components support multiple instances (e.g., `database-app-db/`, `database-analytics-db/`).
+The directory path depends on the component name as defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`database`) + name to a filesystem path (e.g., `type=database, name=app-db` → `components/databases/app-db/`). Database components support multiple instances (e.g., `database-app-db/`, `database-analytics-db/`).
 
 ```text
 components/database[-<name>]/

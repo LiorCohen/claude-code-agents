@@ -401,7 +401,7 @@ import { helper } from '../user/internal/helper';     // NEVER
 - Clear module boundaries (what's in `index.ts` is the public contract)
 
 **Example module structure:**
-```
+```text
 user/
 ├── index.ts           # Public API - import from here
 ├── createUser.ts      # Implementation - don't import directly

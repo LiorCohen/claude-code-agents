@@ -469,7 +469,7 @@ Independence Score =
 - **EPIC**: > 10 acceptance criteria, > 5 endpoints, 3+ components
 
 **Epic Flag:**
-If a change scores as EPIC, set `type: epic` and `requires_epic: true` on the DecomposedChange. The change should be created as an `epic` type containing feature-type child changes in a `changes/` subdirectory (see `change-creation` skill with `type: epic`).
+If a change scores as EPIC, set `type: epic` and `requires_epic: true` on the DecomposedChange. The `requires_epic: true` flag signals that during implementation, the `change-creation` skill creates an epic structure: a parent `type: epic` change containing child `type: feature` changes in a `changes/` subdirectory.
 
 ## Heuristics
 

@@ -203,7 +203,7 @@ This allows independent scaling of API and worker processes.
 
 ### Step 5: Settings Validation
 
-Before returning, validate the discovered configuration against the rules defined in the `project-settings` skill (cross-reference validation for databases, contracts, helm, hybrid modes, and deploy modes).
+Before returning, validate discovered configuration against the `project-settings` skill's cross-reference rules: databases referenced by servers must exist as database components, contracts must exist as contract components, helm `deploy_modes` must be valid for the server's `server_type`, and `deploys` must reference an existing server or webapp.
 
 ### Step 6: Return Configuration
 
@@ -346,7 +346,7 @@ Components are actually created during **implementation phase**:
 ### General Notes
 
 - This skill is conversational and handles user interaction for adjustments
-- The output is used by `spec-writing` skill to populate Components section
+- Component list is stored in context.md. During spec solicitation, the `spec-solicitation` skill populates the Components section of SPEC.md using discovered components and solicited technical details
 - Always validate settings dependencies before accepting the final configuration
 - **Config is MANDATORY**: Always include `{type: config, name: config, settings: {}}` first
 - Settings drive what gets scaffolded - they are not just metadata
