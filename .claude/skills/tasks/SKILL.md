@@ -50,11 +50,13 @@ Each task is a folder named by its ID containing:
 /tasks list
 ```
 
-Run the colocated script and display its stdout **in full** — never truncate, summarize, or collapse any section. Show every task in every section. Output every line exactly as produced by the script:
+Run the colocated script and output the result verbatim:
 
 ```bash
 bash .claude/skills/tasks/list-backlog.sh
 ```
+
+**MANDATORY — ZERO TRUNCATION:** Output the script's stdout exactly as produced — every line, every section, every task. Do NOT summarize, collapse, group, abbreviate, or replace any section with counts like "N more tasks". The user needs to see the full backlog. If you truncate any part of the output, the skill has failed.
 
 ---
 
