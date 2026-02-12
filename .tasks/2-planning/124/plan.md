@@ -310,10 +310,10 @@ Rules for maintaining the `.crit/` learning directory:
 1. Identify which status file the pattern belongs to (planning, implementation, review, completion)
 2. Read the existing file
 3. Check for overlap or contradiction with existing rules
-4. If new rule overlaps with existing: merge into one stronger, more precise rule
-5. If new rule contradicts existing: replace the old rule (it was wrong or outdated)
-6. If unsure about overlap/contradiction: ask the user before modifying
-7. Write the rule as a concise, imperative statement — not a paragraph, not a transcript
+4. Draft the proposed rule as a concise, imperative statement — not a paragraph, not a transcript
+5. **Present the proposed change to the user for approval.** Show: which file, what rule, whether it's new/merge/replacement. Never write to `.crit/` without explicit user approval — these files are persistent project knowledge that affects all future critic runs.
+6. If approved and new rule overlaps with existing: merge into one stronger, more precise rule
+7. If approved and new rule contradicts existing: replace the old rule (it was wrong or outdated)
 
 **When to create new topic files:**
 - When a pattern doesn't fit any existing status file
