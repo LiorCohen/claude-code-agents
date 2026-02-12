@@ -10,9 +10,9 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
-import Ajv, { type ErrorObject } from 'ajv';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
+import { compileSchema, type SchemaValidationError, type JsonSchema } from '@/lib/json-schema';
 
 type ValidationResult = {
   readonly env: string;
@@ -49,29 +49,25 @@ export const validate = async (
     };
   }
 
-  // Load schema
-  const schema = (() => {
+  // Load and compile schema
+  const schemaResult = (() => {
     try {
-      const rawSchema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
-      // Remove $schema property as ajv doesn't need it for validation
-      // and default ajv doesn't support 2020-12 draft
-      const { ['$schema']: _, ...rest } = rawSchema;
-      return { success: true as const, value: rest };
+      const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as JsonSchema;
+      return { success: true as const, validateFn: compileSchema(schema) };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       return { success: false as const, error: errorMessage };
     }
   })();
 
-  if (!schema.success) {
+  if (!schemaResult.success) {
     return {
       success: false,
-      error: `Failed to parse schema: ${schema.error}`,
+      error: `Failed to parse schema: ${schemaResult.error}`,
     };
   }
 
-  const ajv = new Ajv({ allErrors: true, strict: false });
-  const validateFn = ajv.compile(schema.value);
+  const validateFn = schemaResult.validateFn;
 
   // Get environments to validate
   const envDirs = targetEnv
@@ -97,7 +93,7 @@ export const validate = async (
 
       if (!validateFn(config)) {
         const errors =
-          validateFn.errors?.map((e: ErrorObject) => `${e.instancePath || '/'}: ${e.message}`) ?? [];
+          validateFn.errors?.map((e: SchemaValidationError) => `${e.instancePath || '/'}: ${e.message}`) ?? [];
         return { env, valid: false, errors };
       } else {
         return { env, valid: true };

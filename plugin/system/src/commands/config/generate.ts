@@ -10,9 +10,9 @@
 import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { parse, stringify } from 'yaml';
-import Ajv, { type ErrorObject } from 'ajv';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
+import { compileSchema, type SchemaValidationError, type JsonSchema } from '@/lib/json-schema';
 
 type ConfigObject = Readonly<Record<string, unknown>>;
 
@@ -104,16 +104,12 @@ export const generate = async (
 
       // Validate against schema if it exists
       if (existsSync(schemaPath)) {
-        const rawSchema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
-        // Remove $schema property as ajv doesn't need it for validation
-        // and default ajv doesn't support 2020-12 draft
-        const { ['$schema']: _, ...schema } = rawSchema;
-        const ajv = new Ajv({ allErrors: true, strict: false });
-        const validate = ajv.compile(schema);
+        const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as JsonSchema;
+        const validate = compileSchema(schema);
 
         if (!validate(base)) {
           const errors = validate.errors
-            ?.map((e: ErrorObject) => `  - ${e.instancePath || '/'}: ${e.message}`)
+            ?.map((e: SchemaValidationError) => `  - ${e.instancePath || '/'}: ${e.message}`)
             .join('\n');
           return { valid: false as const, error: `Config validation failed:\n${errors}` };
         }

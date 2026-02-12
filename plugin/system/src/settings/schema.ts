@@ -4,22 +4,22 @@
  * This schema validates the component settings in sdd-settings.yaml.
  */
 
-import type { JSONSchema7 } from 'json-schema';
+import type { JsonSchema } from '@/lib/json-schema';
 
 /** JSON Schema for server modes */
-const serverModeSchema: JSONSchema7 = {
+const serverModeSchema: JsonSchema = {
   type: 'string',
   enum: ['api', 'worker', 'cron'],
 };
 
 /** JSON Schema for server type */
-const serverTypeSchema: JSONSchema7 = {
+const serverTypeSchema: JsonSchema = {
   type: 'string',
   enum: ['api', 'worker', 'cron', 'hybrid'],
 };
 
 /** JSON Schema for server settings */
-const serverSettingsSchema: JSONSchema7 = {
+const serverSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     server_type: serverTypeSchema,
@@ -64,7 +64,7 @@ const serverSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for webapp settings */
-const webappSettingsSchema: JSONSchema7 = {
+const webappSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     contracts: {
@@ -84,7 +84,7 @@ const webappSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for helm server settings */
-const helmServerSettingsSchema: JSONSchema7 = {
+const helmServerSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     deploys: {
@@ -111,7 +111,7 @@ const helmServerSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for helm webapp settings */
-const helmWebappSettingsSchema: JSONSchema7 = {
+const helmWebappSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     deploys: {
@@ -139,12 +139,12 @@ const helmWebappSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for helm settings (union) */
-const helmSettingsSchema: JSONSchema7 = {
+const helmSettingsSchema: JsonSchema = {
   oneOf: [helmServerSettingsSchema, helmWebappSettingsSchema],
 };
 
 /** JSON Schema for database settings */
-const databaseSettingsSchema: JSONSchema7 = {
+const databaseSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     provider: {
@@ -164,7 +164,7 @@ const databaseSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for contract settings */
-const contractSettingsSchema: JSONSchema7 = {
+const contractSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     visibility: {
@@ -179,25 +179,25 @@ const contractSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for config settings (empty object) */
-const configSettingsSchema: JSONSchema7 = {
+const configSettingsSchema: JsonSchema = {
   type: 'object',
   additionalProperties: false,
 };
 
 /** JSON Schema for testing settings (empty object) */
-const testingSettingsSchema: JSONSchema7 = {
+const testingSettingsSchema: JsonSchema = {
   type: 'object',
   additionalProperties: false,
 };
 
 /** JSON Schema for cicd settings (empty object) */
-const cicdSettingsSchema: JSONSchema7 = {
+const cicdSettingsSchema: JsonSchema = {
   type: 'object',
   additionalProperties: false,
 };
 
 /** JSON Schema for server component */
-const serverComponentSchema: JSONSchema7 = {
+const serverComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -210,7 +210,7 @@ const serverComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for webapp component */
-const webappComponentSchema: JSONSchema7 = {
+const webappComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -223,7 +223,7 @@ const webappComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for helm component */
-const helmComponentSchema: JSONSchema7 = {
+const helmComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -236,7 +236,7 @@ const helmComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for database component */
-const databaseComponentSchema: JSONSchema7 = {
+const databaseComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -249,7 +249,7 @@ const databaseComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for contract component */
-const contractComponentSchema: JSONSchema7 = {
+const contractComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -262,7 +262,7 @@ const contractComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for config component */
-const configComponentSchema: JSONSchema7 = {
+const configComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', const: 'config' },
@@ -275,7 +275,7 @@ const configComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for testing component */
-const testingComponentSchema: JSONSchema7 = {
+const testingComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -288,7 +288,7 @@ const testingComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for cicd component */
-const cicdComponentSchema: JSONSchema7 = {
+const cicdComponentSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: { type: 'string', pattern: '^[a-z][a-z0-9-]*[a-z0-9]$' },
@@ -301,7 +301,7 @@ const cicdComponentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for any component */
-const componentSchema: JSONSchema7 = {
+const componentSchema: JsonSchema = {
   oneOf: [
     serverComponentSchema,
     webappComponentSchema,
@@ -315,7 +315,7 @@ const componentSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for SDD metadata */
-const sddMetadataSchema: JSONSchema7 = {
+const sddMetadataSchema: JsonSchema = {
   type: 'object',
   properties: {
     initialized_by_plugin_version: {
@@ -342,7 +342,7 @@ const sddMetadataSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for project metadata */
-const projectMetadataSchema: JSONSchema7 = {
+const projectMetadataSchema: JsonSchema = {
   type: 'object',
   properties: {
     name: {
@@ -360,7 +360,7 @@ const projectMetadataSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for logging settings */
-const loggingSettingsSchema: JSONSchema7 = {
+const loggingSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     enabled: {
@@ -380,7 +380,7 @@ const loggingSettingsSchema: JSONSchema7 = {
 };
 
 /** JSON Schema for SDD CLI system settings */
-const systemSettingsSchema: JSONSchema7 = {
+const systemSettingsSchema: JsonSchema = {
   type: 'object',
   properties: {
     logging: loggingSettingsSchema,
@@ -390,8 +390,8 @@ const systemSettingsSchema: JSONSchema7 = {
 };
 
 /** Complete JSON Schema for settings file */
-export const settingsFileSchema: JSONSchema7 = {
-  $schema: 'http://json-schema.org/draft-07/schema#',
+export const settingsFileSchema: JsonSchema = {
+  $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'SDD Settings File',
   description: 'Schema for .sdd/sdd-settings.yaml',
   type: 'object',

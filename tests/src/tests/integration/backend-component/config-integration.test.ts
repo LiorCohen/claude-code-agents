@@ -55,10 +55,10 @@ describe('Backend load_config.ts Template', () => {
    * WHY: JSON Schema validation catches config errors at startup.
    * Ajv is the standard JSON Schema validator.
    */
-  it('imports ajv for schema validation', () => {
+  it('imports ajv 2020-12 for schema validation', () => {
     const content = readFile(LOAD_CONFIG_PATH);
-    expect(content).toContain("from 'ajv'");
-    expect(content).toContain('Ajv');
+    expect(content).toContain("from 'ajv/dist/2020.js'");
+    expect(content).toContain('Ajv2020');
   });
 
   /**

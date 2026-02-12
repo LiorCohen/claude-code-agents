@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Scaffold Spec",
   "description": "Declarative specification for the SDD scaffolding engine.",
   "type": "object",
@@ -36,7 +37,7 @@
               "source": { "type": "string" },
               "dest": { "type": "string" },
               "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
-              "when": { "$ref": "#/definitions/when" }
+              "when": { "$ref": "#/$defs/when" }
             },
             "required": ["type", "source", "dest"],
             "additionalProperties": false
@@ -47,7 +48,7 @@
               "source": { "type": "string" },
               "dest": { "type": "string" },
               "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
-              "when": { "$ref": "#/definitions/when" }
+              "when": { "$ref": "#/$defs/when" }
             },
             "required": ["type", "source", "dest"],
             "additionalProperties": false
@@ -57,7 +58,7 @@
               "type": { "const": "mkdir" },
               "path": { "type": "string" },
               "gitkeep": { "type": "boolean" },
-              "when": { "$ref": "#/definitions/when" }
+              "when": { "$ref": "#/$defs/when" }
             },
             "required": ["type", "path"],
             "additionalProperties": false
@@ -68,7 +69,7 @@
               "path": { "type": "string" },
               "content": { "type": "string" },
               "if_exists": { "type": "string", "enum": ["skip", "overwrite"] },
-              "when": { "$ref": "#/definitions/when" }
+              "when": { "$ref": "#/$defs/when" }
             },
             "required": ["type", "path", "content"],
             "additionalProperties": false
@@ -80,7 +81,7 @@
                 "type": "object",
                 "additionalProperties": { "type": "string" }
               },
-              "when": { "$ref": "#/definitions/when" }
+              "when": { "$ref": "#/$defs/when" }
             },
             "required": ["type", "scripts"],
             "additionalProperties": false
@@ -89,7 +90,7 @@
       }
     }
   },
-  "definitions": {
+  "$defs": {
     "single_condition": {
       "type": "object",
       "required": ["key"],
@@ -106,10 +107,10 @@
     },
     "when": {
       "oneOf": [
-        { "$ref": "#/definitions/single_condition" },
+        { "$ref": "#/$defs/single_condition" },
         {
           "type": "array",
-          "items": { "$ref": "#/definitions/single_condition" },
+          "items": { "$ref": "#/$defs/single_condition" },
           "minItems": 1
         }
       ]
