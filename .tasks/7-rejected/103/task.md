@@ -1,10 +1,11 @@
 ---
 id: 103
 title: Validate sdd-settings writes against schema during sdd-change workflows
-status: planning
+status: rejected
 created: 2026-02-08 11:23 UTC
 depends_on: []
 blocks: []
+rejected_reason: "Obsolete — validation requirements already implemented via reconciliation system. reconcileSettings() validates all writes before persisting, and the reconcile CLI command blocks invalid settings. Different approach than planned but same outcome."
 ---
 
 # Task 103: Validate sdd-settings writes against schema during sdd-change workflows

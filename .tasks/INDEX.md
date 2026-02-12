@@ -5,7 +5,6 @@
 ## Planning
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
-- [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
 ---
 
@@ -148,6 +147,7 @@
 - [#59](7-rejected/59/): Audit and update all agents for compatibility — obsolete, audit completed, findings in #91
 - [#72](7-rejected/72/): Fix broken test benchmarks — obsolete
 - [#91](7-rejected/91/): Fix agents standards violations from audit report — obsolete
+- [#103](7-rejected/103/): Validate sdd-settings writes against schema — obsolete, implemented via reconciliation system
 
 ---
 
