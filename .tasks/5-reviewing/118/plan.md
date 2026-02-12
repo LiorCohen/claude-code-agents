@@ -1,7 +1,7 @@
 ---
 title: Upgrade all JSON schemas to latest stable version (2020-12)
-created: 2026-02-12
-updated: 2026-02-12
+created: 2026-02-12 09:15 UTC
+updated: 2026-02-12 09:39 UTC
 ---
 
 # Plan: Upgrade all JSON schemas to latest stable version (2020-12)

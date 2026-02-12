@@ -1,9 +1,9 @@
 ---
 id: 118
 title: Upgrade all JSON schemas to latest stable version (2020-12)
-status: implementing
+status: reviewing
 priority: high
-created: 2026-02-10
+created: 2026-02-10 11:47 UTC
 tags: [technical-debt, schema, standards]
 ---
 

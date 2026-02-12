@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#118](4-implementing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#118](5-reviewing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
 
 ---
 
