@@ -1,4 +1,5 @@
 ---
+name: critic
 description: >
   Two-step self-review at every task lifecycle phase. Step 1 (this skill)
   runs in-context to gather session signals — files read vs grepped, user
@@ -173,6 +174,20 @@ After the reviewer returns its report, combine both into a single output:
 
 If there are hard blocks: **"BLOCKED — resolve the above before proceeding."**
 If no hard blocks: **"CLEAR — proceed with noted warnings."**
+
+### Challenge Prompts
+
+Always end the critic output with 3-5 ready-to-use prompts the user can throw back at Claude to force deeper verification. These are questions the user gives TO Claude — they challenge Claude's work, not the user's judgement.
+
+Generate prompts tailored to the current phase, findings, and areas of low confidence. Examples:
+
+> - "Did you actually read [specific file], or are you assuming you know what's in it? Show me the part that confirms [specific claim]."
+> - "Walk me through how acceptance criterion N is met — show evidence, not assertions."
+> - "The plan says to modify [file]. Show me exactly what changed and why each change is justified."
+> - "You said [check] passed. Prove it — what command did you run and what was the output?"
+> - "What would break if I reverted [specific file]? If nothing, why did you change it?"
+
+Don't generate generic prompts. Reference actual files, acceptance criteria, and specific areas where the critic had medium or low confidence.
 
 **Critical rule: The critic NEVER auto-fixes.** All findings go to the human for decision.
 
