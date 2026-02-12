@@ -175,19 +175,17 @@ After the reviewer returns its report, combine both into a single output:
 If there are hard blocks: **"BLOCKED — resolve the above before proceeding."**
 If no hard blocks: **"CLEAR — proceed with noted warnings."**
 
-### Challenge Prompts
+### Challenge Prompt
 
-Always end the critic output with 3-5 ready-to-use prompts the user can throw back at Claude to force deeper verification. These are questions the user gives TO Claude — they challenge Claude's work, not the user's judgement.
+Always end the critic output with a single ready-to-use challenge prompt the user can throw back at Claude to force deeper verification. This is a prompt the user gives TO Claude — it challenges Claude's work, not the user's judgement.
 
-Generate prompts tailored to the current phase, findings, and areas of low confidence. Examples:
+The prompt should be a single block of text covering as many points as needed — every finding, every area of low confidence, every unverified claim. Don't split it into separate prompts. One prompt, all the pressure.
 
-> - "Did you actually read [specific file], or are you assuming you know what's in it? Show me the part that confirms [specific claim]."
-> - "Walk me through how acceptance criterion N is met — show evidence, not assertions."
-> - "The plan says to modify [file]. Show me exactly what changed and why each change is justified."
-> - "You said [check] passed. Prove it — what command did you run and what was the output?"
-> - "What would break if I reverted [specific file]? If nothing, why did you change it?"
+Generate the prompt tailored to the current phase, findings, and areas of low confidence. Example:
 
-Don't generate generic prompts. Reference actual files, acceptance criteria, and specific areas where the critic had medium or low confidence.
+> "Are you sure you're done? Walk me through every acceptance criterion and show me evidence — not assertions — that each one is met. Did you actually read [specific file] or are you assuming you know what's in it? Show me the part that confirms [specific claim]. The plan says to modify [file list] — show me exactly what changed and why each change is justified. You said [check] passed — prove it, what command did you run and what was the output? What would break if I reverted [specific file]? If nothing, why did you change it? Did you miss anything? Did you break anything? Verify."
+
+Don't generate a generic prompt. Reference actual files, acceptance criteria, and specific areas where the critic had medium or low confidence.
 
 **Critical rule: The critic NEVER auto-fixes.** All findings go to the human for decision.
 
