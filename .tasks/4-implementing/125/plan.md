@@ -28,7 +28,7 @@ Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vagu
 | `plugin/skills/component-discovery/SKILL.md` | Fix 2 vague refs (lines 206, 349) |
 | `plugin/skills/spec-solicitation/SKILL.md` | Fix 2 vague refs (lines 500-501), extract to resources/ |
 | `plugin/skills/spec-decomposition/SKILL.md` | Fix 1 vague ref (line 472), extract to resources/ |
-| `plugin/skills/typescript-standards/SKILL.md` | Extract to resources/ |
+| `plugin/skills/typescript-standards/SKILL.md` | Fix code block at line 404, extract to resources/ |
 | `plugin/skills/workflow-state/SKILL.md` | Extract to resources/ |
 | `plugin/skills/spec-writing/SKILL.md` | Extract to resources/ |
 | `plugin/skills/external-spec-integration/SKILL.md` | Extract to resources/ |
@@ -111,6 +111,12 @@ Misattributes responsibility — spec-writing validates schemas; spec-solicitati
 **Finding:** Research confirms **no actual circular dependency**. The relationship is unidirectional: workflow-state is a state store (provider), spec-solicitation is a consumer. Data flows one way: spec-solicitation reads context from workflow-state and writes specs back. The apparent circularity comes from both skills listing each other — but workflow-state:753 merely documents that spec-solicitation is a consumer (which is a valid delegation contract), not that it depends on it.
 
 **Fix:** The vague ref fixes in 1.2 (items 1-2) resolve this. workflow-state:753 already has a clear delegation contract — no change needed. spec-solicitation:500-501 gets proper contracts. No structural changes required.
+
+#### 1.4 Fix code block missing language specifier
+
+**Proof:** `typescript-standards/SKILL.md:404` has a fenced code block (` ``` `) without a language specifier.
+
+**Fix:** Change ` ``` ` to ` ```text ` at line 404 of `plugin/skills/typescript-standards/SKILL.md`.
 
 ### Phase 2: Size Reductions (P2/P3 — medium effort)
 
