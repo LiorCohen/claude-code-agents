@@ -7,7 +7,7 @@ created: 2026-02-12 19:00 UTC
 
 ## Problem Summary
 
-Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vague cross-references (13 "refer to project-settings" across 12 skills + 5 other vague refs), 10 oversized skills (6,608 total lines, limit is 500 each), and 1 circular dependency (apparent, not actual). All violations are in `plugin/skills/` markdown files — no TypeScript or runtime changes.
+Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vague cross-references (14 project-settings refs across 13 skills + 4 other vague refs), 10 oversized skills (6,608 total lines, limit is 500 each), and 1 circular dependency (apparent, not actual). All violations are in `plugin/skills/` markdown files — no TypeScript or runtime changes.
 
 ## Files to Modify
 
@@ -41,11 +41,11 @@ Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vagu
 
 ### Phase 1: Quick Fixes (P1 — low effort)
 
-#### 1.1 Fix 13 vague "refer to project-settings" refs
+#### 1.1 Fix 14 vague project-settings refs
 
-Each instance below uses the vague pattern "refer to the `project-settings` skill for X" without describing the delegation contract (what goes in, what comes out).
+Each instance below references the `project-settings` skill without describing the delegation contract (what goes in, what comes out).
 
-**Proof — all 13 instances with exact file paths and quoted text:**
+**Proof — all 14 instances with exact file paths and quoted text:**
 
 | # | File | Line | Violating Text |
 |---|------|------|----------------|
@@ -62,6 +62,7 @@ Each instance below uses the vague pattern "refer to the `project-settings` skil
 | 11 | `change-creation/SKILL.md` | 40 | "refer to the `project-settings` skill for schema" |
 | 12 | `components/integration-testing/integration-testing/SKILL.md` | 10 | "refer to the `project-settings` skill for directory mappings" |
 | 13 | `components/e2e-testing/e2e-testing/SKILL.md` | 10 | "refer to the `project-settings` skill for directory mappings" |
+| 14 | `component-discovery/SKILL.md` | 206 | "validate the discovered configuration against the rules defined in the `project-settings` skill" |
 
 All paths above are relative to `plugin/skills/`.
 
@@ -77,11 +78,11 @@ Adapted per-skill to mention only the settings relevant to that skill.
 
 > Delegate to the `project-settings` skill for directory path resolution. It maps component type + name to a filesystem path (e.g., `type=database, name=app-db` → `components/databases/app-db/`).
 
-**Template C — Validation reference** (component-discovery:206 — see section 1.3):
+**Template C — Validation reference** (instance 14):
 
 > Before returning, validate discovered configuration against the `project-settings` skill's cross-reference rules: databases referenced by servers must exist as database components, contracts must exist as contract components, helm `deploy_modes` must be valid for the server's `server_type`, and `deploys` must reference an existing server or webapp.
 
-#### 1.2 Fix 5 other vague cross-references
+#### 1.2 Fix 4 other vague cross-references
 
 **Proof and fix for each:**
 
@@ -97,11 +98,7 @@ spec-solicitation generates SPEC.md independently — this is not a runtime depe
 
 Vague — tells WHERE to look but not WHAT the contract is. Replace with: "The `requires_epic: true` flag signals that during implementation, the `change-creation` skill creates an epic structure: a parent `type: epic` change containing child `type: feature` changes in a `changes/` subdirectory."
 
-**4. component-discovery:206** — `"validate the discovered configuration against the rules defined in the \`project-settings\` skill"`
-
-Vague project-settings ref without specifying which rules. Replace with Template C from section 1.2 above.
-
-**5. component-discovery:349** — `"The output is used by \`spec-writing\` skill to populate Components section"`
+**4. component-discovery:349** — `"The output is used by \`spec-writing\` skill to populate Components section"`
 
 Misattributes responsibility — spec-writing validates schemas; spec-solicitation uses the output. Replace with: "Component list is stored in context.md. During spec solicitation, the `spec-solicitation` skill populates the Components section of SPEC.md using discovered components and solicited technical details."
 
@@ -249,8 +246,8 @@ Phase 2 items are independent of each other (each skill is modified in isolation
 
 ## Verification
 
-- [ ] All 13 vague "refer to project-settings" instances replaced with proper delegation contracts
-- [ ] 5 other vague cross-references fixed with clear delegation contracts
+- [ ] All 14 vague project-settings instances replaced with proper delegation contracts
+- [ ] 4 other vague cross-references fixed with clear delegation contracts
 - [ ] Circular dependency resolved (documentation clarified — no structural change needed)
 - [ ] All 10 previously oversized skills reduced to ≤500 lines
 - [ ] All resource files under 500 lines each
