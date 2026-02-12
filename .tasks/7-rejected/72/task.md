@@ -2,10 +2,11 @@
 id: 72
 title: Fix broken test benchmarks
 priority:
-status: open
+status: rejected
 created: 2026-02-01
 depends_on: []
 blocks: []
+rejected_reason: Obsolete
 ---
 
 # Task 72: Fix broken test benchmarks

@@ -74,7 +74,6 @@
 - [#80](1-inbox/80/): Plans should become YAML files
 - [#76](1-inbox/76/): Git worktrees for parallel spec/plan execution
 - [#74](1-inbox/74/): Task performance scoring system
-- [#72](1-inbox/72/): Fix broken test benchmarks
 - [#69](1-inbox/69/): Fix sdd-init workflow test timeout
 - [#12](1-inbox/12/): User onboarding and process state tracking
 - [#21](1-inbox/21/): Project sanity verification command
@@ -147,6 +146,7 @@
 - [#83](7-rejected/83/): Apply zero session context to sdd-implement workflow — obsolete, superseded by #81 and #85
 - [#84](7-rejected/84/): Apply zero session context to sdd-init workflow — obsolete, superseded by #81 and #85
 - [#59](7-rejected/59/): Audit and update all agents for compatibility — obsolete, audit completed, findings in #91
+- [#72](7-rejected/72/): Fix broken test benchmarks — obsolete
 
 ---
 
