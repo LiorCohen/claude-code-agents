@@ -27,6 +27,7 @@
 ---
 
 ## High Priority
+- [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#125](1-inbox/125/): Fix skills standards violations from audit report
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
@@ -62,7 +63,6 @@
 ---
 
 ## Inbox (unprioritized)
-- [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
