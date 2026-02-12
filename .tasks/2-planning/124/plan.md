@@ -15,7 +15,7 @@ Claude doesn't self-check. It over-engineers, agrees with everything, drifts fro
 | File | Changes |
 |------|---------|
 | `.claude/skills/critic/SKILL.md` | **New.** Main skill (~300 lines) — phase inference algorithm, core protocols, output format, `.crit/` integration, resource file references |
-| `.claude/skills/critic/resources/phases.md` | **New.** (~400 lines) Detailed per-phase checks for all 9 lifecycle phases with "The user says" voice sections |
+| `.claude/skills/critic/resources/phases.md` | **New.** (~400 lines) Detailed per-phase checks for all 8 lifecycle phases with "The user says" voice sections |
 | `.claude/skills/critic/resources/escalation.md` | **New.** (~150 lines) Escalation matrix — hard blocks vs soft warnings with trigger conditions and examples |
 | `.claude/skills/critic/resources/feedback-loop.md` | **New.** (~100 lines) Rules for maintaining `.crit/` feedback files — hygiene, merging, conflict resolution |
 | `.crit/planning.md` | **New.** Initial seed — learned patterns about planning mistakes (distilled from research) |
@@ -54,13 +54,13 @@ The critic must determine the current lifecycle phase entirely from filesystem a
    - Check `git diff --name-only HEAD` for uncommitted changes
    - Check `git diff --name-only main...HEAD` for all branch changes
    - Map to phase:
-     - Status `implementing` + uncommitted changes → **Phase 7: During implementation**
-     - Status `implementing` + no uncommitted changes → **Phase 6: Starting implementation** (or 8 if branch has substantial commits)
-     - Status `reviewing` → **Phase 8: Submitting for review**
+     - Status `implementing` + uncommitted changes → **Phase 6: During implementation**
+     - Status `implementing` + no uncommitted changes → **Phase 5: Starting implementation** (or 7 if branch has substantial commits)
+     - Status `reviewing` → **Phase 7: Submitting for review**
 3. If branch is `main`:
    - Check `.tasks/2-planning/*/task.md` for any task with status `planning` → **Phase 2/3/4: Planning phases**
    - Check `.tasks/1-inbox/` for recently created tasks → **Phase 1: Creating a task**
-   - Check if the most recent commit message starts with `Tasks: Complete` → **Phase 9: Completing a task**
+   - Check if the most recent commit message starts with `Tasks: Complete` → **Phase 8: Completing a task**
 4. If ambiguous (multiple active tasks, no clear signals) → **Ask the user** which task/phase to review. Never guess.
 
 **Disambiguating planning sub-phases (2, 3, 4):**
@@ -88,7 +88,7 @@ Each protocol is a concrete behavioral rule, not a vague aspiration.
 > - **Low**: Assumption without verification (e.g., "this approach seems consistent with existing patterns, but I haven't read the relevant files")
 > Low-confidence findings are explicitly flagged: "LOW CONFIDENCE — I haven't verified X because Y. The user should check this."
 
-**Diff audit (phases 8, 9 only):**
+**Diff audit (phases 7, 8 only):**
 > 1. Read `plan.md` from the task folder — parse the "Files to Modify" table to get expected file list
 > 2. Run `git diff --name-only main...HEAD` to get actual files changed on the branch
 > 3. Exclude `.tasks/` files from comparison (task management is meta-work)
@@ -98,7 +98,7 @@ Each protocol is a concrete behavioral rule, not a vague aspiration.
 >    - **Files match** → Confirm scope alignment
 > 5. For each file in diff, verify the change is justified line-by-line. If any change can't be traced to a plan item, flag it.
 
-**"Did you run it?" gate (phases 8, 9 only):**
+**"Did you run it?" gate (phases 7, 8 only):**
 > Before claiming completion, the critic checks for evidence:
 > 1. Were `npm test` and `npm run typecheck:plugin` run? (Check for recent test output in conversation, or ask)
 > 2. If plugin TypeScript was changed, was `npm run build:plugin` run?
@@ -142,31 +142,30 @@ If no hard blocks, it ends with: **"CLEAR — proceed with noted warnings."**
 
 **Section 4: `.crit/` Integration**
 
-At startup, the critic reads all `.crit/*.md` files using Glob + Read. For each phase, it prioritizes relevant topic files:
+After inferring the phase, the critic reads only the relevant `.crit/` topic files on-demand (not all files upfront). The mapping:
 
 | Phase | Primary .crit/ files | Secondary |
 |-------|---------------------|-----------|
 | 1 (creating task) | scope.md | planning.md |
-| 2-4 (planning) | planning.md, scope.md | implementation.md |
-| 5 (user review) | scope.md, communication.md | planning.md |
-| 6-7 (implementing) | implementation.md, scope.md | planning.md |
-| 8-9 (review/complete) | implementation.md, scope.md | communication.md |
+| 2-4 (planning) | planning.md, scope.md | communication.md |
+| 5-6 (implementing) | implementation.md, scope.md | planning.md |
+| 7-8 (review/complete) | implementation.md, scope.md | communication.md |
 
-All files are read, but phase-relevant ones are applied with higher weight.
+Only primary files are read by default. Secondary files are read if a finding references a pattern that might be covered there.
 
 **Section 5: Resource File References**
 
 ```markdown
 ## Resource Files
 
-- [phases.md](resources/phases.md) — Detailed checks for each of the 9 lifecycle phases
+- [phases.md](resources/phases.md) — Detailed checks for all 8 lifecycle phases
 - [escalation.md](resources/escalation.md) — Hard block vs soft warning classification criteria
 - [feedback-loop.md](resources/feedback-loop.md) — Rules for maintaining the .crit/ learning directory
 ```
 
 ### 2. Critic Skill — resources/phases.md (~400 lines)
 
-Each of the 9 phases gets a dedicated section with:
+Each of the 8 phases gets a dedicated section with:
 - **Context signals** — how the critic knows it's in this phase
 - **Checks** — 4-8 specific, actionable questions per phase
 - **"The user says"** — a voice section capturing the direct, skeptical review tone (what would the user ask?)
@@ -203,18 +202,13 @@ Each of the 9 phases gets a dedicated section with:
 - Are the "Changes" sections specific enough to implement without ambiguity?
 - Is the scope minimal — does every change serve the task's acceptance criteria?
 - Could a different Claude session implement this plan correctly from the text alone?
-- *"The user says: I'm going to read this plan cold. If I have to ask 'what does this mean?' or 'why is this needed?', the plan isn't ready. Make it self-contained."*
-- Escalation: Ambiguous changes = soft warning. Missing acceptance criteria coverage = hard block.
-
-**Phase 5: Before Approving a Plan** (user perspective — devil's advocate)
 - What's the simplest possible way to achieve this? Is the plan doing that?
 - What about existing patterns — does this plan deviate from how the codebase already works?
 - What would break if this plan is implemented? What's the blast radius?
-- Is there a reason NOT to do this? What are the risks?
-- *"The user says: 'What about X?' 'Did you consider Y?' 'Why not just Z?' 'This feels over-engineered.' 'You're missing the hard part.' 'What breaks if we do this?'"*
-- Escalation: All soft warnings (this phase is advisory)
+- *"The user says: I'm going to read this plan cold. If I have to ask 'what does this mean?' or 'why is this needed?', the plan isn't ready. 'What about X?' 'Did you consider Y?' 'Why not just Z?' 'This feels over-engineered.' 'You're missing the hard part.' 'What breaks if we do this?'"*
+- Escalation: Missing acceptance criteria coverage = hard block. Ambiguous changes = soft warning. Devil's advocate questions = soft warning.
 
-**Phase 6: Starting Implementation** (`/tasks implement`)
+**Phase 5: Starting Implementation** (`/tasks implement`)
 - Have you re-read the approved plan? (Not from memory — actually read plan.md)
 - Have you re-read the relevant standards skills (TypeScript, skills, agents, commands)?
 - Are you about to introduce complexity not in the plan?
@@ -222,7 +216,7 @@ Each of the 9 phases gets a dedicated section with:
 - *"The user says: The plan is approved. Follow it. Not 'inspired by it' — follow it. If you think the plan is wrong, come back and say so. Don't silently deviate."*
 - Escalation: Working on main = hard block. Didn't re-read plan = hard block. Others = soft warning.
 
-**Phase 7: During Implementation**
+**Phase 6: During Implementation** (ongoing)
 - Compare current changes (`git diff`) against the plan's "Files to Modify" table
 - Are you adding files not in the plan? Why?
 - Are you gold-plating? (Adding features, configurability, or "improvements" beyond scope)
@@ -232,7 +226,7 @@ Each of the 9 phases gets a dedicated section with:
 - *"The user says: Show me the diff. Does it match the plan? If you touched a file that's not in the plan, explain why or revert it. Scope creep is the #1 failure mode."*
 - Escalation: Files outside plan scope = hard block. Breaking tests = hard block. Gold-plating = soft warning.
 
-**Phase 8: Submitting for Review** (`/tasks review`)
+**Phase 7: Submitting for Review** (`/tasks review`)
 - **Run diff audit** (see SKILL.md Section 2)
 - **Run "did you run it?" gate** (see SKILL.md Section 2)
 - Are there leftover debug statements, console.log, TODO comments?
@@ -242,11 +236,11 @@ Each of the 9 phases gets a dedicated section with:
 - *"The user says: I'm going to review this diff line by line. Every line needs to justify its existence. If I see changes that aren't in the plan, I'm sending it back. If you say 'tests pass' without showing me output, I don't believe you."*
 - Escalation: Diff/plan mismatch = hard block. No test evidence = hard block. Leftover debug = soft warning.
 
-**Phase 9: Completing a Task** (`/tasks complete`)
+**Phase 8: Completing a Task** (`/tasks complete`)
 - Go through each acceptance criterion in task.md — is it met? With evidence?
 - Are there loose ends? (TODOs added during implementation, known issues deferred)
 - Is the branch ready to merge? (No uncommitted changes, clean state)
-- Were all hard blocks from Phase 8 resolved?
+- Were all hard blocks from Phase 7 resolved?
 - *"The user says: Don't tell me it's done — prove it. Check every acceptance criterion. If even one is not met, it's not done. I'd rather hear 'it's 90% done, here's what's left' than 'it's complete' when it isn't."*
 - Escalation: Unmet acceptance criteria = hard block. Uncommitted changes = hard block. TODOs added = soft warning.
 
@@ -258,29 +252,29 @@ Each of the 9 phases gets a dedicated section with:
 
 | ID | Trigger | Phase(s) | Action |
 |----|---------|----------|--------|
-| H1 | Files in diff not in plan (scope creep) | 7, 8, 9 | List unplanned files, require justification or revert |
-| H2 | Files in plan not in diff (incomplete) | 8, 9 | List missing files, require implementation or plan amendment |
-| H3 | Low confidence on architectural decision | 2, 3, 6 | Flag specific decision, ask user to verify |
+| H1 | Files in diff not in plan (scope creep) | 6, 7, 8 | List unplanned files, require justification or revert |
+| H2 | Files in plan not in diff (incomplete) | 7, 8 | List missing files, require implementation or plan amendment |
+| H3 | Low confidence on architectural decision | 2, 3, 5 | Flag specific decision, ask user to verify |
 | H4 | Contradicts CLAUDE.md or standards | All | Quote the violated rule, require fix |
-| H5 | Breaking existing tests | 7, 8 | Show failing test, require fix before proceeding |
-| H6 | Plugin boundary violation | 7, 8 | Show the cross-boundary reference, require removal |
-| H7 | Working on main during implementation | 6, 7 | Stop immediately, require feature branch |
-| H8 | No build/test evidence before review | 8, 9 | Require actual command output |
+| H5 | Breaking existing tests | 6, 7 | Show failing test, require fix before proceeding |
+| H6 | Plugin boundary violation | 6, 7 | Show the cross-boundary reference, require removal |
+| H7 | Working on main during implementation | 5, 6 | Stop immediately, require feature branch |
+| H8 | No build/test evidence before review | 7, 8 | Require actual command output |
 | H9 | Destructive command without verification | All | Flag the command, require user confirmation |
-| H10 | Unmet acceptance criteria at completion | 9 | List unmet criteria, block completion |
-| H11 | Didn't read files that are being modified | 2, 3, 6, 7 | Flag which files were only grepped, require full read |
+| H10 | Unmet acceptance criteria at completion | 8 | List unmet criteria, block completion |
+| H11 | Didn't read files that are being modified | 2, 3, 5, 6 | Flag which files were only grepped, require full read |
 
 **Soft Warnings** (critic outputs "WARNING" — noted but not blocking):
 
 | ID | Trigger | Phase(s) | Note |
 |----|---------|----------|------|
-| S1 | Minor style deviation | 7, 8 | Note the deviation, suggest fix |
-| S2 | Optional improvement spotted | 3, 7 | Suggest as future task, don't expand current scope |
-| S3 | Non-critical edge case | 3, 7 | Document as known limitation |
-| S4 | Documentation opportunity | 8 | Note but don't add unless in plan |
-| S5 | Verbose commit history | 8 | Suggest squash if excessive |
-| S6 | Gold-plating detected | 7 | Flag the extra work, note it's beyond scope |
-| S7 | TODOs added during implementation | 7, 8 | Note for follow-up, don't block |
+| S1 | Minor style deviation | 6, 7 | Note the deviation, suggest fix |
+| S2 | Optional improvement spotted | 3, 6 | Suggest as future task, don't expand current scope |
+| S3 | Non-critical edge case | 3, 6 | Document as known limitation |
+| S4 | Documentation opportunity | 7 | Note but don't add unless in plan |
+| S5 | Verbose commit history | 7 | Suggest squash if excessive |
+| S6 | Gold-plating detected | 6 | Flag the extra work, note it's beyond scope |
+| S7 | TODOs added during implementation | 6, 7 | Note for follow-up, don't block |
 
 ### 4. Critic Skill — resources/feedback-loop.md (~100 lines)
 
@@ -423,9 +417,9 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 
 ### Phase Inference Validation
 
-- [ ] Critic correctly identifies Phase 7 when on a `feature/task-N-*` branch with uncommitted changes and task status `implementing`
+- [ ] Critic correctly identifies Phase 6 when on a `feature/task-N-*` branch with uncommitted changes and task status `implementing`
 - [ ] Critic correctly identifies Phase 4 when on main with a task in `2-planning/` having complete plan.md and no uncommitted changes
-- [ ] Critic correctly identifies Phase 8 when on a feature branch with task status `reviewing`
+- [ ] Critic correctly identifies Phase 7 when on a feature branch with task status `reviewing`
 - [ ] Critic asks the user when context is ambiguous (multiple active tasks, no clear phase signals)
 - [ ] Phase inference handles edge case: no active tasks at all (asks user what to review)
 
@@ -441,8 +435,8 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 
 - [ ] Anti-grep rule triggers when files are grepped but not fully read
 - [ ] Counter-sycophancy protocol flags when user feedback contradicts standards
-- [ ] Diff audit compares plan's files table against actual branch diff (phases 8, 9)
-- [ ] "Did you run it?" gate requires build/test command output (phases 8, 9)
+- [ ] Diff audit compares plan's files table against actual branch diff (phases 7, 8)
+- [ ] "Did you run it?" gate requires build/test command output (phases 7, 8)
 - [ ] Confidence calibration distinguishes verified (high) from assumed (low)
 
 ### Integration Validation
