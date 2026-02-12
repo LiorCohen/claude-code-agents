@@ -58,6 +58,7 @@
 
 ### Unprioritized
 
+- [#127](1-inbox/127/): Fix system CLI TypeScript standards violations from audit
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
