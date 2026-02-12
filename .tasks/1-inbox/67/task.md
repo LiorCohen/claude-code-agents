@@ -2,7 +2,7 @@
 id: 67
 title: Store user instructions in plans, specs, and .sdd/
 priority: high
-status: planning
+status: inbox
 created: 2026-02-01 13:40 UTC
 depends_on: []
 blocks: []

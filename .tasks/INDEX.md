@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
+(none)
 
 ---
 
@@ -30,6 +30,7 @@
 
 ### High Priority
 
+- [#67](1-inbox/67/): Store user instructions in plans, specs, and .sdd/
 - [#125](1-inbox/125/): Fix skills standards violations from audit report
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
