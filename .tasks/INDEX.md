@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#125](2-planning/125/): Fix skills standards violations from audit report
+(none)
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#125](4-implementing/125/): Fix skills standards violations from audit report
 
 ---
 
