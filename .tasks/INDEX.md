@@ -62,7 +62,7 @@
 ---
 
 ## Inbox (unprioritized)
-- [#126](1-inbox/126/): Implement skill auto-activation hook system with YAML-based skill-rules config
+- [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
