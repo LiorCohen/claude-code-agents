@@ -32,12 +32,12 @@ Read the files, know the state. This enables aggressive context compaction and a
 ├── sdd-settings.yaml
 ├── archive/
 │   ├── external-specs/         # External specs archived here (read-only)
-│   │   └── 20260205-feature-spec.md  # yyyymmdd-lowercased-filename.md
+│   │   └── 20260205-1430-feature-spec.md  # yyyymmdd-HHmm-lowercased-filename.md
 │   ├── revised-specs/          # Specs removed during decomposition revision
-│   │   └── a1b2c3-03-password-reset-20260205/
+│   │   └── 20260205-1430-a1b2c3-03-password-reset/
 │   │       └── SPEC.md
-│   └── regressions/            # Work archived during phase regression
-│       └── a1b2-1-impl-20260205/
+│   └── workflow-regressions/   # Work archived during phase regression
+│       └── 20260205-1430-a1b2-1-impl/
 │           ├── changes.patch   # Git patch for committed changes
 │           ├── stash.patch     # Git stash for uncommitted changes
 │           ├── src/            # Implementation files
@@ -64,7 +64,7 @@ Read the files, know the state. This enables aggressive context compaction and a
 When work is archived during regression:
 
 ```yaml
-# .sdd/archive/regressions/a1b2-1-impl-20260205/metadata.yaml
+# .sdd/archive/workflow-regressions/20260205-1430-a1b2-1-impl/metadata.yaml
 change_id: a1b2-1
 from_phase: implement
 to_phase: spec
@@ -191,7 +191,7 @@ regression:
   reason: "Need to add OAuth support"
   timestamp: 2026-02-05T14:30:00Z
   preserved_work:
-    - path: .sdd/archive/regressions/02-auth-impl-20260205/
+    - path: .sdd/archive/workflow-regressions/20260205-1430-02-auth-impl/
       type: implementation
       description: "Partial password auth implementation"
 ```
@@ -240,7 +240,7 @@ The old design had a single `status` field with immediate `spec_approved → pla
 | review → impl | `/sdd-change request-changes <id>` | Implementation needs changes |
 | review → spec | `/sdd-change regress <id> --to spec` | Major revision needed |
 
-Regression archives discarded work to `.sdd/archive/regressions/`.
+Regression archives discarded work to `.sdd/archive/workflow-regressions/`.
 
 ## Internal API
 
@@ -474,7 +474,7 @@ reason: "Need to add OAuth support"
 success: true
 from_phase: implement
 to_phase: spec
-archived_to: .sdd/archive/regressions/a1b2-1-impl-20260205/
+archived_to: .sdd/archive/workflow-regressions/20260205-1430-a1b2-1-impl/
 cascade_effects:
   - change_id: a1b2-2
     current_spec_status: approved
@@ -483,7 +483,7 @@ cascade_effects:
 ```
 
 **Side Effects:**
-- Archives implementation to `.sdd/archive/regressions/`
+- Archives implementation via system CLI: `archive store --source <prepared-dir> --type workflow-regression`
 - Uses `git stash` for uncommitted changes
 - Creates patch for committed-but-not-pushed changes
 - Updates item's status fields
@@ -635,7 +635,7 @@ affected_items:
     action: preserved_as_target
   - change_id: a1b2-3
     action: archived
-    archive_path: .sdd/archive/revised-specs/a1b2c3-03-password-reset-20260205/
+    archive_path: .sdd/archive/revised-specs/20260205-1430-a1b2c3-03-password-reset/
 rereviews_needed:
   - change_id: a1b2-4
     reason: "Dependency on merged item"
@@ -645,7 +645,7 @@ progress_update:
 ```
 
 **Side Effects:**
-- For merge: archives removed spec to `.sdd/archive/revised-specs/`
+- For merge: archives removed spec via system CLI: `archive store --source <draft-dir> --type revised-spec`
 - Updates `workflow.yaml` item structure
 - Flags affected approved specs for re-review
 - Updates progress aggregates

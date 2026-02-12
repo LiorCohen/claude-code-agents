@@ -11,7 +11,7 @@ Processes external specification files into the SDD workflow structure. Transfor
 ## Purpose
 
 When a user provides an external specification via `/sdd-change new --spec`:
-- Archive the external spec to `.sdd/archive/external-specs/` (single copy, yyyymmdd-filename format)
+- Archive the external spec to `.sdd/archive/external-specs/` (single copy, yyyymmdd-HHmm-filename format)
 - **TRANSFORM** the spec: classify information, identify gaps, ask clarifying questions
 - **DISCOVER** required components through targeted questions
 - **DECOMPOSE** into workflow items with classified context
@@ -58,17 +58,17 @@ Returns archived spec path, workflow ID, hierarchical flag, and list of created 
 
 ### Step 1: Archive External Spec
 
-**Single location, single copy:**
+**Single location, single copy — use the system CLI:**
 
-1. Create archive directory: `.sdd/archive/external-specs/`
-2. Generate filename: `yyyymmdd-lowercased-original-name.md`
-3. Copy external spec to archive location
-4. Display: "Archived to: .sdd/archive/external-specs/20260205-feature-spec.md"
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <external-spec-path> --type external-spec --json
+```
 
-**For directories:**
-1. Create archive subdirectory: `.sdd/archive/external-specs/yyyymmdd-dirname/`
-2. Copy all files preserving structure
-3. Display file count
+The CLI handles datetime-prefix naming (`yyyymmdd-HHmm-lowercased-original-name.md`), directory creation, and lowercasing automatically. Parse the JSON result to get `archived_path`.
+
+**For directories**, the same command works — the CLI detects directory sources and copies all files preserving structure, returning `is_directory: true` and `file_count`.
+
+Display the result: `"Archived to: .sdd/archive/external-specs/20260205-1430-feature-spec.md"`
 
 **IMPORTANT**: This is the ONLY copy. The archived spec is read-only and for audit trail only.
 

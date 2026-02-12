@@ -193,7 +193,7 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     {
       type: 'write_file',
       path: '.claudeignore',
-      content: 'archive/\n',
+      content: '.sdd/archive/\n',
     },
   ];
 
@@ -241,7 +241,9 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     'specs/domain/use-cases',
     'specs/architecture',
     'changes',
-    'archive',
+    '.sdd/archive/external-specs',
+    '.sdd/archive/revised-specs',
+    '.sdd/archive/workflow-regressions',
   ];
   const gitkeepOps: ReadonlyArray<ScaffoldOperation> = gitkeepDirs.map((dir) => ({
     type: 'mkdir' as const,

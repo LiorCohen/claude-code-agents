@@ -259,10 +259,14 @@ Same as interactive flow - suggest branch if on main/master.
 
 #### Step 4: Archive External Spec
 
-Copy to `.sdd/archive/external-specs/` with format: `yyyymmdd-lowercased-filename.md`
+Use the system CLI to archive:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <spec-path> --type external-spec --json
+```
 
 ```
-Archived external spec to: [.sdd/archive/external-specs/20260205-feature-spec.md](.sdd/archive/external-specs/20260205-feature-spec.md)
+Archived external spec to: [.sdd/archive/external-specs/20260205-1430-feature-spec.md](.sdd/archive/external-specs/20260205-1430-feature-spec.md)
 (This is read-only - for audit trail only)
 ```
 
@@ -1033,7 +1037,7 @@ Go back to an earlier phase (e.g., from planning back to spec).
 ### Flow
 
 1. Validate change exists
-2. Archive current state to `.sdd/archive/regressions/`
+2. Archive current state via system CLI: `archive store --source <prepared-dir> --type workflow-regression`
 3. Reset status fields for target phase and later
 4. Flag dependent items for re-review
 5. Log regression reason
@@ -1046,7 +1050,7 @@ Regressing [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) to spec phase...
 Reason: Need to add OAuth support
 
 Archived:
-  [PLAN.md](.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md) → [.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md](.sdd/archive/regressions/a1b2-1/20260205-120000/PLAN.md)
+  [PLAN.md](.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md) → [.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md](.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md)
 
 Status changes:
   spec_status: approved → needs_rereview

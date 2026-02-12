@@ -187,7 +187,6 @@ components: []
 
     // Verify external spec is archived to .sdd/archive/external-specs/
     expect(projectIsDir(testProject, '.sdd', 'archive', 'external-specs')).toBe(true);
-    // The file will be named with date prefix, so just check directory exists
     console.log('✓ External spec archived to .sdd/archive/external-specs/');
 
     // Verify changes directory exists
@@ -210,6 +209,16 @@ components: []
         return [];
       }
     };
+
+    // Verify archived file has datetime-prefix format (yyyymmdd-HHmm-lowercased-name.md)
+    const archiveDir = joinPath(testProject.path, '.sdd', 'archive', 'external-specs');
+    const archiveFiles = await findFiles(archiveDir, '*.md');
+    if (archiveFiles.length > 0) {
+      const archivedName = archiveFiles[0]!.split('/').pop() ?? '';
+      // Should match pattern: 8 digits, dash, 4 digits, dash, lowercased name
+      expect(archivedName).toMatch(/^\d{8}-\d{4}-[a-z0-9-]+\.md$/);
+      console.log(`✓ External spec archived with datetime prefix: ${archivedName}`);
+    }
 
     // Check for workflow.yaml in .sdd/workflows/
     const workflowsDir = joinPath(testProject.path, '.sdd', 'workflows');
