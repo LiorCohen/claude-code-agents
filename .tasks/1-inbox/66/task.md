@@ -2,8 +2,8 @@
 id: 66
 title: Single context-aware SDD command
 priority: medium
-status: open
-created: 2026-01-31
+status: inbox
+created: 2026-01-31 17:08 UTC
 depends_on: []
 blocks: []
 ---

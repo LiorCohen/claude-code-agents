@@ -492,10 +492,10 @@ testkube get execution <execution-id> --output json
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020.js';
 import openApiSpec from '../../../../contract/openapi.json';
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv2020({ allErrors: true });
 
 describe('API Contract Compliance', () => {
   describe('POST /api/users', () => {

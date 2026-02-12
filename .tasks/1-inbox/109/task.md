@@ -2,8 +2,8 @@
 id: 109
 title: Ban Claude's built-in memory - causes non-deterministic behavior
 priority: high
-status: open
-created: 2026-02-08
+status: inbox
+created: 2026-02-08 15:00 UTC
 depends_on: []
 blocks: []
 ---

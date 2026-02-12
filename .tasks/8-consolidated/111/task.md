@@ -1,9 +1,10 @@
 ---
 id: 111
 title: Fix test suite creating .sdd/ artifacts in source directories
-status: inbox
+status: consolidated
 priority: high
 created: 2026-02-09
+consolidated_into: 114
 ---
 
 # Fix test suite creating .sdd/ artifacts in source directories

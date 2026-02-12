@@ -1,9 +1,8 @@
 ---
 id: 21
 title: Project sanity verification command
-priority: inbox
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 21: Project sanity verification command

@@ -1,9 +1,8 @@
 ---
 id: 38
 title: Integration and E2E testing should be separate components
-priority: inbox
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 38: Integration and E2E testing should be separate components

@@ -2,8 +2,8 @@
 id: 82
 title: Reorganize archive into .sdd directory
 priority: medium
-status: open
-created: 2026-02-05
+status: inbox
+created: 2026-02-05 14:32 UTC
 depends_on: []
 blocks: []
 ---

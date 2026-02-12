@@ -1,9 +1,8 @@
 ---
 id: 33
 title: Tests are not useful - need better test creation approach
-priority: inbox
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 33: Tests are not useful - need better test creation approach

@@ -1,6 +1,7 @@
 ---
 title: Validate sdd-settings writes against schema during sdd-change workflows
-created: 2026-02-08
+created: 2026-02-08 15:40 UTC
+updated: 2026-02-08 18:37 UTC
 ---
 
 # Implementation Plan: Validate sdd-settings writes against schema

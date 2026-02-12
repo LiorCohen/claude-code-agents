@@ -1,8 +1,8 @@
 ---
 id: 108
 title: Plans created using sdd-change should include timestamps in implementation status
-status: open
-created: 2026-02-08
+status: inbox
+created: 2026-02-08 14:46 UTC
 depends_on: []
 blocks: []
 ---

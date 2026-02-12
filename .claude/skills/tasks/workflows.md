@@ -68,11 +68,11 @@ User: /tasks prioritize 15 low
 User: /tasks plan 19
 ```
 
-**Workflow:**
+**Workflow — Phase 1 (transition first, before any planning work):**
 1. Find task folder
 2. Move folder to `2-planning/`
 3. Update `task.md` frontmatter: `status: planning`
-4. Create `plan.md` in the task folder
+4. Create empty `plan.md` skeleton in the task folder (frontmatter + headings only, no content yet)
 5. Update INDEX.md
 6. Stage changes and use commit skill (e.g., "Tasks: Move #19 to planning")
 7. Confirm with clickable link to plan
@@ -84,7 +84,10 @@ Task #19 moved to planning status.
 Plan: [plan.md](.tasks/2-planning/19/plan.md)
 ```
 
-Use when starting to create a plan for a task.
+**Workflow — Phase 2 (only after the transition commit completes):**
+8. Research the codebase and write the actual plan content in `plan.md`
+
+**IMPORTANT:** The status transition and commit MUST complete before any planning work begins. Do not start researching or writing plan content until the transition is committed.
 
 ---
 
@@ -219,7 +222,7 @@ User: /tasks complete 7
    c. Remove the worktree with `git worktree remove`
    d. Delete the feature branch only if it has been fully merged into main
 3. Move folder to `6-complete/`
-4. Update `task.md` frontmatter: `status: complete`, add `completed` date
+4. Update `task.md` frontmatter: `status: complete`, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
 5. Update INDEX.md
 6. Commit the task transition on main (e.g., "Tasks: Complete #7")
 
@@ -283,10 +286,10 @@ User: /tasks audit
 #### 2. Frontmatter Compliance
 - All required fields present (`id`, `title`, `status`, `created`)
 - `id` matches the folder name
-- `status` matches the directory the task lives in (e.g., `1-inbox/` → `open`, `7-rejected/` → `rejected`)
+- `status` matches the directory the task lives in (e.g., `1-inbox/` → `inbox`, `7-rejected/` → `rejected`)
 - Rejected tasks have `rejected_reason`
 - Consolidated tasks have `consolidated_into`
-- Completed tasks have `completed` date
+- Completed tasks have `completed` datetime
 - `priority` is a valid value (`low`, `medium`, `high`) or absent
 - `depends_on` and `blocks` reference task IDs that exist
 
@@ -323,7 +326,7 @@ User: /tasks audit
 # Tasks Audit — YYYY-MM-DD_HH-MM
 
 ## Errors (must fix)
-- [ ] #14: Frontmatter `status: open` but task is in `9-rejected/` directory
+- [ ] #14: Frontmatter `status: inbox` but task is in `7-rejected/` directory
 - [ ] INDEX.md references #99 but no task folder exists
 
 ## Warnings (should fix)

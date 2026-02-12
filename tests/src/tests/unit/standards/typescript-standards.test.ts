@@ -16,6 +16,9 @@ const TESTS_SRC = join(REPO_ROOT, 'tests', 'src');
 // Files to exclude from CommonJS checks (this test file checks for these patterns)
 const SELF_FILE = 'typescript-standards.test.ts';
 
+// AJV wrapper requires .js extension for Node.js ESM subpath resolution (ajv/dist/2020.js)
+const JS_EXTENSION_ALLOWED = new Set(['json-schema.ts']);
+
 const walkTs = (dir: string): readonly string[] => {
   const entries = readdirSync(dir, { withFileTypes: true });
   return entries.flatMap((entry) => {
@@ -38,6 +41,7 @@ describe('TypeScript Standards Conformance', () => {
       const violations: string[] = [];
 
       for (const file of allTsFiles) {
+        if (JS_EXTENSION_ALLOWED.has(file.split('/').pop()!)) continue;
         const content = readFileSync(file, 'utf-8');
         const lines = content.split('\n');
 

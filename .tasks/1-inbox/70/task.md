@@ -2,8 +2,8 @@
 id: 70
 title: Git checkpoint workflow for AI-assisted development
 priority: medium
-status: open
-created: 2026-02-01
+status: inbox
+created: 2026-02-01 21:14 UTC
 depends_on: []
 blocks: []
 ---

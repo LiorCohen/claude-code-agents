@@ -1,9 +1,9 @@
 ---
 id: 113
 title: Investigate and remove domain dead code across plugin
-status: open
+status: inbox
 priority: medium
-created: 2026-02-09
+created: 2026-02-09 13:42 UTC
 depends_on: []
 blocks: []
 ---

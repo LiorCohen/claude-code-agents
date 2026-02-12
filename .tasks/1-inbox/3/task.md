@@ -1,9 +1,9 @@
 ---
 id: 3
-title: Docs missing - CMDO Guide
+title: "Docs missing: CMDO Guide"
 priority: low
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 3: Docs missing: CMDO Guide

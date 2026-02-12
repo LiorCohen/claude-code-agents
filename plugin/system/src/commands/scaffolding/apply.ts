@@ -10,23 +10,22 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Ajv from 'ajv';
 import type { CommandResult } from '@/lib/args';
 import { parseNamedArgs } from '@/lib/args';
+import { compileSchema, type SchemaValidateFunction, type JsonSchema } from '@/lib/json-schema';
 import { exists, readText, isDirectory } from '@/lib/fs';
 import { executeSpec } from './engine';
 import type { ScaffoldSpec } from './engine';
 
 /** Load and compile the JSON Schema validator (lazy singleton via Map). */
 const getSchemaValidator = (() => {
-  const cache = new Map<string, ReturnType<Ajv['compile']>>();
-  return (): ReturnType<Ajv['compile']> => {
+  const cache = new Map<string, SchemaValidateFunction>();
+  return (): SchemaValidateFunction => {
     const existing = cache.get('validator');
     if (existing) return existing;
     const schemaPath = join(dirname(fileURLToPath(import.meta.url)), 'scaffold-spec.schema.json');
-    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as Readonly<Record<string, unknown>>;
-    const ajv = new Ajv({ allErrors: true });
-    const validate = ajv.compile(schema);
+    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as JsonSchema;
+    const validate = compileSchema(schema);
     cache.set('validator', validate);
     return validate;
   };

@@ -2,7 +2,7 @@
 id: 124
 title: Add critic skill for self-checking at every task lifecycle phase
 status: inbox
-created: 2026-02-10
+created: 2026-02-10 16:17 UTC
 priority: high
 depends_on: []
 blocks: []

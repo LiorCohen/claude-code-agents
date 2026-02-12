@@ -2,8 +2,8 @@
 id: 20
 title: Plugin installation debugging skill + workflow fix
 priority: low
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 20: Plugin installation debugging skill + workflow fix

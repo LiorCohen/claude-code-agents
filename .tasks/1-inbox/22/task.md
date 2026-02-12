@@ -2,8 +2,8 @@
 id: 22
 title: Add critic agent to marketplace
 priority: low
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 22: Add critic agent to marketplace

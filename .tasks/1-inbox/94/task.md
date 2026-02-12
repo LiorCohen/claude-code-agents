@@ -1,8 +1,8 @@
 ---
 id: 94
 title: local-env is missing settings
-status: open
-created: 2026-02-07
+status: inbox
+created: 2026-02-07 11:40 UTC
 depends_on: []
 blocks: []
 ---

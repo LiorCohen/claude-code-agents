@@ -1,9 +1,8 @@
 ---
 id: 80
 title: Plans should become YAML files
-priority:
-status: open
-created: 2026-02-04
+status: inbox
+created: 2026-02-05 07:56 UTC
 depends_on: []
 blocks: []
 ---

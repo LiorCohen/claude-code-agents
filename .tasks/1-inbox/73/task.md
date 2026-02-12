@@ -2,8 +2,8 @@
 id: 73
 title: User instructions memory for plugin overrides
 priority: low
-status: open
-created: 2026-02-01
+status: inbox
+created: 2026-02-01 21:18 UTC
 depends_on: []
 blocks: []
 ---

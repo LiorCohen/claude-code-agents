@@ -1,8 +1,8 @@
 ---
 id: 69
 title: Fix sdd-init workflow test timeout
-status: open
-created: 2026-02-01
+status: inbox
+created: 2026-02-01 19:27 UTC
 depends_on: []
 blocks: []
 ---

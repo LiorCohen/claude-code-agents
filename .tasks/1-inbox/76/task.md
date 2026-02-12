@@ -1,8 +1,8 @@
 ---
 id: 76
 title: Git worktrees for parallel spec/plan execution
-status: open
-created: 2026-02-02
+status: inbox
+created: 2026-02-02 12:08 UTC
 depends_on: []
 blocks: []
 ---

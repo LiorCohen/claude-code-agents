@@ -1,8 +1,8 @@
 ---
 id: 102
 title: sdd-change verify should never mark complete without explicit user authorization
-status: open
-created: 2026-02-08
+status: inbox
+created: 2026-02-08 10:08 UTC
 depends_on: []
 blocks: []
 ---

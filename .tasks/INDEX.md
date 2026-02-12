@@ -16,23 +16,21 @@
 
 ## Implementing
 
-- [#118](4-implementing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#118](5-reviewing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
 
 ---
 
 ## High Priority
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
-- [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
-- [#91](1-inbox/91/): Fix agents standards violations from audit report
 
 ---
 
@@ -74,7 +72,6 @@
 - [#80](1-inbox/80/): Plans should become YAML files
 - [#76](1-inbox/76/): Git worktrees for parallel spec/plan execution
 - [#74](1-inbox/74/): Task performance scoring system
-- [#72](1-inbox/72/): Fix broken test benchmarks
 - [#69](1-inbox/69/): Fix sdd-init workflow test timeout
 - [#12](1-inbox/12/): User onboarding and process state tracking
 - [#21](1-inbox/21/): Project sanity verification command
@@ -147,6 +144,8 @@
 - [#83](7-rejected/83/): Apply zero session context to sdd-implement workflow — obsolete, superseded by #81 and #85
 - [#84](7-rejected/84/): Apply zero session context to sdd-init workflow — obsolete, superseded by #81 and #85
 - [#59](7-rejected/59/): Audit and update all agents for compatibility — obsolete, audit completed, findings in #91
+- [#72](7-rejected/72/): Fix broken test benchmarks — obsolete
+- [#91](7-rejected/91/): Fix agents standards violations from audit report — obsolete
 
 ---
 
@@ -176,3 +175,4 @@
 - [#57](8-consolidated/57/) → #44
 - [#101](8-consolidated/101/) → #100
 - [#10](8-consolidated/10/) → #66
+- [#111](8-consolidated/111/) → #114

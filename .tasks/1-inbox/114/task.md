@@ -3,10 +3,10 @@ id: 114
 title: Use .temp/ for test environments and preserve on failure
 status: inbox
 priority: high
-created: 2026-02-09
+created: 2026-02-09 14:59 UTC
 ---
 
-# Use .temp/ for test environments and preserve on failure
+# Task 114: Use .temp/ for test environments and preserve on failure
 
 ## Problem
 
@@ -26,3 +26,7 @@ Tests currently create temporary directories in OS temp (`/tmp`) via `mkdtemp()`
 - `tests/src/lib/paths.ts:17` — `TEST_OUTPUT_DIR` defaults to `/tmp/sdd-tests`
 - `tests/src/lib/project.ts:27-30` — `createTestProject()` uses `TEST_OUTPUT_DIR`
 - Various test files use `afterEach`/`afterAll` with `rmdir()` for unconditional cleanup
+
+## Consolidated From
+
+- **#111**: Fix test suite creating .sdd/ artifacts in source directories — tests create `.sdd/system-logs/` in `tests/` source dir because logger uses `process.cwd()`. Moving test environments to `.temp/` resolves this as a side effect.

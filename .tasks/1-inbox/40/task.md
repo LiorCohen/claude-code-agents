@@ -1,9 +1,8 @@
 ---
 id: 40
 title: Fix sdd-change-new test - spec format mismatch
-priority: inbox
-status: open
-created: 2026-01-25
+status: inbox
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 40: Fix sdd-change-new test - spec format mismatch
