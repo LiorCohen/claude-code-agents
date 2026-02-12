@@ -15,3 +15,5 @@
 - Don't add configurability, feature flags, or backwards-compatibility shims
 - Don't design for N when you only need 1
 - If the solution is more complex than the problem, reconsider the approach
+- When replacing an existing feature, systematically compare old vs new capability lists — enumerate every check/behavior the old version performs and verify the new version covers each one or explicitly justifies dropping it
+- Don't assume macOS has GNU tools — `grep -P` (Perl regex) doesn't work on BSD grep; use bash `[[ =~ ]]` for regex matching in portable scripts

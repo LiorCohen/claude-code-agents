@@ -30,10 +30,10 @@ The project has two hook gaps:
 A bash command-type hook registered in `.claude/settings.json` under `UserPromptSubmit`. When the user submits a prompt, Claude Code passes the prompt via stdin as JSON (includes `user_prompt` field). The hook script:
 
 - Reads stdin JSON and extracts `user_prompt` via `jq`
-- Loads `.claude/skill-rules.yaml` (relative to `cwd` from stdin) — parsed via `yq` (YAML→JSON) piped to `jq`, or if `yq` is unavailable, falls back to a simple line-based parser for the flat YAML structure
+- Loads `.claude/skill-rules.yaml` (relative to `cwd` from stdin) — parsed via `yq` (YAML→JSON) piped to `jq`
 - Iterates over rules and matches the prompt against three trigger types:
   - **keywords** — case-insensitive substring match via bash `[[ "${prompt,,}" == *"${keyword,,}"* ]]`
-  - **patterns** — regex match via `grep -qiP "$pattern"` or bash `[[ "$prompt" =~ $pattern ]]`
+  - **patterns** — regex match via bash `[[ "$prompt" =~ $pattern ]]` (BSD grep on macOS doesn't support `-P`, so use native bash regex)
   - **file_paths** — file path extraction from the prompt (tokens containing `/` and ending with known extensions like `.ts`, `.tsx`, `.md`, `.sh`, `.json`, `.yaml`), then glob matching against rule patterns. If no file paths are found in the prompt, file_path triggers are skipped for that rule.
 - If any rules match, outputs `{ "systemMessage": "Relevant skills for this task:\n- /skill-name — description\n- ..." }` via `jq`
 - If no rules match, outputs `{}` (no-op)
@@ -73,34 +73,44 @@ Skills to include rules for:
 - `critic` — task lifecycle work (review, complete, plan, implement)
 - `docs-standards` — documentation or plugin functionality changes
 - `manifest-validation` — manifest/plugin.json changes
+- `plugin-product-standards` — plugin DX review, product quality
 
 ### 3. Objective Stop hook
 
 A bash script that replaces the current prompt-based Stop hook. Runs actual verification commands and reports findings as structured JSON via `jq`.
 
-Checks performed:
+Checks performed (all objective — no self-assessment):
 1. **Uncommitted changes** — runs `git status --porcelain` and reports any dirty files
-2. **Feature branch detection** — checks if current branch matches `feature/task-*` pattern
-3. **Typecheck** — if on a feature branch and `git diff --name-only` shows files under `plugin/system/`, runs `npm run typecheck:plugin` and captures output. Skipped entirely on main or when no plugin/system files are dirty
-4. **Summary** — assembles findings into structured JSON output via `jq`
+2. **Feature branch detection** — checks if current branch matches `feature/task-*` pattern; extracts task ID
+3. **Task status check** — if on a feature branch, verifies the task folder exists in `.tasks/4-implementing/` or `.tasks/5-reviewing/`. Reports if the task is still in implementing (may need to move to review)
+4. **Typecheck** — if on a feature branch and `git diff --name-only` shows files under `plugin/system/`, runs `npm run typecheck:plugin` and captures output. Skipped on main or when no plugin/system files are dirty
+5. **Tests** — if on a feature branch, runs `npm test` and captures exit code + output. Skipped on main
+6. **Reminders** — appends non-objective reminders to systemMessage that only Claude can evaluate: "Have all acceptance criteria been addressed?", "Did you check for contradictions or inconsistencies?", "Did you update docs if needed?"
 
 Output format follows Claude Code's Stop hook contract:
-- If issues found: `{ "decision": "block", "reason": "...", "systemMessage": "..." }`
-- If clean: `{ "decision": "approve", "systemMessage": "Pre-stop checks passed: no uncommitted changes, typecheck clean" }`
+- If any objective check fails: `{ "decision": "block", "reason": "...", "systemMessage": "..." }`
+- If all objective checks pass: `{ "decision": "approve", "systemMessage": "..." }`
 
-The `systemMessage` contains a structured report:
+The `systemMessage` always includes the full report (even on approve), so Claude sees what was verified:
 ```
 ## Pre-stop verification
 
 ### Uncommitted changes
-- plugin/system/src/foo.ts (modified)
-- .tasks/INDEX.md (modified)
+CLEAN — no uncommitted changes
 
 ### Branch context
-On feature branch: feature/task-126-hooks
+On feature branch: feature/task-126-hooks (task #126, status: implementing)
 
 ### Typecheck
 PASS — no type errors
+
+### Tests
+PASS — all tests passed
+
+### Reminders
+- Have all acceptance criteria from the plan been addressed?
+- Are there any contradictions or inconsistencies in the codebase?
+- Did you update docs if plugin functionality changed?
 ```
 
 ### 4. Settings registration
@@ -143,7 +153,7 @@ Update `.claude/settings.json` to:
 
 1. `skill-rules.yaml` must exist before the UserPromptSubmit hook can work
 2. `jq` must be installed (used by both hooks for JSON I/O)
-3. `yq` recommended for YAML parsing (fallback to line-based parsing if unavailable)
+3. `yq` must be installed (used by skill-activate hook for YAML→JSON conversion)
 4. Both hook scripts must be executable (`chmod +x`)
 
 Sequencing: Create skill-rules.yaml and hook scripts first, then update settings.json last.
@@ -168,6 +178,11 @@ Sequencing: Create skill-rules.yaml and hook scripts first, then update settings
 - `test_stop_check_runs_typecheck_on_feature_branch` — on feature branch with plugin changes, runs typecheck
 - `test_stop_check_skips_typecheck_on_main` — on main, skips typecheck
 - `test_stop_check_reports_typecheck_failure` — typecheck errors are included in block reason
+- `test_stop_check_runs_tests_on_feature_branch` — on feature branch, runs npm test and reports result
+- `test_stop_check_reports_test_failure` — test failures are included in block reason
+- `test_stop_check_skips_tests_on_main` — on main, skips npm test
+- `test_stop_check_detects_task_status` — on feature branch, reports task implementing/reviewing status
+- `test_stop_check_includes_reminders` — systemMessage always includes non-objective reminder checklist
 - `test_stop_check_outputs_valid_json` — all output paths produce valid JSON
 
 **Testing approach:** Tests use vitest with `child_process.execFile` to invoke the hook scripts with mocked stdin input. The stop hook tests use a temporary git repo to simulate branch/dirty states.
@@ -191,3 +206,6 @@ Sequencing: Create skill-rules.yaml and hook scripts first, then update settings
 - [ ] Stop hook reports uncommitted changes when present
 - [ ] Stop hook detects feature branch context
 - [ ] Stop hook runs typecheck on feature branches
+- [ ] Stop hook runs tests on feature branches
+- [ ] Stop hook checks task status on feature branches
+- [ ] Stop hook includes non-objective reminders in systemMessage
