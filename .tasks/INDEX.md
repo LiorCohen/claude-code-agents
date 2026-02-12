@@ -4,6 +4,7 @@
 
 ## Planning
 
+- [#82](2-planning/82/plan.md): Reorganize archive into .sdd directory
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 ---
@@ -31,7 +32,6 @@
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
-- [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 
 ---
