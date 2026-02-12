@@ -21,6 +21,8 @@ The codebase has a single remaining draft-07 schema reference in `settings/schem
 | `scaffold-spec.schema.json` | 1 | **none / draft-07 keywords** | Non-compliant |
 | AJV usage (3 files) | 3 | Default import (draft-07 only) | Non-compliant |
 | Backend template (`load_config.ts`) | 1 | Default import (draft-07 only) | Non-compliant |
+| Integration-testing skill example | 1 | `import Ajv from 'ajv'` | Non-compliant |
+| Backend config integration test | 1 | Asserts `from 'ajv'` | Non-compliant |
 | `@types/json-schema` dep | 1 | draft-07 types only | Non-compliant |
 
 ## Files to Modify
@@ -34,6 +36,8 @@ The codebase has a single remaining draft-07 schema reference in `settings/schem
 | `plugin/system/src/commands/scaffolding/apply.ts` | Replace direct AJV import with lib |
 | `plugin/system/src/commands/scaffolding/scaffold-spec.schema.json` | Add `$schema` declaration; rename `definitions` to `$defs`; update `$ref` paths |
 | `plugin/skills/components/backend/backend-scaffolding/templates/src/config/load_config.ts` | Switch to `Ajv2020` import (template — cannot use lib) |
+| `plugin/skills/components/integration-testing/integration-testing/SKILL.md` | Update AJV example code from `import Ajv from 'ajv'` to `Ajv2020` |
+| `tests/src/tests/integration/backend-component/config-integration.test.ts` | Update test assertion from `from 'ajv'` to `from 'ajv/dist/2020'` |
 | `plugin/system/package.json` | Remove `@types/json-schema` dev dependency |
 
 ## Changes
@@ -90,7 +94,15 @@ Same pattern as validate.ts — replace direct AJV import and `$schema` strippin
 
 In `load_config.ts` (scaffolding template), switch to `Ajv2020` import. This file is a **template** that gets scaffolded into user projects — it cannot use the internal `@/lib/json-schema` module, so it imports `Ajv2020` directly from `ajv/dist/2020`.
 
-### 9. Remove `@types/json-schema` dependency
+### 9. Update integration-testing skill example code
+
+In `SKILL.md` line ~495, the contract testing example uses `import Ajv from 'ajv'` and `new Ajv({ allErrors: true })`. Update to use `Ajv2020` import from `ajv/dist/2020` so agents following this skill produce code with correct 2020-12 support.
+
+### 10. Update backend config integration test
+
+In `config-integration.test.ts` line 60, the test asserts `expect(content).toContain("from 'ajv'")`. After the backend template changes to `Ajv2020`, this assertion must change to `from 'ajv/dist/2020'`.
+
+### 11. Remove `@types/json-schema` dependency
 
 Remove from `plugin/system/package.json` devDependencies since `JSONSchema7` is no longer imported.
 
@@ -101,6 +113,8 @@ Remove from `plugin/system/package.json` devDependencies since `JSONSchema7` is 
 3. Changes 4 + 5 + 6 depend on change 1 (lib must exist before consumers migrate)
 4. Change 7 must be tested with the updated lib usage in `apply.ts`
 5. Change 8 is independent (template uses direct import, not lib)
+6. Change 9 is independent (documentation update)
+7. Change 10 depends on change 8 (test must match template)
 
 ## Tests
 
