@@ -20,6 +20,16 @@ Run `git status` and `git diff` to understand:
 - Whether version files need updating
 - Whether CHANGELOG needs updating
 
+### Step 1.5: Build Verification
+
+**When to run:** If any changed files are under `plugin/system/` (TypeScript source).
+
+Run `npm run typecheck:plugin` and verify it passes. If there are type errors, fix them before proceeding — never commit code that doesn't compile.
+
+**Skip conditions:**
+- No changes under `plugin/system/`
+- Changes are only to `.md` files, `.tasks/`, or non-TypeScript files
+
 ### Step 2: Version Check
 
 For each affected plugin, check if version bump is needed:
@@ -279,7 +289,8 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 ## Quick Reference
 
 ```
-Plugin file changed? → Bump version → CHANGELOG → Check docs → Stage all → Commit
+Plugin TS changed? → Typecheck → Bump version → CHANGELOG → Check docs → Stage all → Commit
+Plugin non-TS changed? → Bump version → CHANGELOG → Check docs → Stage all → Commit
 Infrastructure file changed? → CHANGELOG → Stage all → Commit
 Task-related work? → Use tasks skill for status updates → Stage all → Commit
 ```
