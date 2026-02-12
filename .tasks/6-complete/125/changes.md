@@ -6,7 +6,7 @@ commits: 2
 
 # Task #125 — Changes
 
-**Files changed:** 60 (+4,973 / -4,764 lines)
+**Files changed:** 56 (+4,818 / -4,744 lines)
 
 | File | Added | Removed |
 |------|------:|--------:|
@@ -66,10 +66,6 @@ commits: 2
 | [`plugin/skills/spec-solicitation/resources/solicitation-steps.md`](plugin/skills/spec-solicitation/resources/solicitation-steps.md) | +138 | -0 |
 | [`plugin/skills/spec-solicitation/resources/spec-sections.md`](plugin/skills/spec-solicitation/resources/spec-sections.md) | +65 | -0 |
 | [`plugin/skills/spec-solicitation/resources/workflow-yaml.md`](plugin/skills/spec-solicitation/resources/workflow-yaml.md) | +117 | -0 |
-| [`CLAUDE.md`](CLAUDE.md) | +0 | -5 |
-| [`.claude/hooks/stop-check.sh`](.claude/hooks/stop-check.sh) | +3 | -1 |
-| [`.claude/skills/tasks/SKILL.md`](.claude/skills/tasks/SKILL.md) | +7 | -14 |
-| [`.claude/skills/tasks/list-backlog.sh`](.claude/skills/tasks/list-backlog.sh) | +145 | -0 |
 
 ---
 
@@ -219,13 +215,3 @@ Content was moved from oversized SKILL.md files into `resources/` subdirectories
 | integration-testing | 553 | 128 | api-testing.md, authentication.md, database-strategies.md, testkube.md |
 | spec-solicitation | 515 | 201 | solicitation-steps.md, spec-sections.md, workflow-yaml.md |
 
----
-
-### Incidental Changes (4 files)
-
-These files were changed on the feature branch but are not part of the task #125 scope:
-
-- **`CLAUDE.md`** — Removed 5 lines (unrelated cleanup)
-- **`.claude/hooks/stop-check.sh`** — Updated stop hook to use marker file instead of stop_hook_active
-- **`.claude/skills/tasks/SKILL.md`** — Strengthened zero-truncation rule for /tasks list output
-- **`.claude/skills/tasks/list-backlog.sh`** — New script for backlog listing

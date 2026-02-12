@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#125](5-reviewing/125/): Fix skills standards violations from audit report
+(none)
 
 ---
 
@@ -82,6 +82,7 @@
 
 ## Complete
 
+- [#125](6-complete/125/): Fix skills standards violations from audit report ✓ (2026-02-12)
 - [#126](6-complete/126/): Implement hook system — skill auto-activation and objective Stop checks ✓ (2026-02-12)
 - [#124](6-complete/124/): Add critic skill for self-checking at every task lifecycle phase ✓ (2026-02-12)
 - [#82](6-complete/82/): Reorganize archive into .sdd directory ✓ (2026-02-12)
