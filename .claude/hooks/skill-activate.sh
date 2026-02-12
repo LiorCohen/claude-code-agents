@@ -70,11 +70,13 @@ for (( i=0; i<rule_count; i++ )); do
     if [[ "$fp_count" -gt 0 ]]; then
       # Extract tokens that look like file paths (contain / or end with known extensions)
       file_tokens=()
+      set -f  # disable glob expansion on prompt content
       for token in $prompt; do
         if [[ "$token" =~ \.(ts|tsx|md|sh|json|yaml|yml)$ ]] || [[ "$token" == */* ]]; then
           file_tokens+=("$token")
         fi
       done
+      set +f  # re-enable glob expansion
 
       for token in "${file_tokens[@]+"${file_tokens[@]}"}"; do
         for (( f=0; f<fp_count; f++ )); do
@@ -102,9 +104,10 @@ if [[ ${#matched_skills[@]} -eq 0 ]]; then
 fi
 
 # Build systemMessage
+NL=$'\n'
 message="Relevant skills for this task:"
 for entry in "${matched_skills[@]}"; do
-  message="${message}\n${entry}"
+  message="${message}${NL}${entry}"
 done
 
 jq -n --arg msg "$message" '{ "systemMessage": $msg }'

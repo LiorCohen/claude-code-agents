@@ -16,6 +16,7 @@ fi
 
 cd "$cwd"
 
+NL=$'\n'
 block=false
 block_reasons=()
 report=""
@@ -25,9 +26,9 @@ dirty_files="$(git status --porcelain 2>/dev/null || true)"
 if [[ -n "$dirty_files" ]]; then
   block=true
   block_reasons+=("Uncommitted changes detected")
-  report+="### Uncommitted changes\nFOUND — the following files have uncommitted changes:\n\`\`\`\n${dirty_files}\n\`\`\`\n\n"
+  report+="### Uncommitted changes${NL}FOUND — the following files have uncommitted changes:${NL}\`\`\`${NL}${dirty_files}${NL}\`\`\`${NL}${NL}"
 else
-  report+="### Uncommitted changes\nCLEAN — no uncommitted changes\n\n"
+  report+="### Uncommitted changes${NL}CLEAN — no uncommitted changes${NL}${NL}"
 fi
 
 # --- 2. Feature branch detection ---
@@ -41,17 +42,17 @@ if [[ "$branch" =~ ^feature/task-([0-9]+) ]]; then
 fi
 
 if [[ "$on_feature_branch" == true ]]; then
-  report+="### Branch context\nOn feature branch: ${branch} (task #${task_id})\n\n"
+  report+="### Branch context${NL}On feature branch: ${branch} (task #${task_id})${NL}${NL}"
 else
-  report+="### Branch context\nOn branch: ${branch} (not a feature branch — skipping task-specific checks)\n\n"
+  report+="### Branch context${NL}On branch: ${branch} (not a feature branch — skipping task-specific checks)${NL}${NL}"
 fi
 
 # --- 3. Task status check (only on feature branches) ---
 if [[ "$on_feature_branch" == true && -n "$task_id" ]]; then
   if [[ -d ".tasks/4-implementing/${task_id}" ]]; then
-    report+="### Task status\nTask #${task_id} is in **implementing** status. Consider moving to review if implementation is complete.\n\n"
+    report+="### Task status${NL}Task #${task_id} is in **implementing** status. Consider moving to review if implementation is complete.${NL}${NL}"
   elif [[ -d ".tasks/5-reviewing/${task_id}" ]]; then
-    report+="### Task status\nTask #${task_id} is in **reviewing** status.\n\n"
+    report+="### Task status${NL}Task #${task_id} is in **reviewing** status.${NL}${NL}"
   else
     # Check other directories
     found_status=""
@@ -62,9 +63,9 @@ if [[ "$on_feature_branch" == true && -n "$task_id" ]]; then
       fi
     done
     if [[ -n "$found_status" ]]; then
-      report+="### Task status\nTask #${task_id} found in ${found_status}.\n\n"
+      report+="### Task status${NL}Task #${task_id} found in ${found_status}.${NL}${NL}"
     else
-      report+="### Task status\nTask #${task_id} — task folder not found.\n\n"
+      report+="### Task status${NL}Task #${task_id} — task folder not found.${NL}${NL}"
     fi
   fi
 fi
@@ -81,29 +82,33 @@ if [[ "$on_feature_branch" == true ]]; then
     if [[ $typecheck_exit -ne 0 ]]; then
       block=true
       block_reasons+=("Typecheck failed")
-      report+="### Typecheck\nFAIL — type errors found:\n\`\`\`\n${typecheck_output}\n\`\`\`\n\n"
+      report+="### Typecheck${NL}FAIL — type errors found:${NL}\`\`\`${NL}${typecheck_output}${NL}\`\`\`${NL}${NL}"
     else
-      report+="### Typecheck\nPASS — no type errors\n\n"
+      report+="### Typecheck${NL}PASS — no type errors${NL}${NL}"
     fi
   else
-    report+="### Typecheck\nSKIPPED — no plugin/system changes detected\n\n"
+    report+="### Typecheck${NL}SKIPPED — no plugin/system changes detected${NL}${NL}"
   fi
 else
-  report+="### Typecheck\nSKIPPED — not on a feature branch\n\n"
+  report+="### Typecheck${NL}SKIPPED — not on a feature branch${NL}${NL}"
 fi
 
 # --- 5. Reminders (non-objective, for Claude to evaluate) ---
-report+="### Reminders\n"
-report+="- Have all acceptance criteria from the plan been addressed?\n"
-report+="- Did you run tests if required?\n"
-report+="- Are there any contradictions or inconsistencies in the codebase?\n"
-report+="- Did you update docs if plugin functionality changed?\n"
+report+="### Reminders${NL}"
+report+="- Have all acceptance criteria from the plan been addressed?${NL}"
+report+="- Did you run tests if required?${NL}"
+report+="- Are there any contradictions or inconsistencies in the codebase?${NL}"
+report+="- Did you update docs if plugin functionality changed?${NL}"
 
 # --- Build output ---
-system_message="## Pre-stop verification\n\n${report}"
+system_message="## Pre-stop verification${NL}${NL}${report}"
 
 if [[ "$block" == true ]]; then
-  reason="$(printf '%s\n' "${block_reasons[@]}" | paste -sd '; ' -)"
+  reason=""
+  for (( r=0; r<${#block_reasons[@]}; r++ )); do
+    if [[ $r -gt 0 ]]; then reason+="; "; fi
+    reason+="${block_reasons[$r]}"
+  done
   jq -n \
     --arg decision "block" \
     --arg reason "$reason" \
