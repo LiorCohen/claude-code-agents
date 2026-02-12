@@ -27,6 +27,7 @@
 ---
 
 ## High Priority
+- [#125](1-inbox/125/): Fix skills standards violations from audit report
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
