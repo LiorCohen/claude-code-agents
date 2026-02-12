@@ -5,10 +5,22 @@
   "hooks": {
     "Stop": [
       {
+        "matcher": "*",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Before stopping, verify implementation completeness.\n\nCheck:\n(1) Are there uncommitted changes? If yes, commit them or explain why not.\n(2) Is the current task still in 'implementing' status? If yes, either continue working, move it to 'review' status, or explain why you're pausing.\n(3) Have all acceptance criteria from the plan been addressed?\n(4) Did you run tests/build if required?\n(5) Are you sure you're done? Go over the codebase and the plan, ensure you haven't missed anything and that there are no contradictions or inconsistencies. Did you remember to update the docs? Think about this super hard!\n\nRespond with {} to stop, or {\"decision\":\"block\",\"reason\":\"what remains to be done\"} to continue working."
+            "type": "command",
+            "command": "bash .claude/hooks/stop-check.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/skill-activate.sh"
           }
         ]
       }
