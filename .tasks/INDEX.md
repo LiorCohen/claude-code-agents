@@ -6,6 +6,7 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
+- [#124](2-planning/124/plan.md): Add critic skill for self-checking at every task lifecycle phase
 ---
 
 ## Ready
@@ -29,7 +30,6 @@
 ## High Priority
 - [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#125](1-inbox/125/): Fix skills standards violations from audit report
-- [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
