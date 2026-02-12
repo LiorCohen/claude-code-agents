@@ -271,7 +271,7 @@ What must happen before what. List any sequencing requirements.
 
 ## INDEX.md Index Structure
 
-Tasks are grouped by priority first (for open tasks), then by terminal status.
+Active tasks (planning through reviewing) have their own top-level sections. Inbox tasks are grouped by priority as sub-sections under Inbox.
 
 ```markdown
 # Tasks Backlog
@@ -302,25 +302,21 @@ Tasks are grouped by priority first (for open tasks), then by terminal status.
 
 ---
 
-## High Priority
+## Inbox
+
+### High Priority
 
 - [#59](1-inbox/59/): Audit and update agents
 
----
-
-## Medium Priority
+### Medium Priority
 
 - [#10](1-inbox/10/): Missing /sdd-help command
 
----
-
-## Low Priority
+### Low Priority
 
 - [#3](1-inbox/3/): Docs missing: CMDO Guide
 
----
-
-## Inbox (unprioritized)
+### Unprioritized
 
 - [#63](1-inbox/63/): New feature idea
 
@@ -343,4 +339,4 @@ Tasks are grouped by priority first (for open tasks), then by terminal status.
 - [#28](8-consolidated/28/) → #27
 ```
 
-**Note:** Links point to task folders. Priority is determined by the `priority` frontmatter field.
+**Note:** Links point to task folders. Priority is determined by the `priority` frontmatter field. Priority sub-sections only appear under Inbox.

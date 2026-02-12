@@ -55,10 +55,10 @@ User: /tasks prioritize 15 low
 **Workflow:**
 1. Find task folder
 2. Update `task.md` frontmatter `priority` field
-3. Move task entry to correct section in INDEX.md
+3. Move task entry to correct priority sub-section under Inbox in INDEX.md
 4. Stage changes and use commit skill (e.g., "Tasks: Prioritize #15 as high")
 
-**Note:** Priority only affects INDEX.md grouping, not file location.
+**Note:** Priority only affects INDEX.md grouping (sub-sections under Inbox), not file location.
 
 ---
 
@@ -324,7 +324,7 @@ User: /tasks audit
 #### 3. INDEX.md Sync
 - Every non-archived task (inbox, planning, ready, implementing, reviewing) appears in INDEX.md
 - Every entry in INDEX.md points to a task folder that exists
-- Tasks appear in the correct INDEX.md section for their status/priority
+- Tasks appear in the correct INDEX.md section for their status, and in the correct priority sub-section under Inbox
 - Rejected entries include a reason summary
 - Consolidated entries include the target task reference
 

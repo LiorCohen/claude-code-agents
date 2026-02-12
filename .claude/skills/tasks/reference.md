@@ -61,6 +61,6 @@ Any status → 8-consolidated/ (if combined with another)
 Any status → 7-rejected/ (if irrelevant or out of scope)
 ```
 
-**Priority** (high/medium/low) can be set at any point and only affects INDEX.md grouping.
+**Priority** (high/medium/low) can be set at any point and only affects INDEX.md grouping (sub-sections under Inbox).
 
 Plans are created during the planning phase and move with their task folder through the lifecycle.

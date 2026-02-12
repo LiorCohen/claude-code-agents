@@ -35,7 +35,7 @@ Each task is a folder named by its ID containing:
 - `plan.md` - the implementation plan (created during planning phase)
 - `changes.md` - file changes summary (generated during review or before completion)
 
-**Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories but grouped by priority in INDEX.md.
+**Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories. In INDEX.md, priority sub-sections appear under the Inbox heading.
 
 **Reference:** See [schemas.md](schemas.md) for full task/plan schemas and templates.
 
@@ -86,7 +86,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 ```
 
 1. Update `task.md` frontmatter `priority` field
-2. Move entry to correct section in INDEX.md
+2. Move entry to correct priority sub-section under Inbox in INDEX.md
 3. Use commit skill: `Skill(commit, args: '-m "Tasks: Prioritize #<id> as <priority>"')`
 
 ---

@@ -27,16 +27,17 @@
 
 ---
 
-## High Priority
+## Inbox
+
+### High Priority
+
 - [#126](1-inbox/126/): Implement hook system — skill auto-activation and objective Stop checks
 - [#125](1-inbox/125/): Fix skills standards violations from audit report
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 
----
-
-## Medium Priority
+### Medium Priority
 
 - [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
@@ -48,9 +49,7 @@
 - [#56](1-inbox/56/): Create architecture skill with meaningful guidance
 - [#66](1-inbox/66/): Single context-aware SDD command
 
----
-
-## Low Priority
+### Low Priority
 
 - [#73](1-inbox/73/): User instructions memory for plugin overrides
 - [#3](1-inbox/3/): Docs missing: CMDO Guide
@@ -60,9 +59,8 @@
 - [#26](1-inbox/26/): Better session separators/visual indicators
 - [#20](1-inbox/20/): Plugin installation debugging skill + workflow fix
 
----
+### Unprioritized
 
-## Inbox (unprioritized)
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
