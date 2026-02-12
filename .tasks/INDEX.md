@@ -10,13 +10,13 @@
 
 ## Ready
 
-- [#82](3-ready/82/plan.md): Reorganize archive into .sdd directory
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#82](4-implementing/82/plan.md): Reorganize archive into .sdd directory
 
 ---
 
