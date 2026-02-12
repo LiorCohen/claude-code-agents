@@ -6,7 +6,7 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
-- [#124](2-planning/124/plan.md): Add critic skill for self-checking at every task lifecycle phase
+
 ---
 
 ## Ready
@@ -17,7 +17,7 @@
 
 ## Implementing
 
-(none)
+- [#124](4-implementing/124/plan.md): Add critic skill for self-checking at every task lifecycle phase
 
 ---
 
