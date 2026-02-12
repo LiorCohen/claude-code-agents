@@ -1,6 +1,7 @@
 ---
 title: Implement hook system — skill auto-activation and objective Stop checks
 created: 2026-02-12 19:00 UTC
+updated: 2026-02-12 19:30 UTC
 ---
 
 # Plan: Implement hook system — skill auto-activation and objective Stop checks
@@ -17,59 +18,49 @@ The project has two hook gaps:
 
 | File | Changes |
 |------|---------|
-| `.claude/hooks/skill-activate.mjs` | **New** — UserPromptSubmit command hook: reads skill-rules JSON, matches prompt, outputs systemMessage |
-| `.claude/hooks/stop-check.sh` | **New** — Stop command hook: runs git status, branch detection, typecheck, outputs structured JSON via printf |
-| `.claude/skill-rules.json` | **New** — Trigger definitions mapping keywords/patterns/file-paths to skills |
+| `.claude/hooks/skill-activate.sh` | **New** — UserPromptSubmit bash hook: reads skill-rules YAML via `yq`/`jq`, matches prompt, outputs systemMessage |
+| `.claude/hooks/stop-check.sh` | **New** — Stop bash hook: runs git status, branch detection, typecheck, outputs structured JSON via `jq` |
+| `.claude/skill-rules.yaml` | **New** — Trigger definitions mapping keywords/patterns/file-paths to skills |
 | `.claude/settings.json` | Replace prompt-based Stop hook with command-based; add UserPromptSubmit hook |
 
 ## Changes
 
 ### 1. Skill auto-activation hook (UserPromptSubmit)
 
-A command-type hook registered in `.claude/settings.json` under `UserPromptSubmit`. When the user submits a prompt, Claude Code passes the prompt via stdin as JSON (includes `user_prompt` field). The hook script:
+A bash command-type hook registered in `.claude/settings.json` under `UserPromptSubmit`. When the user submits a prompt, Claude Code passes the prompt via stdin as JSON (includes `user_prompt` field). The hook script:
 
-- Reads stdin JSON and extracts `user_prompt`
-- Loads `.claude/skill-rules.json` (relative to `cwd` from stdin)
-- Matches the prompt against three trigger types per rule:
-  - **keywords** — case-insensitive substring match (e.g., "typecheck", "test")
-  - **patterns** — regex match against the full prompt (e.g., `/\b(refactor|restructure)\b/i`)
-  - **file_paths** — file path extraction via regex (tokens containing `/` and ending with known extensions like `.ts`, `.tsx`, `.md`, `.sh`, `.json`), then glob matching against rule patterns. If no file paths are found in the prompt, file_path triggers are skipped for that rule.
-- If any rules match, returns `{ "systemMessage": "Relevant skills for this task:\n- /typescript-standards — ...\n- ..." }`
-- If no rules match, returns `{}` (no-op)
+- Reads stdin JSON and extracts `user_prompt` via `jq`
+- Loads `.claude/skill-rules.yaml` (relative to `cwd` from stdin) — parsed via `yq` (YAML→JSON) piped to `jq`, or if `yq` is unavailable, falls back to a simple line-based parser for the flat YAML structure
+- Iterates over rules and matches the prompt against three trigger types:
+  - **keywords** — case-insensitive substring match via bash `[[ "${prompt,,}" == *"${keyword,,}"* ]]`
+  - **patterns** — regex match via `grep -qiP "$pattern"` or bash `[[ "$prompt" =~ $pattern ]]`
+  - **file_paths** — file path extraction from the prompt (tokens containing `/` and ending with known extensions like `.ts`, `.tsx`, `.md`, `.sh`, `.json`, `.yaml`), then glob matching against rule patterns. If no file paths are found in the prompt, file_path triggers are skipped for that rule.
+- If any rules match, outputs `{ "systemMessage": "Relevant skills for this task:\n- /skill-name — description\n- ..." }` via `jq`
+- If no rules match, outputs `{}` (no-op)
 
-The hook is a Node.js ES module (`.mjs`). It uses only built-in Node.js APIs — `JSON.parse` for the config file (no external YAML dependency needed), `fs.readFileSync` for file I/O, and `RegExp` for pattern matching.
-
-**Architectural note:** This is a project-level hook in `.claude/hooks/`, not a plugin hook. It does not use `hook-runner.sh` or the plugin's TypeScript build system. Project-level hooks are standalone scripts that run independently of the plugin.
+**Architectural note:** These are project-level hooks in `.claude/hooks/`, not plugin hooks. They do not use `hook-runner.sh` or the plugin's TypeScript build system. Both hooks are standalone bash scripts using standard dev tools (`jq`, `git`, `npm`).
 
 ### 2. Skill rules configuration
 
-`.claude/skill-rules.json` defines trigger rules for all current skills that benefit from auto-activation. Not every skill needs rules — only skills that apply to specific types of work (standards, testing, etc.). Skills like `commit` and `tasks` are user-invoked and don't need triggers.
+`.claude/skill-rules.yaml` defines trigger rules for skills that benefit from auto-activation. Not every skill needs rules — only skills that apply to specific types of work (standards, testing, etc.). Skills like `commit` and `tasks` are user-invoked and don't need triggers.
 
 Structure:
 
-```json
-{
-  "rules": [
-    {
-      "skill": "typescript-standards",
-      "description": "TypeScript coding standards for strict, immutable, type-safe code",
-      "triggers": {
-        "keywords": ["typescript", "ts file", "type error", "typecheck", "strict mode"],
-        "patterns": ["\\.(ts|tsx)\\b"],
-        "file_paths": ["**/*.ts", "**/*.tsx"]
-      }
-    },
-    {
-      "skill": "plugin-testing-standards",
-      "description": "Testing methodology for plugins",
-      "triggers": {
-        "keywords": ["test", "spec", "vitest", "jest", "coverage"],
-        "patterns": ["\\btest|spec|describe\\(|it\\(\\b"],
-        "file_paths": ["tests/**", "**/*.test.*", "**/*.spec.*"]
-      }
-    }
-  ]
-}
+```yaml
+rules:
+  - skill: typescript-standards
+    description: TypeScript coding standards for strict, immutable, type-safe code
+    triggers:
+      keywords: [typescript, ts file, type error, typecheck, strict mode]
+      patterns: ["\\.(ts|tsx)\\b"]
+      file_paths: ["**/*.ts", "**/*.tsx"]
+
+  - skill: plugin-testing-standards
+    description: Testing methodology for plugins
+    triggers:
+      keywords: [test, spec, vitest, jest, coverage]
+      patterns: ["\\btest|spec|describe\\(|it\\(\\b"]
+      file_paths: ["tests/**", "**/*.test.*", "**/*.spec.*"]
 ```
 
 Skills to include rules for:
@@ -82,19 +73,17 @@ Skills to include rules for:
 
 ### 3. Objective Stop hook
 
-A bash script that replaces the current prompt-based Stop hook. Runs actual verification commands and reports findings as structured JSON that Claude can act on.
+A bash script that replaces the current prompt-based Stop hook. Runs actual verification commands and reports findings as structured JSON via `jq`.
 
 Checks performed:
 1. **Uncommitted changes** — runs `git status --porcelain` and reports any dirty files
 2. **Feature branch detection** — checks if current branch matches `feature/task-*` pattern
 3. **Typecheck** — if on a feature branch and `git diff --name-only` shows files under `plugin/system/`, runs `npm run typecheck:plugin` and captures output. Skipped entirely on main or when no plugin/system files are dirty
-4. **Summary** — assembles findings into structured JSON output
+4. **Summary** — assembles findings into structured JSON output via `jq`
 
 Output format follows Claude Code's Stop hook contract:
 - If issues found: `{ "decision": "block", "reason": "...", "systemMessage": "..." }`
 - If clean: `{ "decision": "approve", "systemMessage": "Pre-stop checks passed: no uncommitted changes, typecheck clean" }`
-
-JSON output is assembled via `printf`/heredoc — no `jq` dependency. File paths and error messages in the output are sanitized (double quotes and backslashes escaped) to ensure valid JSON.
 
 The `systemMessage` contains a structured report:
 ```
@@ -116,7 +105,7 @@ PASS — no type errors
 Update `.claude/settings.json` to:
 - Remove the existing prompt-based Stop hook
 - Add a command-based Stop hook pointing to `.claude/hooks/stop-check.sh`
-- Add a `UserPromptSubmit` command hook pointing to `.claude/hooks/skill-activate.mjs`
+- Add a `UserPromptSubmit` command hook pointing to `.claude/hooks/skill-activate.sh`
 
 ```json
 {
@@ -138,7 +127,7 @@ Update `.claude/settings.json` to:
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/skill-activate.mjs"
+            "command": "bash .claude/hooks/skill-activate.sh"
           }
         ]
       }
@@ -149,11 +138,12 @@ Update `.claude/settings.json` to:
 
 ## Dependencies
 
-1. `skill-rules.json` must exist before the UserPromptSubmit hook can work
-2. No external dependencies — skill-activate uses only Node.js built-ins, stop-check uses only bash + git + npm
-3. Both hook scripts must be executable (`chmod +x`)
+1. `skill-rules.yaml` must exist before the UserPromptSubmit hook can work
+2. `jq` must be installed (used by both hooks for JSON I/O)
+3. `yq` recommended for YAML parsing (fallback to line-based parsing if unavailable)
+4. Both hook scripts must be executable (`chmod +x`)
 
-Sequencing: Create skill-rules.json and hook scripts first, then update settings.json last.
+Sequencing: Create skill-rules.yaml and hook scripts first, then update settings.json last.
 
 ## Tests
 
@@ -165,8 +155,8 @@ Sequencing: Create skill-rules.json and hook scripts first, then update settings
 - `test_skill_activate_no_match_returns_empty` — prompt with no matching triggers returns no systemMessage
 - `test_skill_activate_multiple_matches_returns_all` — prompt matching multiple skills returns all of them
 - `test_skill_activate_handles_empty_prompt` — empty or missing user_prompt returns no-op
-- `test_skill_activate_handles_missing_config` — missing skill-rules.json fails gracefully (no-op)
-- `test_skill_activate_handles_malformed_json` — invalid JSON fails gracefully (no-op)
+- `test_skill_activate_handles_missing_config` — missing skill-rules.yaml fails gracefully (no-op)
+- `test_skill_activate_handles_malformed_yaml` — invalid YAML fails gracefully (no-op)
 
 - `test_stop_check_detects_uncommitted_changes` — dirty working tree produces block decision with file list
 - `test_stop_check_clean_working_tree_approves` — clean tree with no issues produces approve decision
@@ -182,15 +172,15 @@ Sequencing: Create skill-rules.json and hook scripts first, then update settings
 ### Integration Tests
 
 - `test_hook_registration_valid` — settings.json hook entries point to existing scripts
-- `test_skill_rules_json_valid` — skill-rules.json parses without errors and references existing skills
+- `test_skill_rules_yaml_valid` — skill-rules.yaml parses without errors and references existing skills
 - `test_stop_hook_end_to_end` — script executes and produces valid JSON output
 - `test_skill_activate_end_to_end` — script reads stdin and produces valid JSON output
 
 ## Verification
 
-- [ ] `.claude/hooks/skill-activate.mjs` exists and is executable
+- [ ] `.claude/hooks/skill-activate.sh` exists and is executable
 - [ ] `.claude/hooks/stop-check.sh` exists and is executable
-- [ ] `.claude/skill-rules.json` exists with rules for all applicable skills
+- [ ] `.claude/skill-rules.yaml` exists with rules for all applicable skills
 - [ ] `.claude/settings.json` has command-based Stop and UserPromptSubmit hooks
 - [ ] Old prompt-based Stop hook is removed
 - [ ] `npm run typecheck:plugin` passes (no type regressions)
