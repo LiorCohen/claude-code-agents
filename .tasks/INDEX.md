@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#82](4-implementing/82/plan.md): Reorganize archive into .sdd directory
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#82](5-reviewing/82/plan.md): Reorganize archive into .sdd directory
 
 ---
 
