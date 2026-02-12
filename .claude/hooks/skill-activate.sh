@@ -9,6 +9,13 @@ input="$(cat)"
 prompt="$(printf '%s' "$input" | jq -r '.prompt // ""')"
 cwd="$(printf '%s' "$input" | jq -r '.cwd // ""')"
 
+# Expose session_id for Bash tool calls (keyed by PPID for session isolation)
+session_id="$(printf '%s' "$input" | jq -r '.session_id // ""')"
+if [[ -n "$session_id" ]]; then
+  mkdir -p "${cwd}/.temp" 2>/dev/null || true
+  echo "$session_id" > "${cwd}/.temp/.session-ppid-${PPID}"
+fi
+
 # Nothing to match against
 if [[ -z "$prompt" ]]; then
   echo '{}'

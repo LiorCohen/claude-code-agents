@@ -203,6 +203,16 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 ### Step 7: Review and Confirm
 
+**Before presenting**, create a session-specific commit-pending marker so the stop hook knows a commit is in progress and won't block on uncommitted changes:
+```bash
+mkdir -p .temp
+# Read session ID from the PPID-keyed file written by the UserPromptSubmit hook
+SESSION_ID="$(cat .temp/.session-ppid-$PPID 2>/dev/null || true)"
+if [[ -n "$SESSION_ID" ]]; then
+  touch ".temp/.commit-pending-${SESSION_ID}"
+fi
+```
+
 Present to the user:
 - Summary of files to be committed
 - Proposed commit message
@@ -216,7 +226,14 @@ Present to the user:
 After confirmation:
 1. Stage all related files (code + version files + CHANGELOG)
 2. Create the commit with the generated message
-3. Display commit result
+3. Remove the commit-pending marker:
+   ```bash
+   SESSION_ID="$(cat .temp/.session-ppid-$PPID 2>/dev/null || true)"
+   [[ -n "$SESSION_ID" ]] && rm -f ".temp/.commit-pending-${SESSION_ID}"
+   ```
+4. Display commit result
+
+If the user **declines** the commit, also remove the marker using the same cleanup command.
 
 ---
 

@@ -6,6 +6,7 @@ set -euo pipefail
 # Read stdin JSON
 input="$(cat)"
 cwd="$(printf '%s' "$input" | jq -r '.cwd // ""')"
+session_id="$(printf '%s' "$input" | jq -r '.session_id // ""')"
 cd "$cwd"
 
 # Prevent infinite loop — if we already blocked once, approve this time.
@@ -24,10 +25,20 @@ report=""
 
 # --- 1. Uncommitted changes ---
 dirty_files="$(git status --porcelain 2>/dev/null || true)"
+commit_pending=false
+# Check for session-specific commit-pending marker (set by the commit skill)
+if [[ -n "$session_id" && -f ".temp/.commit-pending-${session_id}" ]]; then
+  commit_pending=true
+fi
+
 if [[ -n "$dirty_files" ]]; then
-  block=true
-  block_reasons+=("Uncommitted changes detected")
-  report+="### Uncommitted changes${NL}FOUND — the following files have uncommitted changes:${NL}\`\`\`${NL}${dirty_files}${NL}\`\`\`${NL}${NL}"
+  if [[ "$commit_pending" == true ]]; then
+    report+="### Uncommitted changes${NL}FOUND — commit skill is awaiting user approval (not blocking):${NL}\`\`\`${NL}${dirty_files}${NL}\`\`\`${NL}${NL}"
+  else
+    block=true
+    block_reasons+=("Uncommitted changes detected")
+    report+="### Uncommitted changes${NL}FOUND — the following files have uncommitted changes:${NL}\`\`\`${NL}${dirty_files}${NL}\`\`\`${NL}${NL}"
+  fi
 else
   report+="### Uncommitted changes${NL}CLEAN — no uncommitted changes${NL}${NL}"
 fi
