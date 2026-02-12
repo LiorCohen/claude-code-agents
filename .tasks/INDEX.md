@@ -17,7 +17,7 @@
 
 ## Implementing
 
-- [#124](4-implementing/124/plan.md): Add critic skill for self-checking at every task lifecycle phase
+(none)
 
 ---
 
@@ -85,6 +85,7 @@
 
 ## Complete
 
+- [#124](6-complete/124/): Add critic skill for self-checking at every task lifecycle phase ✓ (2026-02-12)
 - [#82](6-complete/82/): Reorganize archive into .sdd directory ✓ (2026-02-12)
 - [#118](6-complete/118/): Upgrade all JSON schemas to latest stable version (2020-12) ✓ (2026-02-12)
 - [#122](6-complete/122/): Fix TypeScript standards violations in plugin/system ✓ (2026-02-11)
