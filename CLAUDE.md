@@ -54,6 +54,7 @@
 
 - **commit** - Use for all commits (handles version bump + changelog)
 - **tasks** - Manage tasks and plans using `.tasks/` directory
+- **critic** - Self-review at every task lifecycle phase (`/critic`)
 - **manifest-validation** - Validate plugin/marketplace manifests before commits
 - **plugin-testing-standards** - Follow when writing or modifying tests
 - **typescript-standards** - Follow when writing TypeScript code
@@ -81,6 +82,7 @@ sdd/
 │   ├── settings.json                 # Context7 enabled
 │   └── skills/
 │       ├── commit/                   # Commit workflow with version/changelog
+│       ├── critic/                   # Self-review at every task lifecycle phase
 │       ├── tasks/                    # Task management skill
 │       ├── manifest-validation/      # Validate plugin manifests
 │       ├── plugin-testing-standards/ # Testing methodology for plugins
@@ -91,6 +93,7 @@ sdd/
 │       └── system-cli-standards/  # Standards for CLI invocation from prompts
 ├── .claude-plugin/
 │   └── marketplace.json              # Marketplace manifest
+├── .critic/                              # Learned critic feedback (topic-organized, user-approved)
 ├── .temp/                               # Temp files for skills/agents (gitignored)
 ├── .tasks/                              # Task data
 │   ├── INDEX.md                         # Task index (links to issues/)
