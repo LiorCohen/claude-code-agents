@@ -7,7 +7,7 @@ created: 2026-02-12 19:00 UTC
 
 ## Problem Summary
 
-Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vague cross-references (13 "refer to project-settings" across 12 skills + 5 other vague refs), 10 oversized skills (6,608 total lines, limit is 500 each), 1 circular dependency (apparent, not actual), and 1 code block missing a language specifier. All violations are in `plugin/skills/` markdown files — no TypeScript or runtime changes.
+Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vague cross-references (13 "refer to project-settings" across 12 skills + 5 other vague refs), 10 oversized skills (6,608 total lines, limit is 500 each), and 1 circular dependency (apparent, not actual). All violations are in `plugin/skills/` markdown files — no TypeScript or runtime changes.
 
 ## Files to Modify
 
@@ -28,7 +28,7 @@ Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vagu
 | `plugin/skills/component-discovery/SKILL.md` | Fix 2 vague refs (lines 206, 349) |
 | `plugin/skills/spec-solicitation/SKILL.md` | Fix 2 vague refs (lines 500-501), extract to resources/ |
 | `plugin/skills/spec-decomposition/SKILL.md` | Fix 1 vague ref (line 472), extract to resources/ |
-| `plugin/skills/typescript-standards/SKILL.md` | Fix code block at line 404, extract to resources/ |
+| `plugin/skills/typescript-standards/SKILL.md` | Extract to resources/ |
 | `plugin/skills/workflow-state/SKILL.md` | Extract to resources/ |
 | `plugin/skills/spec-writing/SKILL.md` | Extract to resources/ |
 | `plugin/skills/external-spec-integration/SKILL.md` | Extract to resources/ |
@@ -41,20 +41,7 @@ Re-audit on 2026-02-12 confirmed 30+ violations across 34 plugin skills: 18 vagu
 
 ### Phase 1: Quick Fixes (P1 — low effort)
 
-#### 1.1 Fix code block at typescript-standards:404
-
-**Proof** — bare ` ``` ` at `plugin/skills/typescript-standards/SKILL.md:404`:
-```
-403: ```
-404: user/
-405: ├── index.ts           # Public API - import from here
-...
-411: └── internal/
-412: ```
-```
-The opening fence at line 403 has no language specifier. Add `text`.
-
-#### 1.2 Fix 13 vague "refer to project-settings" refs
+#### 1.1 Fix 13 vague "refer to project-settings" refs
 
 Each instance below uses the vague pattern "refer to the `project-settings` skill for X" without describing the delegation contract (what goes in, what comes out).
 
@@ -94,7 +81,7 @@ Adapted per-skill to mention only the settings relevant to that skill.
 
 > Before returning, validate discovered configuration against the `project-settings` skill's cross-reference rules: databases referenced by servers must exist as database components, contracts must exist as contract components, helm `deploy_modes` must be valid for the server's `server_type`, and `deploys` must reference an existing server or webapp.
 
-#### 1.3 Fix 5 other vague cross-references
+#### 1.2 Fix 5 other vague cross-references
 
 **Proof and fix for each:**
 
@@ -118,7 +105,7 @@ Vague project-settings ref without specifying which rules. Replace with Template
 
 Misattributes responsibility — spec-writing validates schemas; spec-solicitation uses the output. Replace with: "Component list is stored in context.md. During spec solicitation, the `spec-solicitation` skill populates the Components section of SPEC.md using discovered components and solicited technical details."
 
-#### 1.4 Resolve circular dependency (workflow-state ↔ spec-solicitation)
+#### 1.3 Resolve circular dependency (workflow-state ↔ spec-solicitation)
 
 **Proof:**
 - `workflow-state/SKILL.md:753`: `"spec-solicitation skill — reads context, saves specs"`
@@ -126,7 +113,7 @@ Misattributes responsibility — spec-writing validates schemas; spec-solicitati
 
 **Finding:** Research confirms **no actual circular dependency**. The relationship is unidirectional: workflow-state is a state store (provider), spec-solicitation is a consumer. Data flows one way: spec-solicitation reads context from workflow-state and writes specs back. The apparent circularity comes from both skills listing each other — but workflow-state:753 merely documents that spec-solicitation is a consumer (which is a valid delegation contract), not that it depends on it.
 
-**Fix:** The vague ref fixes in 1.3 (items 1-2) resolve this. workflow-state:753 already has a clear delegation contract — no change needed. spec-solicitation:500-501 gets proper contracts. No structural changes required.
+**Fix:** The vague ref fixes in 1.2 (items 1-2) resolve this. workflow-state:753 already has a clear delegation contract — no change needed. spec-solicitation:500-501 gets proper contracts. No structural changes required.
 
 ### Phase 2: Size Reductions (P2/P3 — medium effort)
 
@@ -256,8 +243,6 @@ Phase 2 items are independent of each other (each skill is modified in isolation
 - [ ] `grep -rn "refer to.*project-settings" plugin/skills/` — 0 matches for vague pattern
 - [ ] `grep -rn "for state management\|for spec template" plugin/skills/spec-solicitation/` — 0 matches
 - [ ] All resource files exist and are ≤500 lines each
-- [ ] No bare ` ``` ` blocks without language specifier in typescript-standards
-
 ### Re-Audit
 
 - [ ] Run full skills-standards audit — all 7 categories must pass (0 failing)
@@ -267,7 +252,6 @@ Phase 2 items are independent of each other (each skill is modified in isolation
 - [ ] All 13 vague "refer to project-settings" instances replaced with proper delegation contracts
 - [ ] 5 other vague cross-references fixed with clear delegation contracts
 - [ ] Circular dependency resolved (documentation clarified — no structural change needed)
-- [ ] Code block at typescript-standards:404 has `text` language specifier
 - [ ] All 10 previously oversized skills reduced to ≤500 lines
 - [ ] All resource files under 500 lines each
 - [ ] Re-audit passes with 0 failing categories
