@@ -77,6 +77,8 @@ Find and read the task file at `<status-dir>/19/task.md`.
 3. Add to INDEX.md under Inbox
 4. Use commit skill: `Skill(commit, args: '-m "Tasks: Add #<N>"')`
 
+**Critic check:** After committing, invoke `/critic` for self-review before presenting the task to the user.
+
 ---
 
 ### Prioritize Task
@@ -107,6 +109,8 @@ Find and read the task file at `<status-dir>/19/task.md`.
 **Phase 2 — Plan (only after commit completes):**
 6. Research the codebase and write the actual plan content in `plan.md`
 
+**Critic check:** After writing the plan, invoke `/critic` for self-review before presenting the plan to the user.
+
 Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 
 ---
@@ -116,6 +120,8 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 ```
 /tasks plan-review <id>
 ```
+
+**Critic check:** Before moving, invoke `/critic` for plan review self-check.
 
 1. Move to `3-plan-review/`
 2. Update status
@@ -137,6 +143,8 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 5. Create feature branch: `feature/task-<id>-<slug>`
 6. Create worktree at `.worktrees/task-<id>/`
 
+**Critic check:** After creating the feature branch, invoke `/critic` for implementation readiness self-check.
+
 **IMPORTANT:** Never implement on main. Never merge or delete worktree until `/tasks complete`.
 
 ---
@@ -146,6 +154,8 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 ```
 /tasks review <id>
 ```
+
+**Critic check:** Before generating changes.md, invoke `/critic` for pre-review self-check.
 
 1. Generate `changes.md` in the task folder with frontmatter and file summary table (see [workflows.md](workflows.md) for format)
 2. **Ask the user** if they want a detailed change report (expands `changes.md` with full diffs)
@@ -163,6 +173,8 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 ```
 /tasks complete <id>
 ```
+
+**Critic check:** Before finalizing, invoke `/critic` for completion self-check.
 
 1. **Ensure `changes.md` exists** in the task folder. If missing, generate it (frontmatter + file summary table). See [workflows.md](workflows.md) for format.
 2. If worktree exists:
