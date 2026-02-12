@@ -6,15 +6,16 @@ set -euo pipefail
 # Read stdin JSON
 input="$(cat)"
 cwd="$(printf '%s' "$input" | jq -r '.cwd // ""')"
-stop_hook_active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false')"
+cd "$cwd"
 
-# Prevent infinite loop — if we already blocked once, approve this time
-if [[ "$stop_hook_active" == "true" ]]; then
+# Prevent infinite loop — if we already blocked once, approve this time.
+# Uses a marker file since Claude Code hook input has no re-entry field.
+marker=".temp/.stop-hook-blocked"
+if [[ -f "$marker" ]]; then
+  rm -f "$marker"
   echo '{}'
   exit 0
 fi
-
-cd "$cwd"
 
 NL=$'\n'
 block=false
@@ -104,6 +105,8 @@ report+="- Did you update docs if plugin functionality changed?${NL}"
 system_message="## Pre-stop verification${NL}${NL}${report}"
 
 if [[ "$block" == true ]]; then
+  mkdir -p .temp
+  touch "$marker"
   reason=""
   for (( r=0; r<${#block_reasons[@]}; r++ )); do
     if [[ $r -gt 0 ]]; then reason+="; "; fi
