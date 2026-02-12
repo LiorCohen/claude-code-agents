@@ -16,6 +16,10 @@
       "type": "boolean",
       "description": "Whether the spec was decomposed into an epic with child features"
     },
+    "archived_path": {
+      "type": "string",
+      "description": "Relative path to the archived external spec in .sdd/archive/external-specs/"
+    },
     "items_created": {
       "type": "array",
       "description": "Workflow items created from the external spec",
@@ -53,6 +57,7 @@
     "success",
     "workflow_id",
     "is_hierarchical",
+    "archived_path",
     "items_created"
   ]
 }

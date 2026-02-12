@@ -44,10 +44,10 @@ For directories, SDD looks for an entry point (README.md, SPEC.md, or index.md).
 
 ### 1. Archive
 
-The external spec is copied to `.sdd/archive/external-specs/` with a date prefix:
+The external spec is archived via the system CLI to `.sdd/archive/external-specs/` with a datetime prefix:
 
 ```
-.sdd/archive/external-specs/20260205-feature-requirements.md
+.sdd/archive/external-specs/20260205-1430-feature-requirements.md
 ```
 
 This is the **only** copy. The archived spec is read-only and serves as an audit trail.

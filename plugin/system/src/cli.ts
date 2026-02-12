@@ -14,6 +14,7 @@
  *   config        Config component operations
  *   env           Local environment management
  *   settings      Settings reconciliation
+ *   archive       Archive file management
  */
 
 import { readFileSync } from 'fs';
@@ -38,8 +39,9 @@ import { handleEnvironment } from '@/commands/env';
 import { handlePermissions } from '@/commands/permissions';
 import { handleWorkflow } from '@/commands/workflow';
 import { handleSettings } from '@/commands/settings';
+import { handleArchive } from '@/commands/archive';
 
-const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings', 'archive'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
@@ -106,6 +108,9 @@ Namespaces:
   settings      Settings management
     reconcile   Reconcile settings to latest plugin schema
 
+  archive       Archive file management
+    store       Archive a file or directory to .sdd/archive/<type>/
+
 Global Options:
   --json        JSON output mode
   --verbose     Verbose logging
@@ -137,6 +142,7 @@ const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   permissions: handlePermissions,
   workflow: handleWorkflow,
   settings: handleSettings,
+  archive: handleArchive,
 };
 
 const showHelp = (options: GlobalOptions): CommandResult => {
