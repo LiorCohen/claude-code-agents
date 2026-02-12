@@ -2,7 +2,7 @@
 id: 106
 title: Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 status: inbox
-created: 2026-02-08
+created: 2026-02-08 12:44 UTC
 depends_on: []
 blocks: []
 ---

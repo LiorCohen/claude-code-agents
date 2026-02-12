@@ -3,7 +3,7 @@ id: 119
 title: Add session hook with blurb and plugin update check
 status: inbox
 priority: medium
-created: 2026-02-10
+created: 2026-02-10 11:50 UTC
 tags: [enhancement, hooks, ux]
 ---
 

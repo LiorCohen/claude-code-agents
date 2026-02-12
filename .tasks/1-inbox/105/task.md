@@ -2,7 +2,7 @@
 id: 105
 title: Widen permission wildcards to reduce excessive permission prompts
 status: inbox
-created: 2026-02-08
+created: 2026-02-08 12:00 UTC
 depends_on: []
 blocks: []
 ---

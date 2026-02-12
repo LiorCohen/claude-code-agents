@@ -3,7 +3,7 @@ id: 79
 title: Use project-name-derived component names in on-demand scaffolding
 priority: medium
 status: inbox
-created: 2026-02-02
+created: 2026-02-02 16:06 UTC
 depends_on: [78]
 blocks: []
 ---

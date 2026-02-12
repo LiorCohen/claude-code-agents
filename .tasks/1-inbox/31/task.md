@@ -3,7 +3,7 @@ id: 31
 title: Welcome prompt after plugin installation
 priority: low
 status: inbox
-created: 2026-01-25
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 31: Welcome prompt after plugin installation

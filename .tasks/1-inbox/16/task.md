@@ -3,7 +3,7 @@ id: 16
 title: Plan changes should cascade to dependent items
 priority: medium
 status: inbox
-created: 2026-01-25
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 16: Plan changes should cascade to dependent items

@@ -2,7 +2,7 @@
 id: 39
 title: Capture ad-hoc code changes and sync specs
 status: inbox
-created: 2026-01-25
+created: 2026-01-25 12:00 UTC
 depends_on: [35]
 ---
 

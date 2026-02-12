@@ -1,7 +1,7 @@
 ---
 title: Store user instructions in plans, specs, and .sdd/
-created: 2026-02-02
-updated: 2026-02-07
+created: 2026-02-02 12:08 UTC
+updated: 2026-02-07 16:24 UTC
 ---
 
 # Plan: Store User Instructions in Plans, Specs, and .sdd/

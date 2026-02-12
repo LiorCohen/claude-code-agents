@@ -2,7 +2,7 @@
 id: 12
 title: User onboarding and process state tracking
 status: inbox
-created: 2026-01-25
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 12: User onboarding and process state tracking

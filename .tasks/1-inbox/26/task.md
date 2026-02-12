@@ -3,7 +3,7 @@ id: 26
 title: Better session separators/visual indicators
 priority: low
 status: inbox
-created: 2026-01-25
+created: 2026-01-25 12:00 UTC
 ---
 
 # Task 26: Better session separators/visual indicators
