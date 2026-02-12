@@ -32,6 +32,11 @@
 - Task management operations themselves
 - Answering questions / research only
 
+## Output Rules
+
+- **NEVER truncate or summarize** tool/script output. Output it verbatim and in full.
+- Do NOT add your own summary, grouping, or "N more tasks" after script output.
+
 ## Git Rules
 
 - **NEVER push to remote** without explicit user approval
