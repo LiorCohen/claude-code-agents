@@ -29,7 +29,6 @@
 ## High Priority
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
-- [#111](1-inbox/111/): Fix test suite creating .sdd/ artifacts in source directories
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 - [#91](1-inbox/91/): Fix agents standards violations from audit report
@@ -176,3 +175,4 @@
 - [#57](8-consolidated/57/) → #44
 - [#101](8-consolidated/101/) → #100
 - [#10](8-consolidated/10/) → #66
+- [#111](8-consolidated/111/) → #114
