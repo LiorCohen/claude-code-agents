@@ -312,8 +312,8 @@ Rules for maintaining the `.crit/` learning directory:
 3. Check for overlap or contradiction with existing rules
 4. Draft the proposed rule as a concise, imperative statement — not a paragraph, not a transcript
 5. **Present the proposed change to the user for approval.** Show: which file, what rule, whether it's new/merge/replacement. Never write to `.crit/` without explicit user approval — these files are persistent project knowledge that affects all future critic runs.
-6. If approved and new rule overlaps with existing: merge into one stronger, more precise rule
-7. If approved and new rule contradicts existing: replace the old rule (it was wrong or outdated)
+6. If the new rule overlaps with an existing rule: draft a merged rule and **show both the original and merged version to the user for approval**. Merging can lose nuance — the user decides if the merge is correct.
+7. If the new rule contradicts an existing rule: show both rules to the user and **ask which to keep** (or how to reconcile). Never silently replace.
 
 **When to create new topic files:**
 - When a pattern doesn't fit any existing status file
