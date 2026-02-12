@@ -18,10 +18,10 @@ Claude doesn't self-check. It over-engineers, agrees with everything, drifts fro
 | `.claude/skills/critic/resources/phases.md` | **New.** (~400 lines) Detailed per-phase checks for all 8 lifecycle phases with "The user says" voice sections |
 | `.claude/skills/critic/resources/escalation.md` | **New.** (~150 lines) Escalation matrix — hard blocks vs soft warnings with trigger conditions and examples |
 | `.claude/skills/critic/resources/feedback-loop.md` | **New.** (~100 lines) Rules for maintaining `.crit/` feedback files — hygiene, merging, conflict resolution |
-| `.crit/planning.md` | **New.** Initial seed — learned patterns about planning mistakes (distilled from research) |
-| `.crit/implementation.md` | **New.** Initial seed — learned patterns about coding anti-patterns |
-| `.crit/scope.md` | **New.** Initial seed — learned patterns about over/under-engineering |
-| `.crit/communication.md` | **New.** Initial seed — learned patterns about presenting work |
+| `.crit/planning.md` | **New.** Initial seed — planning phase patterns (scope, file reading, plan quality) |
+| `.crit/implementation.md` | **New.** Initial seed — implementation phase patterns (drift, build commands, boundaries) |
+| `.crit/review.md` | **New.** Initial seed — review phase patterns (diff audit, evidence, presentation) |
+| `.crit/completion.md` | **New.** Initial seed — completion phase patterns (acceptance criteria, loose ends) |
 | `.claude/skills/tasks/SKILL.md` | **Modify.** Add critic skill reference at each lifecycle transition point (~6 one-line additions) |
 | `CLAUDE.md` | **Modify.** Add `.crit/` to repository structure diagram and brief explanation |
 
@@ -45,7 +45,7 @@ agent: general-purpose
 
 **Section 1: Phase Inference Algorithm**
 
-The critic must determine the current lifecycle phase entirely from filesystem and git state (since a forked subagent has no conversation history). The algorithm:
+The critic determines the current lifecycle phase from all available signals: filesystem state, git state, recent git history, and any arguments passed to `/critic`. Although a forked subagent has no conversation history, recent git log entries (`git log --oneline -5`) reveal what just happened in the session (e.g., "Tasks: Move #124 to planning" → planning phase). The algorithm:
 
 1. Run `git branch --show-current` to get the current branch name
 2. If branch matches `feature/task-<N>-*`:
@@ -58,10 +58,14 @@ The critic must determine the current lifecycle phase entirely from filesystem a
      - Status `implementing` + no uncommitted changes → **Phase 5: Starting implementation** (or 7 if branch has substantial commits)
      - Status `reviewing` → **Phase 7: Submitting for review**
 3. If branch is `main`:
-   - Check `.tasks/2-planning/*/task.md` for any task with status `planning` → **Phase 2/3/4: Planning phases**
-   - Check `.tasks/1-inbox/` for recently created tasks → **Phase 1: Creating a task**
-   - Check if the most recent commit message starts with `Tasks: Complete` → **Phase 8: Completing a task**
-4. If ambiguous (multiple active tasks, no clear signals) → **Ask the user** which task/phase to review. Never guess.
+   - Check `git log --oneline -5` for recent task transitions (e.g., "Tasks: Move #124 to planning" → task 124, planning phase)
+   - Scan active status directories (`1-inbox/`, `2-planning/`, `3-ready/`, `5-reviewing/`) for tasks
+   - Cross-reference: if git log names a specific task and that task is in an active directory, use it
+   - If **exactly one** active task exists → use it, infer phase from its status directory
+   - If **multiple** active tasks exist and git log doesn't disambiguate → ask the user
+   - If **no** active tasks exist → ask the user what to review
+   - Status-to-phase mapping: `1-inbox` → Phase 1, `2-planning` → Phase 2/3/4, `3-ready` → Phase 4, `5-reviewing` → Phase 7/8
+4. If ambiguous at any step → **Ask the user**. Never guess.
 
 **Disambiguating planning sub-phases (2, 3, 4):**
 - Task in `2-planning/` with empty plan.md skeleton → Phase 2 (starting planning)
@@ -142,16 +146,17 @@ If no hard blocks, it ends with: **"CLEAR — proceed with noted warnings."**
 
 **Section 4: `.crit/` Integration**
 
-After inferring the phase, the critic reads only the relevant `.crit/` topic files on-demand (not all files upfront). The mapping:
+After inferring the phase, the critic reads the `.crit/` file matching the current status. Files are named after task statuses, so the mapping is direct:
 
-| Phase | Primary .crit/ files | Secondary |
-|-------|---------------------|-----------|
-| 1 (creating task) | scope.md | planning.md |
-| 2-4 (planning) | planning.md, scope.md | communication.md |
-| 5-6 (implementing) | implementation.md, scope.md | planning.md |
-| 7-8 (review/complete) | implementation.md, scope.md | communication.md |
+| Phase | .crit/ file |
+|-------|-------------|
+| 1 (creating task) | `planning.md` |
+| 2-4 (planning) | `planning.md` |
+| 5-6 (implementing) | `implementation.md` |
+| 7 (review) | `review.md` |
+| 8 (completion) | `completion.md` |
 
-Only primary files are read by default. Secondary files are read if a finding references a pattern that might be covered there.
+One file per phase. No primary/secondary distinction needed.
 
 **Section 5: Resource File References**
 
@@ -287,7 +292,7 @@ Rules for maintaining the `.crit/` learning directory:
 - A recurring mistake is identified across multiple tasks → capture it
 
 **How to add entries:**
-1. Identify which topic file the pattern belongs to (planning, implementation, scope, communication)
+1. Identify which status file the pattern belongs to (planning, implementation, review, completion)
 2. Read the existing file
 3. Check for overlap or contradiction with existing rules
 4. If new rule overlaps with existing: merge into one stronger, more precise rule
@@ -296,9 +301,9 @@ Rules for maintaining the `.crit/` learning directory:
 7. Write the rule as a concise, imperative statement — not a paragraph, not a transcript
 
 **When to create new topic files:**
-- When a pattern doesn't fit any existing topic file
+- When a pattern doesn't fit any existing status file
 - When an existing file exceeds ~30 rules (split by subtopic)
-- Name the file descriptively: `testing.md`, `git-workflow.md`, etc.
+- Name new files by status or sub-phase: `testing.md`, `git-workflow.md`, etc.
 
 **Hygiene rules:**
 - No contradictions within or across files
@@ -311,7 +316,7 @@ Rules for maintaining the `.crit/` learning directory:
 
 Each file is seeded with rules distilled from the research documents (`research_2026-02-10.md` and `research_2026-02-10_deep.md`). These are starting points — they grow from real interactions.
 
-**`.crit/planning.md`** (~20 rules):
+**`.crit/planning.md`** (~20 rules) — covers task creation and planning phases:
 - Read all relevant files in full before writing a plan — grep finds files, reading understands them
 - Plans must reference real file paths — verify they exist before listing them
 - Fewer focused changes beat many scattered changes
@@ -323,8 +328,12 @@ Each file is seeded with rules distilled from the research documents (`research_
 - Include meaningful tests in every plan — "test that it works" is not a test
 - Account for the 500-line limit on skill and resource files
 - Check INDEX.md for overlapping tasks before creating plans that duplicate existing work
+- The right amount of complexity is the minimum needed for the current task
+- Don't add configurability, feature flags, or backwards-compatibility shims
+- Don't design for N when you only need 1
+- If the solution is more complex than the problem, reconsider the approach
 
-**`.crit/implementation.md`** (~20 rules):
+**`.crit/implementation.md`** (~20 rules) — covers implementation phase:
 - Follow the approved plan exactly — deviations require going back to planning
 - Use `npm run build:plugin` not `npx tsc` — tsc alone doesn't run tsc-alias
 - Plugin boundary: nothing inside `plugin/` references `.claude/`, `.tasks/`, or root files
@@ -335,31 +344,32 @@ Each file is seeded with rules distilled from the research documents (`research_
 - Prefer editing existing files over creating new ones
 - Run tests after every significant change, not just at the end
 - If a test fails, fix the code — never modify the test to make it pass (unless the test was wrong)
-- Don't use `git commit --no-verify` to bypass pre-commit hooks
 - When something is blocked, investigate the root cause — don't brute-force or retry
-
-**`.crit/scope.md`** (~15 rules):
-- The right amount of complexity is the minimum needed for the current task
-- Don't add configurability, feature flags, or backwards-compatibility shims
 - Don't create helpers or utilities for one-time operations
-- If you're touching more files than the plan specified, you're probably over-engineering
 - Don't add abstractions "in case we need them later"
-- If the solution is more complex than the problem, reconsider the approach
-- Don't add optional parameters to make functions "more flexible"
+- If you're touching more files than the plan specified, you're probably over-engineering
 - A bug fix doesn't need surrounding code cleaned up
-- Don't design for N when you only need 1
 - Silent scope reduction is as bad as scope creep — don't quietly drop acceptance criteria
 
-**`.crit/communication.md`** (~10 rules):
-- Be direct — skip preamble and filler
-- Don't over-explain or justify every micro-decision
+**`.crit/review.md`** (~15 rules) — covers review phase:
+- Every line in the diff must justify its existence — if it's not in the plan, explain or revert
+- Don't claim completion without evidence — "tests pass" requires actual output
+- Be direct — skip preamble and filler when presenting work
 - Flag uncertainty explicitly with confidence levels
 - Present options with trade-offs, not recommendations disguised as questions
-- When presenting work, lead with what the user needs to know or decide
-- Don't claim completion without evidence — "tests pass" requires output
-- If blocked, explain what's blocking and suggest next steps — don't just stop
+- Lead with what the user needs to know or decide
 - Don't add emojis unless asked
 - Disagreement with evidence is more useful than agreement without
+- If blocked, explain what's blocking and suggest next steps — don't just stop
+- Don't over-explain or justify every micro-decision
+
+**`.crit/completion.md`** (~10 rules) — covers completion phase:
+- Check every acceptance criterion individually — with evidence, not assertions
+- Don't mark a task complete if any acceptance criterion is unmet
+- "It's 90% done, here's what's left" is better than "it's complete" when it isn't
+- Verify no uncommitted changes remain on the branch
+- Check for TODOs or deferred issues added during implementation — document them
+- Don't add optional parameters to make functions "more flexible" as a last-minute addition
 
 ### 6. Tasks Skill Integration
 
@@ -411,7 +421,7 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] `critic/resources/escalation.md` exists and is under 500 lines
 - [ ] `critic/resources/feedback-loop.md` exists and is under 500 lines
 - [ ] All resource files are referenced from SKILL.md's "Resource Files" section
-- [ ] `.crit/` directory exists with 4 files: `planning.md`, `implementation.md`, `scope.md`, `communication.md`
+- [ ] `.crit/` directory exists with 4 files: `planning.md`, `implementation.md`, `review.md`, `completion.md`
 - [ ] Each `.crit/` file contains concise imperative rules, not transcripts or paragraphs
 - [ ] `.crit/` is NOT listed in `.gitignore`
 
@@ -420,7 +430,8 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] Critic correctly identifies Phase 6 when on a `feature/task-N-*` branch with uncommitted changes and task status `implementing`
 - [ ] Critic correctly identifies Phase 4 when on main with a task in `2-planning/` having complete plan.md and no uncommitted changes
 - [ ] Critic correctly identifies Phase 7 when on a feature branch with task status `reviewing`
-- [ ] Critic asks the user when context is ambiguous (multiple active tasks, no clear phase signals)
+- [ ] Critic uses recent git log to disambiguate when multiple active tasks exist on main
+- [ ] Critic asks the user when context is ambiguous (multiple active tasks, no clear phase signals, git log doesn't help)
 - [ ] Phase inference handles edge case: no active tasks at all (asks user what to review)
 
 ### Output Format Validation
