@@ -50,20 +50,36 @@ Each task is a folder named by its ID containing:
 /tasks list
 ```
 
-Read `.tasks/INDEX.md` and display it **in full** — never truncate, summarize, or collapse any section. Show every task in every section. Skip empty sections. Omit Complete, Rejected, and Consolidated sections (archival). Render task references as clickable markdown links:
+Read `.tasks/INDEX.md` and display **all** non-archival tasks in a single markdown table. Omit Complete, Rejected, and Consolidated sections (archival). Never truncate, summarize, or collapse rows.
+
+Render task references as clickable markdown links:
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
 - Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
-**Section icons** — prepend these icons to section headings in the output:
-- Planning → 📐 Planning
-- Ready → ✅ Ready
-- Implementing → 🔨 Implementing
-- Reviewing → 🔍 Reviewing
-- Inbox → 📥 Inbox
-  - High Priority → 🔴 High Priority
-  - Medium Priority → 🟡 Medium Priority
-  - Low Priority → 🔵 Low Priority
-  - Unprioritized → ⚪ Unprioritized
+**Table format** — one table, three columns: `Priority`, `#`, `Task`:
+
+```
+| Priority | # | Task |
+|----------|---|------|
+```
+
+**Priority column values** — use these labels with icons as in-row categories:
+- Active statuses (shown first, in this order):
+  - `📐 Planning`
+  - `✅ Plan Review`
+  - `🔨 Implementing`
+  - `🔍 Reviewing`
+- Inbox priorities (shown after active, in this order):
+  - `🔴 High`
+  - `🟡 Medium`
+  - `🔵 Low`
+  - `⚪ —` (unprioritized)
+
+Skip any priority group that has zero tasks. End with a summary line:
+
+```
+**N open** — X high, Y medium, Z low, W unprioritized
+```
 
 ---
 
