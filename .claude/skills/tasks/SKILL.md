@@ -71,14 +71,14 @@ Render task references as clickable markdown links:
   - `🔍 Reviewing`
 - Inbox priorities (shown after active, in this order):
   - `🔴 High`
-  - `🟡 Medium`
+  - `🟡 Med`
   - `🔵 Low`
   - `⚪ —` (unprioritized)
 
 Skip any priority group that has zero tasks. End with a summary line:
 
 ```
-**N open** — X high, Y medium, Z low, W unprioritized
+**N open** — X high, Y med, Z low, W unprioritized
 ```
 
 ---
