@@ -15,7 +15,7 @@ Best practices, conventions, and lifecycle documentation.
 
 ## Best Practices
 
-1. **Commit every transition** - Every state change (add, plan, ready, implement, review, complete, reject, consolidate, prioritize) must be committed immediately. Never leave task changes uncommitted. Use the commit skill with `-m` flag and the `Tasks:` prefix (e.g., `Skill(commit, args: '-m "Tasks: Move #19 to planning"')`). The commit skill ensures proper Co-Authored-By attribution
+1. **Commit every transition** - Every state change (add, plan, plan-review, implement, review, complete, reject, consolidate, prioritize) must be committed immediately. Never leave task changes uncommitted. Use the commit skill with `-m` flag and the `Tasks:` prefix (e.g., `Skill(commit, args: '-m "Tasks: Move #19 to planning"')`). The commit skill ensures proper Co-Authored-By attribution
 2. **Verify clean state after every command** - After every `/tasks` command completes, run `git status` to confirm no uncommitted changes remain in `.tasks/`. If any exist, stage and commit them before returning to the user
 3. **Inbox first** - New tasks go to inbox, prioritize later
 4. **Keep atomic** - One clear outcome per task
@@ -41,9 +41,9 @@ Best practices, conventions, and lifecycle documentation.
                            ↓
                      2-planning/
                            ↓
-                    [/tasks ready]
+                 [/tasks plan-review]
                            ↓
-                      3-ready/
+                    3-plan-review/
                            ↓
                   [/tasks implement]
                            ↓

@@ -91,20 +91,20 @@ Plan: [plan.md](.tasks/2-planning/19/plan.md)
 
 ---
 
-## Mark Ready
+## Mark Plan Review
 
 ```
-User: /tasks ready 19
+User: /tasks plan-review 19
 ```
 
 **Workflow:**
 1. Find task folder
-2. Move folder to `3-ready/`
-3. Update `task.md` frontmatter: `status: ready`
+2. Move folder to `3-plan-review/`
+3. Update `task.md` frontmatter: `status: plan-review`
 4. Update INDEX.md
-5. Stage changes and use commit skill (e.g., "Tasks: Move #19 to ready")
+5. Stage changes and use commit skill (e.g., "Tasks: Move #19 to plan-review")
 
-Use when a task has a complete plan and is ready to implement.
+Use when a task has a complete plan and is ready for plan review before implementation.
 
 ---
 
@@ -322,7 +322,7 @@ User: /tasks audit
 - `depends_on` and `blocks` reference task IDs that exist
 
 #### 3. INDEX.md Sync
-- Every non-archived task (inbox, planning, ready, implementing, reviewing) appears in INDEX.md
+- Every non-archived task (inbox, planning, plan-review, implementing, reviewing) appears in INDEX.md
 - Every entry in INDEX.md points to a task folder that exists
 - Tasks appear in the correct INDEX.md section for their status, and in the correct priority sub-section under Inbox
 - Rejected entries include a reason summary
@@ -335,7 +335,7 @@ User: /tasks audit
 - Consolidated tasks have `→ consolidated into #N` suffix in heading
 
 #### 5. Possibly Obsolete Tasks
-- For each open task (inbox, planning, ready), compare against completed tasks:
+- For each open task (inbox, planning, plan-review), compare against completed tasks:
   - Does a completed task's description overlap significantly with this open task?
   - Does a completed task explicitly address the same problem?
   - Has the area this task targets been redesigned or replaced?
@@ -381,7 +381,7 @@ When the user gives task-related instructions, **automatically move the task to 
 | User instruction | Inferred status | Action |
 |------------------|-----------------|--------|
 | "Plan task 19" / "Create a plan for #19" | `planning` | Move to `2-planning/`, create `plan.md` |
-| "Task 19 is ready" / "Mark #19 ready" | `ready` | Move to `3-ready/` |
+| "Task 19 is ready for plan review" / "Mark #19 plan-review" | `plan-review` | Move to `3-plan-review/` |
 | "Let's work on task 19" / "Implement #19" | `implementing` | Move to `4-implementing/`, create branch + worktree |
 | "Task 19 is ready for review" / "Submit #19" | `reviewing` | Move to `5-reviewing/` |
 | "Task 19 is done" / "Complete #19" | `complete` | Move to `6-complete/`, add completion date |

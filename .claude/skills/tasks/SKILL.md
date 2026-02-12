@@ -17,7 +17,7 @@ Manage the project backlog, track progress, and organize implementation plans.
 ├── INDEX.md              # Index file - task numbers, titles, links
 ├── 1-inbox/              # Open tasks (not yet started)
 ├── 2-planning/           # Plan being created
-├── 3-ready/              # Has plan, ready to implement
+├── 3-plan-review/        # Plan review checkpoint
 │   └── .gitkeep
 ├── 4-implementing/       # Currently being worked on
 │   └── .gitkeep
@@ -111,16 +111,16 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 
 ---
 
-### Mark Ready
+### Mark Plan Review
 
 ```
-/tasks ready <id>
+/tasks plan-review <id>
 ```
 
-1. Move to `3-ready/`
+1. Move to `3-plan-review/`
 2. Update status
 3. Update INDEX.md
-4. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to ready"
+4. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to plan-review"
 
 ---
 
@@ -231,8 +231,8 @@ Write report to `.temp/tasks-audit-<datetime>.md`.
 **CRITICAL:** Each `/tasks` command is a standalone operation. After executing the requested command, **STOP and return control to the user**. NEVER chain commands or advance a task to the next status without explicit user approval.
 
 - `/tasks add` → add to inbox, commit, stop. Do NOT proceed to plan.
-- `/tasks plan` → move to planning, create plan, commit, stop. Do NOT proceed to ready/implement.
-- `/tasks ready` → move to ready, commit, stop. Do NOT proceed to implement.
+- `/tasks plan` → move to planning, create plan, commit, stop. Do NOT proceed to plan-review/implement.
+- `/tasks plan-review` → move to plan-review, commit, stop. Do NOT proceed to implement.
 - `/tasks implement` → move to implementing, create branch, commit, stop. Do NOT start coding.
 
 The user decides when to advance. Always wait for their instruction.

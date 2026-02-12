@@ -15,7 +15,7 @@ All task files use YAML frontmatter.
 | `id` | number | yes | Unique task number |
 | `title` | string | yes | Short title |
 | `priority` | enum | no | `low`, `medium`, `high` (unset = unprioritized) |
-| `status` | enum | yes | `inbox`, `planning`, `ready`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
+| `status` | enum | yes | `inbox`, `planning`, `plan-review`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
 | `created` | datetime | yes | `YYYY-MM-DD HH:MM UTC` |
 | `completed` | datetime | no | `YYYY-MM-DD HH:MM UTC` (when status=complete) |
 | `consolidated_into` | number | no | Task ID (when status=consolidated) |
@@ -284,9 +284,9 @@ Active tasks (planning through reviewing) have their own top-level sections. Inb
 
 ---
 
-## Ready
+## Plan Review
 
-- [#20](3-ready/20/): Plugin installation debugging
+- [#20](3-plan-review/20/): Plugin installation debugging
 
 ---
 

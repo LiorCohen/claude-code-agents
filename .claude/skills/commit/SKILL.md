@@ -154,7 +154,7 @@ Why this change was made (for significant changes).
 **If changes involve `.tasks/` or are related to a tracked task:**
 
 Use the `tasks` skill to ensure proper task status management. The tasks skill is authoritative for:
-- Task lifecycle (open → planning → ready → implementing → reviewing → complete)
+- Task lifecycle (inbox → planning → plan-review → implementing → reviewing → complete)
 - Plan creation and approval workflows
 - Automatic status transitions based on user actions
 
@@ -162,7 +162,7 @@ Use the `tasks` skill to ensure proper task status management. The tasks skill i
 
 | Scenario | Action |
 |----------|--------|
-| Plan created and approved | Use `/tasks ready N` to move task to ready |
+| Plan created and approved | Use `/tasks plan-review N` to move task to plan-review |
 | Starting implementation | Use `/tasks implement N` to move task to implementing |
 | Implementation complete | Use `/tasks review N` to move task to reviewing |
 | Work fully done | Use `/tasks complete N` to mark task complete |
