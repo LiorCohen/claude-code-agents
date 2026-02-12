@@ -14,21 +14,21 @@ Claude doesn't self-check. It over-engineers, agrees with everything, drifts fro
 
 | File | Changes |
 |------|---------|
-| `.claude/skills/critic/SKILL.md` | **New.** Main skill (~300 lines) — phase inference algorithm, core protocols, output format, `.crit/` integration, resource file references |
+| `.claude/skills/critic/SKILL.md` | **New.** Main skill (~300 lines) — phase inference algorithm, core protocols, output format, `.critic/` integration, resource file references |
 | `.claude/skills/critic/resources/phases.md` | **New.** (~400 lines) Detailed per-phase checks for all 8 lifecycle phases with "The user says" voice sections |
 | `.claude/skills/critic/resources/escalation.md` | **New.** (~150 lines) Escalation matrix — hard blocks vs soft warnings with trigger conditions and examples |
-| `.claude/skills/critic/resources/feedback-loop.md` | **New.** (~100 lines) Rules for maintaining `.crit/` feedback files — hygiene, merging, conflict resolution |
-| `.crit/planning.md` | **New.** Initial seed — planning phase patterns (scope, file reading, plan quality) |
-| `.crit/implementation.md` | **New.** Initial seed — implementation phase patterns (drift, build commands, boundaries) |
-| `.crit/review.md` | **New.** Initial seed — review phase patterns (diff audit, evidence, presentation) |
-| `.crit/completion.md` | **New.** Initial seed — completion phase patterns (acceptance criteria, loose ends) |
+| `.claude/skills/critic/resources/feedback-loop.md` | **New.** (~100 lines) Rules for maintaining `.critic/` feedback files — hygiene, merging, conflict resolution |
+| `.critic/planning.md` | **New.** Initial seed — planning phase patterns (scope, file reading, plan quality) |
+| `.critic/implementation.md` | **New.** Initial seed — implementation phase patterns (drift, build commands, boundaries) |
+| `.critic/review.md` | **New.** Initial seed — review phase patterns (diff audit, evidence, presentation) |
+| `.critic/completion.md` | **New.** Initial seed — completion phase patterns (acceptance criteria, loose ends) |
 | `.claude/skills/tasks/SKILL.md` | **Modify.** Rename `ready` → `plan-review` in commands and references; add critic skill reference at each lifecycle transition point (~6 one-line additions) |
 | `.claude/skills/tasks/schemas.md` | **Modify.** Rename `ready` status to `plan-review` in enum, INDEX.md structure example, directory references |
 | `.claude/skills/tasks/workflows.md` | **Modify.** Rename `ready` → `plan-review` in workflow descriptions |
 | `.claude/skills/tasks/reference.md` | **Modify.** Rename `ready` → `plan-review` in lifecycle references |
 | `.claude/skills/commit/SKILL.md` | **Modify.** Rename `ready` → `plan-review` if referenced |
 | `.tasks/3-ready/` | **Rename.** Directory becomes `.tasks/3-plan-review/` (currently empty except `.gitkeep`) |
-| `CLAUDE.md` | **Modify.** Add `.crit/` to repository structure diagram; rename `3-ready` → `3-plan-review` if referenced |
+| `CLAUDE.md` | **Modify.** Add `.critic/` to repository structure diagram; rename `3-ready` → `3-plan-review` if referenced |
 
 ## Changes
 
@@ -41,7 +41,7 @@ description: >
   Self-review at every task lifecycle phase. Infers current phase from
   git/filesystem state, runs phase-specific checks, rates confidence,
   and classifies findings as hard blocks or soft warnings. Reads learned
-  patterns from .crit/*.md files. If no active task or ambiguous context,
+  patterns from .critic/*.md files. If no active task or ambiguous context,
   asks the user what to review. Produces: structured self-evaluation report.
 context: fork
 agent: general-purpose
@@ -144,9 +144,9 @@ The critic produces a structured report:
 
 - [x] [Check description] — [brief evidence]
 
-### Learned Patterns Applied (from .crit/)
+### Learned Patterns Applied (from .critic/)
 
-- Applied rule from `.crit/planning.md`: "[rule text]"
+- Applied rule from `.critic/planning.md`: "[rule text]"
 ```
 
 If there are hard blocks, the critic ends with: **"BLOCKED — resolve the above before proceeding."**
@@ -154,11 +154,11 @@ If no hard blocks, it ends with: **"CLEAR — proceed with noted warnings."**
 
 **Critical rule: The critic NEVER auto-fixes.** The critic produces a report for the user. It does not automatically revise code, revert changes, or trigger corrections based on its findings. Research shows that auto-correction loops between a generator and critic degrade correct code due to sycophancy — the generator agrees with the critic even when the original approach was right. All findings go to the human for decision.
 
-**Section 4: `.crit/` Integration**
+**Section 4: `.critic/` Integration**
 
-After inferring the phase, the critic reads the `.crit/` file matching the current status. Files are named after task statuses, so the mapping is direct:
+After inferring the phase, the critic reads the `.critic/` file matching the current status. Files are named after task statuses, so the mapping is direct:
 
-| Phase | .crit/ file |
+| Phase | .critic/ file |
 |-------|-------------|
 | 1 (creating task) | `planning.md` |
 | 2-4 (planning) | `planning.md` |
@@ -175,7 +175,7 @@ One file per phase. No primary/secondary distinction needed.
 
 - [phases.md](resources/phases.md) — Detailed checks for all 8 lifecycle phases
 - [escalation.md](resources/escalation.md) — Hard block vs soft warning classification criteria
-- [feedback-loop.md](resources/feedback-loop.md) — Rules for maintaining the .crit/ learning directory
+- [feedback-loop.md](resources/feedback-loop.md) — Rules for maintaining the .critic/ learning directory
 ```
 
 ### 2. Critic Skill — resources/phases.md (~400 lines)
@@ -298,7 +298,7 @@ Each of the 8 phases gets a dedicated section with:
 
 ### 4. Critic Skill — resources/feedback-loop.md (~100 lines)
 
-Rules for maintaining the `.crit/` learning directory:
+Rules for maintaining the `.critic/` learning directory:
 
 **When to add entries:**
 - The user pushes back on a plan or approach → capture the pattern
@@ -311,7 +311,7 @@ Rules for maintaining the `.crit/` learning directory:
 2. Read the existing file
 3. Check for overlap or contradiction with existing rules
 4. Draft the proposed rule as a concise, imperative statement — not a paragraph, not a transcript
-5. **Present the proposed change to the user for approval.** Show: which file, what rule, whether it's new/merge/replacement. Never write to `.crit/` without explicit user approval — these files are persistent project knowledge that affects all future critic runs.
+5. **Present the proposed change to the user for approval.** Show: which file, what rule, whether it's new/merge/replacement. Never write to `.critic/` without explicit user approval — these files are persistent project knowledge that affects all future critic runs.
 6. If the new rule overlaps with an existing rule: draft a merged rule and **show both the original and merged version to the user for approval**. Merging can lose nuance — the user decides if the merge is correct.
 7. If the new rule contradicts an existing rule: show both rules to the user and **ask which to keep** (or how to reconcile). Never silently replace.
 
@@ -322,16 +322,16 @@ Rules for maintaining the `.crit/` learning directory:
 
 **Hygiene rules:**
 - No contradictions within or across files
-- No duplications — if two rules say the same thing, merge them
+- No duplications — if two rules say the same thing, propose a merge to the user
 - Keep rules concise — one sentence per rule where possible
 - No raw conversation transcripts — distill into actionable rules
-- Review periodically: if a rule hasn't been relevant in 10+ tasks, consider removing it
+- **Never remove rules without user approval.** If a rule hasn't been relevant in 10+ tasks, propose removal — but the user decides. All `.critic/` modifications (add, merge, replace, remove) require explicit user approval.
 
-### 5. `.crit/` Initial Seed Files
+### 5. `.critic/` Initial Seed Files
 
 Each file is seeded with rules distilled from the research documents (`research_2026-02-10.md` and `research_2026-02-10_deep.md`). These are starting points — they grow from real interactions.
 
-**`.crit/planning.md`** (~20 rules) — covers task creation and planning phases:
+**`.critic/planning.md`** (~20 rules) — covers task creation and planning phases:
 - Read all relevant files in full before writing a plan — grep finds files, reading understands them
 - Plans must reference real file paths — verify they exist before listing them
 - Fewer focused changes beat many scattered changes
@@ -348,7 +348,7 @@ Each file is seeded with rules distilled from the research documents (`research_
 - Don't design for N when you only need 1
 - If the solution is more complex than the problem, reconsider the approach
 
-**`.crit/implementation.md`** (~20 rules) — covers implementation phase:
+**`.critic/implementation.md`** (~20 rules) — covers implementation phase:
 - Follow the approved plan exactly — deviations require going back to planning
 - Use `npm run build:plugin` not `npx tsc` — tsc alone doesn't run tsc-alias
 - Plugin boundary: nothing inside `plugin/` references `.claude/`, `.tasks/`, or root files
@@ -367,7 +367,7 @@ Each file is seeded with rules distilled from the research documents (`research_
 - Silent scope reduction is as bad as scope creep — don't quietly drop acceptance criteria
 - Watch for degradation signals: placeholder code, `// TODO: implement`, sparse implementations, repeated errors — recommend context reset
 
-**`.crit/review.md`** (~15 rules) — covers review phase:
+**`.critic/review.md`** (~15 rules) — covers review phase:
 - Every line in the diff must justify its existence — if it's not in the plan, explain or revert
 - If test files were modified alongside source files, verify assertions weren't weakened — fixing tests to pass is not fixing code
 - Don't claim completion without evidence — "tests pass" requires actual output
@@ -380,7 +380,7 @@ Each file is seeded with rules distilled from the research documents (`research_
 - If blocked, explain what's blocking and suggest next steps — don't just stop
 - Don't over-explain or justify every micro-decision
 
-**`.crit/completion.md`** (~10 rules) — covers completion phase:
+**`.critic/completion.md`** (~10 rules) — covers completion phase:
 - Check every acceptance criterion individually — with evidence, not assertions
 - Don't mark a task complete if any acceptance criterion is unmet
 - "It's 90% done, here's what's left" is better than "it's complete" when it isn't
@@ -408,13 +408,13 @@ Each addition is ~1-2 lines. Total impact on tasks SKILL.md: ~12 lines added.
 
 ### 7. CLAUDE.md Updates
 
-Add `.crit/` to the repository structure diagram:
+Add `.critic/` to the repository structure diagram:
 ```
-├── .crit/                               # Learned critic feedback (topic-organized)
+├── .critic/                               # Learned critic feedback (topic-organized)
 ```
 
 Add a brief note in a relevant section explaining:
-- `.crit/` stores learned patterns from user feedback, organized by topic
+- `.critic/` stores learned patterns from user feedback, organized by topic
 - NOT gitignored — these are persistent project knowledge
 - Managed by the critic skill — don't edit directly unless adding feedback
 
@@ -444,7 +444,7 @@ The `3-ready` status is renamed to `3-plan-review` to accurately reflect its pur
 ## Dependencies
 
 1. `ready` → `plan-review` rename first (the critic skill and tasks integration reference the new name)
-2. `.crit/` seed files created next (the skill references them)
+2. `.critic/` seed files created next (the skill references them)
 3. Critic skill SKILL.md written next (establishes the framework)
 4. Critic resource files written after SKILL.md (referenced from it)
 5. Tasks skill integration last (references the completed critic skill + uses the new plan-review name)
@@ -462,9 +462,9 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] `critic/resources/escalation.md` exists and is under 500 lines
 - [ ] `critic/resources/feedback-loop.md` exists and is under 500 lines
 - [ ] All resource files are referenced from SKILL.md's "Resource Files" section
-- [ ] `.crit/` directory exists with 4 files: `planning.md`, `implementation.md`, `review.md`, `completion.md`
-- [ ] Each `.crit/` file contains concise imperative rules, not transcripts or paragraphs
-- [ ] `.crit/` is NOT listed in `.gitignore`
+- [ ] `.critic/` directory exists with 4 files: `planning.md`, `implementation.md`, `review.md`, `completion.md`
+- [ ] Each `.critic/` file contains concise imperative rules, not transcripts or paragraphs
+- [ ] `.critic/` is NOT listed in `.gitignore`
 
 ### Phase Inference Validation
 
@@ -485,7 +485,7 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] Each finding has a confidence rating (high/medium/low)
 - [ ] Hard blocks end with "BLOCKED — resolve the above before proceeding"
 - [ ] No hard blocks end with "CLEAR — proceed with noted warnings"
-- [ ] Applied `.crit/` rules are cited in the output
+- [ ] Applied `.critic/` rules are cited in the output
 
 ### Protocol Validation
 
@@ -512,24 +512,24 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 ### Integration Validation
 
 - [ ] Tasks SKILL.md references critic at each of the 6 transition points
-- [ ] CLAUDE.md includes `.crit/` in repository structure
+- [ ] CLAUDE.md includes `.critic/` in repository structure
 - [ ] CLAUDE.md references `3-plan-review` (not `3-ready`) if applicable
 - [ ] Critic reference in tasks skill is non-blocking (recommendation, not mandatory gate)
 
 ### Failure Mode Validation
 
-- [ ] If `.crit/` directory is empty or missing files, critic still runs (uses built-in checks only)
+- [ ] If `.critic/` directory is empty or missing files, critic still runs (uses built-in checks only)
 - [ ] If phase inference is wrong, user can correct it and critic re-runs with correct phase
 - [ ] Forked subagent correctly receives skill content as its prompt (not inline execution)
 
 ## Verification
 
 - [ ] `/critic` is invocable and listed in available skills
-- [ ] Running `/critic` while planning produces planning-phase checks with relevant `.crit/` rules
+- [ ] Running `/critic` while planning produces planning-phase checks with relevant `.critic/` rules
 - [ ] Running `/critic` while implementing produces implementation-phase checks with diff comparison
 - [ ] Running `/critic` before review produces diff audit + evidence gate
 - [ ] Hard blocks prevent "CLEAR" output — user must see and address them
-- [ ] `.crit/` files are readable and their rules appear in critic output
+- [ ] `.critic/` files are readable and their rules appear in critic output
 - [ ] Tasks skill transitions reference the critic at all 6 integration points
 - [ ] `/tasks plan-review` command works (renamed from `/tasks ready`)
 - [ ] All 18 acceptance criteria from task.md are addressed
