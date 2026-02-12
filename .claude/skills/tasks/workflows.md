@@ -152,11 +152,11 @@ Use when implementation is complete and ready for review.
 
 ### Changes File
 
-The changes file is **always** generated as `changes.md` in the task folder (e.g., `.tasks/5-reviewing/19/changes.md`). It contains frontmatter with datetimes and a summary table of all files changed on the feature branch vs main.
+The changes file is **always** generated as `changes.md` in the task folder (e.g., `.tasks/5-reviewing/19/changes.md`). It captures **all changes made during the task's lifetime** across all lifecycle stages (planning, implementing, reviewing) — not just the final implementation diff. Task management changes (`.tasks/` folder moves, INDEX.md updates) are excluded.
 
 **How to generate:**
-1. Run `git diff main..HEAD --stat` to get the file list and line counts
-2. Run `git diff main..HEAD --numstat` to get per-file additions/deletions as numbers
+1. Run `git diff main..HEAD --stat -- ':!.tasks/'` to get the file list and line counts (excluding task management files)
+2. Run `git diff main..HEAD --numstat -- ':!.tasks/'` to get per-file additions/deletions as numbers
 3. Write `changes.md` with frontmatter and a summary table
 
 **Template:**
@@ -188,7 +188,7 @@ commits: <count>
 When the user requests a detailed change report, **expand** the existing `changes.md` by appending per-file diff sections below the summary table.
 
 **How to generate:**
-1. Run `git diff main..HEAD` to get the full diff
+1. Run `git diff main..HEAD -- ':!.tasks/'` to get the full diff (excluding task management files)
 2. Append sections to `changes.md`, one per file, each containing:
    - The file path as a heading with a clickable markdown link
    - A one-line description of what changed

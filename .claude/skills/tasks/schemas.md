@@ -131,7 +131,7 @@ rejected_reason: Out of scope for MVP
 
 ## Changes Schema
 
-Changes are stored as `changes.md` inside the task folder. They are always generated when moving to review or completing a task. They document every file changed on the feature branch vs main.
+Changes are stored as `changes.md` inside the task folder. They are always generated when moving to review or completing a task. They capture **all changes made during the task's lifetime** across all lifecycle stages (planning, implementing, reviewing). Task management changes (`.tasks/` files) are excluded.
 
 ### Frontmatter Fields
 
