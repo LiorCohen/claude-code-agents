@@ -23,7 +23,7 @@
 
 ## Reviewing
 
-- [#82](5-reviewing/82/plan.md): Reorganize archive into .sdd directory
+(none)
 
 ---
 
@@ -85,6 +85,7 @@
 
 ## Complete
 
+- [#82](6-complete/82/): Reorganize archive into .sdd directory ✓ (2026-02-12)
 - [#118](6-complete/118/): Upgrade all JSON schemas to latest stable version (2020-12) ✓ (2026-02-12)
 - [#122](6-complete/122/): Fix TypeScript standards violations in plugin/system ✓ (2026-02-11)
 - [#123](6-complete/123/): Update TypeScript standards with missing patterns and corrections ✓ (2026-02-10)

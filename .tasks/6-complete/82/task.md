@@ -2,8 +2,9 @@
 id: 82
 title: Reorganize archive into .sdd directory
 priority: high
-status: reviewing
+status: complete
 created: 2026-02-05 14:32 UTC
+completed: 2026-02-12 15:00 UTC
 depends_on: []
 blocks: []
 ---
