@@ -1,7 +1,7 @@
 ---
 title: Add critic skill for self-checking at every task lifecycle phase
 created: 2026-02-12 16:00 UTC
-updated: 2026-02-12 17:00 UTC
+updated: 2026-02-12 18:00 UTC
 ---
 
 # Plan: Add Critic Skill for Self-Checking at Every Task Lifecycle Phase
@@ -108,6 +108,15 @@ Each protocol is a concrete behavioral rule, not a vague aspiration.
 >    - **Files in diff but not in plan** → Flag as "unplanned change" (hard block — scope creep)
 >    - **Files match** → Confirm scope alignment
 > 5. For each file in diff, verify the change is justified line-by-line. If any change can't be traced to a plan item, flag it.
+
+**Thought depth escalation:**
+> Not all checks need the same level of analysis. The critic uses four thinking depth levels, matched to check complexity:
+> - **Quick** — surface-level structural checks. File exists? Frontmatter valid? Line count under limit? Branch name correct? These are facts, not judgments.
+> - **Standard** — routine checks requiring modest reasoning. Diff audit file list comparison, plan coverage check, status-to-phase mapping. One step of inference.
+> - **Deep** (`think hard`) — checks involving potential hard blocks, low-confidence findings, or multi-file cross-referencing. Standards contradiction analysis, acceptance criteria verification against actual implementation, counter-sycophancy evaluation. Multiple steps of inference, evidence gathering required.
+> - **Ultra** (`think harder`) — architectural decisions, cascading scope mismatches, cross-module coupling analysis, plan-vs-implementation semantic comparison (not just file list — do the *changes* match?). Reserved for Phase 4 (full plan review), Phase 7 (pre-review audit), and any finding where confidence is low on something that matters.
+>
+> The escalation matrix (resources/escalation.md) annotates each check with its default depth. The critic may escalate depth when a lower-depth check surfaces something suspicious (e.g., Quick file list check reveals an unexpected file → escalate to Deep to understand why).
 
 **"Did you run it?" gate (phases 7, 8 only):**
 > Before claiming completion, the critic checks for evidence — conditional on what was changed:
@@ -267,34 +276,34 @@ Each of the 8 phases gets a dedicated section with:
 
 **Hard Blocks** (critic outputs "BLOCKED" — must resolve before proceeding):
 
-| ID | Trigger | Phase(s) | Action |
-|----|---------|----------|--------|
-| H1 | Files in diff not in plan (scope creep) | 6, 7, 8 | List unplanned files, require justification or revert |
-| H2 | Files in plan not in diff (incomplete) | 7, 8 | List missing files, require implementation or plan amendment |
-| H3 | Low confidence on architectural decision | 2, 3, 5 | Flag specific decision, ask user to verify |
-| H4 | Contradicts CLAUDE.md or standards | All | Quote the violated rule, require fix |
-| H5 | Breaking existing tests | 6, 7 | Show failing test, require fix before proceeding |
-| H6 | Plugin boundary violation | 6, 7 | Show the cross-boundary reference, require removal |
-| H7 | Working on main during implementation | 5, 6 | Stop immediately, require feature branch |
-| H8 | No build/test evidence before review | 7, 8 | Require actual command output |
-| H9 | Destructive command without verification | All | Flag the command, require user confirmation |
-| H10 | Unmet acceptance criteria at completion | 8 | List unmet criteria, block completion |
-| H11 | Didn't read files that are being modified | 2, 3, 5, 6 | Flag which files were only grepped, require full read |
-| H12 | Test assertions weakened to make tests pass | 7 | Show original vs modified assertions, require code fix instead |
+| ID | Trigger | Phase(s) | Depth | Action |
+|----|---------|----------|-------|--------|
+| H1 | Files in diff not in plan (scope creep) | 6, 7, 8 | Standard | List unplanned files, require justification or revert |
+| H2 | Files in plan not in diff (incomplete) | 7, 8 | Standard | List missing files, require implementation or plan amendment |
+| H3 | Low confidence on architectural decision | 2, 3, 5 | Deep | Flag specific decision, ask user to verify |
+| H4 | Contradicts CLAUDE.md or standards | All | Deep | Quote the violated rule, require fix |
+| H5 | Breaking existing tests | 6, 7 | Standard | Show failing test, require fix before proceeding |
+| H6 | Plugin boundary violation | 6, 7 | Standard | Show the cross-boundary reference, require removal |
+| H7 | Working on main during implementation | 5, 6 | Quick | Stop immediately, require feature branch |
+| H8 | No build/test evidence before review | 7, 8 | Quick | Require actual command output |
+| H9 | Destructive command without verification | All | Quick | Flag the command, require user confirmation |
+| H10 | Unmet acceptance criteria at completion | 8 | Ultra | List unmet criteria, block completion |
+| H11 | Didn't read files that are being modified | 2, 3, 5, 6 | Standard | Flag which files were only grepped, require full read |
+| H12 | Test assertions weakened to make tests pass | 7 | Deep | Show original vs modified assertions, require code fix instead |
 
 **Soft Warnings** (critic outputs "WARNING" — noted but not blocking):
 
-| ID | Trigger | Phase(s) | Note |
-|----|---------|----------|------|
-| S1 | Minor style deviation | 6, 7 | Note the deviation, suggest fix |
-| S2 | Optional improvement spotted | 3, 6 | Suggest as future task, don't expand current scope |
-| S3 | Non-critical edge case | 3, 6 | Document as known limitation |
-| S4 | Documentation opportunity | 7 | Note but don't add unless in plan |
-| S5 | Verbose commit history | 7 | Suggest squash if excessive |
-| S6 | Gold-plating detected | 6 | Flag the extra work, note it's beyond scope |
-| S7 | TODOs added during implementation | 6, 7 | Note for follow-up, don't block |
-| S8 | Degradation signals (placeholders, sparse code, repeated errors) | 6 | Recommend context reset |
-| S9 | On main while task is in implementing | 5, 6 | Suggest switching to feature branch |
+| ID | Trigger | Phase(s) | Depth | Note |
+|----|---------|----------|-------|------|
+| S1 | Minor style deviation | 6, 7 | Quick | Note the deviation, suggest fix |
+| S2 | Optional improvement spotted | 3, 6 | Standard | Suggest as future task, don't expand current scope |
+| S3 | Non-critical edge case | 3, 6 | Deep | Document as known limitation |
+| S4 | Documentation opportunity | 7 | Quick | Note but don't add unless in plan |
+| S5 | Verbose commit history | 7 | Quick | Suggest squash if excessive |
+| S6 | Gold-plating detected | 6 | Standard | Flag the extra work, note it's beyond scope |
+| S7 | TODOs added during implementation | 6, 7 | Quick | Note for follow-up, don't block |
+| S8 | Degradation signals (placeholders, sparse code, repeated errors) | 6 | Standard | Recommend context reset |
+| S9 | On main while task is in implementing | 5, 6 | Quick | Suggest switching to feature branch |
 
 ### 4. Critic Skill — resources/feedback-loop.md (~100 lines)
 
