@@ -2,7 +2,7 @@
 id: 125
 title: Fix skills standards violations from audit report
 priority: high
-status: inbox
+status: planning
 created: 2026-02-12 12:00 UTC
 depends_on: []
 blocks: []
