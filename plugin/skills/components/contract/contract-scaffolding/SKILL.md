@@ -14,7 +14,7 @@ Use when creating a contract component. Contract components support multiple ins
 
 ## What It Creates
 
-The directory path is `components/contracts/{name}/` based on the component name in `.sdd/sdd-settings.yaml` (refer to the `project-settings` skill for directory mappings).
+The directory path is `components/contracts/{name}/` based on the component name in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`contract`) + name to a filesystem path (e.g., `type=contract, name=customer-api` → `components/contracts/customer-api/`).
 
 ```text
 components/contracts/{name}/

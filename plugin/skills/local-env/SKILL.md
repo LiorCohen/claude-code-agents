@@ -90,7 +90,7 @@ The telemetry namespace contains:
 
 ## Integration with Settings
 
-The deploy command reads `.sdd/sdd-settings.yaml` (refer to the `project-settings` skill for schema) to:
+The deploy command reads `.sdd/sdd-settings.yaml` (delegate to the `project-settings` skill for the settings schema — it returns the project `name`, component list with types, and per-component settings) to:
 1. Get the app `name` (used as the Kubernetes namespace)
 2. Find all `type: database` components to set up
 3. Find all `type: helm` components to deploy

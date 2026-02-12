@@ -14,7 +14,7 @@ Use the following skills for reference:
 
 ## Chart-per-Deployment Pattern
 
-Each deployment configuration gets its own helm chart. A single server can have multiple helm charts (e.g., one for API mode with ingress, one for worker mode without). Refer to the `project-settings` skill for the complete helm settings schema and how `deploy_modes`, `ingress`, and `assets` affect chart structure.
+Each deployment configuration gets its own helm chart. A single server can have multiple helm charts (e.g., one for API mode with ingress, one for worker mode without). Delegate to the `project-settings` skill for the complete helm settings schema — it returns `deploys` (server reference), `deploy_type` (server/webapp), `deploy_modes` (array of mode strings like `[api, worker]`), `ingress` (boolean), and `assets` (static file configuration). These settings determine which templates are included in each chart.
 
 ## Directory Structure
 

@@ -6,7 +6,7 @@ user-invocable: false
 
 # Backend Scaffolding Skill
 
-Creates a Node.js/TypeScript backend component following the CMDO (Config, Model, DAL, Operator) architecture. Scaffolding is driven by **component settings** defined in `.sdd/sdd-settings.yaml` (refer to the `project-settings` skill for the authoritative schema).
+Creates a Node.js/TypeScript backend component following the CMDO (Config, Model, DAL, Operator) architecture. Scaffolding is driven by **component settings** defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the authoritative server settings schema — it accepts a component type (`server`) and returns the typed settings object including `server_type`, `databases`, `provides_contracts`, and framework defaults.
 
 ## When to Use
 
@@ -14,7 +14,7 @@ Use when creating server components. Supports multiple named instances (e.g., `m
 
 ## Settings-Driven Scaffolding
 
-Server components are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Refer to the `project-settings` skill for the complete server settings schema and defaults.
+Server components are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the complete server settings schema and defaults — it returns `server_type` (express/fastify/nestjs), `databases` (array of referenced database component names), `provides_contracts` (array of contract component names), and framework-specific configuration.
 
 ### Conditional Scaffolding Logic
 
