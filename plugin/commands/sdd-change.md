@@ -1037,7 +1037,10 @@ Go back to an earlier phase (e.g., from planning back to spec).
 ### Flow
 
 1. Validate change exists
-2. Archive current state via system CLI: `archive store --source <prepared-dir> --type workflow-regression`
+2. Archive current state via system CLI:
+   ```bash
+   "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type workflow-regression --json
+   ```
 3. Reset status fields for target phase and later
 4. Flag dependent items for re-review
 5. Log regression reason

@@ -240,7 +240,7 @@ Sometimes you need to go back to an earlier phase:
 ```
 
 Regression:
-- Archives discarded work to `.sdd/archive/regressions/`
+- Archives discarded work to `.sdd/archive/workflow-regressions/`
 - Flags dependent items for re-review
 - Requires a reason for audit trail
 

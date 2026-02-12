@@ -84,7 +84,7 @@ Output:
 ═══════════════════════════════════════════════════════════════
 
 Workflow: a1b2c3
-Source: external (.sdd/archive/external-specs/20260205-feature-spec.md)
+Source: external (.sdd/archive/external-specs/20260205-1430-feature-spec.md)
 Created: 2026-02-05
 
 Current: a1b2-1 (Registration) - spec_review
