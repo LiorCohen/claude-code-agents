@@ -6,7 +6,6 @@
 
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
-- [#118](2-planning/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
 ---
 
 ## Ready
@@ -17,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#118](4-implementing/118/plan.md): Upgrade all JSON schemas to latest stable version (2020-12)
 
 ---
 
