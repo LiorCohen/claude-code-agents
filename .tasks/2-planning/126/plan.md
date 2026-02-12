@@ -70,6 +70,9 @@ Skills to include rules for:
 - `skills-standards` — skill authoring
 - `agents-standards` — agent authoring
 - `commands-standards` — command authoring
+- `critic` — task lifecycle work (review, complete, plan, implement)
+- `docs-standards` — documentation or plugin functionality changes
+- `manifest-validation` — manifest/plugin.json changes
 
 ### 3. Objective Stop hook
 
