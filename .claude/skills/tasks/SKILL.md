@@ -54,6 +54,17 @@ Read `.tasks/INDEX.md` and display it **in full** — never truncate, summarize,
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
 - Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
+**Section icons** — prepend these icons to section headings in the output:
+- Planning → 📐 Planning
+- Ready → ✅ Ready
+- Implementing → 🔨 Implementing
+- Reviewing → 🔍 Reviewing
+- Inbox → 📥 Inbox
+  - High Priority → 🔴 High Priority
+  - Medium Priority → 🟡 Medium Priority
+  - Low Priority → 🔵 Low Priority
+  - Unprioritized → ⚪ Unprioritized
+
 ---
 
 ### View Single Task
