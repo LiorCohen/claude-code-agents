@@ -50,20 +50,11 @@ Each task is a folder named by its ID containing:
 /tasks list
 ```
 
-Read `.tasks/INDEX.md` and display it **in full** — never truncate, summarize, or collapse any section. Show every task in every section. Skip empty sections. Omit Complete, Rejected, and Consolidated sections (archival). Render task references as clickable markdown links:
-- If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
-- Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+Run the colocated script and output its stdout as-is — do not modify, summarize, or truncate:
 
-**Section icons** — prepend these icons to section headings in the output:
-- Planning → 📐 Planning
-- Ready → ✅ Ready
-- Implementing → 🔨 Implementing
-- Reviewing → 🔍 Reviewing
-- Inbox → 📥 Inbox
-  - High Priority → 🔴 High Priority
-  - Medium Priority → 🟡 Medium Priority
-  - Low Priority → 🔵 Low Priority
-  - Unprioritized → ⚪ Unprioritized
+```bash
+bash .claude/skills/tasks/list-backlog.sh
+```
 
 ---
 
