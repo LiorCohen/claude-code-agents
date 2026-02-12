@@ -4,7 +4,6 @@
 
 ## Planning
 
-- [#126](2-planning/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
 - [#67](2-planning/67/plan.md): Store user instructions in plans, specs, and .sdd/
 - [#103](2-planning/103/plan.md): Validate sdd-settings writes against schema during sdd-change workflows
 
@@ -12,7 +11,7 @@
 
 ## Plan Review
 
-(none)
+- [#126](3-plan-review/126/plan.md): Implement hook system — skill auto-activation and objective Stop checks
 
 ---
 
