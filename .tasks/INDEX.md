@@ -31,6 +31,7 @@
 - [#124](1-inbox/124/): Add critic skill for self-checking at every task lifecycle phase
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
+- [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
 
 ---
@@ -40,7 +41,6 @@
 - [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
 - [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
-- [#82](1-inbox/82/): Reorganize archive into .sdd directory
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
 - [#70](1-inbox/70/): Git checkpoint workflow for AI-assisted development
 - [#71](1-inbox/71/): Anti-stop hook to prevent accidental session termination
