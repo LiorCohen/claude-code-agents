@@ -84,8 +84,7 @@ Checks performed (all objective — no self-assessment):
 2. **Feature branch detection** — checks if current branch matches `feature/task-*` pattern; extracts task ID
 3. **Task status check** — if on a feature branch, verifies the task folder exists in `.tasks/4-implementing/` or `.tasks/5-reviewing/`. Reports if the task is still in implementing (may need to move to review)
 4. **Typecheck** — if on a feature branch and `git diff --name-only` shows files under `plugin/system/`, runs `npm run typecheck:plugin` and captures output. Skipped on main or when no plugin/system files are dirty
-5. **Tests** — if on a feature branch, runs `npm test` and captures exit code + output. Skipped on main
-6. **Reminders** — appends non-objective reminders to systemMessage that only Claude can evaluate: "Have all acceptance criteria been addressed?", "Did you check for contradictions or inconsistencies?", "Did you update docs if needed?"
+5. **Reminders** — appends non-objective reminders to systemMessage that only Claude can evaluate: "Have all acceptance criteria been addressed?", "Did you run tests if required?", "Did you check for contradictions or inconsistencies?", "Did you update docs if needed?"
 
 Output format follows Claude Code's Stop hook contract:
 - If any objective check fails: `{ "decision": "block", "reason": "...", "systemMessage": "..." }`
@@ -104,11 +103,9 @@ On feature branch: feature/task-126-hooks (task #126, status: implementing)
 ### Typecheck
 PASS — no type errors
 
-### Tests
-PASS — all tests passed
-
 ### Reminders
 - Have all acceptance criteria from the plan been addressed?
+- Did you run tests if required?
 - Are there any contradictions or inconsistencies in the codebase?
 - Did you update docs if plugin functionality changed?
 ```
@@ -178,9 +175,6 @@ Sequencing: Create skill-rules.yaml and hook scripts first, then update settings
 - `test_stop_check_runs_typecheck_on_feature_branch` — on feature branch with plugin changes, runs typecheck
 - `test_stop_check_skips_typecheck_on_main` — on main, skips typecheck
 - `test_stop_check_reports_typecheck_failure` — typecheck errors are included in block reason
-- `test_stop_check_runs_tests_on_feature_branch` — on feature branch, runs npm test and reports result
-- `test_stop_check_reports_test_failure` — test failures are included in block reason
-- `test_stop_check_skips_tests_on_main` — on main, skips npm test
 - `test_stop_check_detects_task_status` — on feature branch, reports task implementing/reviewing status
 - `test_stop_check_includes_reminders` — systemMessage always includes non-objective reminder checklist
 - `test_stop_check_outputs_valid_json` — all output paths produce valid JSON
@@ -206,6 +200,5 @@ Sequencing: Create skill-rules.yaml and hook scripts first, then update settings
 - [ ] Stop hook reports uncommitted changes when present
 - [ ] Stop hook detects feature branch context
 - [ ] Stop hook runs typecheck on feature branches
-- [ ] Stop hook runs tests on feature branches
 - [ ] Stop hook checks task status on feature branches
 - [ ] Stop hook includes non-objective reminders in systemMessage
