@@ -2,7 +2,7 @@
 id: 24
 title: Add plugin Slack support
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

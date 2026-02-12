@@ -2,7 +2,7 @@
 id: 20
 title: Plugin installation debugging skill + workflow fix
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

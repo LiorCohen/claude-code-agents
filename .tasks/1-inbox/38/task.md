@@ -1,8 +1,7 @@
 ---
 id: 38
 title: Integration and E2E testing should be separate components
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

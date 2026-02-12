@@ -1,8 +1,7 @@
 ---
 id: 40
 title: Fix sdd-change-new test - spec format mismatch
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

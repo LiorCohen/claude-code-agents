@@ -15,9 +15,9 @@ All task files use YAML frontmatter.
 | `id` | number | yes | Unique task number |
 | `title` | string | yes | Short title |
 | `priority` | enum | no | `low`, `medium`, `high` (unset = unprioritized) |
-| `status` | enum | yes | `open`, `planning`, `ready`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
-| `created` | date | yes | YYYY-MM-DD |
-| `completed` | date | no | YYYY-MM-DD (when status=complete) |
+| `status` | enum | yes | `inbox`, `planning`, `ready`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
+| `created` | datetime | yes | `YYYY-MM-DD HH:MM UTC` |
+| `completed` | datetime | no | `YYYY-MM-DD HH:MM UTC` (when status=complete) |
 | `consolidated_into` | number | no | Task ID (when status=consolidated) |
 | `rejected_reason` | string | no | Reason for rejection (when status=rejected) |
 | `depends_on` | number[] | no | Task IDs this depends on |
@@ -30,8 +30,8 @@ All task files use YAML frontmatter.
 id: 63
 title: Short descriptive title
 priority: medium
-status: open
-created: 2026-01-30
+status: inbox
+created: 2026-01-30 14:00 UTC
 depends_on: []
 blocks: []
 ---
@@ -56,8 +56,8 @@ id: 7
 title: External spec handling
 priority: high
 status: complete
-created: 2026-01-25
-completed: 2026-01-28
+created: 2026-01-25 09:00 UTC
+completed: 2026-01-28 16:30 UTC
 ---
 
 # Task 7: External spec handling ✓
@@ -81,7 +81,7 @@ id: 28
 title: Schema validation skill
 priority: medium
 status: consolidated
-created: 2026-01-20
+created: 2026-01-20 10:00 UTC
 consolidated_into: 27
 ---
 
@@ -108,7 +108,7 @@ id: 15
 title: Feature that was rejected
 priority: medium
 status: rejected
-created: 2026-01-20
+created: 2026-01-20 10:00 UTC
 rejected_reason: Out of scope for MVP
 ---
 
@@ -138,15 +138,15 @@ Plans are stored as `plan.md` inside the task folder. They are created during th
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `title` | string | yes | Plan title |
-| `created` | date | yes | YYYY-MM-DD |
-| `updated` | date | no | YYYY-MM-DD (last modification) |
+| `created` | datetime | yes | `YYYY-MM-DD HH:MM UTC` |
+| `updated` | datetime | no | `YYYY-MM-DD HH:MM UTC` (last modification) |
 
 ### Plan File Template
 
 ```markdown
 ---
 title: Task management skill
-created: 2026-01-28
+created: 2026-01-28 10:00 UTC
 ---
 
 # Plan: Task Management Skill

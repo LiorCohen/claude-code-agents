@@ -7,7 +7,7 @@ created: 2026-02-10
 tags: [technical-debt, schema, standards]
 ---
 
-# Upgrade all JSON schemas to latest stable version (2020-12)
+# Task 118: Upgrade all JSON schemas to latest stable version (2020-12)
 
 ## Problem
 

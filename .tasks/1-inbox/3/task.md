@@ -1,8 +1,8 @@
 ---
 id: 3
-title: Docs missing - CMDO Guide
+title: "Docs missing: CMDO Guide"
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

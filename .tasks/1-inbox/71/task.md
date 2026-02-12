@@ -2,7 +2,7 @@
 id: 71
 title: Anti-stop hook to prevent accidental session termination
 priority: medium
-status: open
+status: inbox
 created: 2026-02-01
 depends_on: []
 blocks: []

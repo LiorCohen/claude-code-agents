@@ -6,7 +6,7 @@ priority: high
 created: 2026-02-09
 ---
 
-# Use .temp/ for test environments and preserve on failure
+# Task 114: Use .temp/ for test environments and preserve on failure
 
 ## Problem
 

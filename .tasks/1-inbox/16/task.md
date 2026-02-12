@@ -2,7 +2,7 @@
 id: 16
 title: Plan changes should cascade to dependent items
 priority: medium
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

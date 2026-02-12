@@ -7,7 +7,7 @@ created: 2026-02-10
 tags: [enhancement, hooks, ux]
 ---
 
-# Add session hook with blurb and plugin update check
+# Task 119: Add session hook with blurb and plugin update check
 
 ## Problem
 

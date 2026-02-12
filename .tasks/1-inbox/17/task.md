@@ -2,7 +2,7 @@
 id: 17
 title: Plans should follow TDD with test review first
 priority: high
-status: open
+status: inbox
 created: 2026-01-25
 plan: ../../plans/new/PLAN-task-17-tdd-test-review-first.md
 ---

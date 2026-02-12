@@ -1,8 +1,7 @@
 ---
 id: 39
 title: Capture ad-hoc code changes and sync specs
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 depends_on: [35]
 ---

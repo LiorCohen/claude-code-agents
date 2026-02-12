@@ -1,7 +1,7 @@
 ---
 id: 74
 title: Task performance scoring system
-status: open
+status: inbox
 created: 2026-02-02
 depends_on: []
 blocks: []

@@ -2,7 +2,7 @@
 id: 22
 title: Add critic agent to marketplace
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

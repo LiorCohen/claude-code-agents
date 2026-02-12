@@ -1,7 +1,7 @@
 ---
 id: 12
 title: User onboarding and process state tracking
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

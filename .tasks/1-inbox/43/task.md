@@ -1,8 +1,7 @@
 ---
 id: 43
 title: CI/CD components and .github folder integration
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

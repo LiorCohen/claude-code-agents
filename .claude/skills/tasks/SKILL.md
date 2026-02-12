@@ -97,11 +97,15 @@ Find and read the task file at `<status-dir>/19/task.md`.
 /tasks plan <id>
 ```
 
+**Phase 1 — Transition (do this first, before any planning work):**
 1. Move folder to `2-planning/`
 2. Update `task.md`: `status: planning`
-3. Create `plan.md`
+3. Create empty `plan.md` skeleton (frontmatter + headings only, no content)
 4. Update INDEX.md
 5. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to planning"')`
+
+**Phase 2 — Plan (only after commit completes):**
+6. Research the codebase and write the actual plan content in `plan.md`
 
 Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 
@@ -166,7 +170,7 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
    - Remove worktree
    - Delete feature branch (if fully merged)
 2. Move to `6-complete/`
-3. Update status, add `completed` date
+3. Update status, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
 4. Update INDEX.md
 5. Use commit skill: `Skill(commit, args: '-m "Tasks: Complete #<id>"
 

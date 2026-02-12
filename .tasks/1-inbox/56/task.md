@@ -2,7 +2,7 @@
 id: 56
 title: Create architecture skill with meaningful guidance
 priority: medium
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

@@ -2,7 +2,7 @@
 id: 86
 title: Consider component-catalog skill for component type definitions
 priority: medium
-status: open
+status: inbox
 created: 2026-02-05
 depends_on: [85]
 blocks: []

@@ -2,7 +2,7 @@
 id: 31
 title: Welcome prompt after plugin installation
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

@@ -1,8 +1,7 @@
 ---
 id: 35
 title: Checksumming and drift detection for specs/components
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 blocks: [39]
 ---

@@ -1,8 +1,7 @@
 ---
 id: 21
 title: Project sanity verification command
-priority: inbox
-status: open
+status: inbox
 created: 2026-01-25
 ---
 

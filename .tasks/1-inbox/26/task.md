@@ -2,7 +2,7 @@
 id: 26
 title: Better session separators/visual indicators
 priority: low
-status: open
+status: inbox
 created: 2026-01-25
 ---
 
