@@ -140,36 +140,63 @@ User: /tasks review 19
 
 **Workflow:**
 1. Find task folder
-2. **Ask the user:** "Would you like me to generate a change report before moving to review?"
-3. If the user says yes, generate a `changes.md` file in the task folder (see **Change Report Format** below)
-4. Move folder to `5-reviewing/`
-5. Update `task.md` frontmatter: `status: reviewing`
-6. Update INDEX.md
-7. Commit the task transition on main (e.g., "Tasks: Move #19 to reviewing")
+2. Generate `changes.md` in the task folder (see **Changes File** below)
+3. **Ask the user:** "Would you like me to expand the change report with detailed diffs?"
+4. If the user says yes, expand `changes.md` with per-file diffs (see **Detailed Change Report** below)
+5. Move folder to `5-reviewing/`
+6. Update `task.md` frontmatter: `status: reviewing`
+7. Update INDEX.md
+8. Commit the task transition on main (e.g., "Tasks: Move #19 to reviewing")
 
 Use when implementation is complete and ready for review.
 
-### Change Report Format
+### Changes File
 
-The change report is saved as `changes.md` in the task folder (e.g., `.tasks/5-reviewing/19/changes.md`). It documents every file changed on the feature branch vs main.
+The changes file is **always** generated as `changes.md` in the task folder (e.g., `.tasks/5-reviewing/19/changes.md`). It contains frontmatter with datetimes and a summary table of all files changed on the feature branch vs main.
 
 **How to generate:**
 1. Run `git diff main..HEAD --stat` to get the file list and line counts
-2. Run `git diff main..HEAD` to get the full diff
-3. Write `changes.md` with one section per file, each containing:
-   - A clickable markdown link to the file
-   - The file path as a heading
-   - A one-line description of what changed
-   - The actual diff in a syntax-highlighted fenced code block
+2. Run `git diff main..HEAD --numstat` to get per-file additions/deletions as numbers
+3. Write `changes.md` with frontmatter and a summary table
 
 **Template:**
 
 ```markdown
-# Task #<id> — Change Report
+---
+generated: YYYY-MM-DD HH:MM UTC
+branch: <branch-name>
+commits: <count>
+---
 
-**Branch:** `<branch-name>`
-**Commits:** <count>
-**Files changed:** <count> (+<additions> / -<deletions> lines)
+# Task #<id> — Changes
+
+**Files changed:** <count> (+<total-additions> / -<total-deletions> lines)
+
+| File | Added | Removed |
+|------|------:|--------:|
+| [`<file-path>`](<file-path>) | +<n> | -<n> |
+| [`<file-path>`](<file-path>) | +<n> | -<n> |
+```
+
+**Rules:**
+- Each file path is a clickable markdown link
+- Order files logically (core types first, then modules, then commands, then tests, then version/changelog)
+- Added/Removed columns show line counts with `+`/`-` prefixes
+
+### Detailed Change Report
+
+When the user requests a detailed change report, **expand** the existing `changes.md` by appending per-file diff sections below the summary table.
+
+**How to generate:**
+1. Run `git diff main..HEAD` to get the full diff
+2. Append sections to `changes.md`, one per file, each containing:
+   - The file path as a heading with a clickable markdown link
+   - A one-line description of what changed
+   - The actual diff in a syntax-highlighted fenced code block
+
+**Appended sections template:**
+
+```markdown
 
 ---
 
@@ -195,7 +222,7 @@ The change report is saved as `changes.md` in the task folder (e.g., `.tasks/5-r
 - Use `diff` as the code fence language for all diffs (provides +/- syntax highlighting)
 - For new files where you show the full content instead of a diff, use the file's language for syntax highlighting (e.g., `typescript`, `json`, `yaml`, `markdown`)
 - New files show the full content
-- Order files logically (core types first, then modules, then commands, then tests, then version/changelog)
+- Order files logically (same order as the summary table)
 
 **NEVER** merge the feature branch or delete the worktree during reviewing. The worktree and branch persist until the task is completed via `/tasks complete`.
 
@@ -213,7 +240,8 @@ User: /tasks complete 7
 
 **Workflow:**
 1. Find task folder
-2. If a worktree exists at `.worktrees/task-<id>/`:
+2. **Ensure `changes.md` exists** in the task folder. If missing, generate it using the same process as the review step (frontmatter + file summary table — see **Changes File** in the Submit for Review section).
+3. If a worktree exists at `.worktrees/task-<id>/`:
    a. **Verify no work is lost** before removing:
       - Check for uncommitted changes in the worktree (`git -C .worktrees/task-<id> status`)
       - If uncommitted changes exist, **stop and warn the user** — do not proceed
@@ -221,10 +249,10 @@ User: /tasks complete 7
       - If unmerged commits exist, merge the feature branch into main first
    c. Remove the worktree with `git worktree remove`
    d. Delete the feature branch only if it has been fully merged into main
-3. Move folder to `6-complete/`
-4. Update `task.md` frontmatter: `status: complete`, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
-5. Update INDEX.md
-6. Commit the task transition on main (e.g., "Tasks: Complete #7")
+4. Move folder to `6-complete/`
+5. Update `task.md` frontmatter: `status: complete`, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
+6. Update INDEX.md
+7. Commit the task transition on main (e.g., "Tasks: Complete #7")
 
 ---
 

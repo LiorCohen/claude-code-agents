@@ -33,7 +33,7 @@ Manage the project backlog, track progress, and organize implementation plans.
 Each task is a folder named by its ID containing:
 - `task.md` - the task description and metadata
 - `plan.md` - the implementation plan (created during planning phase)
-- `changes.md` - change report (optional, generated when moving to review)
+- `changes.md` - file changes summary (generated during review or before completion)
 
 **Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories but grouped by priority in INDEX.md.
 
@@ -147,8 +147,8 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 /tasks review <id>
 ```
 
-1. **Ask the user** if they want a change report generated
-2. If yes, generate `changes.md` in the task folder (see [workflows.md](workflows.md) for format)
+1. Generate `changes.md` in the task folder with frontmatter and file summary table (see [workflows.md](workflows.md) for format)
+2. **Ask the user** if they want a detailed change report (expands `changes.md` with full diffs)
 3. Move to `5-reviewing/`
 4. Update status
 5. Update INDEX.md
@@ -164,15 +164,16 @@ Output clickable link: `[plan.md](.tasks/2-planning/<id>/plan.md)`
 /tasks complete <id>
 ```
 
-1. If worktree exists:
+1. **Ensure `changes.md` exists** in the task folder. If missing, generate it (frontmatter + file summary table). See [workflows.md](workflows.md) for format.
+2. If worktree exists:
    - Verify no uncommitted changes
    - Merge feature branch if needed
    - Remove worktree
    - Delete feature branch (if fully merged)
-2. Move to `6-complete/`
-3. Update status, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
-4. Update INDEX.md
-5. Use commit skill: `Skill(commit, args: '-m "Tasks: Complete #<id>"
+3. Move to `6-complete/`
+4. Update status, add `completed` datetime (e.g., `completed: 2026-02-12 14:30 UTC`)
+5. Update INDEX.md
+6. Use commit skill: `Skill(commit, args: '-m "Tasks: Complete #<id>"
 
 ---
 

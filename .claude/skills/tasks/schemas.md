@@ -129,6 +129,65 @@ rejected_reason: Out of scope for MVP
 
 ---
 
+## Changes Schema
+
+Changes are stored as `changes.md` inside the task folder. They are always generated when moving to review or completing a task. They document every file changed on the feature branch vs main.
+
+### Frontmatter Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `generated` | datetime | yes | `YYYY-MM-DD HH:MM UTC` |
+| `branch` | string | yes | Feature branch name |
+| `commits` | number | yes | Number of commits on the branch |
+
+### Changes File Template (always generated)
+
+```markdown
+---
+generated: 2026-02-12 14:30 UTC
+branch: feature/task-19-slug
+commits: 5
+---
+
+# Task #19 — Changes
+
+**Files changed:** 8 (+142 / -37 lines)
+
+| File | Added | Removed |
+|------|------:|--------:|
+| [`src/cli.ts`](src/cli.ts) | +45 | -12 |
+| [`src/types.ts`](src/types.ts) | +20 | -3 |
+```
+
+### Detailed Change Report (appended on user request)
+
+When the user requests a detailed change report, append per-file diff sections below the summary table:
+
+```markdown
+---
+
+## 1. [`src/cli.ts`](src/cli.ts)
+
+Refactored command routing to use a dispatch map.
+
+\`\`\`diff
+<actual diff for this file>
+\`\`\`
+
+---
+
+## 2. [`src/types.ts`](src/types.ts)
+
+Added CommandResult type.
+
+\`\`\`diff
+<actual diff for this file>
+\`\`\`
+```
+
+---
+
 ## Plan Schema
 
 Plans are stored as `plan.md` inside the task folder. They are created during the planning phase and move with the task through its lifecycle.
