@@ -53,7 +53,6 @@
 - [#3](1-inbox/3/): Docs missing: CMDO Guide
 - [#24](1-inbox/24/): Add plugin Slack support
 - [#31](1-inbox/31/): Welcome prompt after plugin installation
-- [#22](1-inbox/22/): Add critic agent to marketplace
 - [#26](1-inbox/26/): Better session separators/visual indicators
 - [#20](1-inbox/20/): Plugin installation debugging skill + workflow fix
 
@@ -148,6 +147,7 @@
 - [#72](7-rejected/72/): Fix broken test benchmarks — obsolete
 - [#91](7-rejected/91/): Fix agents standards violations from audit report — obsolete
 - [#103](7-rejected/103/): Validate sdd-settings writes against schema — obsolete, implemented via reconciliation system
+- [#22](7-rejected/22/): Add critic agent to marketplace — obsolete, critic skill already exists
 
 ---
 

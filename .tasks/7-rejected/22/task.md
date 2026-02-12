@@ -2,8 +2,9 @@
 id: 22
 title: Add critic agent to marketplace
 priority: low
-status: inbox
+status: rejected
 created: 2026-01-25 12:00 UTC
+rejected_reason: Obsolete — critic already exists as a skill at .claude/skills/critic/
 ---
 
 # Task 22: Add critic agent to marketplace
