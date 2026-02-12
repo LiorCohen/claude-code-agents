@@ -22,8 +22,13 @@ Claude doesn't self-check. It over-engineers, agrees with everything, drifts fro
 | `.crit/implementation.md` | **New.** Initial seed — implementation phase patterns (drift, build commands, boundaries) |
 | `.crit/review.md` | **New.** Initial seed — review phase patterns (diff audit, evidence, presentation) |
 | `.crit/completion.md` | **New.** Initial seed — completion phase patterns (acceptance criteria, loose ends) |
-| `.claude/skills/tasks/SKILL.md` | **Modify.** Add critic skill reference at each lifecycle transition point (~6 one-line additions) |
-| `CLAUDE.md` | **Modify.** Add `.crit/` to repository structure diagram and brief explanation |
+| `.claude/skills/tasks/SKILL.md` | **Modify.** Rename `ready` → `plan-review` in commands and references; add critic skill reference at each lifecycle transition point (~6 one-line additions) |
+| `.claude/skills/tasks/schemas.md` | **Modify.** Rename `ready` status to `plan-review` in enum, INDEX.md structure example, directory references |
+| `.claude/skills/tasks/workflows.md` | **Modify.** Rename `ready` → `plan-review` in workflow descriptions |
+| `.claude/skills/tasks/reference.md` | **Modify.** Rename `ready` → `plan-review` in lifecycle references |
+| `.claude/skills/commit/SKILL.md` | **Modify.** Rename `ready` → `plan-review` if referenced |
+| `.tasks/3-ready/` | **Rename.** Directory becomes `.tasks/3-plan-review/` (currently empty except `.gitkeep`) |
+| `CLAUDE.md` | **Modify.** Add `.crit/` to repository structure diagram; rename `3-ready` → `3-plan-review` if referenced |
 
 ## Changes
 
@@ -55,16 +60,18 @@ The critic determines the current lifecycle phase from all available signals: fi
    - Check `git diff --name-only main...HEAD` for all branch changes
    - Map to phase:
      - Status `implementing` + uncommitted changes → **Phase 6: During implementation**
-     - Status `implementing` + no uncommitted changes → **Phase 5: Starting implementation** (or 7 if branch has substantial commits)
+     - Status `implementing` + no uncommitted changes + `git diff --name-only main...HEAD` has non-`.tasks/` files → **Phase 6** (implementation started, between changes)
+     - Status `implementing` + no uncommitted changes + only `.tasks/` files changed → **Phase 5: Starting implementation** (branch just created)
      - Status `reviewing` → **Phase 7: Submitting for review**
 3. If branch is `main`:
    - Check `git log --oneline -5` for recent task transitions (e.g., "Tasks: Move #124 to planning" → task 124, planning phase)
-   - Scan active status directories (`1-inbox/`, `2-planning/`, `3-ready/`, `5-reviewing/`) for tasks
+   - Scan active status directories (`1-inbox/`, `2-planning/`, `3-plan-review/`, `4-implementing/`, `5-reviewing/`) for tasks
    - Cross-reference: if git log names a specific task and that task is in an active directory, use it
+   - If task found in `4-implementing/` while on main → flag: "Task #N is in implementing but you're on main, not the feature branch" (soft warning, suggest switching)
    - If **exactly one** active task exists → use it, infer phase from its status directory
    - If **multiple** active tasks exist and git log doesn't disambiguate → ask the user
    - If **no** active tasks exist → ask the user what to review
-   - Status-to-phase mapping: `1-inbox` → Phase 1, `2-planning` → Phase 2/3/4, `3-ready` → Phase 4, `5-reviewing` → Phase 7/8
+   - Status-to-phase mapping: `1-inbox` → Phase 1, `2-planning` → Phase 2/3/4, `3-plan-review` → Phase 4, `4-implementing` → Phase 5/6 (see above), `5-reviewing` → Phase 7/8
 4. If ambiguous at any step → **Ask the user**. Never guess.
 
 **Disambiguating planning sub-phases (2, 3, 4):**
@@ -103,11 +110,12 @@ Each protocol is a concrete behavioral rule, not a vague aspiration.
 > 5. For each file in diff, verify the change is justified line-by-line. If any change can't be traced to a plan item, flag it.
 
 **"Did you run it?" gate (phases 7, 8 only):**
-> Before claiming completion, the critic checks for evidence:
-> 1. Were `npm test` and `npm run typecheck:plugin` run? (Check for recent test output in conversation, or ask)
-> 2. If plugin TypeScript was changed, was `npm run build:plugin` run?
-> 3. "I think it works" is not evidence. "Tests pass (output below)" is evidence.
-> 4. If no evidence of execution exists, this is a hard block.
+> Before claiming completion, the critic checks for evidence — conditional on what was changed:
+> 1. **If TypeScript source was changed** (`plugin/system/`, `*.ts` files): Were `npm test`, `npm run typecheck:plugin`, and `npm run build:plugin` run? Require actual command output.
+> 2. **If only prompt files were changed** (`.md` skill/agent/command files): Structural validation is sufficient (file exists, under 500 lines, frontmatter valid). No build/test commands needed.
+> 3. **If mixed changes**: Both structural validation and build/test evidence required.
+> 4. "I think it works" is not evidence. "Tests pass (output below)" is evidence. For prompt-only changes, "file exists and is under 500 lines" is evidence.
+> 5. If no evidence of execution exists for the type of changes made, this is a hard block.
 
 **Section 3: Output Format**
 
@@ -143,6 +151,8 @@ The critic produces a structured report:
 
 If there are hard blocks, the critic ends with: **"BLOCKED — resolve the above before proceeding."**
 If no hard blocks, it ends with: **"CLEAR — proceed with noted warnings."**
+
+**Critical rule: The critic NEVER auto-fixes.** The critic produces a report for the user. It does not automatically revise code, revert changes, or trigger corrections based on its findings. Research shows that auto-correction loops between a generator and critic degrade correct code due to sycophancy — the generator agrees with the critic even when the original approach was right. All findings go to the human for decision.
 
 **Section 4: `.crit/` Integration**
 
@@ -228,18 +238,20 @@ Each of the 8 phases gets a dedicated section with:
 - Are existing tests still passing?
 - Are you following TypeScript standards (if applicable)?
 - Have you read the full files you're modifying, or just the sections you're changing?
-- *"The user says: Show me the diff. Does it match the plan? If you touched a file that's not in the plan, explain why or revert it. Scope creep is the #1 failure mode."*
-- Escalation: Files outside plan scope = hard block. Breaking tests = hard block. Gold-plating = soft warning.
+- **Degradation check:** Look for signs of quality degradation — placeholder code (`// TODO: implement`), sparse implementations, `...` or `/* rest unchanged */` comments, repeated similar errors. These indicate context window exhaustion. If detected, recommend a context reset.
+- *"The user says: Show me the diff. Does it match the plan? If you touched a file that's not in the plan, explain why or revert it. Scope creep is the #1 failure mode. And if I see placeholder code or TODOs where there should be real implementation, that's a red flag."*
+- Escalation: Files outside plan scope = hard block. Breaking tests = hard block. Gold-plating = soft warning. Degradation signals = soft warning (recommend context reset).
 
 **Phase 7: Submitting for Review** (`/tasks review`)
 - **Run diff audit** (see SKILL.md Section 2)
 - **Run "did you run it?" gate** (see SKILL.md Section 2)
+- **Test file modification check:** If test files were modified alongside source files, flag for review. Check if assertions were weakened, mocks were added, or expectations were relaxed. Claude silently weakens test suites to make them pass — green tests don't mean correct code.
 - Are there leftover debug statements, console.log, TODO comments?
 - Did you add unnecessary comments or docstrings to code you didn't need to change?
 - Does `changes.md` accurately reflect what was done?
 - Is the commit history clean? (Each commit focused, no "fix typo" chains)
-- *"The user says: I'm going to review this diff line by line. Every line needs to justify its existence. If I see changes that aren't in the plan, I'm sending it back. If you say 'tests pass' without showing me output, I don't believe you."*
-- Escalation: Diff/plan mismatch = hard block. No test evidence = hard block. Leftover debug = soft warning.
+- *"The user says: I'm going to review this diff line by line. Every line needs to justify its existence. If I see changes that aren't in the plan, I'm sending it back. If you say 'tests pass' without showing me output, I don't believe you. And if you changed the tests to make them pass instead of fixing the code, I'm definitely sending it back."*
+- Escalation: Diff/plan mismatch = hard block. No test evidence = hard block. Test assertions weakened = hard block. Leftover debug = soft warning.
 
 **Phase 8: Completing a Task** (`/tasks complete`)
 - Go through each acceptance criterion in task.md — is it met? With evidence?
@@ -268,6 +280,7 @@ Each of the 8 phases gets a dedicated section with:
 | H9 | Destructive command without verification | All | Flag the command, require user confirmation |
 | H10 | Unmet acceptance criteria at completion | 8 | List unmet criteria, block completion |
 | H11 | Didn't read files that are being modified | 2, 3, 5, 6 | Flag which files were only grepped, require full read |
+| H12 | Test assertions weakened to make tests pass | 7 | Show original vs modified assertions, require code fix instead |
 
 **Soft Warnings** (critic outputs "WARNING" — noted but not blocking):
 
@@ -280,6 +293,8 @@ Each of the 8 phases gets a dedicated section with:
 | S5 | Verbose commit history | 7 | Suggest squash if excessive |
 | S6 | Gold-plating detected | 6 | Flag the extra work, note it's beyond scope |
 | S7 | TODOs added during implementation | 6, 7 | Note for follow-up, don't block |
+| S8 | Degradation signals (placeholders, sparse code, repeated errors) | 6 | Recommend context reset |
+| S9 | On main while task is in implementing | 5, 6 | Suggest switching to feature branch |
 
 ### 4. Critic Skill — resources/feedback-loop.md (~100 lines)
 
@@ -350,9 +365,11 @@ Each file is seeded with rules distilled from the research documents (`research_
 - If you're touching more files than the plan specified, you're probably over-engineering
 - A bug fix doesn't need surrounding code cleaned up
 - Silent scope reduction is as bad as scope creep — don't quietly drop acceptance criteria
+- Watch for degradation signals: placeholder code, `// TODO: implement`, sparse implementations, repeated errors — recommend context reset
 
 **`.crit/review.md`** (~15 rules) — covers review phase:
 - Every line in the diff must justify its existence — if it's not in the plan, explain or revert
+- If test files were modified alongside source files, verify assertions weren't weakened — fixing tests to pass is not fixing code
 - Don't claim completion without evidence — "tests pass" requires actual output
 - Be direct — skip preamble and filler when presenting work
 - Flag uncertainty explicitly with confidence levels
@@ -382,7 +399,7 @@ Add a one-line critic reference at each lifecycle transition in `.claude/skills/
 Integration points (6 additions):
 - `/tasks add` — after creating and committing the task
 - `/tasks plan` — Phase 2, after plan content is written (before presenting to user)
-- `/tasks ready` — before moving to ready
+- `/tasks plan-review` — before moving to plan-review (fresh-eyes check on the finished plan)
 - `/tasks implement` — after creating the feature branch
 - `/tasks review` — before generating changes.md (the diff audit is most critical here)
 - `/tasks complete` — before finalizing completion
@@ -401,13 +418,37 @@ Add a brief note in a relevant section explaining:
 - NOT gitignored — these are persistent project knowledge
 - Managed by the critic skill — don't edit directly unless adding feedback
 
+### 8. Rename `ready` → `plan-review` Across Task Management System
+
+The `3-ready` status is renamed to `3-plan-review` to accurately reflect its purpose: a formal plan review checkpoint (possibly by a different person) between collaborative planning and implementation.
+
+**Directory rename:**
+- `.tasks/3-ready/` → `.tasks/3-plan-review/` (currently contains only `.gitkeep`)
+
+**Tasks skill files** (4 files, find-and-replace `ready` → `plan-review` in status-related contexts):
+- `SKILL.md`: Rename `/tasks ready` command to `/tasks plan-review`, update directory references, status references
+- `schemas.md`: Update status enum (`ready` → `plan-review`), INDEX.md example structure, directory references
+- `workflows.md`: Update workflow descriptions referencing ready status
+- `reference.md`: Update lifecycle references
+
+**Other files:**
+- `commit/SKILL.md`: Update if it references the ready status
+- `CLAUDE.md`: Update if it references `3-ready` in the repo structure
+
+**What changes in each tasks skill file:**
+- Command name: `/tasks ready <id>` → `/tasks plan-review <id>`
+- Directory name: `3-ready/` → `3-plan-review/`
+- Status value: `ready` → `plan-review`
+- Display name in INDEX.md: `## Ready` → `## Plan Review`
+
 ## Dependencies
 
-1. `.crit/` seed files created first (the skill references them at startup)
-2. Critic skill SKILL.md written next (establishes the framework)
-3. Critic resource files written after SKILL.md (referenced from it)
-4. Tasks skill integration last (references the completed critic skill)
-5. CLAUDE.md update can happen at any point
+1. `ready` → `plan-review` rename first (the critic skill and tasks integration reference the new name)
+2. `.crit/` seed files created next (the skill references them)
+3. Critic skill SKILL.md written next (establishes the framework)
+4. Critic resource files written after SKILL.md (referenced from it)
+5. Tasks skill integration last (references the completed critic skill + uses the new plan-review name)
+6. CLAUDE.md update can happen at any point
 
 ## Tests
 
@@ -428,8 +469,12 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 ### Phase Inference Validation
 
 - [ ] Critic correctly identifies Phase 6 when on a `feature/task-N-*` branch with uncommitted changes and task status `implementing`
+- [ ] Critic correctly identifies Phase 5 when on a feature branch with only `.tasks/` files changed (branch just created)
+- [ ] Critic correctly identifies Phase 6 when on a feature branch with non-`.tasks/` files changed but no uncommitted changes (between changes)
+- [ ] Critic correctly identifies Phase 4 when on main with a task in `3-plan-review/`
 - [ ] Critic correctly identifies Phase 4 when on main with a task in `2-planning/` having complete plan.md and no uncommitted changes
 - [ ] Critic correctly identifies Phase 7 when on a feature branch with task status `reviewing`
+- [ ] Critic flags "on main but task is in implementing" when task found in `4-implementing/` while on main
 - [ ] Critic uses recent git log to disambiguate when multiple active tasks exist on main
 - [ ] Critic asks the user when context is ambiguous (multiple active tasks, no clear phase signals, git log doesn't help)
 - [ ] Phase inference handles edge case: no active tasks at all (asks user what to review)
@@ -447,13 +492,28 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] Anti-grep rule triggers when files are grepped but not fully read
 - [ ] Counter-sycophancy protocol flags when user feedback contradicts standards
 - [ ] Diff audit compares plan's files table against actual branch diff (phases 7, 8)
-- [ ] "Did you run it?" gate requires build/test command output (phases 7, 8)
+- [ ] "Did you run it?" gate requires build/test output for TypeScript changes, structural validation for prompt-only changes
+- [ ] "Did you run it?" gate correctly skips build/test requirement for prompt-only (.md) tasks
 - [ ] Confidence calibration distinguishes verified (high) from assumed (low)
+- [ ] Test file modification check flags weakened assertions in Phase 7
+- [ ] Degradation detection flags placeholder code and TODO proliferation in Phase 6
+- [ ] Critic never auto-fixes — all findings presented to user for decision
+
+### Rename Validation
+
+- [ ] `.tasks/3-plan-review/` directory exists (renamed from `3-ready/`)
+- [ ] `.tasks/3-ready/` no longer exists
+- [ ] Tasks SKILL.md uses `/tasks plan-review` command (not `/tasks ready`)
+- [ ] Tasks schemas.md lists `plan-review` in status enum (not `ready`)
+- [ ] Tasks schemas.md INDEX.md example shows `## Plan Review` section
+- [ ] No remaining references to `3-ready` or `/tasks ready` in tasks skill files
+- [ ] INDEX.md section header is `## Plan Review` (not `## Ready`)
 
 ### Integration Validation
 
 - [ ] Tasks SKILL.md references critic at each of the 6 transition points
 - [ ] CLAUDE.md includes `.crit/` in repository structure
+- [ ] CLAUDE.md references `3-plan-review` (not `3-ready`) if applicable
 - [ ] Critic reference in tasks skill is non-blocking (recommendation, not mandatory gate)
 
 ### Failure Mode Validation
@@ -471,4 +531,5 @@ This is a prompt-only skill (no TypeScript), so verification is structural and b
 - [ ] Hard blocks prevent "CLEAR" output — user must see and address them
 - [ ] `.crit/` files are readable and their rules appear in critic output
 - [ ] Tasks skill transitions reference the critic at all 6 integration points
+- [ ] `/tasks plan-review` command works (renamed from `/tasks ready`)
 - [ ] All 18 acceptance criteria from task.md are addressed
