@@ -2,8 +2,9 @@
 id: 91
 title: Fix agents standards violations from audit report
 priority: high
-status: open
+status: rejected
 created: 2026-02-07
+rejected_reason: Obsolete
 ---
 
 # Task 91: Fix agents standards violations from audit report

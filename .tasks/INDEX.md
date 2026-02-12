@@ -31,7 +31,6 @@
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
-- [#91](1-inbox/91/): Fix agents standards violations from audit report
 
 ---
 
@@ -146,6 +145,7 @@
 - [#84](7-rejected/84/): Apply zero session context to sdd-init workflow — obsolete, superseded by #81 and #85
 - [#59](7-rejected/59/): Audit and update all agents for compatibility — obsolete, audit completed, findings in #91
 - [#72](7-rejected/72/): Fix broken test benchmarks — obsolete
+- [#91](7-rejected/91/): Fix agents standards violations from audit report — obsolete
 
 ---
 
