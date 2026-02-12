@@ -311,10 +311,19 @@ Include a drift risk summary table:
 
 ---
 
+## Size Limit
+
+A skill file (`SKILL.md`) must not exceed **500 lines**. Skills that grow beyond this limit are doing too much — they should be split into focused skills or have duplicated content extracted.
+
+During audit, flag any `SKILL.md` that exceeds 500 lines as a violation.
+
+---
+
 ## Checklist
 
 Use when creating or reviewing a plugin skill:
 
+- [ ] `SKILL.md` is 500 lines or fewer
 - [ ] Frontmatter includes `description` (recommended) and only uses supported optional fields
 - [ ] `name` (if specified) is kebab-case and matches the directory name
 - [ ] `description` is 1-3 sentences: what the skill does + what it accepts/produces. No references to callers or workflow position.
@@ -362,6 +371,7 @@ Produce the report with these sections:
 |----------|---------|---------|-------|
 | Frontmatter | X | Y | Z |
 | Self-containment | ... | ... | ... |
+| Size limit | ... | ... | ... |
 | Dependency graph | ... | ... | ... |
 | Term definitions | ... | ... | ... |
 | Input/Output schemas | ... | ... | ... |
