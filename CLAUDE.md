@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+<!-- This file documents rules that Claude gets wrong. If Claude keeps making a mistake, add a rule here. Don't write a manual — only add what's needed to correct observed behavior. -->
+
 ## Task Management Rules (MANDATORY)
 
 **You MUST use the `tasks` skill (`/tasks`) for all non-trivial work:**
