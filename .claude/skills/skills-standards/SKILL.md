@@ -256,11 +256,44 @@ After the frontmatter, organize the skill body as follows:
 # Skill Title                  <- H1, matches `name` in title-case
 One-line summary paragraph.    <- What this skill does, when to apply it
 ---
+## When to Use                 <- (recommended) Scenarios that trigger this skill
+## Quick Reference             <- (recommended) The 80% — key rules at a glance
 ## Input                       <- (if applicable) JSON Schema
 ## Output                      <- (if applicable) JSON Schema
 ## <Core Sections>             <- H2 sections with the skill's rules/workflow
+## Resource Files              <- (if applicable) Links to resources/ deep dives
 ## Examples                    <- (recommended) Concrete usage examples
 ```
+
+### When to Use
+
+A short bullet list of concrete scenarios where this skill applies. This helps both humans and auto-activation hooks decide whether to load the skill:
+
+```markdown
+## When to Use
+
+- Creating or modifying a backend service component
+- Reviewing scaffolded output for structural compliance
+- Debugging missing layers in a CMDO structure
+```
+
+Keep it to 3–6 bullets. Describe the situation, not the skill's mechanics.
+
+### Quick Reference
+
+The high-hit-rate rules and patterns — the subset a reader needs 80% of the time. Place it before the detailed core sections so Claude sees the most important guidance first without reading the full skill:
+
+```markdown
+## Quick Reference
+
+| Rule | Details |
+|------|---------|
+| File naming | `kebab-case.ts`, one export per file |
+| Imports | Absolute `@/` paths only, no relative `../` |
+| Error handling | Return `Result<T>`, never throw |
+```
+
+Tables work well here. Keep it scannable — no explanations or rationale (those belong in the core sections).
 
 ### Writing rules
 
@@ -313,9 +346,41 @@ Include a drift risk summary table:
 
 ## Size Limit
 
-A skill file (`SKILL.md`) must not exceed **500 lines**. Skills that grow beyond this limit are doing too much — they should be split into focused skills or have duplicated content extracted.
+A skill file (`SKILL.md`) must not exceed **500 lines**. Resource files under `resources/` must also stay under **500 lines** each.
 
-During audit, flag any `SKILL.md` that exceeds 500 lines as a violation.
+When a skill approaches the limit, use **progressive disclosure** before splitting into separate skills:
+
+```text
+my-skill/
+├── SKILL.md              # <500 lines — overview, rules, quick reference
+├── schemas/              # (if applicable) JSON Schema files
+└── resources/            # On-demand deep dives
+    ├── topic-a.md        # <500 lines each
+    ├── topic-b.md
+    └── topic-c.md
+```
+
+`SKILL.md` contains the high-level rules and a **Resource Files** section that links to deeper content:
+
+```markdown
+## Resource Files
+
+For detailed guidance, read these on-demand:
+- [topic-a.md](resources/topic-a.md) — Detailed patterns for X
+- [topic-b.md](resources/topic-b.md) — Complete examples for Y
+```
+
+Claude loads only the main `SKILL.md` initially. Resource files are read on-demand when the current task requires deeper guidance. This keeps token usage proportional to task complexity.
+
+**When to use resources/ vs. splitting into separate skills:**
+
+| Use `resources/` | Split into separate skills |
+|-------------------|---------------------------|
+| Content is subordinate to the main skill | Content stands alone as an independent concern |
+| Readers always enter through the main skill | Different callers invoke the content independently |
+| Shared vocabulary and context | Distinct vocabulary and scope |
+
+During audit, flag any `SKILL.md` or resource file that exceeds 500 lines as a violation.
 
 ---
 
@@ -323,7 +388,9 @@ During audit, flag any `SKILL.md` that exceeds 500 lines as a violation.
 
 Use when creating or reviewing a plugin skill:
 
-- [ ] `SKILL.md` is 500 lines or fewer
+- [ ] `SKILL.md` is 500 lines or fewer; resource files under `resources/` are each under 500 lines
+- [ ] `## When to Use` section lists 3–6 concrete activation scenarios (recommended)
+- [ ] `## Quick Reference` section provides scannable high-hit-rate rules (recommended for skills with many rules)
 - [ ] Frontmatter includes `description` (recommended) and only uses supported optional fields
 - [ ] `name` (if specified) is kebab-case and matches the directory name
 - [ ] `description` is 1-3 sentences: what the skill does + what it accepts/produces. No references to callers or workflow position.
