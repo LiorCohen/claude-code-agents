@@ -30,6 +30,7 @@
 
 ### High Priority
 
+- [#132](1-inbox/132/): Fix critic skill: use datetime-based filenames for .temp output
 - [#131](1-inbox/131/): Add Ralph Wiggum mode for task implementation
 - [#130](1-inbox/130/): Add created_by_plugin_version to sdd-settings components
 - [#128](1-inbox/128/): Maintain plugin user stories in product/ folder
