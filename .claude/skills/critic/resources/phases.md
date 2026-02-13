@@ -4,18 +4,6 @@ Each check is annotated with step ownership: **(C)** = collector (session-aware)
 
 ---
 
-## Phase 1: Creating a Task (`/tasks add`)
-
-- (C) Is there an existing task that overlaps? Check INDEX.md in context
-- (R) Is the description precise enough to act on without interpretation?
-- (R) Are acceptance criteria measurable and verifiable?
-
-> *"The user says: Is this actually a new task, or are you creating busywork? Check the backlog first."*
-
-**Escalation:** All soft warnings (task creation is low-risk)
-
----
-
 ## Phase 2: Starting Planning (`/tasks plan`)
 
 - (C) Which files have you actually Read (full file) vs Grep'd? List them

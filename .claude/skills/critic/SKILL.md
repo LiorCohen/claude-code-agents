@@ -42,7 +42,8 @@ The collector has full session context — it can see what commands were just ru
    - If **exactly one** active task → use it, infer phase from status directory
    - If **multiple** active tasks and signals don't disambiguate → ask the user
    - If **no** active tasks → ask the user
-   - Status-to-phase: `1-inbox` → Phase 1, `2-planning` → Phase 2/3/4, `3-plan-review` → Phase 4, `4-implementing` → Phase 5/6, `5-reviewing` → Phase 7/8
+   - If task is in `1-inbox/` → **not a critic phase** — return immediately with no output (inbox operations don't trigger critic)
+   - Status-to-phase: `2-planning` → Phase 2/3/4, `3-plan-review` → Phase 4, `4-implementing` → Phase 5/6, `5-reviewing` → Phase 7/8
 
 4. **Disambiguating planning sub-phases (2, 3, 4):**
    - Task in `2-planning/` with empty plan.md skeleton → Phase 2 (starting planning)
@@ -197,7 +198,6 @@ After inferring the phase, read the `.critic/` file matching the current status 
 
 | Phase | .critic/ file |
 |-------|-------------|
-| 1 (creating task) | `planning.md` |
 | 2-4 (planning) | `planning.md` |
 | 5-6 (implementing) | `implementation.md` |
 | 7 (review) | `review.md` |

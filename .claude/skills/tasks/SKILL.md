@@ -104,8 +104,6 @@ Find and read the task file at `<status-dir>/19/task.md`.
 3. Add to INDEX.md under Inbox
 4. Use commit skill: `Skill(commit, args: '-m "Tasks: Add #<N>"')`
 
-**Critic check:** After committing, invoke `/critic` for self-review before presenting the task to the user.
-
 ---
 
 ### Prioritize Task
