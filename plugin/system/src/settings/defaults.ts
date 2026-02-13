@@ -13,7 +13,7 @@ import type {
   DatabaseSettings,
   ContractSettings,
   ConfigSettings,
-} from '../types/settings';
+} from '@/types';
 
 // =============================================================================
 // Server Defaults

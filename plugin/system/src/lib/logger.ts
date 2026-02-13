@@ -2,8 +2,8 @@
  * Logging utilities for the CLI.
  */
 
-import { mkdirSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 import pino from 'pino';
 import type { GlobalOptions } from './args';
 import type { LogLevel } from '@/types/settings';

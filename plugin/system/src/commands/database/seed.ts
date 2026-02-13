@@ -70,7 +70,7 @@ export const seed = async (
   }
 
   // Find all seed files
-  const seedFiles = [...(await walkDir(seedsDir, (entry) => entry.name.endsWith('.sql')))].sort();
+  const seedFiles = [...await walkDir(seedsDir, (entry) => entry.name.endsWith('.sql'))].sort();
 
   if (seedFiles.length === 0) {
     console.log('No seed files found');

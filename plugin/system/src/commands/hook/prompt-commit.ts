@@ -5,6 +5,7 @@
  * Reads JSON input from stdin and outputs JSON message.
  */
 
+import { text } from 'node:stream/consumers';
 import type { CommandResult } from '@/lib/args';
 import type { HookInput, PostToolUseHookOutput } from '@/types/config';
 
@@ -59,18 +60,7 @@ const basename = (filePath: string): string => {
   return parts[parts.length - 1] ?? filePath;
 };
 
-/**
- * Read all data from stdin as a string.
- * Collects chunks via event-based accumulation, joins at end.
- */
-const readStdin = (): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const chunks: string[] = [];
-    process.stdin.setEncoding('utf8');
-    process.stdin.on('data', (chunk: string) => { chunks.push(chunk); });
-    process.stdin.on('end', () => { resolve(chunks.join('')); });
-    process.stdin.on('error', reject);
-  });
+const readStdin = (): Promise<string> => text(process.stdin);
 
 export const promptCommit = async (): Promise<CommandResult> => {
   try {
