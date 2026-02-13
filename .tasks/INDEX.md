@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#107](4-implementing/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#107](5-reviewing/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
 
 ---
 
