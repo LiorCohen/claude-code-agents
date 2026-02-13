@@ -156,4 +156,4 @@ Reference prototype: `.temp/webapp-prototype/`
 - [ ] `resources/tanstack.md` updated with router factory pattern
 - [ ] `frontend-scaffolding/SKILL.md` updated with new file listing
 - [ ] `eslint.config.js` included in scaffold with flat config enforcing TS + frontend standards
-- [ ] Build test passes: `tsc --noEmit` and `vite build` on scaffolded output
+- [ ] Build test passes: `tsc --noEmit`, `eslint src/`, and `vite build` on scaffolded output
