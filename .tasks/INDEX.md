@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#107](5-reviewing/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
+(none)
 
 ---
 
@@ -87,6 +87,7 @@
 ## Complete
 
 - [#132](6-complete/132/): Fix critic skill: use datetime-based filenames for .temp output ✓ (2026-02-13)
+- [#107](6-complete/107/): Revisit frontend scaffold — add Radix/Shadcn, align with documented stack ✓ (2026-02-13)
 - [#127](6-complete/127/): Fix system CLI TypeScript standards violations from audit ✓ (2026-02-13)
 - [#126](6-complete/126/): Implement hook system — skill auto-activation and objective Stop checks ✓ (2026-02-12)
 - [#125](6-complete/125/): Fix skills standards violations from audit report ✓ (2026-02-12)
