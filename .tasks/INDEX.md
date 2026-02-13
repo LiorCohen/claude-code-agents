@@ -30,6 +30,7 @@
 
 ### High Priority
 
+- [#128](1-inbox/128/): Maintain plugin user stories in product/ folder
 - [#67](1-inbox/67/): Store user instructions in plans, specs, and .sdd/
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
@@ -38,6 +39,7 @@
 
 ### Medium Priority
 
+- [#129](1-inbox/129/): Frontend workflow guidelines — step-by-step recipes for common coding tasks
 - [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
