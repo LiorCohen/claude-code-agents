@@ -15,25 +15,18 @@ Initialize a new spec-driven project with minimal structure. Components are scaf
 
 **No arguments required.** Project name is derived from the current directory.
 
-**Examples:**
-```bash
-cd my-app
-/sdd-init
-```
-
 ## Workflow
 
 This command follows an approval-based workflow that verifies environment, creates minimal structure, and prepares for change-driven development.
 
 | Phase | Purpose |
 |-------|---------|
-| 0     | Version detection + plugin build (if existing project with version mismatch) |
-| 1     | Detect project name from current directory (or load from existing settings) |
-| 2     | Environment verification (plugin, tools, settings, permissions) |
-| 2.7   | Settings reconciliation (if existing project with version mismatch) |
-| 3     | Create minimal structure (config component only) — skipped for existing projects |
-| 4     | Git init + commit — skipped for existing projects |
-| 5     | Completion message |
+| 1     | Version detection + plugin build (if existing project with version mismatch) |
+| 2     | Detect project name from current directory (or load from existing settings) |
+| 3     | Environment verification (plugin, tools, settings, permissions, reconciliation) |
+| 4     | Create minimal structure (config component only) — skipped for existing projects |
+| 5     | Git init + commit — skipped for existing projects |
+| 6     | Completion message |
 
 ---
 
@@ -42,23 +35,22 @@ This command follows an approval-based workflow that verifies environment, creat
 **You MUST complete ALL phases before declaring initialization complete.** Use this checklist to track progress:
 
 ```
-[ ] Phase 0: Version check completed (or skipped for new projects)
-[ ] Phase 1: Project name detected and confirmed
-[ ] Phase 2: Environment verified (plugin, tools, settings, permissions)
-[ ] Phase 2.7: Settings reconciled (or skipped if versions match / new project)
-[ ] Phase 3: Minimal structure created (or skipped for existing projects)
-[ ] Phase 4: Git repository initialized and committed (or skipped for existing projects)
-[ ] Phase 5: Completion report displayed
+[ ] Phase 1: Version check completed (or skipped for new projects)
+[ ] Phase 2: Project name detected and confirmed
+[ ] Phase 3: Environment verified (plugin, tools, settings, permissions, reconciliation)
+[ ] Phase 4: Minimal structure created (or skipped for existing projects)
+[ ] Phase 5: Git repository initialized and committed (or skipped for existing projects)
+[ ] Phase 6: Completion report displayed
 ```
 
 **DO NOT:**
 - Stop after environment verification without completing structure creation
-- Declare "initialization complete" until Phase 5 is finished
+- Declare "initialization complete" until Phase 6 is finished
 - Ask the user "should I continue?" between phases - just proceed
 
 ---
 
-### Phase 0: Version Detection & Plugin Build
+### Phase 1: Version Detection & Plugin Build
 
 **This phase runs BEFORE any other logic.** If plugin code has changed, all subsequent logic (validation, reconciliation, CLI commands) would run against stale built code.
 
@@ -69,11 +61,11 @@ This command follows an approval-based workflow that verifies environment, creat
    - Run `npm install` in `${CLAUDE_PLUGIN_ROOT}/system/`
    - Run `npm run build` in `${CLAUDE_PLUGIN_ROOT}/system/`
    - Only proceed once plugin is built with current code
-5. If no settings file exists, this is a new project — skip version check, proceed to Phase 1
+5. If no settings file exists, this is a new project — skip version check, proceed to Phase 2
 
 ---
 
-### Phase 1: Detect Project Name
+### Phase 2: Detect Project Name
 
 **If `.sdd/sdd-settings.yaml` exists** (existing project):
 - Load `project.name` from the settings file
@@ -123,18 +115,18 @@ If no: Exit gracefully.
 
 ---
 
-### Phase 2: Environment Verification
+### Phase 3: Environment Verification
 
-#### 2.1 Platform Check (HARD BLOCKER)
+#### 3.1 Platform Check (HARD BLOCKER)
 
-The SDD plugin requires a Unix environment. This is checked by the `check-tools` CLI command (Phase 2.5) via its `platform` field. If the platform is unsupported (native Windows without WSL), **STOP** immediately:
+The SDD plugin requires a Unix environment. This is checked by the `check-tools` CLI command (Phase 3.5) via its `platform` field. If the platform is unsupported (native Windows without WSL), **STOP** immediately:
 
 ```
 SDD requires a Unix environment (macOS or Linux).
 On Windows, use WSL (Windows Subsystem for Linux): https://learn.microsoft.com/en-us/windows/wsl/install
 ```
 
-#### 2.2 Plugin Installation Verification (HARD BLOCKER)
+#### 3.2 Plugin Installation Verification (HARD BLOCKER)
 
 This must pass before any other checks. The plugin's absolute path is available via `${CLAUDE_PLUGIN_ROOT}` (set by Claude when the plugin loads).
 
@@ -149,7 +141,7 @@ This must pass before any other checks. The plugin's absolute path is available 
 
 **This is a hard blocker.** If the plugin is not installed, not built, or not functional after repair attempts, do NOT continue to other phases.
 
-#### 2.3 Plugin Update Check
+#### 3.3 Plugin Update Check
 
 ```
 Checking for plugin updates...
@@ -164,7 +156,7 @@ Would you like to stop and upgrade? (yes/no)
 If yes: Exit with instructions to run `claude plugins update sdd`
 If no: Continue with current version
 
-#### 2.4 .claude/settings.json Verification
+#### 3.4 .claude/settings.json Verification
 
 Check the project's `.claude/settings.json` for required entries:
 
@@ -186,7 +178,7 @@ Check the project's `.claude/settings.json` for required entries:
 
 If missing: create or merge the required entries (preserve existing settings).
 
-#### 2.5 Required Tools Check (via System CLI)
+#### 3.5 Required Tools Check (via System CLI)
 
 Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" env check-tools --json` and interpret the result:
 - Display the human-readable tool summary
@@ -217,7 +209,7 @@ Please install the missing tools and tell me when you're ready. I'll re-check.
 
 All tools must be installed before proceeding. There is no skip option.
 
-#### 2.6 Permissions Check
+#### 3.6 Permissions Check
 
 ```
 Checking permissions...
@@ -228,7 +220,7 @@ Would you like me to configure recommended permissions automatically? (yes/no)
 ```
 
 **If yes:**
-Run `/sdd-run permissions configure` to merge SDD permissions into `.claude/settings.local.json`.
+Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" permissions configure` to merge SDD permissions into `.claude/settings.local.json`.
 
 **If no:**
 ```
@@ -239,90 +231,47 @@ You can configure permissions later by running:
 This will merge SDD recommended permissions into your .claude/settings.local.json
 ```
 
-Note: permissions written to `.claude/settings.local.json` do NOT take effect mid-session. The session restart requirement is communicated in Phase 5.
+Note: permissions written to `.claude/settings.local.json` do NOT take effect mid-session. The session restart requirement is communicated in Phase 6.
 
----
+#### 3.7 Settings Reconciliation (Existing Projects Only)
 
-### Phase 2.7: Settings Reconciliation (Existing Projects Only)
+**Skip this step if:** this is a new project (no existing `.sdd/sdd-settings.yaml`), or if versions already match.
 
-**Skip this phase if:** this is a new project (no existing `.sdd/sdd-settings.yaml`), or if versions already match.
-
-If this is an existing project with a version mismatch (detected in Phase 0):
+If this is an existing project with a version mismatch (detected in Phase 1):
 
 1. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" settings reconcile` to migrate settings to the latest schema
 2. Display the command output (it prints a summary of changes and any directory warnings)
-3. **Skip Phase 3 and Phase 4** — structure already exists, git already initialized
-4. Jump to Phase 5 with upgrade-specific messaging
+3. **Skip Phase 4 and Phase 5** — structure already exists, git already initialized
+4. Jump to Phase 6 with upgrade-specific messaging
 
 ---
 
-### Phase 3: Create Minimal Structure
+### Phase 4: Create Minimal Structure
 
-**Skip this phase for existing projects** (upgrade/repair mode skips to Phase 5).
+**Skip this phase for existing projects** (upgrade/repair mode skips to Phase 6).
 
 **INVOKE the `project-scaffolding` skill** with:
 
 ```yaml
 mode: minimal
-project_name: <from Phase 1>
+project_name: <from Phase 2>
 target_dir: <current directory>
 ```
 
-Create only:
-
-```
-<project>/
-├── .sdd/
-│   └── sdd-settings.yaml    # Contains only config component
-├── specs/
-│   └── INDEX.md             # Empty spec registry
-├── components/
-│   └── config/              # Only config is scaffolded
-│       ├── package.json
-│       ├── tsconfig.json
-│       ├── envs/
-│       │   ├── default/config.yaml
-│       │   └── local/config.yaml
-│       ├── schemas/config.schema.json
-│       └── types/index.ts
-├── package.json              # Workspace root (empty scripts initially)
-├── .gitignore
-├── README.md
-└── CLAUDE.md
-```
-
-**sdd-settings.yaml format:** Use the minimal template from the `project-settings` skill (see its "Minimal Template" section).
-
 ---
 
-### Phase 4: Git Init + Commit
+### Phase 5: Git Init + Commit
 
 Initialize git repository (if not already in one):
 ```bash
 git init
 ```
 
-Stage and commit all created files:
-
-```bash
-git add .
-git commit -m "$(cat <<'EOF'
-Initialize SDD project: <project-name>
-
-- Created minimal SDD structure
-- Config component ready
-- Spec registry initialized
-
-Components (Server, Webapp, Database, Contract) will be scaffolded on-demand as changes are created.
-
-Co-Authored-By: SDD Plugin vX.Y.Z
-EOF
-)"
-```
+Stage and commit all created files following the `commit-standards` skill.
 
 ---
 
-### Phase 5: Completion Message
+### Phase 6: Completion Message
 
 ```
 ═══════════════════════════════════════════════════════════════
