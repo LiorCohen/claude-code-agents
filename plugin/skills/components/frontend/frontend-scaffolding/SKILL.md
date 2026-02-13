@@ -16,53 +16,82 @@ Use when creating webapp components. Supports multiple named instances (e.g., `w
 
 ```text
 components/<webapp-name>/
+├── .gitignore
+├── components.json
+├── eslint.config.js
+├── eslint-rules/
+│   └── allowed-structure.js
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── index.html
-├── .gitignore
 └── src/
+    ├── index.html
+    ├── index.ts
+    ├── index.css
     ├── main.tsx              # Entry point
     ├── app.tsx               # Root app component
-    ├── index.css             # Global styles (Tailwind)
-    ├── pages/
-    │   ├── index.ts          # Empty barrel (add pages as features are implemented)
-    │   └── home.tsx          # Home page
+    ├── vite-env.d.ts
     ├── components/
     │   ├── index.ts
-    │   └── sidebar.tsx       # Navigation sidebar
-    ├── viewmodels/           # ViewModel hooks (empty, for user)
-    ├── models/               # Domain models (empty, for user)
-    ├── services/             # API services (empty, for user)
-    ├── stores/               # State stores (empty, for user)
-    ├── types/                # Type definitions (empty, for user)
-    ├── utils/                # Utilities (empty, for user)
+    │   ├── layout/
+    │   │   ├── index.ts
+    │   │   └── layout.tsx
+    │   ├── sidebar/
+    │   │   ├── index.ts
+    │   │   └── sidebar.tsx
+    │   └── ui/
+    │       ├── index.ts
+    │       ├── button.tsx
+    │       └── card.tsx
     ├── hooks/
-    │   └── index.ts          # Empty barrel (add hooks as features are implemented)
-    └── api/
-        └── index.ts          # Empty barrel (add API clients as features are implemented)
+    │   ├── index.ts
+    │   ├── use_app_config.tsx
+    │   ├── use_app_router.ts
+    │   └── use_query_client.ts
+    ├── lib/
+    │   ├── index.ts
+    │   └── utils.ts
+    ├── pages/
+    │   ├── index.ts
+    │   └── home_page/
+    │       ├── index.ts
+    │       └── home_page.tsx
+    ├── routes/
+    │   ├── index.ts
+    │   └── routes.tsx
+    ├── services/
+    │   └── index.ts
+    └── types/
+        └── index.ts
 ```
 
 ## MVVM Architecture
 
 | Layer | Purpose | Location |
 |-------|---------|----------|
-| **M**odel | Domain types and business logic | `src/models/` |
-| **V**iew | React components (pages, components) | `src/pages/`, `src/components/` |
-| **V**iew**M**odel | State and logic hooks | `src/viewmodels/` |
-
-Plus supporting directories for services, stores, and API clients.
+| **V**iew | React components (pages, layout, UI primitives) | `src/pages/`, `src/components/` |
+| **V**iew**M**odel | State and logic hooks | `src/hooks/` |
+| **M**odel | API client services | `src/services/` |
+| Utilities | `cn()`, shared helpers | `src/lib/` |
+| Routes | TanStack Router route definitions | `src/routes/` |
+| Types | Shared type definitions | `src/types/` |
 
 ## Tech Stack
 
 | Technology | Purpose |
 |------------|---------|
-| React 18 | UI framework |
-| TypeScript | Type safety |
-| Vite | Build tool and dev server |
-| TailwindCSS v4 | Utility-first CSS (CSS-based config) |
+| React 19 | UI framework |
+| TypeScript 5.9 | Type safety |
+| Vite 7 | Build tool and dev server |
+| Vitest 4 | Unit testing framework |
+| ESLint 9 | Linting (flat config) |
+| Tailwind CSS 4 | Utility-first CSS (CSS-based config) |
 | TanStack Router | Type-safe routing |
 | TanStack Query | Server state management |
+| TanStack Table | Headless table primitives |
+| TanStack Form | Type-safe form management |
+| Radix UI / Shadcn | Accessible component primitives |
+| class-variance-authority, clsx, tailwind-merge | Style composition utilities |
 
 ## Multiple Instances
 
@@ -79,8 +108,8 @@ Supports multiple named frontend instances:
 | Variable | Description |
 |----------|-------------|
 | `{{PROJECT_NAME}}` | Project name |
-| `{{PROJECT_DESCRIPTION}}` | Project description |
-| `{{PRIMARY_DOMAIN}}` | Primary business domain |
+| `{{CONTRACT_PACKAGE}}` | Workspace package name for API contract types (e.g., `@my-project/api-types`) |
+| `{{CONFIG_PACKAGE}}` | Workspace package name for webapp configuration types (e.g., `@my-project/config`) |
 
 ## Usage
 
@@ -102,19 +131,32 @@ All templates are colocated in this skill's `templates/` directory:
 
 ```text
 skills/components/frontend/frontend-scaffolding/templates/
+├── .gitignore
+├── components.json
+├── eslint.config.js
+├── eslint-rules/
+│   └── allowed-structure.js
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── index.html
-├── .gitignore
 └── src/
+    ├── index.html
+    ├── index.ts
+    ├── index.css
     ├── main.tsx
     ├── app.tsx
-    ├── index.css
-    ├── pages/
+    ├── vite-env.d.ts
     ├── components/
+    │   ├── index.ts
+    │   ├── layout/
+    │   ├── sidebar/
+    │   └── ui/
     ├── hooks/
-    └── api/
+    ├── lib/
+    ├── pages/
+    ├── routes/
+    ├── services/
+    └── types/
 ```
 
 ## Config Schema
@@ -177,6 +219,8 @@ To scaffold a frontend component, build a spec and invoke the engine:
 | Variable | Source |
 |----------|--------|
 | `PROJECT_NAME` | From `sdd-settings.yaml` project name |
+| `CONTRACT_PACKAGE` | Workspace package name for API contract types |
+| `CONFIG_PACKAGE` | Workspace package name for webapp configuration types |
 
 ### Operations
 
@@ -184,7 +228,7 @@ To scaffold a frontend component, build a spec and invoke the engine:
 {
   "target_dir": "<project-root>",
   "base_dir": "<plugin-root>/skills",
-  "variables": { "PROJECT_NAME": "<project-name>" },
+  "variables": { "PROJECT_NAME": "<project-name>", "CONTRACT_PACKAGE": "<contract-package>", "CONFIG_PACKAGE": "<config-package>" },
   "operations": [
     {
       "type": "template_dir",

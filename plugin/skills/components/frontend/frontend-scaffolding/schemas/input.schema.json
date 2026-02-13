@@ -27,7 +27,15 @@
         "type": "string",
         "description": "Contract name consumed by this webapp"
       }
+    },
+    "contract_package": {
+      "type": "string",
+      "description": "Workspace package name for API contract types (e.g., @my-project/api-types)"
+    },
+    "config_package": {
+      "type": "string",
+      "description": "Workspace package name for webapp configuration types (e.g., @my-project/config)"
     }
   },
-  "required": ["name"]
+  "required": ["name", "contract_package", "config_package"]
 }
