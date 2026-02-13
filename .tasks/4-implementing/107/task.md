@@ -146,7 +146,7 @@ Reference prototype: `prototype/` (in this task folder)
 
 ## Acceptance Criteria
 
-- [ ] Scaffold templates match prototype in `.temp/webapp-prototype/`
+- [ ] Scaffold templates match prototype in `.tasks/4-implementing/107/prototype/`
 - [ ] `components.json` included in scaffold
 - [ ] All deps pinned to stable versions verified in build test
 - [ ] `frontend-standards/SKILL.md` updated with directory structure, rules from D18–D23

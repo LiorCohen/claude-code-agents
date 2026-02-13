@@ -9,7 +9,7 @@ created: 2026-02-13 14:00 UTC
 
 The frontend scaffold templates are outdated and misaligned with documented standards. Deps use loose ranges at old versions (React 18, Vite 5, ESLint 8). The scaffold ships directories the task decisions explicitly remove (`viewmodels/`, `models/`, `stores/`, `utils/`, `api/`). There's no Radix UI, Shadcn, TanStack Router, or TanStack Form in the template. The entry point architecture doesn't support config injection. No ESLint config is included. The frontend standards skill references patterns (`viewmodels/`, `stores/`, `types/generated.ts`) that contradict the task decisions.
 
-A validated prototype exists at `.tasks/2-planning/107/prototype/` — templates should match it, with known deviations corrected during implementation (see "Prototype Deviations" below).
+A validated prototype exists at `.tasks/4-implementing/107/prototype/` — templates should match it, with known deviations corrected during implementation (see "Prototype Deviations" below).
 
 ## Files to Modify
 
