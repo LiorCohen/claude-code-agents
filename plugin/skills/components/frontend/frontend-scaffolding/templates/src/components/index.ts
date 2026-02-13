@@ -1,2 +1,3 @@
-// Components index - exports only
+export { Layout } from './layout';
 export { Sidebar } from './sidebar';
+export * from './ui';
