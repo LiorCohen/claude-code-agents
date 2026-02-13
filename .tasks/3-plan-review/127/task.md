@@ -1,7 +1,7 @@
 ---
 id: 127
 title: Fix system CLI TypeScript standards violations from audit
-status: planning
+status: plan-review
 created: 2026-02-12 18:00 UTC
 depends_on: []
 blocks: []

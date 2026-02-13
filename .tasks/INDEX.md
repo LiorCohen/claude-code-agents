@@ -4,13 +4,13 @@
 
 ## Planning
 
-- [#127](2-planning/127/plan.md): Fix system CLI TypeScript standards violations from audit
+(none)
 
 ---
 
 ## Plan Review
 
-(none)
+- [#127](3-plan-review/127/plan.md): Fix system CLI TypeScript standards violations from audit
 
 ---
 
