@@ -279,6 +279,7 @@ The user decides when to advance. Always wait for their instruction.
 ## Quick Reference
 
 - **Task numbering:** Permanent IDs, never reused. Find highest + 1.
+- **Sort order:** All INDEX.md sections are sorted by task ID **descending** (newest first). Maintain this when adding, moving, or reordering tasks.
 - **Commit every transition:** Use `Tasks:` prefix
 - **Inbox first:** New tasks → inbox, prioritize later
 - **Worktree lifecycle:** Created by `/tasks implement`, removed by `/tasks complete`
