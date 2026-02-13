@@ -52,7 +52,7 @@ src/
 │   └── ...
 ├── lib/                      # Pure utilities and helpers
 │   ├── index.ts
-│   ├── cn.ts                 # cn() — clsx + tailwind-merge
+│   ├── utils.ts              # cn() — clsx + tailwind-merge
 │   └── ...
 ├── pages/                    # Page components (View + ViewModel + Model)
 │   ├── home_page/
@@ -158,7 +158,7 @@ import { App } from '@/components';
 const root = createRoot(document.getElementById('root')!);
 root.render(<App />);
 
-// src/lib/cn.ts — GOOD: no side-effects, exports only
+// src/lib/utils.ts — GOOD: no side-effects, exports only
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
