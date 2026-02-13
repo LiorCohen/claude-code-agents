@@ -80,8 +80,8 @@ export default tseslint.config(
           { group: ['@/routes/*'], message: 'Import from @/routes barrel' },
           { group: ['@/services/*'], message: 'Import from @/services barrel' },
           { group: ['@/types/*'], message: 'Import from @/types barrel' },
-          { group: ['@/components/*/*'], message: 'Import from @/components or sub-barrel' },
-          { group: ['@/pages/*/*'], message: 'Import from @/pages or sub-barrel' },
+          { group: ['@/components/**'], message: 'Import from @/components barrel' },
+          { group: ['@/pages/**'], message: 'Import from @/pages barrel' },
         ],
       }],
 

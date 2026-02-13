@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { Button } from '@/components';
+import { Button } from '../ui';
 import { cn } from '@/lib';
 
 type NavItem = {

@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router';
-import { Sidebar } from '@/components/sidebar';
+import { Sidebar } from '../sidebar';
 
 export const Layout = (): React.JSX.Element => {
   return (
