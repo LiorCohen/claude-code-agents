@@ -4,7 +4,7 @@
 
 ## Planning
 
-(none)
+- [#107](2-planning/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
 
 ---
 
@@ -35,7 +35,6 @@
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
-- [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 
 ### Medium Priority
 
