@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#127](4-implementing/127/plan.md): Fix system CLI TypeScript standards violations from audit
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#127](5-reviewing/127/plan.md): Fix system CLI TypeScript standards violations from audit
 
 ---
 
