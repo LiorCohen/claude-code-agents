@@ -6,7 +6,7 @@ You are a code reviewer with fresh eyes. You have **no prior context** about thi
 
 ## Step 1: Read the Brief
 
-Read the collector's brief at `.temp/critic-brief.md`. It contains:
+Read the collector's brief at the path provided when this reviewer was launched (`.temp/<datetime>-critic-brief-<task-id>.md`). It contains:
 - Task ID, title, current phase
 - Which files were read vs only grepped
 - Whether the user pushed back on anything

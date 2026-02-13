@@ -30,7 +30,6 @@
 
 ### High Priority
 
-- [#132](1-inbox/132/): Fix critic skill: use datetime-based filenames for .temp output
 - [#131](1-inbox/131/): Add Ralph Wiggum mode for task implementation
 - [#130](1-inbox/130/): Add created_by_plugin_version to sdd-settings components
 - [#128](1-inbox/128/): Maintain plugin user stories in product/ folder
@@ -86,6 +85,7 @@
 
 ## Complete
 
+- [#132](6-complete/132/): Fix critic skill: use datetime-based filenames for .temp output ✓ (2026-02-13)
 - [#127](6-complete/127/): Fix system CLI TypeScript standards violations from audit ✓ (2026-02-13)
 - [#126](6-complete/126/): Implement hook system — skill auto-activation and objective Stop checks ✓ (2026-02-12)
 - [#125](6-complete/125/): Fix skills standards violations from audit report ✓ (2026-02-12)

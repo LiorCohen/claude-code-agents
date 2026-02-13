@@ -82,7 +82,7 @@ For each finding, rate confidence based on what was actually verified (read the 
 
 ## Brief Generation
 
-After running collector checks, write a structured brief to `.temp/critic-brief.md`:
+After running collector checks, write a structured brief to `.temp/<datetime>-critic-brief-<task-id>.md` (e.g., `.temp/2026-02-13-1530-critic-brief-107.md`). Use `YYYY-MM-DD-HHmm` format for the datetime portion.
 
 ```markdown
 ## Critic Brief
@@ -118,13 +118,14 @@ After running collector checks, write a structured brief to `.temp/critic-brief.
 
 ## Launching the Reviewer
 
-After writing the brief, launch the forked reviewer:
+After writing the brief, launch the forked reviewer. Inject the actual brief file path into the reviewer prompt:
 
 ```
 Task(
   subagent_type: "general-purpose",
   description: "Critic reviewer — fresh-context code review",
-  prompt: [contents of resources/reviewer-prompt.md with brief path injected]
+  prompt: [contents of resources/reviewer-prompt.md with actual brief path injected,
+           e.g. replace the placeholder with ".temp/2026-02-13-1530-critic-brief-107.md"]
 )
 ```
 
