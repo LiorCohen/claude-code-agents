@@ -30,6 +30,7 @@
 
 ### High Priority
 
+- [#130](1-inbox/130/): Add created_by_plugin_version to sdd-settings components
 - [#128](1-inbox/128/): Maintain plugin user stories in product/ folder
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
