@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#107](2-planning/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
+(none)
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#107](4-implementing/107/plan.md): Add Radix and Shadcn as part of frontend standards and scaffolding
 
 ---
 

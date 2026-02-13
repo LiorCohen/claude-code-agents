@@ -1,7 +1,7 @@
 ---
 id: 107
 title: Revisit frontend scaffold — add Radix/Shadcn, align with documented stack
-status: planning
+status: implementing
 priority: high
 created: 2026-02-08 14:32 UTC
 depends_on: []
