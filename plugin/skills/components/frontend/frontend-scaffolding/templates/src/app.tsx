@@ -1,36 +1,21 @@
-import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Sidebar } from './components';
-import { HomePage } from './pages';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
+import { useAppQueryClient, useAppRouter, AppConfigProvider } from '@/hooks';
+import type { WebappConfig } from '{{CONFIG_PACKAGE}}';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 1,
-    },
-  },
-});
-
-const PageRouter = ({ currentPage }: { currentPage: string }): JSX.Element => {
-  switch (currentPage) {
-    case 'home':
-    default:
-      return <HomePage />;
-  }
+type AppProps = {
+  readonly config: WebappConfig;
 };
 
-export const App = (): JSX.Element => {
-  const [currentPage, setCurrentPage] = useState('home');
+export const App = ({ config }: AppProps): React.JSX.Element => {
+  const queryClient = useAppQueryClient();
+  const router = useAppRouter();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gray-100 flex">
-        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-        <main className="flex-1">
-          <PageRouter currentPage={currentPage} />
-        </main>
-      </div>
-    </QueryClientProvider>
+    <AppConfigProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </AppConfigProvider>
   );
 };

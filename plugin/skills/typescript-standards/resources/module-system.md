@@ -107,6 +107,36 @@ user/
     └── validator.ts
 ```
 
+## Intra-Module Imports
+
+**CRITICAL:** Inside a module, nothing should ever import from its own `index.ts`. All imports within a module must use relative paths. The barrel is the module's public API for *external* consumers only. For nested modules, the same barrel rules apply.
+
+```typescript
+// Given this structure:
+// user/
+// ├── index.ts          ← barrel for external consumers
+// ├── create_user.ts
+// ├── update_user.ts
+// ├── types.ts
+// └── validation/
+//     ├── index.ts
+//     └── validate_email.ts
+
+// In user/create_user.ts:
+
+// GOOD: relative path to sibling file
+import type { User } from './types';
+
+// GOOD: relative path to nested sub-module barrel
+import { validateEmail } from './validation';
+
+// BAD: importing from own module's barrel
+import type { User } from '.';              // circular
+import { validateEmail } from './index';    // circular
+```
+
+**Why:** Importing from the module's own `index.ts` creates circular dependencies and defeats the purpose of the barrel (which is the module's public contract for external consumers, not internal wiring).
+
 ## No File Extensions in Imports
 
 **CRITICAL:** Never include file extensions in import statements.

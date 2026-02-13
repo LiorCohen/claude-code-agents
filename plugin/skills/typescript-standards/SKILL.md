@@ -169,7 +169,7 @@ import * as R from 'ramda';        // Never
 
 ## Module System Rules
 
-Named exports only (never default exports). ES modules only (never CommonJS). `index.ts` files contain only imports/exports (no logic). Always import through `index.ts` (never bypass to implementation files). No file extensions in imports. Use `@/` path alias for deep imports (2+ directory levels). Use `import type` for type-only imports.
+Named exports only (never default exports). ES modules only (never CommonJS). `index.ts` files contain only imports/exports (no logic). Always import through `index.ts` (never bypass to implementation files). Inside a module, never import from its own `index.ts` — use relative paths to siblings. No file extensions in imports. Use `@/` path alias for deep imports (2+ directory levels). Use `import type` for type-only imports.
 
 See [module-system.md](resources/module-system.md) for full rules with examples.
 

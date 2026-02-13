@@ -4,7 +4,7 @@
 
 - **API Contract:** OpenAPI 3.x (path depends on contract component name in `.sdd/sdd-settings.yaml`)
 - **Backend:** Node.js 20, TypeScript 5, Express (CMDO architecture)
-- **Frontend:** React 18, TypeScript 5, Vite (MVVM architecture)
+- **Frontend:** React 19, TypeScript 5.9, Vite (MVVM architecture)
 - **Database:** PostgreSQL 15
 - **Testing:** Vitest (unit), Testkube (integration/E2E)
 - **Deployment:** Kubernetes, Helm

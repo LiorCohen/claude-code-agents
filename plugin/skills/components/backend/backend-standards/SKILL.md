@@ -359,6 +359,33 @@ Wrap business operations with spans using `@opentelemetry/api`.
 
 ---
 
+## Intra-Module Imports
+
+**Inside a module, nothing should ever import from its own `index.ts`.** All imports within a module must use relative paths. The barrel is the module's public API for external consumers only. For nested modules, the same barrel rules apply.
+
+```typescript
+// Given this structure:
+// controllers/
+// ├── index.ts          ← barrel: re-exports all routers
+// ├── users/
+// │   ├── index.ts
+// │   └── users_router.ts
+// └── health/
+//     ├── index.ts
+//     └── health_router.ts
+
+// In controllers/users/users_router.ts:
+
+// GOOD: relative path to sibling sub-module barrel
+import { healthCheck } from '../health';
+
+// BAD: importing from own module's barrel
+import { healthCheck } from '@/controllers';
+import { healthCheck } from '@/controllers/health';
+```
+
+---
+
 ## Implementation Order
 
 When implementing a new feature, follow this order to minimize rework and ensure clean architecture:
