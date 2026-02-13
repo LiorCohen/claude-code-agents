@@ -1,6 +1,6 @@
 ---
 name: frontend-standards
-description: MVVM architecture standards for React/TypeScript frontends with TanStack ecosystem and TailwindCSS.
+description: MVVM architecture standards for React/TypeScript frontends with TanStack ecosystem, TailwindCSS, and Shadcn UI.
 ---
 
 
@@ -16,7 +16,7 @@ MVVM architecture for React/TypeScript frontends with strict separation between 
 View (React Components) → ViewModel (Hooks) → Model (Business Logic)
          ↓                       ↓                    ↓
     TailwindCSS            TanStack Query         Services/API
-                           Zustand Stores
+    Shadcn UI              useReducer+Context
 ```
 
 ### Key Distinction: UI vs Logic
@@ -35,12 +35,31 @@ View (React Components) → ViewModel (Hooks) → Model (Business Logic)
 
 ```text
 src/
-├── pages/                    # Page components (Views + ViewModels + Models)
+├── components/               # Shared presentational components
+│   ├── user_card/
+│   │   ├── index.ts          # Barrel exports only
+│   │   ├── user_card.tsx
+│   │   └── user_card.test.tsx
+│   └── ui/                   # Shadcn UI primitives (see shadcn.md)
+│       ├── index.ts
+│       ├── button.tsx
+│       ├── dialog.tsx
+│       └── ...
+├── hooks/                    # Shared hooks (auth, user data, etc.)
+│   ├── index.ts
+│   ├── use_auth.ts
+│   ├── use_user_data.ts
+│   └── ...
+├── lib/                      # Pure utilities and helpers
+│   ├── index.ts
+│   ├── cn.ts                 # cn() — clsx + tailwind-merge
+│   └── ...
+├── pages/                    # Page components (View + ViewModel + Model)
 │   ├── home_page/
-│   │   ├── index.ts          # Exports only
-│   │   ├── home_page.tsx     # View component
-│   │   ├── use_home_view_model.ts  # ViewModel hook
-│   │   ├── home_model.ts     # Page-specific model (business logic)
+│   │   ├── index.ts
+│   │   ├── home_page.tsx
+│   │   ├── use_home_view_model.ts
+│   │   ├── home_model.ts
 │   │   └── home_page.test.tsx
 │   └── user_profile/
 │       ├── index.ts
@@ -48,28 +67,160 @@ src/
 │       ├── use_user_profile_view_model.ts
 │       ├── user_profile_model.ts
 │       └── user_profile.test.tsx
-├── components/               # Shared presentational components
-│   ├── button/
-│   │   ├── index.ts
-│   │   ├── button.tsx
-│   │   └── button.test.tsx
+├── routes/                   # TanStack Router route definitions
+│   ├── index.ts
+│   └── routes.tsx            # createAppRouter() factory
+├── services/                 # API clients and external services (flat)
+│   ├── index.ts
+│   ├── users.ts
+│   ├── auth.ts
 │   └── ...
-├── viewmodels/               # Shared ViewModel hooks
-│   ├── use_auth.ts
-│   ├── use_user_data.ts
+├── types/                    # App-local type definitions
+│   ├── index.ts
 │   └── ...
-├── services/                 # API clients and external services
-│   ├── api/
-│   │   ├── users.ts
-│   │   └── auth.ts
-│   └── ...
-├── types/                    # Generated types from OpenAPI
-│   └── generated.ts          # Auto-generated from contract
-├── stores/                   # Global state (Zustand)
-│   ├── auth_store.ts
-│   └── ...
-└── utils/                    # Pure utility functions
-    └── ...
+└── index.ts                  # Entry point (only file with side-effects)
+```
+
+### Directory Allowlist (D18)
+
+Only the following `src/` subdirectories are permitted:
+
+- `components/` — shared presentational components
+- `components/ui/` — Shadcn UI primitives
+- `hooks/` — shared hooks (replaces `viewmodels/`)
+- `lib/` — pure utilities and helpers
+- `pages/` — page components (View + ViewModel + Model)
+- `routes/` — TanStack Router route definitions
+- `services/` — API clients and external services (flat, no subdirectories)
+- `types/` — app-local type definitions
+
+**No new top-level `src/` directories.** If something doesn't fit, it belongs in one of the above.
+
+---
+
+## Barrel-Only Index Files (D20)
+
+All `index.ts` files must be **pure barrels** — imports and re-exports only. No logic, no side effects.
+
+```typescript
+// src/hooks/index.ts — GOOD: pure barrel
+export { useAuth } from './use_auth';
+export { useUserData } from './use_user_data';
+```
+
+- Always `.ts` (never `.tsx`) for index files
+- No function definitions, no variable assignments, no conditional logic
+
+---
+
+## Barrel Imports Only (D23)
+
+Every subdirectory has an `index.ts` barrel. All imports from outside a directory go through its barrel.
+
+```typescript
+// GOOD: barrel import
+import { useAuth } from '@/hooks';
+import { cn } from '@/lib';
+import { fetchUser } from '@/services';
+
+// BAD: deep import
+import { useAuth } from '@/hooks/use_auth';
+import { cn } from '@/lib/cn';
+import { fetchUser } from '@/services/users';
+```
+
+**Exception:** Intra-directory imports (files within the same directory) use relative paths to siblings directly.
+
+---
+
+## No Side-Effects (D19)
+
+Only `src/index.ts` (the app entry point) may have module-level side-effects (CSS import, `ReactDOM.render`, window assignment). All other files must be side-effect free.
+
+```typescript
+// src/index.ts — OK: entry point, side-effects allowed
+import './index.css';
+import { createRoot } from 'react-dom/client';
+import { App } from '@/components';
+
+const root = createRoot(document.getElementById('root')!);
+root.render(<App />);
+
+// src/lib/cn.ts — GOOD: no side-effects, exports only
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+```
+
+---
+
+## Hooks for Providers (D22)
+
+`QueryClient` and router instances must be lazily created via `useState` hooks inside provider components. No direct instantiation at module scope.
+
+```typescript
+// GOOD: lazy creation inside component
+import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+export const AppQueryProvider = ({ children }: { readonly children: React.ReactNode }) => {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 5 * 60 * 1000 } },
+  }));
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+};
+
+// BAD: module-scope instantiation (side-effect)
+const queryClient = new QueryClient();
+```
+
+---
+
+## Factory Functions for Routes (D21)
+
+Routes use a `createAppRouter()` factory exported from `routes/routes.tsx`. Type registration uses `ReturnType<typeof createAppRouter>`.
+
+```typescript
+// src/routes/routes.tsx
+import { createRouter, createRootRoute, createRoute } from '@tanstack/react-router';
+
+const rootRoute = createRootRoute();
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: () => <HomePage />,
+});
+
+export const createAppRouter = () =>
+  createRouter({
+    routeTree: rootRoute.addChildren([indexRoute]),
+  });
+
+// Type registration
+declare module '@tanstack/react-router' {
+  type Register = {
+    router: ReturnType<typeof createAppRouter>;
+  };
+}
+```
+
+---
+
+## `cn()` for Class Merging
+
+Use `cn()` from `@/lib` (clsx + tailwind-merge) instead of raw `clsx`. This correctly handles Tailwind class conflicts.
+
+```typescript
+import { cn } from '@/lib';
+
+export const Card = ({ className, children }: CardProps) => (
+  <div className={cn('rounded-lg border p-4', className)}>
+    {children}
+  </div>
+);
 ```
 
 ---
@@ -82,9 +233,9 @@ React components that render UI. **No business logic.**
 // src/pages/user_profile/user_profile.tsx
 import { useUserProfileViewModel } from './use_user_profile_view_model';
 
-interface UserProfileProps {
+type UserProfileProps = {
   readonly userId: string;
-}
+};
 
 export const UserProfile = ({ userId }: UserProfileProps) => {
   const { user, displayName, isLoading, error, canEdit, handleEdit } = useUserProfileViewModel(userId);
@@ -123,50 +274,21 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
 
 For detailed guidance, read these on-demand:
 - [tanstack.md](resources/tanstack.md) — Router, Query, Table, Form patterns
-- [mvvm-patterns.md](resources/mvvm-patterns.md) — Model, ViewModel, View with Zustand examples
-- [tailwind.md](resources/tailwind.md) — Utility classes, responsive, dark mode, clsx
+- [mvvm-patterns.md](resources/mvvm-patterns.md) — Model, ViewModel, View with useReducer+Context examples
+- [tailwind.md](resources/tailwind.md) — Utility classes, responsive, dark mode, cn()
+- [shadcn.md](resources/shadcn.md) — Shadcn UI component anatomy, cva variants, Radix primitives
 
 ---
 
 ## Type Consumption
 
-**Always consume generated types from contract:**
+**Always consume shared API types from workspace packages via barrel imports:**
 
 ```typescript
-import type { User, CreateUserRequest, ApiError } from '../../types/generated';
+import type { User, CreateUserRequest, ApiError } from '@my-org/api-types';
 ```
 
-Never hand-write API types—they are generated from the contract component's `openapi.yaml` at `components/contracts/{name}/openapi.yaml`.
-
----
-
-## No Implicit Global Code
-
-All code must be explicitly invoked—no side effects on module import.
-
-```typescript
-// GOOD: Explicit function calls
-export const initializeApp = () => {
-  // Setup code here
-};
-
-export const App = () => {
-  return <div>...</div>;
-};
-
-// Entry point explicitly calls init
-initializeApp();
-ReactDOM.render(<App />, root);
-
-// BAD: Code runs on import
-const analytics = new Analytics(); // Runs immediately
-analytics.track('module_loaded'); // Side effect on import
-```
-
-This ensures:
-- Code is testable
-- Tree-shaking works correctly
-- No hidden dependencies or execution order issues
+Never hand-write API types — they are generated from the contract component's `openapi.yaml` at `components/contracts/{name}/openapi.yaml`.
 
 ---
 
@@ -186,8 +308,8 @@ This ensures:
 - `src/pages/user_profile/use_user_profile_view_model.ts`
 - `src/pages/user_profile/user_profile_model.ts`
 - `src/components/button/button.tsx`
-- `src/viewmodels/use_auth.ts`
-- `src/stores/auth_store.ts`
+- `src/hooks/use_auth.ts`
+- `src/services/users.ts`
 
 **Note:** Component names in code remain PascalCase (e.g., `export const UserProfile = ...`).
 
@@ -199,16 +321,18 @@ Shared components go in `src/components/`:
 
 ```typescript
 // src/components/user_card/user_card.tsx
-import type { User } from '../../types/generated';
+import type { User } from '@my-org/api-types';
+import { cn } from '@/lib';
 
-interface UserCardProps {
+type UserCardProps = {
   readonly user: User;
   readonly onEdit: (id: string) => void;
-}
+  readonly className?: string;
+};
 
-export const UserCard = ({ user, onEdit }: UserCardProps) => {
+export const UserCard = ({ user, onEdit, className }: UserCardProps) => {
   return (
-    <div className="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div className={cn('p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow', className)}>
       <h2 className="text-xl font-semibold mb-2">{user.name}</h2>
       <p className="text-gray-600 mb-4">{user.email}</p>
       <button
@@ -236,16 +360,20 @@ Before committing frontend code, verify:
 
 - [ ] Page follows MVVM structure (View + ViewModel + Model files)
 - [ ] View contains no business logic
-- [ ] ViewModel returns interface with all `readonly` properties
+- [ ] ViewModel returns type with all `readonly` properties
 - [ ] Model has no React dependencies
-- [ ] TanStack Router used for all navigation
+- [ ] TanStack Router used for all navigation (factory pattern)
 - [ ] TanStack Query used for all server state
 - [ ] TailwindCSS used for all styling (no CSS files, no inline styles)
+- [ ] `cn()` used for class merging (not raw `clsx`)
 - [ ] All filenames use `lowercase_with_underscores`
-- [ ] Generated types consumed from `types/generated.ts`
-- [ ] No implicit global code (all code explicitly invoked)
-- [ ] Zustand stores follow readonly pattern
-- [ ] Props interfaces use `readonly` modifier
+- [ ] Types consumed from workspace packages via barrel imports
+- [ ] No module-level side-effects (except `src/index.ts`)
+- [ ] All `index.ts` files are pure barrels
+- [ ] All imports go through barrels (no deep imports)
+- [ ] Only allowlisted directories exist in `src/`
+- [ ] Props types use `readonly` modifier
+- [ ] `useReducer` + Context for global client state (no Zustand)
 
 ---
 
