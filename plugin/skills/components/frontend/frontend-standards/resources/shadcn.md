@@ -139,7 +139,7 @@ src/components/ui/
 
 - File names use `lowercase_with_underscores` (e.g., `dropdown_menu.tsx`, not `dropdown-menu.tsx`)
 - One component family per file (a file may export multiple related parts like `Dialog`, `DialogContent`, `DialogTrigger`)
-- The `index.ts` barrel re-exports everything so consumers import from `@/components/ui`
+- The `index.ts` barrel re-exports everything so consumers import from `@/components` (the top-level barrel re-exports `./ui`)
 
 ---
 
@@ -172,8 +172,7 @@ Application components consume Shadcn primitives from the barrel:
 
 ```typescript
 // src/pages/settings/settings_page.tsx
-import { Button } from '@/components/ui';
-import { Card } from '@/components/ui';
+import { Button, Card } from '@/components';
 import { useSettingsViewModel } from './use_settings_view_model';
 
 export const SettingsPage = () => {

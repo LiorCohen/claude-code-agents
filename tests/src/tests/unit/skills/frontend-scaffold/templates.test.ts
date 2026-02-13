@@ -257,13 +257,13 @@ describe('button uses Radix Slot', () => {
 });
 
 /**
- * WHY: Deep imports (e.g. @/components/ui/button) bypass barrels and
- * create tight coupling. Sub-barrel imports like @/components/sidebar
- * (2 segments) are fine — they resolve to a barrel index.ts. Only 3+
- * segments indicate a deep file import.
+ * WHY: All cross-group imports must use top-level barrel imports
+ * (e.g. @/components, @/hooks, @/pages) — single segment after @/.
+ * Sub-barrel imports like @/components/sidebar bypass the top-level
+ * barrel and create tighter coupling between groups.
  */
 describe('no deep imports', () => {
-  it('no template file imports a deep @/ path (3+ segments)', () => {
+  it('every @/ import uses only the top-level barrel (1 segment)', () => {
     /** WHY: Barrel-only imports keep refactoring local to each directory group. */
     const sourceFiles = [
       'src/app.tsx',
@@ -293,8 +293,8 @@ describe('no deep imports', () => {
         const segments = importPath.split('/');
         expect(
           segments.length,
-          `${relPath} has deep import "@/${importPath}" (${segments.length} segments, max 2)`
-        ).toBeLessThanOrEqual(2);
+          `${relPath} has deep import "@/${importPath}" (${segments.length} segments, max 1)`
+        ).toBeLessThanOrEqual(1);
       }
     }
   });

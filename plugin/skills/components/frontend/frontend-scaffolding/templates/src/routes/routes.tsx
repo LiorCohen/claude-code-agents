@@ -1,7 +1,8 @@
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
-import { Layout } from '@/components/layout';
-import { HomePage } from '@/pages/home_page';
+import { Layout } from '@/components';
+import { HomePage } from '@/pages';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types -- AppRouter derives via ReturnType<>; explicit annotation would be circular
 export const createAppRouter = () => {
   const rootRoute = createRootRoute({
     component: Layout,

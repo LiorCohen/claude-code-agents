@@ -111,6 +111,8 @@ describe('Components index re-exports UI', () => {
  * WHY: Frontend standards must use `type` instead of `interface` in all
  * code examples. The TypeScript standards mandate type aliases for object
  * shapes. If standards show interface, developers copy the wrong pattern.
+ * Exception: `declare module` augmentation requires `interface` for
+ * TypeScript declaration merging (e.g., TanStack Router's Register).
  */
 describe('No interface keyword in standards', () => {
   const STANDARDS_FILES = [
@@ -134,13 +136,22 @@ describe('No interface keyword in standards', () => {
     /**
      * WHY: interface keyword followed by a capital letter indicates a
      * TypeScript interface declaration. Standards must use type aliases.
+     * Exception: interfaces inside `declare module` blocks are required
+     * for TypeScript declaration merging and are excluded from this check.
      */
-    it(`${fileName} has no interface declarations`, () => {
+    it(`${fileName} has no interface declarations (except in declare module)`, () => {
       const content = readFile(filePath);
       const lines = content.split('\n');
+
+      let inDeclareModule = false;
       const violations = lines
         .map((line, idx) => ({ line, num: idx + 1 }))
-        .filter(({ line }) => interfacePattern.test(line));
+        .filter(({ line }) => {
+          if (/declare\s+module\b/.test(line)) inDeclareModule = true;
+          if (inDeclareModule && line.trim() === '}') inDeclareModule = false;
+          if (inDeclareModule) return false;
+          return interfacePattern.test(line);
+        });
 
       expect(
         violations,

@@ -13,33 +13,39 @@ Routes are defined via a `createAppRouter()` factory function, not instantiated 
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 import { UserProfile } from '@/pages';
 
-const rootRoute = createRootRoute();
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types -- AppRouter derives via ReturnType<>; explicit annotation would be circular
+export const createAppRouter = () => {
+  const rootRoute = createRootRoute();
 
-const userProfileRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/users/$userId',
-  component: () => {
-    const { userId } = userProfileRoute.useParams();
-    return <UserProfile userId={userId} />;
-  },
-});
-
-export const createAppRouter = () =>
-  createRouter({
-    routeTree: rootRoute.addChildren([userProfileRoute]),
+  const userProfileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/users/$userId',
+    component: () => {
+      const { userId } = userProfileRoute.useParams();
+      return <UserProfile userId={userId} />;
+    },
   });
+
+  const routeTree = rootRoute.addChildren([userProfileRoute]);
+
+  return createRouter({ routeTree });
+};
 ```
 
 ### Type Registration
 
-Register the router type so `useNavigate`, `useParams`, etc. are fully typed throughout the app:
+Register the router type so `useNavigate`, `useParams`, etc. are fully typed throughout the app.
+
+> **Exception:** `declare module` augmentation requires `interface` (not `type`) because TypeScript declaration merging only works with interfaces.
 
 ```typescript
 // src/routes/routes.tsx (at bottom of file)
+export type AppRouter = ReturnType<typeof createAppRouter>;
+
 declare module '@tanstack/react-router' {
-  type Register = {
-    router: ReturnType<typeof createAppRouter>;
-  };
+  interface Register {
+    router: AppRouter;
+  }
 }
 ```
 

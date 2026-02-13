@@ -129,7 +129,19 @@ import { cn } from '@/lib/cn';
 import { fetchUser } from '@/services/users';
 ```
 
-**Exception:** Intra-directory imports (files within the same directory) use relative paths to siblings directly.
+**Inside a module, nothing should ever import from its own `index.ts`.** All imports within a module must use relative paths. The barrel is the module's public API for external consumers only. For nested modules, the same barrel rules apply.
+
+```typescript
+// In components/layout/layout.tsx:
+
+// GOOD: relative path to sibling sub-module barrel
+import { Sidebar } from '../sidebar';
+import { Button } from '../ui';
+
+// BAD: importing from own module's barrel — circular dependency
+import { Sidebar } from '@/components';
+import { Sidebar } from '@/components/sidebar';
+```
 
 ---
 
@@ -184,26 +196,32 @@ Routes use a `createAppRouter()` factory exported from `routes/routes.tsx`. Type
 
 ```typescript
 // src/routes/routes.tsx
-import { createRouter, createRootRoute, createRoute } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import { HomePage } from '@/pages';
 
-const rootRoute = createRootRoute();
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types -- AppRouter derives via ReturnType<>; explicit annotation would be circular
+export const createAppRouter = () => {
+  const rootRoute = createRootRoute();
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: () => <HomePage />,
-});
-
-export const createAppRouter = () =>
-  createRouter({
-    routeTree: rootRoute.addChildren([indexRoute]),
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/',
+    component: HomePage,
   });
 
-// Type registration
+  const routeTree = rootRoute.addChildren([indexRoute]);
+
+  return createRouter({ routeTree });
+};
+
+export type AppRouter = ReturnType<typeof createAppRouter>;
+
+// Exception: declare module augmentation requires `interface` (not `type`)
+// because TypeScript declaration merging only works with interfaces.
 declare module '@tanstack/react-router' {
-  type Register = {
-    router: ReturnType<typeof createAppRouter>;
-  };
+  interface Register {
+    router: AppRouter;
+  }
 }
 ```
 
