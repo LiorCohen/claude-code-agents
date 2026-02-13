@@ -26,61 +26,165 @@ _(All resolved)_
 
 ## Decisions
 
-1. **Component directory structure** — Option C: `components/ui/` for Shadcn components, `components/` for shared custom components, page-specific components stay colocated in `pages/{name}/`. Fits the existing MVVM structure.
+**1. Where should Shadcn components live relative to custom components?**
+`components/ui/` for Shadcn components, `components/` for shared custom components, page-specific components stay colocated in `pages/{name}/`.
 
-2. **cn() vs clsx** — Adopt `cn()` (clsx + tailwind-merge). Scaffold includes `src/lib/utils.ts` with the `cn()` function. Standards updated to use `cn()` instead of raw `clsx`. Deps: `clsx` + `tailwind-merge`.
+**2. Should we use raw `clsx` or the Shadcn-standard `cn()` wrapper?**
+Adopt `cn()` (clsx + tailwind-merge) for intelligent Tailwind class merging. Scaffold includes `src/lib/utils.ts` with the function. Deps: `clsx` + `tailwind-merge`.
 
-3. **Base components in scaffold** — Include the Shadcn components needed to make the scaffold's existing examples (sidebar, home page) look decent. Claude writes Shadcn components directly as code (not via `npx shadcn` CLI) into `components/ui/`. Standards docs teach Claude the Shadcn patterns and component catalog for adding more as needed.
+**3. Should the scaffold ship with pre-built Shadcn components or leave `components/ui/` empty?**
+Include the Shadcn components the scaffold examples need (Button, Card). Devs won't run `npx shadcn` — Claude writes all webapp code directly. Standards docs teach Claude the Shadcn patterns for adding more components as needed.
 
-4. **Scaffold package.json sync** — Fix all missing deps as part of this task. Align template package.json with documented stack: add TanStack Router, Zustand, TanStack Table, TanStack Form, clsx, tailwind-merge, plus Radix/Shadcn deps.
+**4. The template package.json is missing deps documented in the frontend stack (TanStack Router, Zustand, TanStack Table, TanStack Form). Should we fix this?**
+Yes. Fix all gaps as part of this task.
 
-5. **Placeholder routing** — Yes, replace the `useState`-based PageRouter with proper TanStack Router setup in the scaffold.
+**5. The current scaffold uses a `useState`-based PageRouter placeholder. Should we replace it with real routing?**
+Yes. Replace with proper TanStack Router setup.
 
-6. **Radix vs Shadcn guidance** — Hierarchy: (1) Use Shadcn component if one exists. (2) If no Shadcn component but a Radix primitive exists, build a custom component on top of it following Shadcn patterns, place in `components/ui/`. (3) If neither exists, build fully custom.
+**6. When should Claude use Shadcn components vs raw Radix primitives vs fully custom?**
+Hierarchy: (1) Use a Shadcn component if one exists. (2) If no Shadcn component but a Radix primitive exists, build a custom component on top of it following Shadcn patterns, place in `components/ui/`. (3) If neither exists, build fully custom.
 
-7. **Shadcn standards resource** — Resource doc covers: `cn()` pattern, Shadcn component anatomy (forwardRef, className prop, cn merging, Radix primitive usage), available Shadcn components with their Radix deps, how to extend/customize components, `components/ui/` conventions, and `cva` (class-variance-authority) for component variants. Include `cva` as a dependency.
+**7. How does Claude learn to write Shadcn components correctly without the CLI?**
+New resource doc covering: `cn()` pattern, component anatomy (forwardRef, className prop, cn merging, Radix primitive usage), component catalog, `cva` for variants, `components/ui/` conventions.
 
-8. **Pinned versions** — All deps in scaffold template package.json must use pinned versions (e.g., `"5.0.11"`), never `"latest"` or loose ranges.
+**8. Should scaffold deps use version ranges or exact versions?**
+Always pinned (e.g., `"5.0.11"`), never `"latest"` or loose ranges.
 
-9. **Version upgrades** — Bump all deps to highest stable versions. Key bumps: React 18→19.2, Vite 5→7.3, Vitest 1→4.0, ESLint 8→9.21 (not 10 — typescript-eslint doesn't support it yet), TypeScript 5.3→5.9. Standards docs updated to reflect new versions.
+**9. Several scaffold deps are outdated. Should we bump them?**
+Bump all to highest stable: React 18→19.2, Vite 5→7.3, Vitest 1→4.0, ESLint 8→9.21 (not 10 — typescript-eslint doesn't support it), TypeScript 5.3→5.9.
 
-10. **hooks vs viewmodels** — Drop `viewmodels/` from src root. Keep `hooks/` for shared hooks. Page-specific ViewModels stay colocated inside `pages/{name}/`. Standards docs updated to reflect this.
+**10. The current scaffold has both `hooks/` and `viewmodels/` at src root. Do we need both?**
+Drop `viewmodels/`. Keep `hooks/` for shared hooks. Page-specific ViewModels stay colocated inside `pages/{name}/`.
 
-11. **Drop unnecessary root dirs** — Remove `api/`, `utils/`, `models/`, `stores/` from scaffold. `lib/utils.ts` covers utilities. Hooks manage Zustand stores internally. API clients live in `services/`.
+**11. The scaffold has `api/`, `utils/`, `models/`, `stores/` directories that overlap with other patterns. Keep or remove?**
+Remove all four. `lib/utils.ts` covers utilities. Hooks manage Zustand stores internally. API clients live in `services/`.
 
-12. **types/** — For global webapp types only. Contract types come from workspace packages (imported like any npm dep), not generated locally.
+**12. What goes in `types/`? Are types generated from OpenAPI?**
+Global webapp types only. Contract types come from workspace packages (imported like any npm dep), not generated locally.
 
-13. **Layout is a component** — Layout lives in `components/layout/layout.tsx` (with barrel). `app.tsx` only owns provider wiring (QueryClientProvider, RouterProvider). `routes/` contains only route definitions.
+**13. Should Layout live in `app.tsx` alongside providers?**
+No. Layout is a reusable UI component, not provider wiring. Layout lives in `components/layout/layout.tsx` (with barrel). `app.tsx` only owns provider wiring.
 
-14. **Entry point pattern** — `src/index.ts` imports `mount` from `main.tsx` and assigns it to `window.__webapp_start__`. `src/index.html` loads `index.ts`. No import side-effects in `main.tsx`.
+**14. How does the webapp boot? What is the entry point chain?**
+`src/index.html` loads `src/index.ts`. `index.ts` imports CSS, imports `mount` from `main.tsx`, and assigns it to `window.__webapp_start__`. No import side-effects in `main.tsx`.
 
-15. **mount() signature** — `mount(elementId: string, config: WebappConfig)` — two args. Config type imported from workspace config package.
+**15. What arguments does the mount function take?**
+`mount(elementId: string, config: WebappConfig)` — two args. Config type imported from workspace config package.
 
-16. **Component subdirectories** — Custom components in `components/` each get their own directory with an `index.ts` barrel (e.g., `components/sidebar/sidebar.tsx` + `components/sidebar/index.ts`). Shadcn `components/ui/` stays flat.
+**16. How should custom components be organized within `components/`?**
+Each gets its own directory with an `index.ts` barrel (e.g., `components/sidebar/sidebar.tsx` + `components/sidebar/index.ts`). Shadcn `components/ui/` stays flat.
 
-17. **index.html in src/** — `index.html` lives inside `src/`, not project root. Vite config uses `root: 'src'`.
+**17. Should `index.html` live at the project root (Vite default) or inside `src/`?**
+Inside `src/`. All source lives in `src/`. Vite config uses `root: 'src'`.
 
-18. **Strict directory structure** — The scaffold defines a fixed set of `src/` directories and root files. Claude must not create additional root-level files or folders beyond what the scaffold specifies. All generated code must fit into the established structure: `components/`, `components/ui/`, `hooks/`, `lib/`, `pages/`, `routes/`, `services/`, `types/`. Standards docs must explicitly list the allowed directories and state that no new top-level dirs should be added.
+**18. How do we prevent Claude from creating ad-hoc directories outside the scaffold structure?**
+Fixed allowlist: `components/`, `components/ui/`, `hooks/`, `lib/`, `pages/`, `routes/`, `services/`, `types/`. Standards docs must explicitly list allowed directories and state that no new top-level dirs should be added.
 
-19. **No import side-effects** — Only `src/index.ts` may have import side-effects (CSS import, window assignment). All other files must be side-effect free.
+**19. Which files are allowed to have module-level side-effects (CSS imports, `new` calls, window assignments)?**
+Only `src/index.ts`. All other files must be side-effect free.
 
-20. **Index files are barrels only** — All `index.ts` files must contain only imports and exports. No logic, no function calls, no variable declarations beyond re-exports. Always use `index.ts` (never `index.tsx`) since barrel files never contain JSX.
+**20. Can index files contain logic, or should they be pure barrels?**
+Pure barrels only — imports and exports. No logic, no function calls, no variable declarations. Always `.ts` (never `.tsx`) since barrels never contain JSX.
 
-21. **Routes export a factory function** — `routes.tsx` exports `createAppRouter()` instead of executing route setup at module scope. Type registration uses `ReturnType<typeof createAppRouter>`.
+**21. Route setup calls (`createRootRoute`, `createRoute`, etc.) execute at module scope. How do we avoid that side-effect?**
+`routes.tsx` exports a `createAppRouter()` factory function instead. Type registration uses `ReturnType<typeof createAppRouter>`.
 
-22. **Provider setup via hooks** — `useAppQueryClient` and `useAppRouter` hooks lazily create instances via `useState`. `app.tsx` consumes these hooks — no direct instantiation in the component.
+**22. `new QueryClient()` and `createRouter()` at module scope are side-effects. Where should they be created?**
+`useAppQueryClient` and `useAppRouter` hooks lazily create instances via `useState`. `app.tsx` consumes these hooks — no direct instantiation.
 
-23. **All directories have barrel index.ts** — Every `src/` subdirectory (`components/`, `hooks/`, `lib/`, `pages/`, `routes/`, `services/`, `types/`) must have an `index.ts` barrel. All imports go through barrels — never bypass (e.g., `@/lib` not `@/lib/utils`).
+**23. Should every `src/` subdirectory have a barrel `index.ts`? Should imports always go through barrels?**
+Yes to both. Every subdirectory (`components/`, `hooks/`, `lib/`, `pages/`, `routes/`, `services/`, `types/`) must have an `index.ts` barrel. All imports go through barrels (e.g., `@/lib` not `@/lib/utils`).
 
-24. **Shadcn components follow TS standards** — Use `type` (not `interface`) for component props. Arrow functions in `lib/`. `displayName` assignments and `forwardRef` are acceptable exceptions for `components/ui/`.
+**24. Standard Shadcn components use `forwardRef`, `displayName` assignment, and `import * as React` which conflict with our TS standards. How do we reconcile?**
+Use `type` (not `interface`) for props. Arrow functions in `lib/`. `displayName` and `forwardRef` are acceptable exceptions for `components/ui/` only.
+
+## Implementation Changes
+
+Reference prototype: `.temp/webapp-prototype/`
+
+### A. Scaffold templates (`plugin/skills/components/frontend/frontend-scaffolding/templates/`)
+
+**Update existing files:**
+
+| File | Changes |
+|------|---------|
+| `package.json` | Add radix-ui, cva, clsx, tailwind-merge, TanStack Router/Table/Form, Zustand. Bump all deps to pinned stable versions (D4, D8, D9) |
+| `vite.config.ts` | Add `root: 'src'`, add `resolve.alias` for `@/` (D17) |
+| `tsconfig.json` | Verify strict mode, path aliases |
+| `src/main.tsx` | Export `mount(elementId, config)` function, no side-effects (D14, D15, D19) |
+| `src/app.tsx` | Providers only via hooks, no Layout, no side-effects (D13, D19, D22) |
+| `src/index.css` | Keep as-is (Tailwind import) |
+| `src/components/index.ts` | Barrel exporting Layout and Sidebar (D20, D23) |
+| `src/hooks/index.ts` | Barrel exporting useAppQueryClient and useAppRouter (D20, D23) |
+| `src/pages/index.ts` | Barrel (currently `src/pages/home.tsx` — restructure below) |
+
+**Move/rename existing files:**
+
+| From | To | Reason |
+|------|----|--------|
+| `index.html` (root) | `src/index.html` | D17 |
+| `src/components/sidebar.tsx` | `src/components/sidebar/sidebar.tsx` + `src/components/sidebar/index.ts` | D16 |
+| `src/pages/home.tsx` | `src/pages/home_page/home_page.tsx` + `src/pages/home_page/index.ts` | D16 |
+
+**Add new files:**
+
+| File | Purpose |
+|------|---------|
+| `components.json` | Shadcn configuration (D7) |
+| `src/index.ts` | Entry point — CSS import, mount to `window.__webapp_start__` (D14, D19) |
+| `src/lib/utils.ts` | `cn()` utility (D2) |
+| `src/lib/index.ts` | Barrel for lib (D23) |
+| `src/components/ui/button.tsx` | Shadcn Button with cva variants (D3, D7) |
+| `src/components/ui/card.tsx` | Shadcn Card components (D3, D7) |
+| `src/components/layout/layout.tsx` | Layout component with Sidebar + Outlet (D13) |
+| `src/components/layout/index.ts` | Barrel (D16, D23) |
+| `src/routes/routes.tsx` | `createAppRouter()` factory function + type registration (D5, D21) |
+| `src/routes/index.ts` | Barrel (D23) |
+| `src/hooks/use_query_client.ts` | Lazy QueryClient via useState (D22) |
+| `src/hooks/use_app_router.ts` | Lazy router via useState (D22) |
+| `src/services/index.ts` | Placeholder barrel (D11, D18) |
+| `src/types/index.ts` | Placeholder barrel (D12, D18) |
+
+**Delete existing files:**
+
+| File | Reason |
+|------|--------|
+| `src/api/index.ts` | Replaced by `src/services/` (D11) |
+
+### B. Frontend standards (`plugin/skills/components/frontend/frontend-standards/`)
+
+**Update existing files:**
+
+| File | Changes |
+|------|---------|
+| `SKILL.md` | Update directory structure diagram, version numbers, add rules: strict directory allowlist (D18), barrel-only index files (D20), no side-effects (D19), import through barrels (D23), hooks pattern for providers (D22), factory functions for routes (D21) |
+| `resources/mvvm-patterns.md` | Drop viewmodels from root, hooks replace viewmodels at root level (D10), update directory structure |
+| `resources/tailwind.md` | Add `cn()` pattern, replace raw clsx guidance (D2) |
+| `resources/tanstack.md` | Add Router setup with `createAppRouter()` factory pattern (D5, D21), update version references (D9) |
+
+**Add new files:**
+
+| File | Purpose |
+|------|---------|
+| `resources/shadcn.md` | Shadcn component anatomy, forwardRef/cn/cva patterns, component catalog, Radix vs Shadcn guidance hierarchy, `components/ui/` conventions, TS standards exceptions (D6, D7, D24) |
+
+### C. Scaffolding skill definition
+
+**Update existing files:**
+
+| File | Changes |
+|------|---------|
+| `frontend-scaffolding/SKILL.md` | Update file listing to match new structure, update template variable references |
 
 ## Acceptance Criteria
 
-- [ ] Radix and Shadcn added to scaffold template dependencies
+- [ ] Scaffold templates match prototype in `.temp/webapp-prototype/`
 - [ ] `components.json` included in scaffold
-- [ ] Directory structure updated to accommodate Shadcn components
-- [ ] Frontend standards docs updated (component library usage, cn() pattern)
-- [ ] Scaffold package.json aligned with documented stack
-- [ ] Clear guidance on Radix vs Shadcn vs custom components
-- [ ] All deps bumped to highest stable versions (pinned)
-- [ ] Standards docs reflect updated version numbers
+- [ ] All deps pinned to stable versions verified in build test
+- [ ] `frontend-standards/SKILL.md` updated with directory structure, rules from D18–D23
+- [ ] `resources/shadcn.md` created with component patterns and Radix/Shadcn guidance
+- [ ] `resources/mvvm-patterns.md` updated (no root viewmodels)
+- [ ] `resources/tailwind.md` updated with `cn()` pattern
+- [ ] `resources/tanstack.md` updated with router factory pattern
+- [ ] `frontend-scaffolding/SKILL.md` updated with new file listing
+- [ ] Build test passes: `tsc --noEmit` and `vite build` on scaffolded output
