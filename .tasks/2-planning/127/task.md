@@ -36,8 +36,7 @@ Full audit report: [audit-2026-02-12.md](audit-2026-02-12.md)
 ## Acceptance Criteria
 
 - [ ] Barrel files (`index.ts`) created for `lib/` and `types/`
-- [ ] All imports go through barrel files (no direct implementation file imports)
-- [ ] All `settings/*.ts` imports use `@/types` path alias instead of `../types/settings`
+- [ ] Settings imports use `@/types` barrel (no relative `../types/settings` paths)
 - [ ] All `.sort()` replaced with `toSorted()`
 - [ ] Logic extracted from `commands/env/providers/index.ts` into dedicated module
 - [ ] Stdin `.push()` replaced with immutable pattern
