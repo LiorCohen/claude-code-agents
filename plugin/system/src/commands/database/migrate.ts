@@ -70,7 +70,7 @@ export const migrate = async (
   }
 
   // Find all migration files
-  const migrationFiles = [...(await walkDir(migrationsDir, (entry) => entry.name.endsWith('.sql')))]
+  const migrationFiles = [...await walkDir(migrationsDir, (entry) => entry.name.endsWith('.sql'))]
     .sort();
 
   if (migrationFiles.length === 0) {

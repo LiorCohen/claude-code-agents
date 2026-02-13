@@ -44,7 +44,7 @@ export type {
   SddMetadata,
   ProjectMetadata,
   SettingsFile,
-} from '../types/settings';
+} from '@/types';
 
 // Re-export type guards
 export {
@@ -56,7 +56,7 @@ export {
   isConfigComponent,
   isHelmServerSettings,
   isHelmWebappSettings,
-} from '../types/settings';
+} from '@/types';
 
 // Re-export defaults
 export {

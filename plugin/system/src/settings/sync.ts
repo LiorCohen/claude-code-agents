@@ -12,8 +12,8 @@ import type {
   WebappSettings,
   HelmSettings,
   SettingsFile,
-} from '../types/settings';
-import { isServerComponent, isHelmComponent } from '../types/settings';
+} from '@/types';
+import { isServerComponent, isHelmComponent } from '@/types';
 
 /** Result of a sync operation */
 export type SyncResult = {

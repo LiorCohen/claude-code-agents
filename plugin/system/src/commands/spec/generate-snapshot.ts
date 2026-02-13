@@ -43,7 +43,7 @@ const generateSnapshotContent = async (specsDir: string): Promise<string> => {
   );
 
   const today = new Date().toISOString().split('T')[0];
-  const domains = Object.keys(byDomain).sort();
+  const domains = [...Object.keys(byDomain)].sort();
 
   // Generate markdown using array methods
   const header: readonly string[] = [

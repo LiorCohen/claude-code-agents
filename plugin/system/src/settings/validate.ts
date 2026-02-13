@@ -10,7 +10,7 @@ import type {
   HelmSettings,
   SettingsFile,
   ServerMode,
-} from '../types/settings';
+} from '@/types';
 import {
   isServerComponent,
   isWebappComponent,
@@ -18,7 +18,7 @@ import {
   isDatabaseComponent,
   isContractComponent,
   isHelmServerSettings,
-} from '../types/settings';
+} from '@/types';
 
 /** Validation error */
 export type SettingsValidationError = {

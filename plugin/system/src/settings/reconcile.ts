@@ -8,7 +8,7 @@
 
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { SettingsFile, ComponentType, LogLevel } from '../types/settings';
+import type { SettingsFile, ComponentType, LogLevel } from '@/types';
 import { generateComponentPath } from './sync';
 import { validateSettings } from './validate';
 

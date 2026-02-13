@@ -10,8 +10,8 @@ import type {
   HelmSettings,
   HelmServerSettings,
   ServerSettings,
-} from '../types/settings';
-import { isServerComponent, isHelmComponent, isHelmServerSettings } from '../types/settings';
+} from '@/types';
+import { isServerComponent, isHelmComponent, isHelmServerSettings } from '@/types';
 
 /** Templates that should be included based on settings */
 export type HelmTemplateSet = {

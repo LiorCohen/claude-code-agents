@@ -17,18 +17,11 @@ import { exists, readText, isDirectory } from '@/lib/fs';
 import { executeSpec } from './engine';
 import type { ScaffoldSpec } from './engine';
 
-/** Load and compile the JSON Schema validator (lazy singleton via Map). */
-const getSchemaValidator = (() => {
-  const cache = new Map<string, SchemaValidateFunction>();
-  return (): SchemaValidateFunction => {
-    const existing = cache.get('validator');
-    if (existing) return existing;
-    const schemaPath = join(dirname(fileURLToPath(import.meta.url)), 'scaffold-spec.schema.json');
-    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as JsonSchema;
-    const validate = compileSchema(schema);
-    cache.set('validator', validate);
-    return validate;
-  };
+/** Compiled JSON Schema validator (eager — module loads only when scaffolding apply runs). */
+const schemaValidator: SchemaValidateFunction = (() => {
+  const schemaPath = join(dirname(fileURLToPath(import.meta.url)), 'scaffold-spec.schema.json');
+  const schema = JSON.parse(readFileSync(schemaPath, 'utf-8')) as JsonSchema;
+  return compileSchema(schema);
 })();
 
 /**
@@ -77,7 +70,7 @@ const validateSpec = (
   }
 
   // JSON Schema validation for structural completeness (per-operation fields, when conditions)
-  const validate = getSchemaValidator();
+  const validate = schemaValidator;
   if (!validate(raw)) {
     const errors = (validate.errors ?? [])
       .map((e) => `${e.instancePath || '/'}: ${e.message}`)

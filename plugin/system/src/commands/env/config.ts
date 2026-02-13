@@ -31,7 +31,7 @@ type SddSettings = {
 }
 
 type LocalConfigUrls = {
-  readonly databases: Readonly<Record<string, { host: string; port: number }>>;
+  readonly databases: Readonly<Record<string, Readonly<{ host: string; port: number }>>>;
   readonly services: Readonly<Record<string, string>>;
 }
 
