@@ -147,6 +147,21 @@ Update files outside the frontend scaffold/standards directories that reference 
 - **`plugin/agents/frontend-dev.md`**: Remove "Zustand for global client state" (line 105), replace with `useReducer` + Context guidance. Update any state management references throughout the agent prompt
 - **`plugin/skills/project-scaffolding/templates/project/CLAUDE.md`**: Update "React 18, TypeScript 5" to "React 19, TypeScript 5.9" and adjust architecture description
 
+## Implementation Strategy
+
+Delegate each phase to a subagent to avoid context window exhaustion. The main context orchestrates — reads the plan, dispatches phases in order, commits after each.
+
+| Phase | Subagent Scope | Inputs (subagent reads) | Commit After |
+|-------|---------------|------------------------|--------------|
+| 1. Templates | Section A — all scaffold template files | Plan (section A + Prototype Deviations), prototype files, current templates | Yes |
+| 2. Standards | Section B — frontend-standards skill + resources | Plan (section B), current standards files | Yes |
+| 3. Scaffolding SKILL | Section C — scaffolding skill definition + schema | Plan (section C), current SKILL.md + schema | Yes |
+| 4. Cross-codebase | Section D — agent + project template | Plan (section D), target files | Yes |
+| 5. Tests | Write all tests | Plan (Tests section), completed template + standards files | Yes |
+| 6. Build verification | Run tsc, eslint, vite build on scaffolded output | Scaffolding engine, completed templates | Final commit |
+
+Each subagent prompt includes: the relevant plan section verbatim, the list of files to read, and the expected output. Subagents write files; main context reviews and commits. If a subagent's work needs correction, fix in main context before dispatching the next phase.
+
 ## Dependencies
 
 1. **Template files first** — all scaffold templates must be updated/created before standards docs can reference them accurately
