@@ -39,7 +39,6 @@
 
 - [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
-- [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
 - [#70](1-inbox/70/): Git checkpoint workflow for AI-assisted development
 - [#71](1-inbox/71/): Anti-stop hook to prevent accidental session termination
@@ -49,6 +48,7 @@
 
 ### Low Priority
 
+- [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
 - [#73](1-inbox/73/): User instructions memory for plugin overrides
 - [#3](1-inbox/3/): Docs missing: CMDO Guide
 - [#24](1-inbox/24/): Add plugin Slack support

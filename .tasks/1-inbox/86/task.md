@@ -1,7 +1,7 @@
 ---
 id: 86
 title: Consider component-catalog skill for component type definitions
-priority: medium
+priority: low
 status: inbox
 created: 2026-02-05 18:52 UTC
 depends_on: [85]
