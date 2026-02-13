@@ -59,7 +59,7 @@ _(All resolved)_
 
 ## Implementation Changes
 
-Reference prototype: `.temp/webapp-prototype/`
+Reference prototype: `prototype/` (in this task folder)
 
 ### A. Scaffold templates (`plugin/skills/components/frontend/frontend-scaffolding/templates/`)
 
