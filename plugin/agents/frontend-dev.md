@@ -102,7 +102,7 @@ Follow all rules defined in the `typescript-standards` and `frontend-standards` 
 - TanStack Table for tabular data
 - TanStack Form for complex forms
 - TailwindCSS only for styling
-- Zustand for global client state
+- useReducer + Context for global client state, encapsulated behind hooks (no external state library)
 
 **Code Quality:**
 - All filenames use `lowercase_with_underscores`
