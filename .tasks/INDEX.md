@@ -34,6 +34,7 @@
 - [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
 - [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
 - [#17](1-inbox/17/): Plans should follow TDD with test review first
+- [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 
 ### Medium Priority
 
@@ -60,7 +61,6 @@
 
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
-- [#107](1-inbox/107/): Add Radix and Shadcn as part of frontend standards and scaffolding
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization

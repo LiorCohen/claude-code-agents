@@ -2,6 +2,7 @@
 id: 107
 title: Add Radix and Shadcn as part of frontend standards and scaffolding
 status: inbox
+priority: high
 created: 2026-02-08 14:32 UTC
 depends_on: []
 blocks: []
