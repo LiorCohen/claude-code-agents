@@ -22,6 +22,7 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/skills/scaffolding/SKILL.md` | Add no-op rule for existing components, document implementation-phase usage |
 | `plugin/skills/component-discovery/SKILL.md` | Minor: add note about settings flowing into SPEC.md Components section |
 | `plugin/skills/spec-solicitation/resources/solicitation-steps.md` | Update Step 9 to populate Settings column when writing Components section |
+| `plugin/agents/devops.md` | Add `scaffolding` to skills frontmatter |
 
 ## Changes
 
@@ -51,33 +52,25 @@ No changes needed to the external spec flow — it already defers scaffolding co
 
 ### 2. Add scaffolding as a plan phase in the planning skill
 
-In `plugin/skills/planning/SKILL.md`, update the Dynamic Phase Generation section:
+In `plugin/skills/planning/SKILL.md` (currently 479 lines — budget is tight, stay under 500):
 
-When the SPEC.md `## Components` section lists **New Components** that don't yet exist in `sdd-settings.yaml`, the planning skill generates a **"Phase 1: Component Scaffolding"** phase as the first phase, shifting all subsequent phases down by one.
+**Generation Algorithm update:** Add a step before the existing dependency ordering (line 129). When SPEC.md `## Components` lists new components not yet in `sdd-settings.yaml`, prepend a "Phase 1: Component Scaffolding" phase and shift subsequent phases. When no new components exist, omit it. Integrate this into the existing algorithm rather than adding a separate section.
 
-This phase:
-- Is assigned to `devops` agent (infrastructure setup)
-- Invokes the component-specific scaffolding skills for each new component
-- Updates `sdd-settings.yaml` with new component entries
-- Runs scaffolding in dependency order (config → contract → server → webapp → database → helm)
-- Is a no-op if all components already exist
-
-When no new components are needed, this phase is omitted entirely and Phase 1 starts with whatever the dependency graph dictates (typically contract or config).
-
-Update the plan template to show this optional phase:
+**Plan template update:** Add the scaffolding phase to the feature template (between "Phases" heading and "Phase 1: API Contract"):
 
 ```markdown
 ### Phase 1: Component Scaffolding (if new components)
 **Agent:** `devops`
-**Standards:** Component scaffolding skills
+**Standards:** `scaffolding`, component-specific scaffolding skills (e.g., `backend-scaffolding`, `frontend-scaffolding`)
 
-**Outcome:** New component directories and boilerplate created
+**Outcome:** New component directories and boilerplate created, `sdd-settings.yaml` updated
 
 **Deliverables:**
-- Component directories scaffolded
-- sdd-settings.yaml updated
-- package.json scripts updated
+- Component directories scaffolded per SPEC.md Components section
+- sdd-settings.yaml updated with new component entries
 ```
+
+The `devops` agent's `skills:` frontmatter must include `scaffolding` so it can execute this phase (see Change 8).
 
 ### 3. Enhance spec template Components section
 
@@ -103,9 +96,28 @@ In `plugin/skills/change-creation/templates/spec-feature.md`, update the `## Com
 
 The Settings column captures the discovery output so the plan (and scaffolding phase) know exactly what to scaffold.
 
+**Only the feature template needs this change.** Bugfix/refactor templates don't have a Components section because they modify existing components. Epic templates decompose into features, each with its own spec.
+
 ### 4. Update spec-sections documentation
 
-In `plugin/skills/spec-solicitation/resources/spec-sections.md`, update section 15 (Components) to match the enhanced template, including the Settings column for new components.
+In `plugin/skills/spec-solicitation/resources/spec-sections.md`, update item 15 (line 32-34). Change:
+
+```
+15. **Components**
+    - New Components table (Component, Type, Purpose)
+    - Modified Components table (Component, Changes)
+```
+
+To:
+
+```
+15. **Components**
+    - Note: "New components will be scaffolded during implementation"
+    - New Components table (Component, Type, Settings, Purpose)
+    - Modified Components table (Component, Changes)
+```
+
+The only difference is adding Settings to the New Components table columns and the scaffolding note.
 
 ### 5. Add no-op rule to scaffolding skill
 
@@ -117,11 +129,74 @@ In `plugin/skills/scaffolding/SKILL.md`, add a section documenting:
 
 ### 6. Minor update to component-discovery skill
 
-In `plugin/skills/component-discovery/SKILL.md`, add a note in the output section clarifying that component settings flow into the SPEC.md Components section (with Settings column) so the implementation plan can use them for scaffolding.
+In `plugin/skills/component-discovery/SKILL.md`, update the Output section (lines 107-111) to clarify how discovery output flows into the spec. Change:
+
+```
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns detected project type and a list of components with names, types, and settings.
+```
+
+To:
+
+```
+## Output
+
+Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
+
+Returns detected project type and a list of components with names, types, and settings.
+
+Component settings from this output (server_type, databases, provides_contracts, etc.) flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
+```
 
 ### 7. Update solicitation steps to populate Settings column
 
-In `plugin/skills/spec-solicitation/resources/solicitation-steps.md`, update Step 9 (Technical Deep-Dive) to note that when generating the SPEC.md Components section, the Settings column must be populated from the component-discovery output. The solicitation skill already loads discovered components from the workflow — this change makes it explicit that Settings data (server_type, databases, provides_contracts, etc.) must be written into the New Components table.
+In `plugin/skills/spec-solicitation/resources/solicitation-steps.md`, add a note at the end of Step 9 (line 118, after the YAGNI Principle paragraph). Insert after:
+
+```
+**YAGNI Principle**: Only ask about operations the UI actually requires. Do NOT assume full CRUD for every entity. If the UI only shows a list view, don't ask about Create/Update/Delete.
+```
+
+Add:
+
+```
+**Components Section**: When generating SPEC.md, populate the `## Components` New Components table's Settings column from the component-discovery output. Each discovered component's settings (server_type, databases, provides_contracts, etc.) must appear in this column so the implementation plan can scaffold correctly.
+```
+
+### 8. Add scaffolding skill to devops agent
+
+In `plugin/agents/devops.md`, make two changes:
+
+**Frontmatter** (lines 7-11) — change:
+
+```yaml
+skills:
+  - project-settings
+  - postgresql
+  - helm-standards
+  - cicd-standards
+```
+
+To:
+
+```yaml
+skills:
+  - project-settings
+  - postgresql
+  - helm-standards
+  - cicd-standards
+  - scaffolding
+```
+
+**Skills body** (line 24, after the `cicd-standards` bullet) — add a new bullet:
+
+```
+- `scaffolding` — Orchestrates component scaffolding during implementation (structural skeleton only)
+```
+
+The `scaffolding` skill is the orchestrator that coordinates component-specific scaffolding skills (backend-scaffolding, frontend-scaffolding, etc.) — the agent only needs the orchestrator, not each individual one.
 
 ## Dependencies
 
@@ -132,20 +207,24 @@ Changes are independent and can be made in any order, but logically:
 
 ## Tests
 
-### Unit Tests
+All changes are prompt-only (.md files) — no automated test infrastructure applies. The following are manual verification checks to perform after implementation.
 
-- [ ] `test_interactive_flow_steps_do_not_include_scaffolding` — verify interactive flow step sequence in sdd-change.md has no scaffolding step
-- [ ] `test_external_flow_steps_do_not_include_scaffolding` — verify external spec flow has no scaffolding step
-- [ ] `test_plan_includes_scaffolding_phase_for_new_components` — verify plan template includes Phase 1 (scaffolding) scaffolding when new components exist
-- [ ] `test_plan_omits_scaffolding_phase_when_all_components_exist` — verify plan template omits Phase 1 (scaffolding) when no new components
-- [ ] `test_spec_components_section_includes_settings` — verify spec template Components section has Settings column
-- [ ] `test_scaffolding_noop_for_existing_components` — verify scaffolding skill documents no-op behavior
+### Structural Checks
 
-### Integration Tests
+- [ ] `sdd-change.md` interactive flow has no scaffolding step between discovery and workflow creation
+- [ ] `sdd-change.md` external spec flow has no scaffolding step (unchanged)
+- [ ] `planning/SKILL.md` template includes Phase 1: Component Scaffolding with `devops` agent and explicit `Standards:` field
+- [ ] `planning/SKILL.md` line count stays under 500
+- [ ] `spec-feature.md` Components section has Settings column in New Components table
+- [ ] `scaffolding/SKILL.md` documents no-op rule and implementation-phase-only usage
+- [ ] `solicitation-steps.md` Step 9 notes Settings column population from discovery output
+- [ ] `devops.md` frontmatter `skills:` includes `scaffolding`
 
-- [ ] `test_interactive_new_creates_no_files_or_directories` — run through interactive `new` flow and verify no component directories are created
-- [ ] `test_external_new_creates_no_files_or_directories` — run through external spec `new` flow and verify no component directories are created
-- [ ] `test_implementation_scaffolds_from_plan_phase` — verify implementation with scaffolding plan phase creates component directories
+### Cross-Reference Checks
+
+- [ ] All step numbers in `sdd-change.md` interactive flow are sequential (no gaps or duplicates)
+- [ ] All `<from step N>` references in `sdd-change.md` point to correct renumbered steps
+- [ ] `spec-sections.md` Components section matches `spec-feature.md` template
 
 ## Verification
 
