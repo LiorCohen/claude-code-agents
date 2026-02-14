@@ -20,7 +20,8 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/skills/change-creation/templates/spec-feature.md` | Enhance Components section to include component settings from discovery |
 | `plugin/skills/spec-solicitation/resources/spec-sections.md` | Enhance Components section documentation to include settings |
 | `plugin/skills/scaffolding/SKILL.md` | Add no-op rule for existing components, document implementation-phase usage |
-| `plugin/skills/component-discovery/SKILL.md` | Minor: add note about settings flowing into SPEC.md Components section |
+| `plugin/skills/component-discovery/SKILL.md` | Fix "project type" reference, add note about settings flowing into SPEC.md |
+| `plugin/skills/component-discovery/schemas/output.schema.json` | Remove non-existent `project_type` field |
 | `plugin/skills/spec-solicitation/resources/solicitation-steps.md` | Update Step 9 to populate Settings column when writing Components section |
 | `plugin/agents/devops.md` | Add `scaffolding` to skills frontmatter |
 
@@ -129,7 +130,7 @@ In `plugin/skills/scaffolding/SKILL.md`, add a section documenting:
 
 ### 6. Minor update to component-discovery skill
 
-In `plugin/skills/component-discovery/SKILL.md`, update the Output section (lines 107-111) to clarify how discovery output flows into the spec. Change:
+In `plugin/skills/component-discovery/SKILL.md`, update the Output section (lines 107-111). The current text references "project type" which doesn't exist. Fix the description and add a note about settings flow. Change:
 
 ```
 ## Output
@@ -146,10 +147,12 @@ To:
 
 Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
 
-Returns detected project type and a list of components with names, types, and settings.
+Returns a list of components with names, types, and settings.
 
 Component settings from this output (server_type, databases, provides_contracts, etc.) flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
 ```
+
+Also update `schemas/output.schema.json` to remove the `project_type` field and its `required` entry.
 
 ### 7. Update solicitation steps to populate Settings column
 
