@@ -10,21 +10,20 @@ created: 2026-02-14 12:00 UTC
 
 Three systemic issues discovered when running `/sdd-init` on a new blank project. Each is a symptom of a broader problem affecting the entire plugin, not just sdd-init.
 
-## Issue 1: CLAUDE_PLUGIN_ROOT is not a runtime env var — the canonical invocation pattern is broken
+## Issue 1: Prompt files use `${CLAUDE_PLUGIN_ROOT}` which the agent delegates to Bash instead of resolving
 
-**Finding:** `CLAUDE_PLUGIN_ROOT` is a **config-time variable only**. Claude Code expands it via string interpolation in JSON configs (hooks.json, .mcp.json) before passing commands to Bash. It is **never** set as an environment variable in Bash tool sessions.
+**How `CLAUDE_PLUGIN_ROOT` works (per Claude Code docs):**
+- Claude Code expands `${CLAUDE_PLUGIN_ROOT}` via string interpolation in JSON configs (hooks.json, .mcp.json)
+- It is also set as an environment variable for hook and MCP server subprocesses
+- It is **not** set as an environment variable in Bash tool sessions (agent-initiated commands)
 
-**Key discovery (tested):** The agent CAN resolve the plugin root path from Claude Code's context when running inside a plugin prompt (skill/command/agent). The problem is that `${CLAUDE_PLUGIN_ROOT}` in markdown looks like a Bash variable, so the agent passes it through to Bash literally instead of substituting the value it already knows. The agent then has to self-recover after the Bash call fails.
+**Hooks and shell scripts are fine.** Per the docs, `CLAUDE_PLUGIN_ROOT` is available "in hooks, MCP servers, and scripts." Claude Code sets it as an env var for hook subprocesses, so `hook-runner.sh` and `system-run.sh` (when invoked from hooks) can use `${CLAUDE_PLUGIN_ROOT}` internally without issues.
 
-**Impact on hooks:** Claude Code expands `${CLAUDE_PLUGIN_ROOT}/hooks/hook-runner.sh` in hooks.json → the script IS found and executed. But inside `hook-runner.sh`, it references `${CLAUDE_PLUGIN_ROOT}` again (`exec node ... "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js"`). At that point it's a Bash env var lookup and the variable is empty. **Hooks are likely broken too.** (No agent is involved in hook execution to self-recover.)
+**Key discovery (tested):** The agent CAN resolve the plugin root path from Claude Code's context when running inside a plugin prompt (skill/command/agent). However, when prompt files use `${CLAUDE_PLUGIN_ROOT}` in bash command examples, the agent treats it as a Bash variable and passes it through literally to the Bash tool. Since the env var is not set in Bash tool sessions, the command fails. The agent then self-recovers by discovering the correct path and retrying (wastes tool calls, not guaranteed to work).
 
-**Impact on prompt files:** 50+ skill/command/agent `.md` files instruct the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action>`. The agent treats this as a Bash variable reference and passes it through. Bash doesn't have it → failure → agent self-recovers (wastes tool calls, not guaranteed).
+**The problem is purely about notation in prompt files.** 50+ skill/command/agent `.md` files instruct the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action>`. The `${...}` syntax causes the agent to delegate resolution to Bash instead of substituting the value it already knows.
 
-**Two-part fix needed:**
-
-1. **Shell scripts** (`system-run.sh`, `hook-runner.sh`): Self-locate by deriving plugin root from their own filesystem path. This fixes hooks (where Claude Code finds the script via JSON expansion, but the script itself needs the path internally — and there's no agent to self-recover).
-
-2. **Prompt files**: Change the notation so the agent substitutes the value itself instead of delegating to Bash. The `${CLAUDE_PLUGIN_ROOT}` syntax must be replaced with something the agent recognizes as "substitute this with the plugin root path I know from context" rather than "pass this Bash variable through." Update `system-cli-standards` with the new canonical pattern and update all 50+ prompt files.
+**Fix:** Change the notation in prompt files so the agent substitutes the value itself instead of delegating to Bash. Replace the `${CLAUDE_PLUGIN_ROOT}` syntax with something the agent recognizes as "substitute this with the plugin root path I know from context" rather than "pass this Bash variable through." Update `system-cli-standards` with the new canonical invocation pattern and update all 50+ prompt files.
 
 ## Issue 2: Prompt files reference CLI commands that don't exist
 
