@@ -30,6 +30,7 @@
 
 ### High Priority
 
+- [#140](1-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](1-inbox/137/): Split system CLI commands into internal and public categories
 - [#131](1-inbox/131/): Add Ralph Wiggum mode for task implementation
 - [#130](1-inbox/130/): Add created_by_plugin_version to sdd-settings components
