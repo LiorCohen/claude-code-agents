@@ -18,6 +18,7 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/commands/sdd-change.md` | Remove Step 5 (On-Demand Scaffolding) from interactive flow, renumber steps |
 | `plugin/skills/planning/SKILL.md` | Add scaffolding as an explicit plan phase when new components are identified |
 | `plugin/skills/change-creation/templates/spec-feature.md` | Enhance Components section to include component settings from discovery |
+| `plugin/skills/change-creation/templates/spec-refactor.md` | Add Components section (refactors can introduce new components) |
 | `plugin/skills/spec-solicitation/resources/spec-sections.md` | Enhance Components section documentation to include settings |
 | `plugin/skills/scaffolding/SKILL.md` | Add no-op rule, remove Component Presets section (bundles) |
 | `plugin/skills/component-discovery/SKILL.md` | Fix "project type" reference, add note about settings flowing into SPEC.md |
@@ -99,7 +100,9 @@ In `plugin/skills/change-creation/templates/spec-feature.md`, update the `## Com
 
 The Settings column captures the discovery output so the plan (and scaffolding phase) know exactly what to scaffold.
 
-**Only the feature template needs this change.** Bugfix/refactor templates don't have a Components section because they modify existing components. Epic templates decompose into features, each with its own spec.
+**Also add this Components section to `plugin/skills/change-creation/templates/spec-refactor.md`** — insert it before `## Transformation Plan` (line 80). Refactors can introduce new components (e.g., "add helm deployment for existing server", "split monolith into API + worker", "extract shared types into a contract").
+
+Bugfix templates don't need a Components section — a bugfix that requires a new component is really a feature. Epic templates decompose into features, each with its own spec.
 
 ### 4. Update spec-sections documentation
 
@@ -274,6 +277,7 @@ Changes 1-8 are prompt-only (.md files). Change 9 modifies TypeScript (reconcile
 - [ ] `planning/SKILL.md` template includes Phase 1: Component Scaffolding with `devops` agent and explicit `Standards:` field
 - [ ] `planning/SKILL.md` line count stays under 500
 - [ ] `spec-feature.md` Components section has Settings column in New Components table
+- [ ] `spec-refactor.md` has a Components section with the same structure
 - [ ] `scaffolding/SKILL.md` documents no-op rule and implementation-phase-only usage
 - [ ] `scaffolding/SKILL.md` no longer has a "Component Presets" section
 - [ ] `component-discovery/SKILL.md` and `output.schema.json` have no `project_type` references
