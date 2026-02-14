@@ -25,6 +25,7 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/skills/component-discovery/schemas/output.schema.json` | Remove non-existent `project_type` field |
 | `plugin/skills/spec-solicitation/resources/solicitation-steps.md` | Update Step 9 to populate Settings column when writing Components section |
 | `plugin/agents/devops.md` | Add `scaffolding` to skills frontmatter |
+| `plugin/skills/project-scaffolding/SKILL.md` | Fix incorrect claim that `/sdd-change new` creates structure on-demand |
 | `plugin/system/src/settings/reconcile.ts` | Remove dead `project.type` deprecation handler |
 | `tests/src/tests/unit/settings/settings-reconcile.test.ts` | Remove `project.type` removal test |
 
@@ -58,7 +59,7 @@ No changes needed to the external spec flow — it already defers scaffolding co
 
 In `plugin/skills/planning/SKILL.md` (currently 479 lines — budget is tight, stay under 500):
 
-**Generation Algorithm update:** Add a step before the existing dependency ordering (line 129). When SPEC.md `## Components` lists new components not yet in `sdd-settings.yaml`, prepend a "Phase 1: Component Scaffolding" phase and shift subsequent phases. When no new components exist, omit it. Integrate this into the existing algorithm rather than adding a separate section.
+**Generation Algorithm update:** Add a step before the existing dependency ordering (line 129). When SPEC.md `## Components` lists new components not yet in `sdd-settings.yaml`, prepend a "Phase 1: Component Scaffolding" phase and shift subsequent phases. When no new components exist, omit it. Integrate this into the existing algorithm rather than adding a separate section. This applies to all change types (feature, refactor) — any spec with new components gets a scaffolding phase.
 
 **Plan template update:** Add the scaffolding phase to the feature template (between "Phases" heading and "Phase 1: API Contract"):
 
@@ -212,7 +213,21 @@ skills:
 
 The `scaffolding` skill is the orchestrator that coordinates component-specific scaffolding skills (backend-scaffolding, frontend-scaffolding, etc.) — the agent only needs the orchestrator, not each individual one.
 
-### 9. Remove dead project.type deprecation handler
+### 9. Fix project-scaffolding claim about on-demand creation
+
+In `plugin/skills/project-scaffolding/SKILL.md`, line 15 says:
+
+```
+Creates only the essential structure needed to start. Additional structure is created on-demand by `/sdd-change new`.
+```
+
+Change to:
+
+```
+Creates only the essential structure needed to start. Additional components are scaffolded during implementation when the plan includes a scaffolding phase.
+```
+
+### 10. Remove dead project.type deprecation handler
 
 In `plugin/system/src/settings/reconcile.ts`, remove lines 209-217 — the `project.type` deprecation handler in the `deprecatedProjectChanges` array. This code strips `project.type` from old settings files, but the field was never consumed and is now fully removed from the system. The `project.domain` handler (lines 200-207) stays — it's a separate deprecation.
 
