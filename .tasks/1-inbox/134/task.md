@@ -14,18 +14,17 @@ Three systemic issues discovered when running `/sdd-init` on a new blank project
 
 **Finding:** `CLAUDE_PLUGIN_ROOT` is a **config-time variable only**. Claude Code expands it via string interpolation in JSON configs (hooks.json, .mcp.json) before passing commands to Bash. It is **never** set as an environment variable in Bash tool sessions.
 
-**Impact on hooks:** Claude Code expands `${CLAUDE_PLUGIN_ROOT}/hooks/hook-runner.sh` in hooks.json → the script IS found. But inside `hook-runner.sh`, it references `${CLAUDE_PLUGIN_ROOT}` again internally (`exec node ... "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js"`). At that point it's a Bash env var lookup and the variable is empty. **Hooks are likely broken too.**
+**Key discovery (tested):** The agent CAN resolve the plugin root path from Claude Code's context when running inside a plugin prompt (skill/command/agent). The problem is that `${CLAUDE_PLUGIN_ROOT}` in markdown looks like a Bash variable, so the agent passes it through to Bash literally instead of substituting the value it already knows. The agent then has to self-recover after the Bash call fails.
 
-**Impact on prompt files:** 50+ skill/command/agent `.md` files instruct the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action>`. The agent constructs this as a Bash command. The variable is empty. The agent must self-recover by discovering the path (wastes tool calls, not guaranteed to work).
+**Impact on hooks:** Claude Code expands `${CLAUDE_PLUGIN_ROOT}/hooks/hook-runner.sh` in hooks.json → the script IS found and executed. But inside `hook-runner.sh`, it references `${CLAUDE_PLUGIN_ROOT}` again (`exec node ... "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js"`). At that point it's a Bash env var lookup and the variable is empty. **Hooks are likely broken too.** (No agent is involved in hook execution to self-recover.)
+
+**Impact on prompt files:** 50+ skill/command/agent `.md` files instruct the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action>`. The agent treats this as a Bash variable reference and passes it through. Bash doesn't have it → failure → agent self-recovers (wastes tool calls, not guaranteed).
 
 **Two-part fix needed:**
 
-1. **Shell scripts** (`system-run.sh`, `hook-runner.sh`): Self-locate by deriving plugin root from their own filesystem path. This fixes hooks (where Claude Code finds the script via JSON expansion, but the script itself needs the path internally).
+1. **Shell scripts** (`system-run.sh`, `hook-runner.sh`): Self-locate by deriving plugin root from their own filesystem path. This fixes hooks (where Claude Code finds the script via JSON expansion, but the script itself needs the path internally — and there's no agent to self-recover).
 
-2. **Prompt files**: The canonical invocation pattern in `system-cli-standards` (`"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"`) must be replaced with a mechanism that works without the env var. All 50+ prompt files must be updated to use the new pattern. Options to evaluate during planning:
-   - Discovery one-liner (search `~/.claude/plugins/` for system-run.sh)
-   - Store plugin root in project-local file (e.g., `.sdd/.plugin-root`) during init
-   - Other mechanism TBD
+2. **Prompt files**: Change the notation so the agent substitutes the value itself instead of delegating to Bash. The `${CLAUDE_PLUGIN_ROOT}` syntax must be replaced with something the agent recognizes as "substitute this with the plugin root path I know from context" rather than "pass this Bash variable through." Update `system-cli-standards` with the new canonical pattern and update all 50+ prompt files.
 
 ## Issue 2: Prompt files reference CLI commands that don't exist
 
