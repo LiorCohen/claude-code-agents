@@ -203,7 +203,9 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 ### Step 7: Review and Confirm
 
-Present to the user:
+**Task-only commits (all changed files are under `.tasks/`):** Skip confirmation — proceed directly to Step 8.
+
+**All other commits:** Present to the user:
 - Summary of files to be committed
 - Proposed commit message
 - Version changes (if any)
@@ -213,7 +215,7 @@ Present to the user:
 
 ### Step 8: Execute Commit
 
-After confirmation:
+After confirmation (or immediately for task-only commits):
 1. Stage all related files (code + version files + CHANGELOG)
 2. Create the commit with the generated message
 3. Display commit result
@@ -292,7 +294,7 @@ Agent: ✓ Committed: abc1234 "Fix backend-dev agent: Improve error handling, bu
 Plugin TS changed? → Typecheck → Bump version → CHANGELOG → Check docs → Stage all → Commit
 Plugin non-TS changed? → Bump version → CHANGELOG → Check docs → Stage all → Commit
 Infrastructure file changed? → CHANGELOG → Stage all → Commit
-Task-related work? → Use tasks skill for status updates → Stage all → Commit
+Task-only changes? → Stage all → Commit (no confirmation needed)
 ```
 
 ## Common Mistakes to Avoid
