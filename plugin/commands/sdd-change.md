@@ -180,15 +180,7 @@ INVOKE component-discovery skill with:
   existing_components: <from sdd-settings.yaml>
 ```
 
-#### Step 5: On-Demand Component Scaffolding
-
-For each recommended component:
-1. Check if `components/{type}/` exists
-2. If missing, trigger scaffolding via the component's scaffolding skill
-
-Each component scaffolding skill handles updating the root `package.json` (see "Root Package.json Update" in each skill).
-
-#### Step 6: Create Workflow Item
+#### Step 5: Create Workflow Item
 
 ```yaml
 INVOKE workflow-state.create_item with:
@@ -199,17 +191,17 @@ INVOKE workflow-state.create_item with:
   depends_on: []
 ```
 
-#### Step 7: Spec Solicitation
+#### Step 6: Spec Solicitation
 
 ```yaml
 INVOKE spec-solicitation skill with:
-  change_id: <from step 6>
+  change_id: <from step 5>
   workflow_id: <from step 3>
 ```
 
 The skill guides user through requirements gathering and creates SPEC.md.
 
-#### Step 8: Move to Review
+#### Step 7: Move to Review
 
 When spec is complete:
 ```yaml
@@ -219,7 +211,7 @@ INVOKE workflow-state.ready_for_review with:
 
 This moves the item from drafts to changes/ and sets status to `spec_review`.
 
-#### Step 9: Display Next Steps
+#### Step 8: Display Next Steps
 
 ```
 ===============================================================

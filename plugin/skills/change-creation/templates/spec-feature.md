@@ -274,19 +274,19 @@ specs/
 
 ## Components
 
-> What components are created or modified.
+> Components identified during discovery. New components will be scaffolded during implementation.
 
 ### New Components
 
-| Component | Type | Purpose |
-|-----------|------|---------|
-| AuthService | service | Handles authentication logic |
+| Component | Type | Settings | Purpose |
+|-----------|------|----------|---------|
+| main-server | server | server_type: api, databases: [app-db] | API backend |
 
 ### Modified Components
 
 | Component | Changes |
 |-----------|---------|
-| UserService | Add session management methods |
+| web-app | Add new routes for feature |
 
 ## System Analysis
 

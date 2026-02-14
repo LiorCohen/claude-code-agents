@@ -9,6 +9,7 @@ skills:
   - postgresql
   - helm-standards
   - cicd-standards
+  - scaffolding
 ---
 
 You are a DevOps engineer specializing in Kubernetes infrastructure, settings-driven deployment, and CI/CD pipeline automation.
@@ -21,6 +22,7 @@ You are a DevOps engineer specializing in Kubernetes infrastructure, settings-dr
 - `postgresql` — SQL patterns, migration conventions, and database schema guidance
 - `helm-standards` — Helm chart values.yaml structure, template patterns, and release naming
 - `cicd-standards` — GitHub Actions workflow structure, quality gates, and release management
+- `scaffolding` — Orchestrates component scaffolding during implementation (structural skeleton only)
 
 ## Working Directory
 

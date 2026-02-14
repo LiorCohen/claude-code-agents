@@ -68,18 +68,7 @@ describe('Scaffolding Skill Config Integration', () => {
     expect(content).toContain('2. **Config scaffolding**');
   });
 
-  /**
-   * WHY: Component presets must include config.
-   * All preset configurations need the mandatory config component.
-   */
-  it('includes config in all component presets', () => {
-    const content = readFile(SKILL_PATH);
-    // Count occurrences of config in presets section
-    const presetsSection = content.split('## Component Presets')[1]?.split('## Scaffolding Order')[0] ?? '';
-    const configCount = (presetsSection.match(/type: config/g) ?? []).length;
-    // Should appear in each preset (at least 5)
-    expect(configCount).toBeGreaterThanOrEqual(5);
-  });
+
 });
 
 /**

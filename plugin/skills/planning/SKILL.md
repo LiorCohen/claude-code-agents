@@ -128,7 +128,8 @@ If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, t
 
 1. **Read required components** from SPEC.md `## Components` section
 2. **Reference existing components** from `.sdd/sdd-settings.yaml` for details
-3. **Order by dependency graph:**
+3. **Check for new components:** If SPEC.md `## Components` lists new components not yet in `sdd-settings.yaml`, prepend a "Phase 1: Component Scaffolding" phase and shift subsequent phase numbers. If all components already exist, omit the scaffolding phase. This applies to all change types (feature, refactor).
+4. **Order by dependency graph:**
    ```text
    config ──────┐
                 │
@@ -137,7 +138,7 @@ If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, t
                 │           ↓
                 └───────→ webapp
    ```
-4. **Assign agents and standards** based on component + change nature:
+5. **Assign agents and standards** based on component + change nature:
 
 | Component | Primary Agent | Standards | Notes |
 |-----------|---------------|-----------|-------|
@@ -147,7 +148,7 @@ If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, t
 | helm | devops | `helm-standards`, `cicd-standards` | Deployment and infrastructure |
 | config | contextual | Depends on agent assigned | backend-dev, frontend-dev, or devops based on what config affects |
 
-5. **Add final phases:**
+6. **Add final phases:**
    - `tester` for integration/E2E testing
    - `reviewer` (+ `db-advisor` if DB changes)
 
@@ -242,7 +243,18 @@ sdd_version: [X.Y.Z]
 <!-- Phases are generated dynamically based on affected components -->
 <!-- Domain updates are executed from SPEC.md before code phases -->
 
-### Phase 1: API Contract
+<!-- INCLUDE Phase 1 ONLY if SPEC.md lists new components not in sdd-settings.yaml. OMIT entirely if all components already exist. -->
+### Phase 1: Component Scaffolding (if new components)
+**Agent:** `devops`
+**Standards:** `scaffolding`, component-specific scaffolding skills (e.g., `backend-scaffolding`, `frontend-scaffolding`)
+
+**Outcome:** New component directories and boilerplate created, `sdd-settings.yaml` updated
+
+**Deliverables:**
+- Component directories scaffolded per SPEC.md Components section
+- sdd-settings.yaml updated with new component entries
+
+### Phase 2: API Contract
 **Agent:** `api-designer`
 **Component:** contract
 **Standards:** `typescript-standards`, `contract-standards`
@@ -253,7 +265,7 @@ sdd_version: [X.Y.Z]
 - Updated OpenAPI spec with Spectral validation passing
 - Generated TypeScript types
 
-### Phase 2: Backend Implementation
+### Phase 3: Backend Implementation
 **Agent:** `backend-dev`
 **Component:** server
 **Standards:** `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing`
@@ -264,7 +276,7 @@ sdd_version: [X.Y.Z]
 - Working API endpoints
 - Unit tests passing
 
-### Phase 3: Frontend Implementation
+### Phase 4: Frontend Implementation
 **Agent:** `frontend-dev`
 **Component:** webapp
 **Standards:** `typescript-standards`, `frontend-standards`, `unit-testing`
@@ -275,7 +287,7 @@ sdd_version: [X.Y.Z]
 - Working UI
 - Unit tests passing
 
-### Phase 4: Integration & E2E Testing
+### Phase 5: Integration & E2E Testing
 **Agent:** `tester`
 **Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
 
@@ -284,7 +296,7 @@ sdd_version: [X.Y.Z]
 **Deliverables:**
 - Test suites passing
 
-### Phase 5: Review
+### Phase 6: Review
 **Agent:** `reviewer`, `db-advisor` (if DB changes)
 **Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
 

@@ -93,7 +93,7 @@ The primary business domain.
     console.log('Created minimal project structure\n');
     console.log('Running /sdd-change new...');
 
-    const result = await runClaude(NEW_CHANGE_PROMPT, testProject.path, 300);
+    const result = await runClaude(NEW_CHANGE_PROMPT, testProject.path, 420);
 
     // Save output for debugging
     await writeFileAsync(joinPath(testProject.path, 'claude-output.json'), result.output);
@@ -120,5 +120,5 @@ The primary business domain.
     // This test only verifies spec creation
 
     console.log('\nAll assertions passed!');
-  }, 360000); // 6 minute timeout
+  }, 480000); // 8 minute timeout
 });

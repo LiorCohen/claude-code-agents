@@ -1,19 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Component Discovery Output",
-  "description": "Output from component discovery, including detected project type and discovered components.",
+  "description": "Output from component discovery, including discovered components.",
   "type": "object",
   "properties": {
-    "project_type": {
-      "type": "string",
-      "enum": [
-        "fullstack",
-        "backend",
-        "frontend",
-        "custom"
-      ],
-      "description": "Detected project type based on analysis"
-    },
     "components": {
       "type": "array",
       "description": "Discovered components with their configurations",
@@ -45,7 +35,6 @@
     }
   },
   "required": [
-    "project_type",
     "components"
   ]
 }

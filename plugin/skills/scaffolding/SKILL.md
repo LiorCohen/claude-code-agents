@@ -24,7 +24,11 @@ This skill coordinates multiple component scaffolding skills:
 
 ## When to Use
 
-Use this skill when you need to create the SDD project structure after the user has approved the project configuration.
+Scaffolding runs during the **implementation phase only** — never during `sdd-change new`. The plan determines when scaffolding is needed (as "Phase 1: Component Scaffolding" when new components are identified in SPEC.md).
+
+### No-Op Rule
+
+Scaffolding is a **no-op for existing components**. If `components/{type-plural}/{name}/` already exists, skip it entirely. Never overwrite user code. The plan must distinguish "scaffold new component" from "modify existing component."
 
 ## Input
 
@@ -188,79 +192,6 @@ components:
 | `helm` | `helm-scaffolding` | Yes |
 | `testing` | (inline) | Yes |
 | `cicd` | (inline) | Yes |
-
-## Component Presets
-
-**Full-Stack Application (default):**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: task-api}
-- {type: server, name: task-service}
-- {type: webapp, name: task-dashboard}
-- {type: database, name: task-db}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Backend API Only:**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: task-api}
-- {type: server, name: task-service}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Frontend Only:**
-```yaml
-- {type: config, name: config}
-- {type: webapp, name: task-dashboard}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Multi-Backend:**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: order-api}
-- {type: server, name: order-service}
-- {type: server, name: notification-worker}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Multi-Frontend:**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: storefront-api}
-- {type: server, name: storefront-service}
-- {type: webapp, name: admin-portal}
-- {type: webapp, name: customer-app}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Backend with Database:**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: inventory-api}
-- {type: server, name: inventory-service}
-- {type: database, name: inventory-db}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
-
-**Full-Stack with Helm Deployment:**
-```yaml
-- {type: config, name: config}
-- {type: contract, name: task-api}
-- {type: server, name: task-service}
-- {type: webapp, name: task-dashboard}
-- {type: database, name: task-db}
-- {type: helm, name: task-service}
-- {type: testing, name: testing}
-- {type: cicd, name: cicd}
-```
 
 ## Scaffolding Order
 

@@ -77,6 +77,20 @@
 [code snippet]
 ```
 
+## Components
+
+> Components identified during discovery. New components will be scaffolded during implementation.
+
+### New Components
+
+| Component | Type | Settings | Purpose |
+|-----------|------|----------|---------|
+
+### Modified Components
+
+| Component | Changes |
+|-----------|---------|
+
 ## Transformation Plan
 
 ### Step-by-Step Changes

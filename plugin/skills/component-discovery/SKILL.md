@@ -108,7 +108,9 @@ requirements than from text descriptions alone.
 
 Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
 
-Returns detected project type and a list of components with names, types, and settings.
+Returns a list of components with names, types, and settings.
+
+Component settings from this output (server_type, databases, provides_contracts, etc.) flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
 
 ## Skills
 
@@ -214,7 +216,6 @@ Return the final configuration with all settings.
 ### Example 1: Standard Full-Stack
 
 ```yaml
-project_type: "fullstack"
 components:
   - name: config
     type: config
@@ -260,7 +261,6 @@ components:
 ### Example 2: Microservices with Hybrid Server
 
 ```yaml
-project_type: "custom"
 components:
   - name: config
     type: config

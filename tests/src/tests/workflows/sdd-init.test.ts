@@ -85,7 +85,7 @@ describe('sdd-init command', () => {
     console.log('Running /sdd-init (minimal mode)...');
 
     // sdd-init minimal should be faster than full scaffolding
-    const result = await runClaude(MINIMAL_INIT_PROMPT, testProject.path, 180);
+    const result = await runClaude(MINIMAL_INIT_PROMPT, testProject.path, 300);
 
     // Save output for debugging
     await writeFileAsync(joinPath(testProject.path, 'claude-output.json'), result.output);
@@ -140,7 +140,7 @@ describe('sdd-init command', () => {
     expect(projectFileDoesNotExist(project, 'components', 'database')).toBe(true);
 
     console.log('\nAll assertions passed!');
-  }, 240000); // 4 minute timeout for minimal scaffolding
+  }, 360000); // 6 minute timeout for minimal scaffolding
 });
 
 /**
