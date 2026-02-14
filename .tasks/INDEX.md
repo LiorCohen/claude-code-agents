@@ -63,7 +63,6 @@
 
 ### Unprioritized
 
-- [#139](1-inbox/139/): Remove component bundles — always ask users to pick components explicitly
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
@@ -165,6 +164,7 @@
 
 ## Consolidated
 
+- [#139](8-consolidated/139/) → #138
 - [#79](8-consolidated/79/) → #138
 - [#111](8-consolidated/111/) → #114
 - [#108](8-consolidated/108/) → #120

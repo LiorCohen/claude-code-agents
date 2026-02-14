@@ -1,7 +1,8 @@
 ---
 id: 139
 title: Remove component bundles — always ask users to pick components explicitly
-status: inbox
+status: consolidated
+consolidated_into: 138
 created: 2026-02-14 16:00 UTC
 depends_on: []
 blocks: []

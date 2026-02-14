@@ -19,7 +19,7 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/skills/planning/SKILL.md` | Add scaffolding as an explicit plan phase when new components are identified |
 | `plugin/skills/change-creation/templates/spec-feature.md` | Enhance Components section to include component settings from discovery |
 | `plugin/skills/spec-solicitation/resources/spec-sections.md` | Enhance Components section documentation to include settings |
-| `plugin/skills/scaffolding/SKILL.md` | Add no-op rule for existing components, document implementation-phase usage |
+| `plugin/skills/scaffolding/SKILL.md` | Add no-op rule, remove Component Presets section (bundles) |
 | `plugin/skills/component-discovery/SKILL.md` | Fix "project type" reference, add note about settings flowing into SPEC.md |
 | `plugin/skills/component-discovery/schemas/output.schema.json` | Remove non-existent `project_type` field |
 | `plugin/skills/spec-solicitation/resources/solicitation-steps.md` | Update Step 9 to populate Settings column when writing Components section |
@@ -120,13 +120,17 @@ To:
 
 The only difference is adding Settings to the New Components table columns and the scaffolding note.
 
-### 5. Add no-op rule to scaffolding skill
+### 5. Update scaffolding skill — no-op rule and remove presets
 
-In `plugin/skills/scaffolding/SKILL.md`, add a section documenting:
+In `plugin/skills/scaffolding/SKILL.md`, two changes:
+
+**Add a section** documenting:
 - Scaffolding runs during implementation phase only — never during `sdd-change new`
 - Scaffolding is a no-op for existing components (if `components/{type-plural}/{name}/` already exists, skip entirely)
 - Never overwrite user code
 - The plan must distinguish "scaffold new component" from "modify existing component"
+
+**Remove the "Component Presets" section** (lines 192-250). These predefined bundles (Full-Stack Application, Backend API Only, Frontend Only, Multi-Backend, Multi-Frontend, Backend with Database) are no longer used — component discovery always asks users to pick components explicitly. Delete the entire `## Component Presets` section and its six preset blocks.
 
 ### 6. Minor update to component-discovery skill
 

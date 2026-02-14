@@ -43,6 +43,10 @@ This applies to **both** the interactive and external spec paths. The principle 
 - **Scaffolding is just another implementation phase** — the spec lists required components, the plan includes scaffolding as a phase like any other (e.g., "scaffold backend component", "set up database migrations"). Implementation executes the plan phases in order. Not every plan needs scaffolding.
 - **Fix parallel write conflicts on `sdd-settings.yaml`** — the race condition goes away naturally since scaffolding moves to sequential implementation, but settings writes should be serialized regardless.
 
+## Consolidated From
+
+- **#139**: Remove component bundles — always ask users to pick components explicitly. The `project_type` field in component-discovery output (fullstack, backend, frontend, custom) and the "Component Presets" section in scaffolding/SKILL.md are the bundle concept. Both are removed as part of the `project_type` cleanup in this task.
+
 ## Acceptance Criteria
 
 - [ ] `sdd-change new` never creates component directories, files, or modifies `sdd-settings.yaml` (both interactive and external spec flows)
