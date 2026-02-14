@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#134](5-reviewing/134/plan.md): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
+(none)
 
 ---
 
@@ -88,6 +88,7 @@
 
 ## Complete
 
+- [#134](6-complete/134/): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition ✓ (2026-02-14)
 - [#136](6-complete/136/): Remove version bump command from system CLI ✓ (2026-02-14)
 - [#132](6-complete/132/): Fix critic skill: use datetime-based filenames for .temp output ✓ (2026-02-13)
 - [#107](6-complete/107/): Revisit frontend scaffold — add Radix/Shadcn, align with documented stack ✓ (2026-02-13)
