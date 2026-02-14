@@ -1,43 +1,39 @@
 ---
 id: 134
-title: "Fix CLI invocation resilience: env var fallback, command reference validation, and permissions configure precondition"
+title: "Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition"
 status: inbox
 priority: null
 created: 2026-02-14 12:00 UTC
 ---
 
-# Fix CLI Invocation Resilience
+# Fix CLI Invocation
 
 Three systemic issues discovered when running `/sdd-init` on a new blank project. Each is a symptom of a broader problem affecting the entire plugin, not just sdd-init.
 
-## Issue 1: CLAUDE_PLUGIN_ROOT not available in Bash tool sessions
+## Issue 1: CLAUDE_PLUGIN_ROOT is not a runtime env var — the canonical invocation pattern is broken
 
-`system-run.sh` and `hook-runner.sh` use `${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js`, but the env var may not be set in Bash tool sessions. When unset, the path resolves to `/system/dist/cli.js` (absolute root path).
+**Finding:** `CLAUDE_PLUGIN_ROOT` is a **config-time variable only**. Claude Code expands it via string interpolation in JSON configs (hooks.json, .mcp.json) before passing commands to Bash. It is **never** set as an environment variable in Bash tool sessions.
 
-**Scope:** This affects every CLI invocation across every skill, command, and agent — not just sdd-init. There are 50+ prompt files that tell the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"`.
+**Impact on hooks:** Claude Code expands `${CLAUDE_PLUGIN_ROOT}/hooks/hook-runner.sh` in hooks.json → the script IS found. But inside `hook-runner.sh`, it references `${CLAUDE_PLUGIN_ROOT}` again internally (`exec node ... "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js"`). At that point it's a Bash env var lookup and the variable is empty. **Hooks are likely broken too.**
 
-**Two layers of exposure:**
+**Impact on prompt files:** 50+ skill/command/agent `.md` files instruct the agent to run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action>`. The agent constructs this as a Bash command. The variable is empty. The agent must self-recover by discovering the path (wastes tool calls, not guaranteed to work).
 
-| Layer | Where | Expanded by | Status |
-|-------|-------|-------------|--------|
-| JSON configs | `hooks.json`, `.mcp.json` | Claude Code (string interpolation) | Likely works |
-| Shell scripts | `system-run.sh`, `hook-runner.sh` | Bash (env var) | Unknown / possibly broken |
-| Prompt files | 50+ `.md` files | Agent constructs bash command | Broken when env var not set |
+**Two-part fix needed:**
 
-**Fix:** Make `system-run.sh` and `hook-runner.sh` self-locating — derive plugin root from their own filesystem path as fallback. Since `system-run.sh` lives at `<plugin-root>/system/system-run.sh`, it can always resolve its own root:
+1. **Shell scripts** (`system-run.sh`, `hook-runner.sh`): Self-locate by deriving plugin root from their own filesystem path. This fixes hooks (where Claude Code finds the script via JSON expansion, but the script itself needs the path internally).
 
-```bash
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(dirname "$SCRIPT_DIR")}"
-```
+2. **Prompt files**: The canonical invocation pattern in `system-cli-standards` (`"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"`) must be replaced with a mechanism that works without the env var. All 50+ prompt files must be updated to use the new pattern. Options to evaluate during planning:
+   - Discovery one-liner (search `~/.claude/plugins/` for system-run.sh)
+   - Store plugin root in project-local file (e.g., `.sdd/.plugin-root`) during init
+   - Other mechanism TBD
 
 ## Issue 2: Prompt files reference CLI commands that don't exist
 
 sdd-init Phase 3.6 references `permissions check --json`, but this subcommand was never implemented. The CLI only supports `permissions configure`.
 
-**Scope:** This is a wider problem — there is no validation that prompt files (skills, agents, commands) reference CLI commands that actually exist. Any `.md` file can reference `system-run.sh foo bar` and nothing catches it until runtime.
+**Scope:** There is no validation that prompt files reference CLI commands that actually exist. Any `.md` file can reference `system-run.sh foo bar` and nothing catches it until runtime.
 
-**Fix:** Add a rule to `system-cli-standards` that all CLI invocations in prompt files must reference commands that actually exist. Add a test or audit mechanism to enforce this — parse all `.md` files for `system-run.sh <namespace> <action>` patterns and validate against the CLI's actual command registry.
+**Fix:** Add a rule to `system-cli-standards` requiring all CLI invocations in prompt files to reference commands that actually exist. Add a test or audit mechanism to enforce — parse all `.md` files for `system-run.sh <namespace> <action>` patterns and validate against the CLI's actual command registry.
 
 ## Issue 3: `permissions configure` requires existing SDD project
 

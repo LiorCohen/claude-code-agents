@@ -62,7 +62,7 @@
 
 ### Unprioritized
 
-- [#134](1-inbox/134/): Fix CLI invocation resilience: env var fallback, command reference validation, and permissions configure precondition
+- [#134](1-inbox/134/): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
