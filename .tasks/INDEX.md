@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#134](4-implementing/134/plan.md): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#134](5-reviewing/134/plan.md): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
 
 ---
 

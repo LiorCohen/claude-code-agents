@@ -1,7 +1,7 @@
 ---
 id: 134
 title: "Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition"
-status: implementing
+status: reviewing
 priority: null
 created: 2026-02-14 12:00 UTC
 ---
