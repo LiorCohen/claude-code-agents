@@ -44,7 +44,6 @@
 - [#129](1-inbox/129/): Frontend workflow guidelines — step-by-step recipes for common coding tasks
 - [#119](1-inbox/119/): Add session hook with blurb and plugin update check
 - [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
-- [#79](1-inbox/79/): Use project-name-derived component names in on-demand scaffolding
 - [#71](1-inbox/71/): Anti-stop hook to prevent accidental session termination
 - [#70](1-inbox/70/): Git checkpoint workflow for AI-assisted development
 - [#66](1-inbox/66/): Single context-aware SDD command
@@ -166,6 +165,7 @@
 
 ## Consolidated
 
+- [#79](8-consolidated/79/) → #138
 - [#111](8-consolidated/111/) → #114
 - [#108](8-consolidated/108/) → #120
 - [#101](8-consolidated/101/) → #100
