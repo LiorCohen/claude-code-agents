@@ -1,6 +1,6 @@
 export type { ComponentEntry, ScaffoldingConfig, ScaffoldingResult, DomainConfig, UserPersona, PopulationResult } from './component';
 
-export type { VersionInfo, PluginJson, MarketplaceJson, MarketplacePlugin, HookInput, HookToolInput, PreToolUseHookOutput, PostToolUseHookOutput } from './config';
+export type { PluginJson, HookInput, HookToolInput, PreToolUseHookOutput, PostToolUseHookOutput } from './config';
 
 // settings: types
 export type { ServerMode, ServerType, ServerSettings, WebappSettings, HelmAssets, HelmServerSettings, HelmWebappSettings, HelmSettings, DatabaseProvider, DatabaseSettings, ContractVisibility, ContractSettings, ConfigSettings, TestingSettings, CicdSettings, LogLevel, LoggingSettings, SystemSettings, ComponentType, ComponentSettingsMap, ComponentSettings, ComponentBase, ServerComponent, WebappComponent, HelmComponent, DatabaseComponent, ContractComponent, ConfigComponent, TestingComponent, CicdComponent, Component, SddMetadata, ProjectMetadata, SettingsFile } from './settings';

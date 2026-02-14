@@ -2,25 +2,9 @@
  * Type definitions for configuration files.
  */
 
-export type VersionInfo = {
-  readonly major: number;
-  readonly minor: number;
-  readonly patch: number;
-}
-
 export type PluginJson = {
   readonly version: string;
   readonly name?: string;
-  readonly description?: string;
-}
-
-export type MarketplaceJson = {
-  readonly plugins: readonly MarketplacePlugin[];
-}
-
-export type MarketplacePlugin = {
-  readonly name: string;
-  readonly version: string;
   readonly description?: string;
 }
 

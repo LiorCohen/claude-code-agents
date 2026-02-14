@@ -30,16 +30,6 @@ sdd-system spec index --changes-dir changes/ # Generate changes/INDEX.md
 sdd-system spec snapshot --specs-dir specs/ # Generate SNAPSHOT.md
 ```
 
-### version
-
-Version management.
-
-```bash
-sdd-system version bump patch   # Bump patch version
-sdd-system version bump minor   # Bump minor version
-sdd-system version bump major   # Bump major version
-```
-
 ### database
 
 Database component operations (for scaffolded database components).
