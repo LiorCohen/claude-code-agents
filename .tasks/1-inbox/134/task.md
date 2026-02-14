@@ -27,7 +27,7 @@ Three systemic issues discovered when running `/sdd-init` on a new blank project
 
 1. **Shell scripts** (`system-run.sh`, `hook-runner.sh`): Self-locate by deriving plugin root from their own filesystem path. Don't rely on caller-provided env vars — the script knows where it lives and can derive the plugin root from that.
 
-2. **Prompt files**: Change the notation so the agent substitutes the value itself instead of delegating to Bash. Replace the `${CLAUDE_PLUGIN_ROOT}` syntax with something the agent recognizes as "substitute this with the plugin root path I know from context" rather than "pass this Bash variable through." Update `system-cli-standards` with the new canonical invocation pattern and update all 50+ prompt files.
+2. **Prompt files**: Replace `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"` with `<plugin-root>/system/system-run.sh` in all 50+ prompt files. The `<plugin-root>` angle-bracket notation signals to the agent that it must resolve this placeholder itself from its Claude Code plugin context, rather than passing it as a Bash variable. Update `system-cli-standards` with the new canonical invocation pattern.
 
 ## Issue 2: Prompt files reference CLI commands that don't exist
 
@@ -41,4 +41,4 @@ sdd-init Phase 3.6 tells the agent to check if permissions are configured ("Chec
 
 During sdd-init, Phase 3.6 (permissions) runs before Phase 4 (create structure). `configurePermissions()` calls `findProjectRoot()` which looks for `package.json` or `.sdd/sdd-settings.yaml` — neither exists yet for a new project.
 
-**Fix:** Make `configurePermissions()` fall back to `cwd` when no project root is found (it only needs the cwd to locate `.claude/settings.local.json`). Also reorder sdd-init so permissions configuration runs after structure creation.
+**Fix:** Make `configurePermissions()` fall back to `cwd` when no project root is found (it only needs the cwd to locate `.claude/settings.local.json`).
