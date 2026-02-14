@@ -239,7 +239,6 @@ The following namespaces are used internally by other commands and should not be
 
 - `scaffolding` - Used by `/sdd-init` for project setup
 - `spec` - Used for spec validation, indexing, and snapshots
-- `version` - Used by the commit skill for version bumping
 - `hook` - Hook handlers for internal use
 - `contract generate-types` - Invoked automatically during implementation plans
 - `permissions` - Used by `/sdd-init` for auto-configuring permissions

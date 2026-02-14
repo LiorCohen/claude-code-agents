@@ -7,7 +7,6 @@
  * Namespaces:
  *   scaffolding   Project and domain scaffolding
  *   spec          Spec validation, indexing, snapshots
- *   version       Version bumping
  *   hook          Hook handlers (validate-write, prompt-commit)
  *   database      Database component operations
  *   contract      Contract component operations
@@ -30,7 +29,6 @@ import type { LogLevel } from '@/types/settings';
 // Command imports
 import { handleSpec } from '@/commands/spec';
 import { handleScaffolding } from '@/commands/scaffolding';
-import { handleVersion } from '@/commands/version';
 import { handleHook } from '@/commands/hook';
 import { handleDatabase } from '@/commands/database';
 import { handleContract } from '@/commands/contract';
@@ -41,7 +39,7 @@ import { handleWorkflow } from '@/commands/workflow';
 import { handleSettings } from '@/commands/settings';
 import { handleArchive } from '@/commands/archive';
 
-const NAMESPACES = ['scaffolding', 'spec', 'version', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings', 'archive'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings', 'archive'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
@@ -58,9 +56,6 @@ Namespaces:
     validate    Validate spec frontmatter/structure
     index       Generate changes/INDEX.md
     snapshot    Create project snapshot
-
-  version       Version bumping
-    bump        Bump version (major|minor|patch)
 
   hook          Hook handlers (called by hook-runner.sh)
     validate-write   PreToolUse hook: auto-approve/block writes
@@ -120,7 +115,6 @@ Examples:
   sdd-system spec validate changes/2026/01/01/feature/SPEC.md
   sdd-system spec validate --all --changes-dir changes/
   sdd-system scaffolding project --config config.json
-  sdd-system version bump patch
   sdd-system database setup my-db
 `.trim();
 
@@ -133,7 +127,6 @@ type CommandHandler = (
 const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   scaffolding: handleScaffolding,
   spec: handleSpec,
-  version: handleVersion,
   hook: handleHook,
   database: handleDatabase,
   contract: handleContract,
