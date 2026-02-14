@@ -56,26 +56,31 @@ Render task references as clickable markdown links:
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
 - Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
 
-**Table format** — one table, three columns: `Priority`, `#`, `Task`:
+**Table format** — one table, four columns: `Status`, `Priority`, `#`, `Task`:
 
 ```
-| Priority | # | Task |
-|----------|---|------|
+| Status | Priority | # | Task |
+|--------|----------|---|------|
 ```
 
-**Priority column values** — use these labels with icons as in-row categories:
-- Active statuses (shown first, in this order):
-  - `📐 Planning`
-  - `✅ Plan Review`
-  - `🔨 Implementing`
-  - `🔍 Reviewing`
-- Inbox priorities (shown after active, in this order):
-  - `🔴 High`
-  - `🟡 Med`
-  - `🔵 Low`
-  - `⚪ —` (unprioritized)
+**Status column values:**
+- `📐 Planning`
+- `✅ Plan Review`
+- `🔨 Implementing`
+- `🔍 Reviewing`
+- `📥 Inbox` (for tasks in 1-inbox/)
 
-Skip any priority group that has zero tasks. End with a summary line:
+**Priority column values:**
+- `🔴 High`
+- `🟡 Med`
+- `🔵 Low`
+- `⚪ —` (unprioritized or null)
+
+Read the `priority` field from each task's `task.md` frontmatter to populate the Priority column for all tasks, including active ones.
+
+**Sort order:** Active statuses first (in the order listed above), then inbox tasks by priority (high, med, low, unprioritized). Within each group, sort by task ID descending.
+
+End with a summary line:
 
 ```
 **N open** — X high, Y med, Z low, W unprioritized
