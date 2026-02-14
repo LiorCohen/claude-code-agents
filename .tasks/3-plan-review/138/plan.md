@@ -226,6 +226,8 @@ All changes are prompt-only (.md files) — no automated test infrastructure app
 - [ ] `planning/SKILL.md` line count stays under 500
 - [ ] `spec-feature.md` Components section has Settings column in New Components table
 - [ ] `scaffolding/SKILL.md` documents no-op rule and implementation-phase-only usage
+- [ ] `scaffolding/SKILL.md` no longer has a "Component Presets" section
+- [ ] `component-discovery/SKILL.md` and `output.schema.json` have no `project_type` references
 - [ ] `solicitation-steps.md` Step 9 notes Settings column population from discovery output
 - [ ] `devops.md` frontmatter `skills:` includes `scaffolding`
 
