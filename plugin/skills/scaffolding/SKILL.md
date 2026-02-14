@@ -45,7 +45,7 @@ All scaffolding operations are executed by the generic scaffolding engine. Compo
 ### Invocation
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec <path-to-spec.json> [--dry-run]
+<plugin-root>/system/system-run.sh scaffolding apply --spec <path-to-spec.json> [--dry-run]
 ```
 
 ### Spec Format
@@ -83,12 +83,12 @@ See each component's `SKILL.md` for the complete spec format and context flag de
 The `scaffolding project` command uses the engine internally — it builds a spec from the project config and executes it.
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding project --config <config.json>
+<plugin-root>/system/system-run.sh scaffolding project --config <config.json>
 ```
 
 ## Usage
 
-After gathering project configuration in `/sdd-init`, run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding project` with a config JSON file containing the project settings. The config must include:
+After gathering project configuration in `/sdd-init`, run `<plugin-root>/system/system-run.sh scaffolding project` with a config JSON file containing the project settings. The config must include:
 
 ```json
 {

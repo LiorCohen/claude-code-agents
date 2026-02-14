@@ -7,7 +7,7 @@ Detailed steps 1-10 for processing external specifications into the SDD workflow
 **Single location, single copy — use the system CLI:**
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <external-spec-path> --type external-spec --json
+<plugin-root>/system/system-run.sh archive store --source <external-spec-path> --type external-spec --json
 ```
 
 The CLI handles datetime-prefix naming (`yyyymmdd-HHmm-lowercased-original-name.md`), directory creation, and lowercasing automatically. Parse the JSON result to get `archived_path`.

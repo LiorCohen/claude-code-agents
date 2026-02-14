@@ -41,13 +41,13 @@ Use when your project needs:
 After scaffolding, database operations are performed via the system CLI:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database setup <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database teardown <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database seed <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database reset <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database port-forward <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>
+<plugin-root>/system/system-run.sh database setup <component-name>
+<plugin-root>/system/system-run.sh database teardown <component-name>
+<plugin-root>/system/system-run.sh database migrate <component-name>
+<plugin-root>/system/system-run.sh database seed <component-name>
+<plugin-root>/system/system-run.sh database reset <component-name>
+<plugin-root>/system/system-run.sh database port-forward <component-name>
+<plugin-root>/system/system-run.sh database psql <component-name>
 ```
 
 ## Prerequisites
@@ -163,7 +163,7 @@ export type DatabaseConfig = Readonly<{
 To scaffold a database component, build a spec and invoke the engine:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

@@ -70,7 +70,7 @@ updated: YYYY-MM-DD
 
 ## Validation Rules
 
-Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate <path>` to check:
+Run `<plugin-root>/system/system-run.sh spec validate <path>` to check:
 - Required frontmatter fields present based on `spec_type`
 - Acceptance criteria in Given/When/Then format (tech specs only)
 - All referenced definitions exist in domain glossary

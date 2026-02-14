@@ -211,7 +211,7 @@ webapp-{name}:
 To scaffold a frontend component, build a spec and invoke the engine:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

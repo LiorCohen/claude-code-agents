@@ -262,7 +262,7 @@ Same as interactive flow - suggest branch if on main/master.
 Use the system CLI to archive:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <spec-path> --type external-spec --json
+<plugin-root>/system/system-run.sh archive store --source <spec-path> --type external-spec --json
 ```
 
 ```
@@ -1039,7 +1039,7 @@ Go back to an earlier phase (e.g., from planning back to spec).
 1. Validate change exists
 2. Archive current state via system CLI:
    ```bash
-   "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type workflow-regression --json
+   <plugin-root>/system/system-run.sh archive store --source <prepared-dir> --type workflow-regression --json
    ```
 3. Reset status fields for target phase and later
 4. Flag dependent items for re-review

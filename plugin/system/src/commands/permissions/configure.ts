@@ -59,14 +59,7 @@ const mergePermissions = (
 export const configurePermissions = async (): Promise<CommandResult> => {
   // Find project root
   const projectRootResult: ProjectRootResult = await findProjectRoot();
-  if (!projectRootResult.found) {
-    return {
-      success: false,
-      error:
-        'No SDD project found. Run this command from within an SDD project directory, or run /sdd-init first.',
-    };
-  }
-  const projectRoot = projectRootResult.path;
+  const projectRoot = projectRootResult.found ? projectRootResult.path : process.cwd();
 
   // Paths
   const claudeDir = path.join(projectRoot, '.claude');

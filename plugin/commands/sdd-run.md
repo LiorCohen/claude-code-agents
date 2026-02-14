@@ -226,10 +226,10 @@ This is typically invoked during `/sdd-init` but can be run manually to refresh 
 When you invoke `/sdd-run`, execute the following:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action> [args] [options]
+<plugin-root>/system/system-run.sh <namespace> <action> [args] [options]
 ```
 
-Where `CLAUDE_PLUGIN_ROOT` is the path to the SDD plugin directory.
+Where `<plugin-root>` is the plugin's absolute path, resolved by the agent from its Claude Code plugin context.
 
 ---
 

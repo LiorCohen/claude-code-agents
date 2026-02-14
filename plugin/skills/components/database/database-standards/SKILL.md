@@ -216,8 +216,8 @@ When adding database changes:
 ### Step 3: Test Migration
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>  # Verify schema
+<plugin-root>/system/system-run.sh database migrate <component-name>
+<plugin-root>/system/system-run.sh database psql <component-name>  # Verify schema
 ```
 
 ### Step 4: Add Seeds (if needed)
@@ -234,13 +234,13 @@ The backend DAL layer must follow `backend-standards` — it defines CMDO archit
 ## Database Commands
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database setup <component-name>        # Deploy PostgreSQL to k8s
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database teardown <component-name>     # Remove PostgreSQL from k8s
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database migrate <component-name>      # Run all migrations
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database seed <component-name>         # Run all seeds
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database reset <component-name>        # Full reset: teardown + setup + migrate + seed
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database port-forward <component-name> # Port forward to local
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" database psql <component-name>         # Open psql shell
+<plugin-root>/system/system-run.sh database setup <component-name>        # Deploy PostgreSQL to k8s
+<plugin-root>/system/system-run.sh database teardown <component-name>     # Remove PostgreSQL from k8s
+<plugin-root>/system/system-run.sh database migrate <component-name>      # Run all migrations
+<plugin-root>/system/system-run.sh database seed <component-name>         # Run all seeds
+<plugin-root>/system/system-run.sh database reset <component-name>        # Full reset: teardown + setup + migrate + seed
+<plugin-root>/system/system-run.sh database port-forward <component-name> # Port forward to local
+<plugin-root>/system/system-run.sh database psql <component-name>         # Open psql shell
 ```
 
 ---

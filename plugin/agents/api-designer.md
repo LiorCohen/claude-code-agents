@@ -50,7 +50,7 @@ components/contracts/{name}/
 ## Type Generation
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" contract generate-types <component-name>
+<plugin-root>/system/system-run.sh contract generate-types <component-name>
 ```
 
 This creates `generated/types.ts` inside the contract component. Server and webapp components consume these types via workspace package imports:
