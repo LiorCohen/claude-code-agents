@@ -29,7 +29,7 @@ Three systemic issues discovered when running `/sdd-init` on a new blank project
 
 ## Issue 2: Prompt files reference CLI commands that don't exist
 
-sdd-init Phase 3.6 references `permissions check --json`, but this subcommand was never implemented. The CLI only supports `permissions configure`.
+sdd-init Phase 3.6 tells the agent to check if permissions are configured ("Checking permissions...") but doesn't specify which CLI command to use. The agent inferred it should run `permissions check --json`, but this subcommand doesn't exist — the CLI only supports `permissions configure`.
 
 **Scope:** There is no validation that prompt files reference CLI commands that actually exist. Any `.md` file can reference `system-run.sh foo bar` and nothing catches it until runtime.
 
