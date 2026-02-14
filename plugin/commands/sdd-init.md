@@ -130,8 +130,8 @@ On Windows, use WSL (Windows Subsystem for Linux): https://learn.microsoft.com/e
 
 This must pass before any other checks. The plugin's absolute path is available via `${CLAUDE_PLUGIN_ROOT}` (set by Claude when the plugin loads).
 
-1. Check `${CLAUDE_PLUGIN_ROOT}`. If set, use it as the plugin path. If not set, fall back to searching `~/.claude/plugins` recursively for the SDD plugin (look for `marketplace.json` or `plugin.json` marker files). If neither finds the plugin: **STOP** — display installation instructions and exit.
-2. Verify the plugin path exists and contains expected marker files (`plugin.json` or `.claude-plugin/marketplace.json`)
+1. Check `${CLAUDE_PLUGIN_ROOT}`. If set, use it as the plugin path. If not set, fall back to searching `~/.claude/plugins` recursively for the SDD plugin (look for `plugin.json` marker files). If neither finds the plugin: **STOP** — display installation instructions and exit.
+2. Verify the plugin path exists and contains expected marker files (`plugin.json`)
 3. Check build readiness:
    - `${CLAUDE_PLUGIN_ROOT}/system/dist/` exists (plugin built)
    - `${CLAUDE_PLUGIN_ROOT}/system/node_modules/` exists (dependencies installed)

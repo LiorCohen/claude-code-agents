@@ -10,10 +10,6 @@ user-invocable: false
 
 Manages `.sdd/workflows/<workflow-id>/` state - tracking where each item is in the solicitation → review → approval → implementation lifecycle.
 
-**IMPORTANT**: This is completely separate from:
-- The marketplace-level `tasks` skill (manages `.tasks/` directory for project backlog)
-- The top-level `.tasks/` directory (issue tracking, planning)
-
 This is **process state management**, not project task management.
 
 ## Core Principle: Zero Session Context
