@@ -22,7 +22,7 @@
 
 ## Reviewing
 
-- [#138](5-reviewing/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
+(none)
 
 ---
 
@@ -90,6 +90,7 @@
 
 ## Complete
 
+- [#138](6-complete/138/): Separate component discovery from scaffolding in sdd-change new flow ✓ (2026-02-14)
 - [#134](6-complete/134/): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition ✓ (2026-02-14)
 - [#136](6-complete/136/): Remove version bump command from system CLI ✓ (2026-02-14)
 - [#132](6-complete/132/): Fix critic skill: use datetime-based filenames for .temp output ✓ (2026-02-13)

@@ -2,8 +2,9 @@
 id: 138
 title: Separate component discovery from scaffolding in sdd-change new flow
 priority: null
-status: implementing
+status: complete
 created: 2026-02-14 17:00 UTC
+completed: 2026-02-14 20:11 UTC
 depends_on: []
 blocks: []
 ---
