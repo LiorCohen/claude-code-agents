@@ -63,6 +63,7 @@
 
 ### Unprioritized
 
+- [#141](1-inbox/141/): Remove 'implement' from critic auto-triggers
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
