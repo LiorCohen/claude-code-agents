@@ -63,6 +63,7 @@
 
 ### Unprioritized
 
+- [#142](1-inbox/142/): Add charting library to frontend standards and scaffold
 - [#141](1-inbox/141/): Remove 'implement' from critic auto-triggers
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
