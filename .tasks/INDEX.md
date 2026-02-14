@@ -4,7 +4,7 @@
 
 ## Planning
 
-(none)
+- [#138](2-planning/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
 
 ---
 
@@ -64,7 +64,6 @@
 ### Unprioritized
 
 - [#139](1-inbox/139/): Remove component bundles — always ask users to pick components explicitly
-- [#138](1-inbox/138/): Separate component discovery from scaffolding in sdd-change new flow
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase

@@ -2,7 +2,7 @@
 id: 138
 title: Separate component discovery from scaffolding in sdd-change new flow
 priority: null
-status: inbox
+status: planning
 created: 2026-02-14 17:00 UTC
 depends_on: []
 blocks: []
