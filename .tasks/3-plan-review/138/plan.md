@@ -132,7 +132,7 @@ In `plugin/skills/scaffolding/SKILL.md`, two changes:
 - Never overwrite user code
 - The plan must distinguish "scaffold new component" from "modify existing component"
 
-**Remove the "Component Presets" section** (lines 192-250). These predefined bundles (Full-Stack Application, Backend API Only, Frontend Only, Multi-Backend, Multi-Frontend, Backend with Database) are no longer used — component discovery always asks users to pick components explicitly. Delete the entire `## Component Presets` section and its six preset blocks.
+**Remove the "Component Presets" section** (lines 192-263). These predefined bundles (Full-Stack Application, Backend API Only, Frontend Only, Multi-Backend, Multi-Frontend, Backend with Database, Full-Stack with Helm Deployment) are no longer used — component discovery always asks users to pick components explicitly. Delete the entire `## Component Presets` section and all seven preset blocks.
 
 ### 6. Minor update to component-discovery skill
 
@@ -265,7 +265,7 @@ Changes are independent and can be made in any order, but logically:
 
 ## Tests
 
-All changes are prompt-only (.md files) — no automated test infrastructure applies. The following are manual verification checks to perform after implementation.
+Changes 1-8 are prompt-only (.md files). Change 9 modifies TypeScript (reconcile.ts) and a test file — run `npm run typecheck:plugin` and `npm test` after implementing it. The following are verification checks to perform after implementation.
 
 ### Structural Checks
 
@@ -279,6 +279,10 @@ All changes are prompt-only (.md files) — no automated test infrastructure app
 - [ ] `component-discovery/SKILL.md` and `output.schema.json` have no `project_type` references
 - [ ] `solicitation-steps.md` Step 9 notes Settings column population from discovery output
 - [ ] `devops.md` frontmatter `skills:` includes `scaffolding`
+- [ ] `reconcile.ts` no longer references `project.type`
+- [ ] `settings-reconcile.test.ts` no longer has `removes project.type` test
+- [ ] `npm run typecheck:plugin` passes
+- [ ] `npm test` passes
 
 ### Cross-Reference Checks
 
