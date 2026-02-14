@@ -152,6 +152,8 @@ Returns a list of components with names, types, and settings.
 Component settings from this output (server_type, databases, provides_contracts, etc.) flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
 ```
 
+Also remove the `project_type` line from both examples in the same file (line 217: `project_type: "fullstack"`, line 263: `project_type: "custom"`).
+
 Also update `schemas/output.schema.json` to remove the `project_type` field and its `required` entry.
 
 ### 7. Update solicitation steps to populate Settings column
