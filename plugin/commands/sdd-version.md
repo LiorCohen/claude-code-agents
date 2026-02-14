@@ -17,11 +17,11 @@ Display the installed SDD plugin version and the project's plugin version, highl
 
 ## Preconditions
 
-- `${CLAUDE_PLUGIN_ROOT}` is set (plugin is loaded)
+- Plugin is loaded (agent has access to plugin root path)
 
 ## Flow
 
-1. Read the installed plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `version` field
+1. Read the installed plugin version from `<plugin-root>/.claude-plugin/plugin.json` → `version` field
 2. Check if `.sdd/sdd-settings.yaml` exists in the current directory
 3. If it exists, read the project plugin version from `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version` for pre-reconciliation files)
 4. Optionally read `sdd.initialized_by_plugin_version` for context (the version that first created the project)

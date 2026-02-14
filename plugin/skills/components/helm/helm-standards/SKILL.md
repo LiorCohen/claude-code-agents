@@ -252,7 +252,7 @@ Config is injected into HTML at deploy time:
 
 ```bash
 # Generate config for production environment
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env production --component main-server \
+<plugin-root>/system/system-run.sh config generate --env production --component main-server \
   --output helm-values-config.yaml
 
 # Deploy with config

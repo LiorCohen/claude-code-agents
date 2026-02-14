@@ -16,7 +16,7 @@ The spec commands are available via the system CLI:
 Generates `changes/INDEX.md` from all change spec files.
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec index --changes-dir changes/
+<plugin-root>/system/system-run.sh spec index --changes-dir changes/
 ```
 
 ### Generate Snapshot
@@ -24,7 +24,7 @@ Generates `changes/INDEX.md` from all change spec files.
 Generates `specs/SNAPSHOT.md` compiling all active specs.
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec snapshot --specs-dir specs/
+<plugin-root>/system/system-run.sh spec snapshot --specs-dir specs/
 ```
 
 ### Validate Spec
@@ -33,10 +33,10 @@ Validates spec frontmatter and format.
 
 ```bash
 # Validate single spec
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate changes/2026/01/21/my-change/SPEC.md
+<plugin-root>/system/system-run.sh spec validate changes/2026/01/21/my-change/SPEC.md
 
 # Validate all specs
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate --all --specs-dir specs/
+<plugin-root>/system/system-run.sh spec validate --all --specs-dir specs/
 ```
 
 ---
@@ -120,13 +120,13 @@ Returns success status and any validation errors or warnings.
 ### After Creating a Spec
 
 1. Merge spec to main
-2. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec index` to update INDEX.md
-3. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec snapshot` to update SNAPSHOT.md
+2. Run `<plugin-root>/system/system-run.sh spec index` to update INDEX.md
+3. Run `<plugin-root>/system/system-run.sh spec snapshot` to update SNAPSHOT.md
 4. Commit the updated index and snapshot
 
 ### Before Release
 
-1. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" spec validate --all` to ensure all specs are valid
+1. Run `<plugin-root>/system/system-run.sh spec validate --all` to ensure all specs are valid
 2. Review SNAPSHOT.md for completeness
 3. Verify all active specs have corresponding implementations
 

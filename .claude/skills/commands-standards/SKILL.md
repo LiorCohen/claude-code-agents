@@ -176,7 +176,7 @@ Or inline within a flow step:
 
 ### Rules
 
-1. **Use `sdd-system` by name** — Always reference the CLI as `sdd-system`, not by its file path. The execution wrapper (`node --enable-source-maps "${CLAUDE_PLUGIN_ROOT}/system/dist/cli.js"`) should appear at most once in the command, in an `## Execution` section.
+1. **Use `sdd-system` by name** — Always reference the CLI as `sdd-system`, not by its file path. The execution wrapper (`node --enable-source-maps "<plugin-root>/system/dist/cli.js"`) should appear at most once in the command, in an `## Execution` section.
 2. **CLI for deterministic work only** — The CLI handles file operations, validation, and code generation. If the operation requires judgment, context, or conversation, use a skill or agent instead.
 3. **Document error handling** — When a CLI command can fail (validation errors, missing files), document what the command shows the user and whether execution continues or stops.
 4. **No CLI implementation details** — The command documents what CLI subcommand to call and what it returns. It does not document how the CLI implements the operation internally.

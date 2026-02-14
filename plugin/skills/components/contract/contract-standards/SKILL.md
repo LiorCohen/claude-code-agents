@@ -187,7 +187,7 @@ These run on a separate port (e.g., 9090) from the main API.
 ### Running Generation
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" contract generate-types <component-name>
+<plugin-root>/system/system-run.sh contract generate-types <component-name>
 ```
 
 ### Generated Type Usage
@@ -241,7 +241,7 @@ info:
 ### Spectral Linting
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" contract validate <component-name>
+<plugin-root>/system/system-run.sh contract validate <component-name>
 ```
 
 Uses `.spectral.yaml` for custom rules (optional).
@@ -269,13 +269,13 @@ When adding a new endpoint:
 ### Step 2: Validate
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" contract validate <component-name>
+<plugin-root>/system/system-run.sh contract validate <component-name>
 ```
 
 ### Step 3: Generate Types
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" contract generate-types <component-name>
+<plugin-root>/system/system-run.sh contract generate-types <component-name>
 ```
 
 ### Step 4: Implement in Server

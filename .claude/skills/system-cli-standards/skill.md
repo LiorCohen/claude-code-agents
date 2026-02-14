@@ -14,12 +14,11 @@ Standards for all plugin prompt files (skills, agents, commands) that invoke or 
 The one correct way to call the CLI from a prompt file:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" <namespace> <action> [args] [options]
+<plugin-root>/system/system-run.sh <namespace> <action> [args] [options]
 ```
 
-- `CLAUDE_PLUGIN_ROOT` is set by Claude Code when the plugin loads. It is available in all bash commands executed during a plugin session.
-- Always quote the path: `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh"` — paths may contain spaces.
-- `system-run.sh` is the single entry point. It forwards to the compiled CLI via `exec`.
+- `<plugin-root>` is a placeholder that the agent resolves from its Claude Code plugin context. It is NOT shell syntax — the agent substitutes the actual absolute path before constructing the bash command.
+- `system-run.sh` is the single entry point. It self-locates the plugin root from its own filesystem path and forwards to the compiled CLI via `exec`.
 - The system package is `private: true` with no `bin` field, so `system-run.sh` is the only valid way to invoke it.
 
 ---
@@ -93,14 +92,14 @@ CLI commands that accept file content (e.g., `--config <path>`) should also acce
 
 **Preferred** — pipe content via stdin:
 ```bash
-echo "${content}" | "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" namespace action --config -
+echo "${content}" | <plugin-root>/system/system-run.sh namespace action --config -
 ```
 
 **Avoid** — creating temp files:
 ```bash
 # Don't do this — creates files that need cleanup
 echo "${content}" > /tmp/temp-config.yaml
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" namespace action --config /tmp/temp-config.yaml
+<plugin-root>/system/system-run.sh namespace action --config /tmp/temp-config.yaml
 rm /tmp/temp-config.yaml
 ```
 
@@ -172,6 +171,20 @@ Before adding a new CLI command, verify:
 - [ ] It has proper exit codes (0 success, 1 failure)
 - [ ] It does not reference or depend on any prompt files (skills, agents, commands)
 - [ ] It is documented in the relevant command `.md` file that will invoke it
+
+---
+
+## Command Existence Rule
+
+Every `system-run.sh <namespace> <action>` reference in a prompt file must correspond to a command that actually exists in the CLI registry. Prompt files must not reference nonexistent namespace/action pairs.
+
+**Source of truth:** Each namespace has a `schema.ts` at `plugin/system/src/commands/<namespace>/schema.ts` exporting an `ACTIONS` array. This is the authoritative list of valid actions per namespace.
+
+**Enforcement:** The `cli-invocation-audit.test.ts` test scans all `.md` files under `plugin/` for `system-run.sh <namespace> <action>` patterns and validates each pair against the CLI's actual command registry. This test runs as part of `npm test`.
+
+**When adding a new CLI invocation to a prompt file:**
+1. Verify the `<namespace> <action>` pair exists in the corresponding `schema.ts`
+2. If the command doesn't exist yet, create it first — never reference a command that doesn't exist
 
 ---
 

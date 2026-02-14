@@ -239,7 +239,7 @@ cascade_effects:
 ```
 
 **Side Effects:**
-- Archives implementation via system CLI: `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <prepared-dir> --type workflow-regression --json`
+- Archives implementation via system CLI: `<plugin-root>/system/system-run.sh archive store --source <prepared-dir> --type workflow-regression --json`
 - Uses `git stash` for uncommitted changes
 - Creates patch for committed-but-not-pushed changes
 - Updates item's status fields
@@ -401,7 +401,7 @@ progress_update:
 ```
 
 **Side Effects:**
-- For merge: archives removed spec via system CLI: `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" archive store --source <draft-dir> --type revised-spec --json`
+- For merge: archives removed spec via system CLI: `<plugin-root>/system/system-run.sh archive store --source <draft-dir> --type revised-spec --json`
 - Updates `workflow.yaml` item structure
 - Flags affected approved specs for re-review
 - Updates progress aggregates

@@ -184,7 +184,7 @@ The ConfigMap is mounted in deployments and `SDD_CONFIG_PATH` is set automatical
 Deployment workflow:
 ```bash
 # Generate merged config
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env production --component main-server \
+<plugin-root>/system/system-run.sh config generate --env production --component main-server \
   --output production-config.yaml
 
 # Deploy with config
@@ -219,7 +219,7 @@ Cluster-level observability (Victoria Metrics, Victoria Logs) is set up separate
 To scaffold a Helm chart, build a spec with context flags derived from helm + server settings and invoke the engine:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

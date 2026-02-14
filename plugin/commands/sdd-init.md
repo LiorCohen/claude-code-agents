@@ -56,10 +56,10 @@ This command follows an approval-based workflow that verifies environment, creat
 
 1. Check if `.sdd/sdd-settings.yaml` exists
 2. If it exists, raw-parse the YAML and read version from `sdd.updated_by_plugin_version` (or legacy `sdd.plugin_version` for pre-reconciliation files)
-3. Read current plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `version` field
+3. Read current plugin version from `<plugin-root>/.claude-plugin/plugin.json` → `version` field
 4. If versions differ:
-   - Run `npm install` in `${CLAUDE_PLUGIN_ROOT}/system/`
-   - Run `npm run build` in `${CLAUDE_PLUGIN_ROOT}/system/`
+   - Run `npm install` in `<plugin-root>/system/`
+   - Run `npm run build` in `<plugin-root>/system/`
    - Only proceed once plugin is built with current code
 5. If no settings file exists, this is a new project — skip version check, proceed to Phase 2
 
@@ -128,15 +128,15 @@ On Windows, use WSL (Windows Subsystem for Linux): https://learn.microsoft.com/e
 
 #### 3.2 Plugin Installation Verification (HARD BLOCKER)
 
-This must pass before any other checks. The plugin's absolute path is available via `${CLAUDE_PLUGIN_ROOT}` (set by Claude when the plugin loads).
+This must pass before any other checks. The agent knows the plugin's absolute path from its Claude Code plugin context.
 
-1. Check `${CLAUDE_PLUGIN_ROOT}`. If set, use it as the plugin path. If not set, fall back to searching `~/.claude/plugins` recursively for the SDD plugin (look for `plugin.json` marker files). If neither finds the plugin: **STOP** — display installation instructions and exit.
+1. Use the known plugin path from your plugin context. If the plugin path cannot be determined, fall back to searching `~/.claude/plugins` recursively for the SDD plugin (look for `plugin.json` marker files). If neither finds the plugin: **STOP** — display installation instructions and exit.
 2. Verify the plugin path exists and contains expected marker files (`plugin.json`)
 3. Check build readiness:
-   - `${CLAUDE_PLUGIN_ROOT}/system/dist/` exists (plugin built)
-   - `${CLAUDE_PLUGIN_ROOT}/system/node_modules/` exists (dependencies installed)
+   - `<plugin-root>/system/dist/` exists (plugin built)
+   - `<plugin-root>/system/node_modules/` exists (dependencies installed)
 4. If `dist/` exists: plugin is ready (this is the normal case for installed plugins)
-5. If `dist/` missing but `system/package.json` exists: run `npm install && npm run build` in `${CLAUDE_PLUGIN_ROOT}/system/` (development mode)
+5. If `dist/` missing but `system/package.json` exists: run `npm install && npm run build` in `<plugin-root>/system/` (development mode)
 6. If repairs fail: **STOP** — display error details and exit
 
 **This is a hard blocker.** If the plugin is not installed, not built, or not functional after repair attempts, do NOT continue to other phases.
@@ -180,7 +180,7 @@ If missing: create or merge the required entries (preserve existing settings).
 
 #### 3.5 Required Tools Check (via System CLI)
 
-Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" env check-tools --json` and interpret the result:
+Run `<plugin-root>/system/system-run.sh env check-tools --json` and interpret the result:
 - Display the human-readable tool summary
 - If all tools installed: continue to next phase
 - If any tools are missing: list the missing tools with their install hints
@@ -220,7 +220,7 @@ Would you like me to configure recommended permissions automatically? (yes/no)
 ```
 
 **If yes:**
-Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" permissions configure` to merge SDD permissions into `.claude/settings.local.json`.
+Run `<plugin-root>/system/system-run.sh permissions configure` to merge SDD permissions into `.claude/settings.local.json`.
 
 **If no:**
 ```
@@ -239,7 +239,7 @@ Note: permissions written to `.claude/settings.local.json` do NOT take effect mi
 
 If this is an existing project with a version mismatch (detected in Phase 1):
 
-1. Run `"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" settings reconcile` to migrate settings to the latest schema
+1. Run `<plugin-root>/system/system-run.sh settings reconcile` to migrate settings to the latest schema
 2. Display the command output (it prints a summary of changes and any directory warnings)
 3. **Skip Phase 4 and Phase 5** — structure already exists, git already initialized
 4. Jump to Phase 6 with upgrade-specific messaging

@@ -246,16 +246,16 @@ This command invokes the system CLI via `system-run.sh`:
 
 ```bash
 # generate
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config generate --env <env> [--component <name>] [--output <path>]
+<plugin-root>/system/system-run.sh config generate --env <env> [--component <name>] [--output <path>]
 
 # validate
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config validate [--env <env>]
+<plugin-root>/system/system-run.sh config validate [--env <env>]
 
 # diff
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config diff <env1> <env2>
+<plugin-root>/system/system-run.sh config diff <env1> <env2>
 
 # add-env
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" config add-env <env-name>
+<plugin-root>/system/system-run.sh config add-env <env-name>
 ```
 
 The system CLI handles the actual merge logic, validation, and file operations.

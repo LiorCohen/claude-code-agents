@@ -26,7 +26,7 @@ During implementation, this skill:
 This skill uses a TypeScript script for deterministic file creation:
 
 ```bash
-cat << 'EOF' | "${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding domain --config -
+cat << 'EOF' | <plugin-root>/system/system-run.sh scaffolding domain --config -
 {
     "target_dir": "/path/to/project",
     "primary_domain": "Task Management",

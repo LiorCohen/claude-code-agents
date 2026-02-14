@@ -199,7 +199,7 @@ The config component uses the engine for base template structure, but config sec
 ### Base structure via engine
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/system/system-run.sh" scaffolding apply --spec spec.json
+<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ```json

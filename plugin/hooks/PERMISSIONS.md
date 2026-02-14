@@ -152,11 +152,11 @@ These are always blocked:
 1. **Check jq is installed**: `which jq`
 2. **Test validation hook manually**:
    ```bash
-   echo '{"tool":"Write","tool_input":{"file_path":"specs/test.md"}}' | ${CLAUDE_PLUGIN_ROOT}/hooks/validate-sdd-writes.sh
+   echo '{"tool":"Write","tool_input":{"file_path":"specs/test.md"}}' | <plugin-root>/hooks/validate-sdd-writes.sh
    ```
 3. **Test commit prompt hook manually**:
    ```bash
-   echo '{"tool":"Write","tool_input":{"file_path":"components/backend/src/index.ts"}}' | ${CLAUDE_PLUGIN_ROOT}/hooks/prompt-commit-after-write.sh
+   echo '{"tool":"Write","tool_input":{"file_path":"components/backend/src/index.ts"}}' | <plugin-root>/hooks/prompt-commit-after-write.sh
    ```
 4. **Check plugin version**: Ensure you have v4.6.0+ which includes the hooks
 
