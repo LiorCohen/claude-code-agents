@@ -66,7 +66,6 @@
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
-- [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
 - [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
 - [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
 - [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
@@ -166,6 +165,7 @@
 ## Consolidated
 
 - [#111](8-consolidated/111/) → #114
+- [#108](8-consolidated/108/) → #120
 - [#101](8-consolidated/101/) → #100
 - [#61](8-consolidated/61/) → #62
 - [#58](8-consolidated/58/) → #62

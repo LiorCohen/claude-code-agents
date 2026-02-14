@@ -60,3 +60,7 @@ Many places across the codebase use `Date` where they should use `DateTime`. Onl
 ### Tasks (`.tasks/`)
 
 - **2-planning/103/plan.md** — L168: `const now = new Date();`
+
+## Consolidated Tasks
+
+- **#108**: Plans created using sdd-change should include timestamps (DateTime) in implementation status transitions
