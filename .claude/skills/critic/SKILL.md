@@ -82,7 +82,7 @@ For each finding, rate confidence based on what was actually verified (read the 
 
 ## Brief Generation
 
-After running collector checks, write a structured brief to `.temp/<datetime>-critic-brief-<task-id>.md` (e.g., `.temp/2026-02-13-1530-critic-brief-107.md`). Use `YYYY-MM-DD-HHmm` format for the datetime portion.
+After running collector checks, write a structured brief to `.temp/<datetime>-critic-brief-<task-id>.md` (e.g., `.temp/2026-02-13-1530-critic-brief-107.md`). Get the datetime by running `date -u +"%Y-%m-%d-%H%M"` — never guess or fabricate timestamps.
 
 ```markdown
 ## Critic Brief
