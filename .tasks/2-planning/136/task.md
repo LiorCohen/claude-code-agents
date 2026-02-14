@@ -1,7 +1,7 @@
 ---
 id: 136
 title: Remove version bump command from system CLI
-status: inbox
+status: planning
 created: 2026-02-14 12:00 UTC
 depends_on: []
 blocks: []

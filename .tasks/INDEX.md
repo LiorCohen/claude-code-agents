@@ -4,7 +4,7 @@
 
 ## Planning
 
-(none)
+- [#136](2-planning/136/): Remove version bump command from system CLI
 
 ---
 
@@ -62,7 +62,6 @@
 
 ### Unprioritized
 
-- [#136](1-inbox/136/): Remove version bump command from system CLI
 - [#135](1-inbox/135/): Add installation instructions defaulting to user scope
 - [#134](1-inbox/134/): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
