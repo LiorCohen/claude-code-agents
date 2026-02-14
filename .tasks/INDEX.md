@@ -16,7 +16,7 @@
 
 ## Implementing
 
-- [#136](4-implementing/136/): Remove version bump command from system CLI
+(none)
 
 ---
 
@@ -89,6 +89,7 @@
 
 ## Complete
 
+- [#136](6-complete/136/): Remove version bump command from system CLI ✓ (2026-02-14)
 - [#132](6-complete/132/): Fix critic skill: use datetime-based filenames for .temp output ✓ (2026-02-13)
 - [#107](6-complete/107/): Revisit frontend scaffold — add Radix/Shadcn, align with documented stack ✓ (2026-02-13)
 - [#127](6-complete/127/): Fix system CLI TypeScript standards violations from audit ✓ (2026-02-13)

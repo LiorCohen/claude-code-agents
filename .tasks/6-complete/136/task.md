@@ -1,8 +1,9 @@
 ---
 id: 136
 title: Remove version bump command from system CLI
-status: implementing
+status: complete
 created: 2026-02-14 12:00 UTC
+completed: 2026-02-14 13:30 UTC
 depends_on: []
 blocks: []
 ---
