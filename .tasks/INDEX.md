@@ -16,13 +16,13 @@
 
 ## Implementing
 
-- [#138](4-implementing/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#138](5-reviewing/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
 
 ---
 
