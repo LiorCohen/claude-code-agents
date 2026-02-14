@@ -40,8 +40,7 @@ This applies to **both** the interactive and external spec paths. The principle 
 
 - **Keep component discovery in `new` (both flows)** — it's a planning question about which components are needed. Discovery results are recorded in the spec.
 - **Remove all scaffolding from `new` (both flows)** — no directories, no files, no settings mutations. Neither interactive nor external spec paths should scaffold.
-- **Scaffolding becomes a planned implementation step** — the spec lists required components, the plan includes scaffolding as an explicit step, implementation executes it with access to approved spec content.
-- **`sdd-change implement` runs scaffolding first** — when the plan includes scaffolding steps, implementation executes them before handing off to implementation agents. Not every plan needs scaffolding.
+- **Scaffolding is just another implementation phase** — the spec lists required components, the plan includes scaffolding as a phase like any other (e.g., "scaffold backend component", "set up database migrations"). Implementation executes the plan phases in order. Not every plan needs scaffolding.
 - **Fix parallel write conflicts on `sdd-settings.yaml`** — the race condition goes away naturally since scaffolding moves to sequential implementation, but settings writes should be serialized regardless.
 
 ## Acceptance Criteria
@@ -50,7 +49,7 @@ This applies to **both** the interactive and external spec paths. The principle 
 - [ ] `sdd-change new` still performs component discovery (analytical only, both flows)
 - [ ] Spec template includes a "Required Components" section for discovery output
 - [ ] Plan template includes scaffolding as an explicit step when new components are needed
-- [ ] `sdd-change implement` executes scaffolding steps from the plan before implementation
+- [ ] Scaffolding appears as a normal phase in the implementation plan (not a special pre-step)
 - [ ] Scaffolding is deterministic — structural skeleton only, no spec-driven code generation
 - [ ] Scaffolding is a no-op for existing components (never overwrites)
 - [ ] No parallel write conflicts on `sdd-settings.yaml`
