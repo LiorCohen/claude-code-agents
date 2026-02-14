@@ -12,7 +12,9 @@ blocks: []
 
 ## Description
 
-In the current `sdd-change` skill, the interactive `new` action runs Step 4 (Component Discovery) and Step 5 (On-Demand Component Scaffolding) before Step 7 (Spec Solicitation). This means component directories are created with generic placeholder code before requirements have even been gathered.
+In the current `sdd-change` skill, scaffolding happens too early — before requirements have been fully gathered and approved. In the interactive flow, Steps 4-5 (Component Discovery + On-Demand Scaffolding) run before Step 7 (Spec Solicitation), creating directories and boilerplate before a spec even exists. The external spec flow is better but still not fully correct — it must also ensure scaffolding is deferred to implementation.
+
+This applies to **both** the interactive and external spec paths. The principle is universal: scaffolding is implementation, not creation.
 
 ### Why this is wrong
 
@@ -30,15 +32,15 @@ In the current `sdd-change` skill, the interactive `new` action runs Step 4 (Com
 
 ### Proposed fix
 
-- **Keep component discovery in `new`** — it's a planning question about which components are needed. Discovery results are recorded in the spec.
-- **Remove all scaffolding from `new`** — no directories, no files, no settings mutations.
+- **Keep component discovery in `new` (both flows)** — it's a planning question about which components are needed. Discovery results are recorded in the spec.
+- **Remove all scaffolding from `new` (both flows)** — no directories, no files, no settings mutations. Neither interactive nor external spec paths should scaffold.
 - **Scaffolding becomes a planned implementation step** — the spec lists required components, the plan includes scaffolding as an explicit step, implementation executes it with access to approved spec content.
 - **Fix parallel write conflicts on `sdd-settings.yaml`** — the race condition goes away naturally since scaffolding moves to sequential implementation, but settings writes should be serialized regardless.
 
 ## Acceptance Criteria
 
-- [ ] `sdd-change new` never creates component directories, files, or modifies `sdd-settings.yaml`
-- [ ] `sdd-change new` still performs component discovery (analytical only)
+- [ ] `sdd-change new` never creates component directories, files, or modifies `sdd-settings.yaml` (both interactive and external spec flows)
+- [ ] `sdd-change new` still performs component discovery (analytical only, both flows)
 - [ ] Component scaffolding is an explicit part of the spec (what components are needed) and plan (what to scaffold)
 - [ ] Scaffolding executes during implementation, driven by the approved plan
 - [ ] Scaffolding has access to approved spec content to generate meaningful code instead of guesses
