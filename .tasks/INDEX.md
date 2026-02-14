@@ -62,6 +62,7 @@
 
 ### Unprioritized
 
+- [#134](1-inbox/134/): Fix 3 sdd-init issues: CLAUDE_PLUGIN_ROOT fallback, permissions check, and permissions configure project requirement
 - [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
 - [#120](1-inbox/120/): Replace Date with DateTime across codebase
 - [#108](1-inbox/108/): Plans created using sdd-change should include timestamps in implementation status
