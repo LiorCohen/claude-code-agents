@@ -12,7 +12,7 @@ Creates the non-component parts of an SDD project: root files and specs director
 
 ### Minimal Mode (Default for /sdd-init)
 
-Creates only the essential structure needed to start. Additional structure is created on-demand by `/sdd-change new`.
+Creates only the essential structure needed to start. Additional components are scaffolded during implementation when the plan includes a scaffolding phase.
 
 ```yaml
 mode: minimal

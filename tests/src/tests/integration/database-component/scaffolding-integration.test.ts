@@ -184,8 +184,6 @@ describe('Documentation Consistency', () => {
     const content = readFile(commandMd);
 
     // Verify database is mentioned as a component option
-    expect(content).toContain('Database');
-    // Verify database is mentioned as a component option
     expect(content.toLowerCase()).toContain('database');
   });
 

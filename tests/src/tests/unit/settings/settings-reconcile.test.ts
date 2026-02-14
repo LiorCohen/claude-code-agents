@@ -113,11 +113,6 @@ describe('project field deprecation', () => {
     expect(content).toContain('domain inference moved to sdd-change');
   });
 
-  it('removes project.type', () => {
-    expect(content).toContain("'project.type'");
-    expect(content).toContain('project type no longer tracked');
-  });
-
   it('preserves project name', () => {
     expect(content).toContain('projectName');
     expect(content).toContain('rawProject.name');

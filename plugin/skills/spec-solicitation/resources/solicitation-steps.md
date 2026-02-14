@@ -117,6 +117,8 @@ External specs usually have good UI detail. Only ask about:
 
 **YAGNI Principle**: Only ask about operations the UI actually requires. Do NOT assume full CRUD for every entity. If the UI only shows a list view, don't ask about Create/Update/Delete.
 
+**Components Section**: When generating SPEC.md, populate the `## Components` New Components table's Settings column from the component-discovery output. Each discovered component's settings (server_type, databases, provides_contracts, etc.) must appear in this column so the implementation plan can scaffold correctly.
+
 ## Resume Behavior
 
 On resume (when `resume: true`):

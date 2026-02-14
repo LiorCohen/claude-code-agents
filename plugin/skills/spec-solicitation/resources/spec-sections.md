@@ -30,7 +30,8 @@ After all questions answered, generate SPEC.md with:
     - Changes Summary table (Path, Action, Description)
 
 15. **Components**
-    - New Components table (Component, Type, Purpose)
+    - Note: "New components will be scaffolded during implementation"
+    - New Components table (Component, Type, Settings, Purpose)
     - Modified Components table (Component, Changes)
 
 16. **System Analysis**

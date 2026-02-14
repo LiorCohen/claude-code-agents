@@ -5,7 +5,7 @@ description: Initialize a new SDD project with minimal structure.
 
 # /sdd-init
 
-Initialize a new spec-driven project with minimal structure. Components are scaffolded on-demand when you create changes that need them.
+Initialize a new spec-driven project with minimal structure. Components are scaffolded during implementation when the plan includes a scaffolding phase.
 
 ## Usage
 
@@ -302,5 +302,5 @@ NEXT STEPS:
     /sdd-change new --spec path/to/requirements.md
 
   Components (server, webapp, database, contract, testing, cicd)
-  will be scaffolded on-demand when your changes need them.
+  are scaffolded during implementation when the plan includes them.
 ```

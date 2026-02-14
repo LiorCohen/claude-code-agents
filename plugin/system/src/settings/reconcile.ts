@@ -206,15 +206,6 @@ export const reconcileSettings = (
           },
         ]
       : []),
-    ...(rawProject.type !== undefined
-      ? [
-          {
-            type: 'removed' as const,
-            field: 'project.type',
-            detail: 'Deprecated — project type no longer tracked in settings',
-          },
-        ]
-      : []),
   ];
 
   // =========================================================================

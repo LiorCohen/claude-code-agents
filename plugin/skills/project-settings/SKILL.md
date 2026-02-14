@@ -301,8 +301,8 @@ sdd:
 project:
   name: "{{PROJECT_NAME}}"
 
-# Components are added here as they are scaffolded via /sdd-change new
-# The first change targeting a component type triggers scaffolding.
+# Components are added here as they are scaffolded during implementation.
+# The plan determines when scaffolding is needed for new components.
 #
 # Example after scaffolding a server:
 #   - name: my-app-server
