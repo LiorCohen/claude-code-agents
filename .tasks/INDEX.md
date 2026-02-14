@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#136](2-planning/136/): Remove version bump command from system CLI
+(none)
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#136](4-implementing/136/): Remove version bump command from system CLI
 
 ---
 
