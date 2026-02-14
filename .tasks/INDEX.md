@@ -10,13 +10,13 @@
 
 ## Plan Review
 
-- [#138](3-plan-review/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
+(none)
 
 ---
 
 ## Implementing
 
-(none)
+- [#138](4-implementing/138/plan.md): Separate component discovery from scaffolding in sdd-change new flow
 
 ---
 
