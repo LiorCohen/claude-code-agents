@@ -24,6 +24,8 @@ The fix: remove scaffolding from `sdd-change new` entirely, and make it a normal
 | `plugin/skills/component-discovery/schemas/output.schema.json` | Remove non-existent `project_type` field |
 | `plugin/skills/spec-solicitation/resources/solicitation-steps.md` | Update Step 9 to populate Settings column when writing Components section |
 | `plugin/agents/devops.md` | Add `scaffolding` to skills frontmatter |
+| `plugin/system/src/settings/reconcile.ts` | Remove dead `project.type` deprecation handler |
+| `tests/src/tests/unit/settings/settings-reconcile.test.ts` | Remove `project.type` removal test |
 
 ## Changes
 
@@ -206,6 +208,53 @@ skills:
 ```
 
 The `scaffolding` skill is the orchestrator that coordinates component-specific scaffolding skills (backend-scaffolding, frontend-scaffolding, etc.) — the agent only needs the orchestrator, not each individual one.
+
+### 9. Remove dead project.type deprecation handler
+
+In `plugin/system/src/settings/reconcile.ts`, remove lines 209-217 — the `project.type` deprecation handler in the `deprecatedProjectChanges` array. This code strips `project.type` from old settings files, but the field was never consumed and is now fully removed from the system. The `project.domain` handler (lines 200-207) stays — it's a separate deprecation.
+
+Change:
+
+```typescript
+const deprecatedProjectChanges: readonly ReconciliationChange[] = [
+  ...(rawProject.domain !== undefined
+    ? [
+        {
+          type: 'removed' as const,
+          field: 'project.domain',
+          detail: 'Deprecated — domain inference moved to sdd-change',
+        },
+      ]
+    : []),
+  ...(rawProject.type !== undefined
+    ? [
+        {
+          type: 'removed' as const,
+          field: 'project.type',
+          detail: 'Deprecated — project type no longer tracked in settings',
+        },
+      ]
+    : []),
+];
+```
+
+To:
+
+```typescript
+const deprecatedProjectChanges: readonly ReconciliationChange[] = [
+  ...(rawProject.domain !== undefined
+    ? [
+        {
+          type: 'removed' as const,
+          field: 'project.domain',
+          detail: 'Deprecated — domain inference moved to sdd-change',
+        },
+      ]
+    : []),
+];
+```
+
+In `tests/src/tests/unit/settings/settings-reconcile.test.ts`, remove lines 116-119 — the test case `'removes project.type'` inside the `'project field deprecation'` describe block.
 
 ## Dependencies
 
