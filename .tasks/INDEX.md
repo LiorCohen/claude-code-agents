@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#134](2-planning/134/plan.md): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
+(none)
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#134](4-implementing/134/plan.md): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition
 
 ---
 
