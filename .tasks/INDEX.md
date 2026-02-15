@@ -63,6 +63,7 @@
 
 ### Unprioritized
 
+- [#144](1-inbox/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
 - [#143](1-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis
 - [#142](1-inbox/142/): Add charting library to frontend standards and scaffold
 - [#141](1-inbox/141/): Remove 'implement' from critic auto-triggers
