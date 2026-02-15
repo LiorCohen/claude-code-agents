@@ -52,7 +52,7 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 
 - No spec-review gate — speccing is interactive, user explicitly approves transition to planning
 - No changes to phases 2-8 (planning through consolidated)
-- Nothing inside the `plugin/` folder — this is entirely a root `.claude/` and `.tasks/` change
+- Nothing inside the `plugin/` folder — changes are limited to `.claude/`, `.tasks/`, and `.critic/`
 - Completed/archived task files that reference `1-inbox/` paths are historical artifacts — do NOT modify
 
 ## Constraints
