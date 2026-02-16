@@ -86,7 +86,7 @@ When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces
 
 **Global options** (preserved from current sdd-run): `--json`, `--verbose`, `--help`.
 
-**Execution model**: Each namespace+action maps to `system-run.sh <namespace> <action> [args] [options]` — same as current sdd-run. The new sdd-run.md preserves this execution section.
+**Execution model**: For pass-through namespaces (database, contract, permissions), the action maps directly to `system-run.sh <namespace> <action> [args] [options]` — same as current sdd-run. For orchestrated namespaces (change, init, config, version, local-env), sdd-run.md INVOKEs the corresponding orchestrator skill, which may internally call `system-run.sh`. Note: the system CLI uses `env` as the namespace name; the `local-env` orchestrator maps `local-env` (user-facing) → `env` (system CLI).
 
 #### Namespace documentation
 
@@ -124,7 +124,7 @@ Scenario: You've just initialized a project and the init workflow offered to con
 When to use: You want to check if your project is up to date with the installed plugin, or diagnose version mismatches.
 Scenario: Your team reports that a command isn't working as expected. You run `version` and see the project was last reconciled with v6.2.0 but the installed plugin is v7.0.0. The output tells you to run `/sdd-run init` to reconcile.
 
-**Internal namespaces** (NOT user-facing, NOT shown in `/sdd-run help`): `scaffolding`, `spec`, `hook`, `contract generate-types`, `settings`. These are invoked internally by skills/commands via `system-run.sh` and remain unchanged. Settings was never user-facing — it is managed internally by the `project-settings` skill (invoked during init, change workflows, and by `/sdd` when users describe settings changes in natural language).
+**Internal namespaces** (NOT user-facing, NOT shown in `/sdd-run help`): `scaffolding`, `spec`, `hook`, `contract generate-types`, `settings`, `workflow`, `archive`. These are invoked internally by skills/commands via `system-run.sh` and remain unchanged. Settings was never user-facing — it is managed internally by the `project-settings` skill (invoked during init, change workflows, and by `/sdd` when users describe settings changes in natural language).
 
 **Dispatcher architecture**: sdd-run.md is a pure thin dispatcher — it contains no inlined logic. Each namespace delegates to either an orchestrator skill or a trivial pass-through. sdd-run.md itself only contains: namespace routing, help output, global options, and namespace documentation with usage scenarios.
 
@@ -259,7 +259,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `docs/components.md` | Update | Replace command refs with `/sdd` prompts |
 | `docs/agents.md` | Update | Replace command refs with `/sdd` prompts |
 | `docs/workflow-progress.md` | Update | Replace command refs with `/sdd` prompts |
-| `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 |
+| `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 + add orchestrator skill paths to `skills` array |
 | `.claude-plugin/marketplace.json` | Update | Version bump to 7.0.0 |
 | `changelog/v7.md` | Create | New major version changelog |
 
@@ -285,3 +285,4 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 5 matches (change, init, config, version, local-env).
 19. **Old local-env skill removed**: The `local-env` skill no longer exists at its original location. Verify: `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed".
 20. **User-facing references use `/sdd` prompts, not `/sdd-run`**: Docs, README, and non-orchestrator skills reference `/sdd` with natural language prompts. Verify: `grep -rn "/sdd-run" plugin/skills/ docs/ README.md --include="*.md" | grep -v "docs/commands.md" | grep -v "orchestrators/"` returns zero matches (excluding docs/commands.md which documents all three commands, and orchestrators which are internal dispatchers).
+21. **Plugin manifest discovers orchestrator skills**: The `skills` array in `plugin.json` includes paths for each orchestrator directory. Verify: `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns at least 5 matches (change-orchestration, init-orchestration, config-orchestration, version-orchestration, local-env-orchestration).
