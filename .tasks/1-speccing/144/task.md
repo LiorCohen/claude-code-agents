@@ -210,7 +210,8 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 - **Clean break**: Old command names are deleted entirely — no aliases or deprecation period
 - **System CLI mostly untouched**: The internal `system-run.sh` CLI and its handlers are not modified, except for the database namespace which adds `--env <env>` support (schema + handler changes in `plugin/system/src/commands/database/`)
 - **Skills/agents untouched in logic**: Only command *references* in skills and agents are updated; no behavioral changes. Note: `system-run.sh` invocations in skills are internal CLI calls, NOT command references — they must NOT be changed.
-- **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new` (now `change create`), sdd-version says `/sdd-init`). These output patterns inside sdd-run.md must reference the new command names.
+- **References use `/sdd` with natural language prompts**: All user-facing references to commands — in docs, README, scaffolding templates, agent advice, and orchestrator output messages — are replaced with `/sdd` and a relevant natural language prompt, NOT with `/sdd-run` equivalents. The goal is to funnel users through the Jarvis hub. Example: "Run `/sdd I want to create a new feature`" instead of "Run `/sdd-run change create --type feature`". Exceptions where `/sdd-run` is appropriate: (1) the `/sdd` command itself cross-references `/sdd-run` as "you can also run this directly", (2) `docs/commands.md` documents all three commands explicitly, (3) tests verify explicit `/sdd-run` command behavior, (4) marketplace skills (`.claude/skills/`) that describe how to author commands/skills.
+- **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new`, sdd-version says `/sdd-init`). These output patterns inside orchestrator skills must use `/sdd` with natural language prompts.
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
 - **Tutor is read-only**: `/sdd-help` teaches and demonstrates but does not execute actions or modify project state
@@ -243,21 +244,21 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/system/src/commands/database/schema.ts` | Update | Add `env` property to database args schema |
 | `plugin/system/src/commands/database/handler.ts` | Update | Thread `--env` arg to action functions |
 | `plugin/system/src/commands/database/*.ts` (7 action files) | Update | Accept and use env parameter |
-| `plugin/skills/` (33 files) | Update | Update old command references across all skills |
-| `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — generates project CLAUDE.md with command refs |
-| `plugin/agents/` | Update | Update command references in agent files |
-| `.claude/skills/` (3 files) | Update | Update old command references in marketplace skills (commands-standards, docs-standards, plugin-testing-standards) |
-| `tests/` (14 files) | Update | Update old command references in test files |
-| `README.md` | Update | Update command references (17 occurrences) |
-| `docs/commands.md` | Rewrite | Restructure around 3 new commands |
-| `docs/getting-started.md` | Update | Update command references |
-| `docs/workflows.md` | Update | Update command references |
-| `docs/external-specs.md` | Update | Update command references |
-| `docs/tutorial.md` | Update | Update command references |
-| `docs/config-guide.md` | Update | Update command references |
-| `docs/components.md` | Update | Update command references |
-| `docs/agents.md` | Update | Update command references |
-| `docs/workflow-progress.md` | Update | Update command references |
+| `plugin/skills/` (33 files) | Update | Replace old command refs with `/sdd` + natural language prompts |
+| `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — replace command refs with `/sdd` prompts |
+| `plugin/agents/` | Update | Replace command refs with `/sdd` + natural language prompts |
+| `.claude/skills/` (3 files) | Update | Update command refs in marketplace skills (these use `/sdd-run` since they describe command authoring) |
+| `tests/` (14 files) | Update | Update command refs to `/sdd-run` equivalents (tests need explicit commands) |
+| `README.md` | Update | Replace command refs with `/sdd` prompts (17 occurrences) |
+| `docs/commands.md` | Rewrite | Restructure around 3 new commands (documents all three explicitly) |
+| `docs/getting-started.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/workflows.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/external-specs.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/tutorial.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/config-guide.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/components.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/agents.md` | Update | Replace command refs with `/sdd` prompts |
+| `docs/workflow-progress.md` | Update | Replace command refs with `/sdd` prompts |
 | `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 |
 | `.claude-plugin/marketplace.json` | Update | Version bump to 7.0.0 |
 | `changelog/v7.md` | Create | New major version changelog |
@@ -274,12 +275,13 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 8. **`/sdd-help` is read-only**: The tutor does not invoke system CLI, write files, or execute commands. Verify: `grep -E "system-run|Bash|Write|Edit" plugin/commands/sdd-help.md` returns zero matches.
 9. **No stale references to old commands in plugin**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md"` returns zero matches.
 10. **No stale references to old commands in tests**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts"` returns zero matches.
-11. **Scaffolding template updated**: The project CLAUDE.md template references new commands. Verify: `grep -E "sdd-run|/sdd " plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns matches.
+11. **Scaffolding template uses `/sdd` prompts**: The project CLAUDE.md template references `/sdd` with natural language prompts, not `/sdd-run`. Verify: `grep "/sdd " plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns matches AND `grep "/sdd-run" plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns zero matches.
 12. **No stale references to old commands in docs**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" docs/ README.md` returns zero matches.
-13. **Agents still function**: The devops agent references `/sdd-run local-env` correctly. Verify: `grep "sdd-run local-env" plugin/agents/devops.md` returns matches.
+13. **Agents use `/sdd` prompts**: Agent files reference `/sdd` with natural language prompts, not `/sdd-run`. Verify: `grep -r "/sdd " plugin/agents/ --include="*.md"` returns matches AND `grep -r "/sdd-run" plugin/agents/ --include="*.md"` returns zero matches.
 14. **No stale `sdd-run env` references**: The `env` namespace is renamed to `local-env`. Verify: `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero matches (excluding historical notes in task files).
 15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" .claude/skills/ --include="*.md"` returns zero matches.
 16. **Database CLI accepts --env**: The database schema and handlers accept an `env` parameter. Verify: `grep "env" plugin/system/src/commands/database/schema.ts` returns a match.
 17. **Orchestrator skills exist**: Each namespace with non-trivial logic delegates to an orchestrator skill. Verify: `ls plugin/skills/orchestrators/` shows `change-orchestration/`, `init-orchestration/`, `config-orchestration/`, `version-orchestration/`, `local-env-orchestration/` — each containing a `SKILL.md`. The change-orchestration directory also contains phase sub-files. Verify: `ls plugin/skills/orchestrators/change-orchestration/` shows `SKILL.md`, `creation.md`, `spec-review.md`, `planning.md`, `implementation.md`, `verification.md`, `management.md`.
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 5 matches (change, init, config, version, local-env).
 19. **Old local-env skill removed**: The `local-env` skill no longer exists at its original location. Verify: `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed".
+20. **User-facing references use `/sdd` prompts, not `/sdd-run`**: Docs, README, skills, and agents reference `/sdd` with natural language prompts. Verify: `grep -rn "/sdd-run" plugin/skills/ plugin/agents/ docs/ README.md --include="*.md" | grep -v "docs/commands.md" | grep -v "orchestrators/" | grep -v ".tasks/"` returns zero matches (excluding docs/commands.md which documents all three commands, and orchestrators which are internal dispatchers).
