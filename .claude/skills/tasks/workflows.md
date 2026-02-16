@@ -96,7 +96,7 @@ User: /tasks plan 19
 
 **Precondition:** Task must be in `speccing` status. If not, refuse: "Task #19 must be specced before planning. Use `/tasks spec 19` first."
 
-**Speccing validation gate:** Verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content. Refuse if any section is missing or trivial.
+**Speccing validation gate:** Verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content. Pay special attention to Acceptance Criteria: every criterion must have an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms." Refuse if any section is missing or insufficient.
 
 **Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 

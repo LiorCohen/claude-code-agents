@@ -148,7 +148,7 @@ Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
 **Precondition:** Task must be in `speccing` status. If not, refuse with: "Task #<id> must be specced before planning. Use `/tasks spec <id>` first."
 
-**Speccing validation gate:** Before transitioning, verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. If any section is missing or insufficient, refuse with details.
+**Speccing validation gate:** Before transitioning, verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. Pay special attention to Acceptance Criteria: every criterion must have an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms." If any section is missing or insufficient, refuse with details.
 
 **Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 

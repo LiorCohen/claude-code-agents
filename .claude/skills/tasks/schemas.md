@@ -96,8 +96,10 @@ Why this change is needed. What problem it solves. What breaks without it.
 
 ## Acceptance Criteria
 
-- [ ] Testable criterion 1
-- [ ] Testable criterion 2
+Each criterion must have an external verification method — a command, test, or observable output that proves it works without relying on Claude's self-assessment.
+
+- [ ] Criterion — **verify:** `command or test that proves it`
+- [ ] Criterion — **verify:** `command or test that proves it`
 ```
 
 ### Completed Task Template
