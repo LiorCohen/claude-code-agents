@@ -202,7 +202,7 @@ export const reconcileSettings = (
           {
             type: 'removed' as const,
             field: 'project.domain',
-            detail: 'Deprecated — domain inference moved to sdd-change',
+            detail: 'Deprecated — domain inference moved to change workflow',
           },
         ]
       : []),
