@@ -159,7 +159,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 ## Constraints
 
 - **Clean break**: Old command names are deleted entirely — no aliases or deprecation period
-- **System CLI untouched**: The internal `system-run.sh` CLI and its handlers are not modified
+- **System CLI mostly untouched**: The internal `system-run.sh` CLI and its handlers are not modified, except for the database namespace which adds `--env <env>` support (schema + handler changes in `plugin/system/src/commands/database/`)
 - **Skills/agents untouched in logic**: Only command *references* in skills and agents are updated; no behavioral changes. Note: `system-run.sh` invocations in skills are internal CLI calls, NOT command references — they must NOT be changed.
 - **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new`, sdd-version says `/sdd-init`). These output patterns inside sdd-run.md must reference the new command names.
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
@@ -181,6 +181,9 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/commands/sdd-version.md` | Delete | Absorbed into `/sdd-run version` |
 | `plugin/skills/orchestrators/change-orchestration/SKILL.md` | Create | Multi-step change lifecycle logic (from sdd-change.md) |
 | `plugin/skills/orchestrators/init-orchestration/SKILL.md` | Create | 6-phase init workflow logic (from sdd-init.md) |
+| `plugin/system/src/commands/database/schema.ts` | Update | Add `env` property to database args schema |
+| `plugin/system/src/commands/database/handler.ts` | Update | Thread `--env` arg to action functions |
+| `plugin/system/src/commands/database/*.ts` (7 action files) | Update | Accept and use env parameter |
 | `plugin/skills/` (33 files) | Update | Update old command references across all skills |
 | `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — generates project CLAUDE.md with command refs |
 | `plugin/agents/` | Update | Update command references in agent files |
@@ -217,6 +220,6 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 13. **Agents still function**: The devops agent references `/sdd-run local-env` correctly. Verify: `grep "sdd-run local-env" plugin/agents/devops.md` returns matches.
 14. **No stale `sdd-run env` references**: The `env` namespace is renamed to `local-env`. Verify: `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero matches (excluding historical notes in task files).
 15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" .claude/skills/ --include="*.md"` returns zero matches.
-16. **System CLI untouched**: No files under `plugin/system/src/` are modified. Verify: `git diff --name-only plugin/system/` returns empty.
+16. **Database CLI accepts --env**: The database schema and handlers accept an `env` parameter. Verify: `grep "env" plugin/system/src/commands/database/schema.ts` returns a match.
 17. **Orchestrator skills exist**: The orchestration logic from deleted commands lives in dedicated skills. Verify: `ls plugin/skills/orchestrators/` shows `change-orchestration/`, `init-orchestration/` — each containing a `SKILL.md`.
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates complex namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 2 matches (change, init).
