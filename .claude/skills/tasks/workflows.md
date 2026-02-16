@@ -107,7 +107,11 @@ User: /tasks plan 19
 4. Create empty `plan.md` skeleton in the task folder (frontmatter + headings only, no content yet)
 5. Update INDEX.md
 6. Stage changes and use commit skill (e.g., "Tasks: Move #19 to planning")
-7. Confirm with clickable link to plan
+**Output:**
+```
+Task #19 moved to planning status.
+Plan: [plan.md](.tasks/2-planning/19/plan.md)
+```
 
 **Workflow — Phase 2 (only after the transition commit completes):**
 8. Research the codebase and write the actual plan content in `plan.md`
