@@ -53,7 +53,6 @@
 - [#113](0-inbox/113/): Investigate and remove domain dead code across plugin
 - [#71](0-inbox/71/): Anti-stop hook to prevent accidental session termination
 - [#70](0-inbox/70/): Git checkpoint workflow for AI-assisted development
-- [#66](0-inbox/66/): Single context-aware SDD command
 - [#56](0-inbox/56/): Create architecture skill with meaningful guidance
 - [#16](0-inbox/16/): Plan changes should cascade to dependent items
 
@@ -179,6 +178,7 @@
 ## Consolidated
 
 - [#139](8-consolidated/139/) → #138
+- [#66](8-consolidated/66/) → #144
 - [#79](8-consolidated/79/) → #138
 - [#111](8-consolidated/111/) → #114
 - [#108](8-consolidated/108/) → #120

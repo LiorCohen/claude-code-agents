@@ -85,6 +85,8 @@ Absorbs all current functionality under namespaced subcommands:
 /sdd-run help                    ← show all namespaces and subcommands
 ```
 
+When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces and their subcommands.
+
 ### `/sdd` — Context-aware workflow assistant (Jarvis)
 
 The hub command. Aware of `/sdd-help` and `/sdd-run` and cross-references them.
@@ -93,9 +95,11 @@ The hub command. Aware of `/sdd-help` and `/sdd-run` and cross-references them.
 1. **Understand** — read context, interpret the user's request
 2. **Explain** — tell the user what it understood and what it intends to do (including the specific `/sdd-run` command it would invoke)
 3. **Ask** — request explicit approval before proceeding
-4. **Execute** — only after the user approves
+4. **Execute** — only after the user approves, by invoking the Skill tool with the `sdd-run` command (e.g., `Skill(sdd-run, args: "change new --type feature")`)
 
 This is non-negotiable. The Jarvis interprets natural language, which means it can misinterpret. The approval step catches misunderstandings before they become actions.
+
+**Invocation mechanism:** `/sdd` delegates to `/sdd-run` via the Skill tool — it does not inline `/sdd-run` logic. This keeps the two commands decoupled.
 
 When invoked with no arguments:
 1. Reads project context:
@@ -130,18 +134,21 @@ Capabilities:
 
 The tutor does not execute actions itself — it teaches and demonstrates, referring only to `/sdd` for doing work. The tutor is not aware of `/sdd-run`; users discover `/sdd-run` organically through `/sdd`'s cross-references.
 
+### Consolidated tasks
+
+- **#66** (Single context-aware SDD command) — subsumed by `/sdd` Jarvis command
+
 ### File changes
 
 - **Delete**: `plugin/commands/sdd-change.md`, `sdd-config.md`, `sdd-init.md`, `sdd-settings.md`, `sdd-version.md`
 - **Rewrite**: `plugin/commands/sdd-run.md` as the unified explicit command
 - **Create**: `plugin/commands/sdd.md` as the Jarvis command
 - **Create**: `plugin/commands/sdd-help.md` as the tutor command
-- **Update**: All agent and skill references from old command names to new names
-  - `plugin/agents/devops.md` — already uses `/sdd-run env`, may need minor updates
-  - `plugin/skills/` — update references to `/sdd-change` → `/sdd-run change`, etc.
-  - `plugin/skills/commit-standards/SKILL.md` — update command references
-  - `plugin/skills/external-spec-integration/SKILL.md` — update entry point reference
-  - `plugin/skills/spec-writing/resources/frontmatter-validation.md` — update `/sdd-change` references
+- **Update**: 33 skill files across `plugin/skills/` that reference old command names
+- **Update**: Agent files that reference old command names
+- **Update**: Scaffolding template `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` — this generates the project's CLAUDE.md during `sdd-init` and references old command names
+- **Update**: 14 test files under `tests/` that reference old command names
+- **Update**: Docs (`docs/*.md`, `README.md`)
 
 ## Constraints
 
@@ -151,6 +158,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
 - **Tutor is read-only**: `/sdd-help` teaches and demonstrates but does not execute actions or modify project state
+- **Major version bump**: This is a breaking change (entire command surface replaced). Triggers version 7.0.0. A new `changelog/v7.md` file will be created.
 
 ## Changes
 
@@ -164,11 +172,14 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/commands/sdd-init.md` | Delete | Absorbed into `/sdd-run init` |
 | `plugin/commands/sdd-settings.md` | Delete | Absorbed into `/sdd-run settings` |
 | `plugin/commands/sdd-version.md` | Delete | Absorbed into `/sdd-run version` |
-| `plugin/agents/devops.md` | Update | Update any stale command references |
-| `plugin/skills/commit-standards/SKILL.md` | Update | Update command references |
-| `plugin/skills/external-spec-integration/SKILL.md` | Update | Update entry point reference |
-| `plugin/skills/spec-writing/resources/frontmatter-validation.md` | Update | Update `/sdd-change` references |
+| `plugin/skills/` (33 files) | Update | Update old command references across all skills |
+| `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — generates project CLAUDE.md with command refs |
+| `plugin/agents/` | Update | Update command references in agent files |
+| `tests/` (14 files) | Update | Update old command references in test files |
 | Docs (`docs/*.md`, `README.md`) | Update | Update all command references |
+| `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 |
+| `.claude-plugin/marketplace.json` | Update | Version bump to 7.0.0 |
+| `changelog/v7.md` | Create | New major version changelog |
 
 ## Acceptance Criteria
 
@@ -180,6 +191,8 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
 7. **`/sdd-help` covers core concepts**: The `sdd-help.md` file includes sections on SDD methodology, capability discovery, and guided walkthrough. Verify: `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches.
 8. **`/sdd-help` is read-only**: The tutor does not invoke system CLI, write files, or execute commands. Verify: `grep -E "system-run|Bash|Write|Edit" plugin/commands/sdd-help.md` returns zero matches.
-9. **No stale references to old commands**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md"` returns zero matches (excluding changelog/historical references).
-10. **Agents still function**: The devops agent references `/sdd-run env` correctly. Verify: `grep "sdd-run env" plugin/agents/devops.md` returns matches.
-11. **System CLI untouched**: No files under `plugin/system/src/` are modified. Verify: `git diff --name-only plugin/system/` returns empty.
+9. **No stale references to old commands in plugin**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md"` returns zero matches.
+10. **No stale references to old commands in tests**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts"` returns zero matches.
+11. **Scaffolding template updated**: The project CLAUDE.md template references new commands. Verify: `grep -E "sdd-run|/sdd " plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns matches.
+12. **Agents still function**: The devops agent references `/sdd-run env` correctly. Verify: `grep "sdd-run env" plugin/agents/devops.md` returns matches.
+13. **System CLI untouched**: No files under `plugin/system/src/` are modified. Verify: `git diff --name-only plugin/system/` returns empty.
