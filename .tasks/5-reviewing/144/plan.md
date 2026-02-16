@@ -276,6 +276,22 @@ The bulk-update phase. Process every file that references old command names.
    - Update the version table: change v6's range to `6.0.0 – 6.x.x` (final 6.x version) and add v7 row
    - Update v6's date range to end date
 
+### Phase 9: Sub-help for insufficient arguments
+
+Add argument validation to `sdd-run.md` so that every namespace displays a focused sub-help message when invoked with insufficient arguments, instead of executing or failing.
+
+**Orchestrated namespaces** (change, init, config, version, local-env) already have "No Arguments" sections in their orchestrator skills — no changes needed.
+
+**Pass-through namespaces** need sub-help blocks added to `sdd-run.md`:
+- `database` — sub-help when no action; sub-help when action but no component
+- `contract` — sub-help when no action; sub-help when action but no component
+- `permissions` — sub-help when no action
+
+Also add an "Argument Validation — Sub-Help" section establishing the 3-level validation pattern:
+1. No namespace → full namespace reference
+2. Namespace but no action → namespace sub-help
+3. Namespace + action but missing required args → action-specific help
+
 ## Dependencies
 
 1. **Phase 1** (orchestrators) has no dependencies — can start immediately
@@ -286,6 +302,7 @@ The bulk-update phase. Process every file that references old command names.
 6. **Phase 6** (database --env) is independent — can run any time
 7. **Phase 7** (update refs) depends on Phases 1-5 — needs new command names to exist, old ones deleted
 8. **Phase 8** (version/changelog) runs last — captures all changes
+9. **Phase 9** (sub-help) depends on Phase 2 — adds to sdd-run.md
 
 Critical path: Phase 1 → Phase 2 → Phase 3 → Phase 5 → Phase 7 → Phase 8
 

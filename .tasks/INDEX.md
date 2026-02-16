@@ -22,13 +22,13 @@
 
 ## Implementing
 
-- [#144](4-implementing/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#144](5-reviewing/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
 
 ---
 
