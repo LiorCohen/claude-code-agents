@@ -27,6 +27,7 @@ Best practices, conventions, and lifecycle documentation.
 10. **Update both** - Task folder AND INDEX.md must stay in sync
 11. **Add context** - When completing, summarize what was done
 12. **Date everything** - Completion dates help track velocity
+13. **Branch isolation** - Feature branches only modify their associated task; new tasks go on main
 
 ---
 
@@ -35,7 +36,11 @@ Best practices, conventions, and lifecycle documentation.
 ### Task Lifecycle
 
 ```
-                  1-inbox/ (open tasks)
+                  0-inbox/ (open tasks)
+                           ↓
+                     [/tasks spec]
+                           ↓
+                     1-speccing/
                            ↓
                      [/tasks plan]
                            ↓

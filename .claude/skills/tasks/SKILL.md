@@ -15,14 +15,12 @@ Manage the project backlog, track progress, and organize implementation plans.
 ```
 .tasks/
 ├── INDEX.md              # Index file - task numbers, titles, links
-├── 1-inbox/              # Open tasks (not yet started)
+├── 0-inbox/              # Open tasks (not yet started)
+├── 1-speccing/           # Spec being refined (interactive solicitation)
 ├── 2-planning/           # Plan being created
 ├── 3-plan-review/        # Plan review checkpoint
-│   └── .gitkeep
 ├── 4-implementing/       # Currently being worked on
-│   └── .gitkeep
 ├── 5-reviewing/          # Implementation complete, under review
-│   └── .gitkeep
 ├── 6-complete/           # Done
 ├── 7-rejected/           # Rejected or irrelevant
 └── 8-consolidated/       # Consolidated into other tasks
@@ -54,7 +52,7 @@ Read `.tasks/INDEX.md` and display **all** non-archival tasks in a single markdo
 
 Render task references as clickable markdown links:
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
-- Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+- Otherwise: link to task.md, e.g., `[#67](.tasks/0-inbox/67/task.md)`
 
 **Table format** — one table, four columns: `Status`, `Priority`, `#`, `Task`:
 
@@ -64,11 +62,12 @@ Render task references as clickable markdown links:
 ```
 
 **Status column values:**
+- `📝 Speccing`
 - `📐 Planning`
 - `✅ Plan Review`
 - `🔨 Implementing`
 - `🔍 Reviewing`
-- `📥 Inbox` (for tasks in 1-inbox/)
+- `📥 Inbox` (for tasks in 0-inbox/)
 
 **Priority column values:**
 - `🔴 High`
@@ -105,7 +104,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 ```
 
 1. Determine next task number (highest N + 1)
-2. Create `1-inbox/<N>/task.md`
+2. Create `0-inbox/<N>/task.md`
 3. Add to INDEX.md under Inbox
 4. Use commit skill: `Skill(commit, args: '-m "Tasks: Add #<N>"')`
 
@@ -123,11 +122,35 @@ Find and read the task file at `<status-dir>/19/task.md`.
 
 ---
 
+### Start Speccing
+
+```
+/tasks spec <id>
+```
+
+Moves a task from inbox (or back from planning) to speccing, then interactively solicits the task spec from the user.
+
+**From inbox:** Move folder to `1-speccing/`, update status to `speccing`, update INDEX.md, commit. Then begin interactive solicitation.
+
+**From planning (back-transition for substantial rework):** Move folder back to `1-speccing/`, update status to `speccing`, update INDEX.md, commit. Then resume solicitation.
+
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. There is no defined end — the user decides when the spec is complete.
+
+Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
+
+---
+
 ### Start Planning
 
 ```
 /tasks plan <id>
 ```
+
+**Precondition:** Task must be in `speccing` status. If not, refuse with: "Task #<id> must be specced before planning. Use `/tasks spec <id>` first."
+
+**Speccing validation gate:** Before transitioning, verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. Pay special attention to Acceptance Criteria: every criterion must have an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms." If any section is missing or insufficient, refuse with details.
+
+**Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 
 **Phase 1 — Transition (do this first, before any planning work):**
 1. Move folder to `2-planning/`
@@ -138,6 +161,7 @@ Find and read the task file at `<status-dir>/19/task.md`.
 
 **Phase 2 — Plan (only after commit completes):**
 6. Research the codebase and write the actual plan content in `plan.md`
+7. If planning reveals spec gaps, update task.md directly (never plan.md) and commit as a planning-phase spec update.
 
 **Critic check:** After writing the plan, invoke `/critic` for self-review before presenting the plan to the user.
 
@@ -272,12 +296,15 @@ Write report to `.temp/tasks-audit-<datetime>.md`.
 
 **CRITICAL:** Each `/tasks` command is a standalone operation. After executing the requested command, **STOP and return control to the user**. NEVER chain commands or advance a task to the next status without explicit user approval.
 
-- `/tasks add` → add to inbox, commit, stop. Do NOT proceed to plan.
+- `/tasks add` → add to inbox, commit, stop. Do NOT proceed to spec.
+- `/tasks spec` → move to speccing (or back-transition), run solicitation, stop. Do NOT proceed to plan.
 - `/tasks plan` → move to planning, create plan, commit, stop. Do NOT proceed to plan-review/implement.
 - `/tasks plan-review` → move to plan-review, commit, stop. Do NOT proceed to implement.
 - `/tasks implement` → move to implementing, create branch, commit, stop. Do NOT start coding.
 
 The user decides when to advance. Always wait for their instruction.
+
+**Branch isolation:** When working inside a feature branch or worktree, only modify the task associated with that branch. Never touch other tasks. Never create new tasks in a feature branch — create and commit them directly on main.
 
 ---
 
@@ -289,6 +316,7 @@ The user decides when to advance. Always wait for their instruction.
 - **Inbox first:** New tasks → inbox, prioritize later
 - **Worktree lifecycle:** Created by `/tasks implement`, removed by `/tasks complete`
 - **Preserve content:** Never lose original content when consolidating/rejecting
+- **Branch isolation:** Feature branches only modify their associated task; new tasks go on main
 
 **Full documentation:**
 - [schemas.md](schemas.md) - Task/plan formats and templates

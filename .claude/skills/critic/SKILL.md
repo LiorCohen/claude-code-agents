@@ -36,14 +36,15 @@ The collector has full session context — it can see what commands were just ru
 3. **If branch is `main`:**
    - Check session context for which task is being discussed (most reliable signal)
    - Check `git log --oneline -5` for recent task transitions
-   - Scan active status directories (`1-inbox/`, `2-planning/`, `3-plan-review/`, `4-implementing/`, `5-reviewing/`) for tasks
+   - Scan active status directories (`0-inbox/`, `1-speccing/`, `2-planning/`, `3-plan-review/`, `4-implementing/`, `5-reviewing/`) for tasks
    - Cross-reference all signals
    - If task in `4-implementing/` while on main → soft warning (S9): suggest switching to feature branch
    - If **exactly one** active task → use it, infer phase from status directory
    - If **multiple** active tasks and signals don't disambiguate → ask the user
    - If **no** active tasks → ask the user
-   - If task is in `1-inbox/` → **not a critic phase** — return immediately with no output (inbox operations don't trigger critic)
-   - Status-to-phase: `2-planning` → Phase 2/3/4, `3-plan-review` → Phase 4, `4-implementing` → Phase 5/6, `5-reviewing` → Phase 7/8
+   - If task is in `0-inbox/` → **not a critic phase** — return immediately with no output (inbox operations don't trigger critic)
+   - If task is in `1-speccing/` → **not a critic phase** during interactive solicitation — return immediately with no output. Exception: when `/tasks plan` is invoked on a speccing task, run Phase 1 (speccing exit gate) checks
+   - Status-to-phase: `1-speccing` (via `/tasks plan`) → Phase 1, `2-planning` → Phase 2/3/4, `3-plan-review` → Phase 4, `4-implementing` → Phase 5/6, `5-reviewing` → Phase 7/8
 
 4. **Disambiguating planning sub-phases (2, 3, 4):**
    - Task in `2-planning/` with empty plan.md skeleton → Phase 2 (starting planning)
@@ -199,6 +200,7 @@ After inferring the phase, read the `.critic/` file matching the current status 
 
 | Phase | .critic/ file |
 |-------|-------------|
+| 1 (speccing exit) | `speccing.md` |
 | 2-4 (planning) | `planning.md` |
 | 5-6 (implementing) | `implementation.md` |
 | 7 (review) | `review.md` |
@@ -222,6 +224,6 @@ The escalation matrix in [escalation.md](resources/escalation.md) annotates each
 ## Resource Files
 
 - [reviewer-prompt.md](resources/reviewer-prompt.md) — Prompt for the forked reviewer subagent
-- [phases.md](resources/phases.md) — Detailed checks for all 8 lifecycle phases
+- [phases.md](resources/phases.md) — Detailed checks for all lifecycle phases
 - [escalation.md](resources/escalation.md) — Hard block vs soft warning classification criteria
 - [feedback-loop.md](resources/feedback-loop.md) — Rules for maintaining the .critic/ learning directory

@@ -4,6 +4,21 @@ Each check is annotated with step ownership: **(C)** = collector (session-aware)
 
 ---
 
+## Phase 1: Speccing Exit Gate (`/tasks plan` on a speccing task)
+
+- (R) Are all 6 required sections present and non-empty? (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria)
+- (R) Does each section have meaningful content (not trivial one-liners or placeholders)?
+- (R) Is the scope clear enough that planning can focus purely on execution?
+- (R) Are acceptance criteria testable and specific?
+- (R) Does every acceptance criterion have an external verification method — a command, test, grep, or observable output? "Claude reads the file and confirms" is not verification. How do we know this works without trusting a prompt?
+- (C) Were guiding questions asked? Were open questions resolved?
+
+> *"The user says: Is the spec complete enough to plan against? If I can't tell what's changing from reading task.md alone, it's not ready. And if I can't verify a criterion without asking Claude to self-assess, it's not a real criterion."*
+
+**Escalation:** Empty/trivial sections = hard block (H13). Acceptance criteria without external verification = hard block (H13). Vague acceptance criteria = soft warning.
+
+---
+
 ## Phase 2: Starting Planning (`/tasks plan`)
 
 - (C) Which files have you actually Read (full file) vs Grep'd? List them

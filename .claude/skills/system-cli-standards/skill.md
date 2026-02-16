@@ -204,7 +204,7 @@ Every `system-run.sh <namespace> <action>` reference in a prompt file must corre
    - **Violation**: Something that is currently broken or wrong
    - **Authority issue**: A deterministic operation in a prompt that should be a CLI command (improves speed and reliability)
 5. Write report to `.temp/system-cli-audit-<datetime>.md`
-6. Ask the user if they want to turn the audit into a task. If yes, **copy the report file into the task directory** (e.g., `.tasks/1-inbox/116/audit-<datetime>.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
+6. Ask the user if they want to turn the audit into a task. If yes, **copy the report file into the task directory** (e.g., `.tasks/0-inbox/116/audit-<datetime>.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
 
 **Note:** `plugin/system/README.md` is the CLI's own documentation and is out of scope for prompt file audits.
 

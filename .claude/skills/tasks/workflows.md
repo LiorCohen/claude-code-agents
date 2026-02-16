@@ -13,7 +13,7 @@ User: /tasks list
 
 **Action:** Read INDEX.md and display the index, grouped by section. Always show all tasks in each section with their full titles - never abbreviate or summarize the inbox or other sections. Skip empty sections and omit Completed, Rejected, and Consolidated sections (these are archival). Render each task reference (`#XX`) as a markdown link pointing to its primary file relative to the repo root:
 - If task has a plan.md file: link to plan.md, e.g., `[#67](.tasks/2-planning/67/plan.md)`
-- Otherwise: link to task.md, e.g., `[#67](.tasks/1-inbox/67/task.md)`
+- Otherwise: link to task.md, e.g., `[#67](.tasks/0-inbox/67/task.md)`
 
 ---
 
@@ -35,7 +35,7 @@ User: /tasks add <description>
 
 **Workflow:**
 1. Determine next task number (highest N + 1 across all status dirs)
-2. Create folder `1-inbox/<N>/` with `task.md`
+2. Create folder `0-inbox/<N>/` with `task.md`
 3. Add entry to INDEX.md under Inbox
 4. Stage changes and use commit skill: `Skill(commit, args: '-m "Tasks: Add #63"')`
 5. Confirm with task number
@@ -62,11 +62,43 @@ User: /tasks prioritize 15 low
 
 ---
 
+## Start Speccing
+
+```
+User: /tasks spec 19
+```
+
+**From inbox:**
+1. Find task folder in `0-inbox/`
+2. Move folder to `1-speccing/`
+3. Update `task.md` frontmatter: `status: speccing`
+4. Update INDEX.md
+5. Stage changes and use commit skill (e.g., "Tasks: Move #19 to speccing")
+6. Begin interactive solicitation (see below)
+
+**From planning (back-transition for substantial rework):**
+1. Find task folder in `2-planning/`
+2. Move folder to `1-speccing/`
+3. Update `task.md` frontmatter: `status: speccing`
+4. Update INDEX.md
+5. Stage changes and use commit skill (e.g., "Tasks: Move #19 back to speccing")
+6. Resume solicitation
+
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. The user decides when the spec is complete — there is no defined end.
+
+---
+
 ## Start Planning
 
 ```
 User: /tasks plan 19
 ```
+
+**Precondition:** Task must be in `speccing` status. If not, refuse: "Task #19 must be specced before planning. Use `/tasks spec 19` first."
+
+**Speccing validation gate:** Verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content. Pay special attention to Acceptance Criteria: every criterion must have an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms." Refuse if any section is missing or insufficient.
+
+**Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 
 **Workflow — Phase 1 (transition first, before any planning work):**
 1. Find task folder
@@ -75,7 +107,6 @@ User: /tasks plan 19
 4. Create empty `plan.md` skeleton in the task folder (frontmatter + headings only, no content yet)
 5. Update INDEX.md
 6. Stage changes and use commit skill (e.g., "Tasks: Move #19 to planning")
-7. Confirm with clickable link to plan
 
 **Output:**
 ```
@@ -85,7 +116,8 @@ Plan: [plan.md](.tasks/2-planning/19/plan.md)
 ```
 
 **Workflow — Phase 2 (only after the transition commit completes):**
-8. Research the codebase and write the actual plan content in `plan.md`
+7. Research the codebase and write the actual plan content in `plan.md`
+8. If planning reveals spec gaps, update task.md directly (never plan.md) and commit as a planning-phase spec update.
 
 **IMPORTANT:** The status transition and commit MUST complete before any planning work begins. Do not start researching or writing plan content until the transition is committed.
 
@@ -314,7 +346,7 @@ User: /tasks audit
 #### 2. Frontmatter Compliance
 - All required fields present (`id`, `title`, `status`, `created`)
 - `id` matches the folder name
-- `status` matches the directory the task lives in (e.g., `1-inbox/` → `inbox`, `7-rejected/` → `rejected`)
+- `status` matches the directory the task lives in (e.g., `0-inbox/` → `inbox`, `1-speccing/` → `speccing`, `7-rejected/` → `rejected`)
 - Rejected tasks have `rejected_reason`
 - Consolidated tasks have `consolidated_into`
 - Completed tasks have `completed` datetime
@@ -322,7 +354,7 @@ User: /tasks audit
 - `depends_on` and `blocks` reference task IDs that exist
 
 #### 3. INDEX.md Sync
-- Every non-archived task (inbox, planning, plan-review, implementing, reviewing) appears in INDEX.md
+- Every non-archived task (inbox, speccing, planning, plan-review, implementing, reviewing) appears in INDEX.md
 - Every entry in INDEX.md points to a task folder that exists
 - Tasks appear in the correct INDEX.md section for their status, and in the correct priority sub-section under Inbox
 - Rejected entries include a reason summary
@@ -380,6 +412,7 @@ When the user gives task-related instructions, **automatically move the task to 
 
 | User instruction | Inferred status | Action |
 |------------------|-----------------|--------|
+| "Spec task 19" / "Flesh out #19" | `speccing` | Move to `1-speccing/`, begin solicitation |
 | "Plan task 19" / "Create a plan for #19" | `planning` | Move to `2-planning/`, create `plan.md` |
 | "Task 19 is ready for plan review" / "Mark #19 plan-review" | `plan-review` | Move to `3-plan-review/` |
 | "Let's work on task 19" / "Implement #19" | `implementing` | Move to `4-implementing/`, create branch + worktree |
@@ -391,4 +424,6 @@ When the user gives task-related instructions, **automatically move the task to 
 
 **After completing implementation work, automatically move the task to `5-reviewing/`** to signal that implementation is done and ready for user review.
 
-Skip forward transitions are allowed (e.g., inbox → implementing for quick fixes without formal planning).
+Skip-forward transitions are allowed (e.g., inbox → implementing for quick fixes), but Claude must always challenge the user before skipping phases: "This task hasn't been specced/planned — are you sure?" Require explicit confirmation before proceeding.
+
+**Branch isolation:** When working inside a feature branch or worktree, only modify the task associated with that branch. Never touch other tasks. Never create new tasks in a feature branch — create and commit them directly on main.

@@ -1,7 +1,7 @@
 ---
 id: 145
 title: Add speccing phase to task lifecycle with structural validation gate
-status: implementing
+status: reviewing
 priority: null
 created: 2026-02-15
 ---
@@ -26,10 +26,10 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 
 - Rename `1-inbox/` to `0-inbox/`
 - Create new `1-speccing/` phase directory
-- Add `/tasks spec <id>` command — moves task from inbox to speccing, then interactively solicits the task spec from the user through guiding questions. Maintains a running list of open questions. There is no well-defined "end of speccing" — the user decides when the spec is complete. The goal is a user-approved task/spec with all 5 required sections filled.
+- Add `/tasks spec <id>` command — moves task from inbox to speccing, then interactively solicits the task spec from the user through guiding questions. Maintains a running list of open questions. There is no well-defined "end of speccing" — the user decides when the spec is complete. The goal is a user-approved task/spec with all 6 required sections filled.
 - `/tasks add` stays low-ceremony — creates a minimal task.md (title + brief description). The speccing phase is where the task gets fleshed out into a proper spec.
-- Update task.md specced template with 5 required sections: Description, Motivation, Scope, Constraints, Acceptance Criteria
-- Add structural validation gate: `/tasks plan` must verify all 5 sections have meaningful content (not trivial one-liners or placeholders) before allowing transition from speccing to planning
+- Update task.md specced template with 6 required sections: Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria
+- Add structural validation gate: `/tasks plan` must verify all 6 sections have meaningful content (not trivial one-liners or placeholders) before allowing transition from speccing to planning
 - Critic as speccing exit gate: `/tasks plan` invokes `/critic` before transitioning — the critic verifies the spec is complete and coherent before planning begins
 - Hard constraint: planning refuses to start if task hasn't been through speccing
 - Skip-forward transitions (e.g., inbox → implementing) remain possible for simple tasks, but Claude must always challenge the user before skipping phases ("This task hasn't been specced/planned — are you sure?") and require explicit confirmation
@@ -74,10 +74,10 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 - [ ] `/tasks spec <id>` works on tasks in `2-planning/` to send them back to speccing (for substantial rework)
 - [ ] During planning, spec gaps are fixed in task.md (never in plan.md)
 - [ ] `/tasks plan <id>` refuses if task is not in speccing status
-- [ ] `/tasks plan <id>` refuses if any of the 5 required sections lack meaningful content
+- [ ] `/tasks plan <id>` refuses if any of the 6 required sections lack meaningful content
 - [ ] `/tasks plan <id>` invokes critic as speccing exit gate before transitioning
 - [ ] Skip-forward transitions prompt the user with a challenge before proceeding
-- [ ] Task template in schemas.md reflects the 5 required sections (specced template) while `/tasks add` stays minimal
+- [ ] Task template in schemas.md reflects the 6 required sections (specced template with Changes table) while `/tasks add` stays minimal
 - [ ] All INDEX.md links point to correct `0-inbox/` paths
 - [ ] All tasks skill files (SKILL.md, schemas.md, workflows.md, reference.md) updated consistently
 - [ ] Backlog table shows `📝 Speccing` status for tasks in `1-speccing/`
