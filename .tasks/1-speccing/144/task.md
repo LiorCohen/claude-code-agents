@@ -1,7 +1,7 @@
 ---
 id: 144
 title: Remove user-facing commands sdd-config, sdd-run, and sdd-settings
-status: inbox
+status: speccing
 priority: null
 created: 2026-02-15
 ---

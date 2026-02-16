@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#144](1-speccing/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
 
 ---
 
@@ -71,7 +71,6 @@
 
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
-- [#144](0-inbox/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
 - [#143](0-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis
 - [#142](0-inbox/142/): Add charting library to frontend standards and scaffold
 - [#141](0-inbox/141/): Remove 'implement' from critic auto-triggers
