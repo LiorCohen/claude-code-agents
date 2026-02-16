@@ -10,7 +10,7 @@
 
 ## Planning
 
-- [#144](2-planning/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
+(none)
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## Implementing
 
-(none)
+- [#144](4-implementing/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
 
 ---
 
