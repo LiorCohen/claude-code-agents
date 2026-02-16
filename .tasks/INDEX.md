@@ -68,6 +68,7 @@
 
 ### Unprioritized
 
+- [#149](0-inbox/149/): Add D2 skill
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
