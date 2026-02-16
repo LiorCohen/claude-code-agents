@@ -17,3 +17,6 @@
 - If the solution is more complex than the problem, reconsider the approach
 - When replacing an existing feature, systematically compare old vs new capability lists — enumerate every check/behavior the old version performs and verify the new version covers each one or explicitly justifies dropping it
 - Don't assume macOS has GNU tools — `grep -P` (Perl regex) doesn't work on BSD grep; use bash `[[ =~ ]]` for regex matching in portable scripts
+- File counts from subagent exploration must be independently verified — subagents can overcount (matching file paths as command refs) or undercount (missing bare references). Run the actual grep yourself and count the results before committing numbers to the plan
+- When iteratively updating the plan (e.g., adding files found during review), verify that corresponding counts in task.md are also updated — task and plan counts silently diverge during revision cycles
+- For major version bumps, `changelog/README.md` is a separate deliverable from `changelog/v{N}.md` — it needs a new summary paragraph and version table row. Easy to miss because it's not part of the standard changelog workflow
