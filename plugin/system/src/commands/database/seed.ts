@@ -16,7 +16,8 @@ import { findProjectRoot } from '@/lib/config';
 
 export const seed = async (
   componentName: string,
-  args: readonly string[]
+  args: readonly string[],
+  _env: string = 'local'
 ): Promise<CommandResult> => {
   const { named } = parseNamedArgs(args);
 

@@ -15,14 +15,15 @@ import { seed } from './seed';
 
 export const reset = async (
   componentName: string,
-  args: readonly string[]
+  args: readonly string[],
+  env: string = 'local'
 ): Promise<CommandResult> => {
-  console.log(`Resetting database for component: ${componentName}`);
+  console.log(`Resetting database for component: ${componentName} (env: ${env})`);
   console.log('');
 
   // Step 1: Teardown
   console.log('Step 1/4: Teardown...');
-  const teardownResult = await teardown(componentName, args);
+  const teardownResult = await teardown(componentName, args, env);
   if (!teardownResult.success) {
     // Teardown may fail if nothing to tear down, continue anyway
     console.log('  (No existing deployment to tear down)');
@@ -31,7 +32,7 @@ export const reset = async (
 
   // Step 2: Setup
   console.log('Step 2/4: Setup...');
-  const setupResult = await setup(componentName, args);
+  const setupResult = await setup(componentName, args, env);
   if (!setupResult.success) {
     return {
       success: false,
@@ -42,7 +43,7 @@ export const reset = async (
 
   // Step 3: Migrate
   console.log('Step 3/4: Migrate...');
-  const migrateResult = await migrate(componentName, args);
+  const migrateResult = await migrate(componentName, args, env);
   if (!migrateResult.success) {
     return {
       success: false,
@@ -53,7 +54,7 @@ export const reset = async (
 
   // Step 4: Seed
   console.log('Step 4/4: Seed...');
-  const seedResult = await seed(componentName, args);
+  const seedResult = await seed(componentName, args, env);
   if (!seedResult.success) {
     return {
       success: false,

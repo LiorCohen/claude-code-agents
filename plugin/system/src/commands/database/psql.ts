@@ -13,7 +13,8 @@ import { parseNamedArgs } from '@/lib/args';
 
 export const psql = async (
   componentName: string,
-  args: readonly string[]
+  args: readonly string[],
+  _env: string = 'local'
 ): Promise<CommandResult> => {
   const { named } = parseNamedArgs(args);
 
