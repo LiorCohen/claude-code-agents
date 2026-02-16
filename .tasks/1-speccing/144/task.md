@@ -52,8 +52,8 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | `change` | `implement <change-id>` | `/sdd-change implement` | `/sdd-run change implement` | Renamed |
 | `change` | `verify <change-id>` | `/sdd-change verify` | `/sdd-run change verify` | Renamed |
 | `change` | `review <change-id>` | `/sdd-change review` | `/sdd-run change review` | Renamed |
-| `change` | `answer <q-id> "<answer>"` | `/sdd-change answer` | `/sdd-run change answer` | Renamed |
-| `change` | `assume <q-id> "<assumption>"` | `/sdd-change assume` | `/sdd-run change assume` | Renamed |
+| `change` | `answer <change-id> <q-id> "<answer>"` | `/sdd-change answer` | `/sdd-run change answer` | Renamed + added change-id arg |
+| `change` | `assume <change-id> <q-id> "<assumption>"` | `/sdd-change assume` | `/sdd-run change assume` | Renamed + added change-id arg |
 | `change` | `regress <change-id> --to <phase>` | `/sdd-change regress` | `/sdd-run change regress` | Renamed |
 | `change` | `request-changes <change-id>` | `/sdd-change request-changes` | `/sdd-run change request-changes` | Renamed |
 | `init` | *(no action — runs full workflow)* | `/sdd-init` | `/sdd-run init` | Renamed |
