@@ -4,7 +4,7 @@
 
 ## Speccing
 
-- [#144](1-speccing/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
+- [#144](1-speccing/144/): Three-command structure: /sdd + /sdd-run + /sdd-help
 
 ---
 
@@ -69,6 +69,7 @@
 
 ### Unprioritized
 
+- [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
 - [#143](0-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis
