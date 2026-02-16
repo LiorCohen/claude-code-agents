@@ -246,7 +246,7 @@ Get the actual directory names for all components.
 
 ```text
 ┌─────────────────┐
-│   sdd-init      │  Settings defined during project creation
+│   /sdd (init)   │  Settings defined during project creation
 └────────┬────────┘
          │
          ▼

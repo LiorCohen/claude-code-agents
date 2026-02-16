@@ -186,13 +186,13 @@ SDD checks that:
 ### Step 6.1: Start the Database
 
 ```
-/sdd-run database setup restaurant-db
+/sdd set up the restaurant-db database
 ```
 
 ### Step 6.2: Run Migrations
 
 ```
-/sdd-run database migrate restaurant-db
+/sdd run migrations for restaurant-db
 ```
 
 ### Step 6.3: Generate Local Config
@@ -259,7 +259,7 @@ git checkout main && git merge feature/your-feature
 | Verify feature | `/sdd I want to verify the implementation` |
 | Check status | `/sdd` |
 | Manage config | `/sdd I want to generate config for local` |
-| Database operations | `/sdd-run database <action>` |
+| Database operations | `/sdd set up the database` |
 
 **The SDD workflow:**
 
@@ -283,8 +283,8 @@ claude mcp add-plugin "https://raw.githubusercontent.com/LiorCohen/sdd/main/.cla
 ### "Database connection refused"
 
 Start the database:
-```bash
-/sdd-run database setup restaurant-db
+```
+/sdd set up the restaurant-db database
 ```
 
 ### "Tests failing"
@@ -295,8 +295,8 @@ npm test -- --reporter verbose
 ```
 
 Ensure migrations are current:
-```bash
-/sdd-run database migrate restaurant-db
+```
+/sdd run migrations for restaurant-db
 ```
 
 ---

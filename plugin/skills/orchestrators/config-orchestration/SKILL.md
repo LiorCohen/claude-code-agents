@@ -158,6 +158,7 @@ When merging `envs/default/` → `envs/{env}/`:
 - `config-scaffolding` skill - Creates the config component
 - `config-standards` skill - Standards for configuration management
 - `helm-standards` skill - How Helm charts consume config
+- `docs/config-guide.md` - User-facing guide covering Local Development workflows, Production deployment, and SDD_CONFIG_PATH usage
 
 ## Output
 

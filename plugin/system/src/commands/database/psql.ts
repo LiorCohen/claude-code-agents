@@ -14,7 +14,7 @@ import { parseNamedArgs } from '@/lib/args';
 export const psql = async (
   componentName: string,
   args: readonly string[],
-  _env: string = 'local'
+  env: string = 'local'
 ): Promise<CommandResult> => {
   const { named } = parseNamedArgs(args);
 
@@ -25,7 +25,7 @@ export const psql = async (
   const pgUser = named['user'] ?? process.env['PGUSER'] ?? componentName;
   const pgPassword = named['password'] ?? process.env['PGPASSWORD'] ?? `${componentName}-local`;
 
-  console.log(`Connecting to ${pgDatabase}@${pgHost}:${pgPort}...`);
+  console.log(`Connecting to ${pgDatabase}@${pgHost}:${pgPort} (env: ${env})...`);
   console.log('');
 
   return new Promise((resolve) => {

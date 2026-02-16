@@ -207,7 +207,7 @@ Once comfortable with the basic flow:
 For power users:
 - **Component settings** — fine-tune scaffolding, databases, helm charts
 - **Local environments** — full k8s development stack on your machine
-- **Direct commands** — use `/sdd-run` for explicit control (you'll discover these naturally through `/sdd`'s cross-references)
+- **Direct operations** — power users discover explicit system commands naturally through `/sdd`'s cross-references
 - **Multi-change workflows** — decompose large specs into dependent changes
 
 ---

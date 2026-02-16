@@ -394,8 +394,8 @@ Include a drift risk summary table:
 
 | Command | Score | Tier | Top Factors |
 |---------|-------|------|-------------|
-| sdd-config | 3 | Low | 4 CLI refs (+4) |
-| sdd-change | 12 | High | 8 INVOKEs (+8), 3 vague refs (+6), 12-step flow (+1) |
+| sdd-run (config namespace) | 3 | Low | 4 CLI refs (+4) |
+| sdd-run (change namespace) | 12 | High | 8 INVOKEs (+8), 3 vague refs (+6), 12-step flow (+1) |
 ```
 
 ---

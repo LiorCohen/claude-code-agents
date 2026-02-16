@@ -110,11 +110,11 @@ For local development where you trust all operations:
 
 | Command | Files Created/Modified |
 |---------|----------------------|
-| `/sdd-init` | ~50+ files: project structure, specs, components, config |
-| `/sdd-change new` | 2-3 files: SPEC.md, workflow.yaml, INDEX.md |
-| `/sdd-change approve spec` | 1-2 files: PLAN.md, workflow.yaml |
-| `/sdd-change implement` | Many files: implementation code, tests, docs |
-| `/sdd-change verify` | None (read-only verification) |
+| `/sdd` (init) | ~50+ files: project structure, specs, components, config |
+| `/sdd` (create feature) | 2-3 files: SPEC.md, workflow.yaml, INDEX.md |
+| `/sdd` (approve spec) | 1-2 files: PLAN.md, workflow.yaml |
+| `/sdd` (implement) | Many files: implementation code, tests, docs |
+| `/sdd` (verify) | None (read-only verification) |
 
 ### Safe Directories (Auto-Approved by Hook)
 

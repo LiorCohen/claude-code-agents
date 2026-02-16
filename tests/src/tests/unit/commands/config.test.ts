@@ -165,3 +165,25 @@ describe('/sdd-run config Merge Algorithm', () => {
     expect(content).toContain('remove');
   });
 });
+
+/**
+ * WHY: Workflow documentation (local development, production deployment) moved
+ * from the old sdd-config.md command to docs/config-guide.md. The orchestrator
+ * must link to it so users can find these workflows.
+ */
+describe('config-orchestration Workflow Documentation', () => {
+  it('links to config-guide.md for workflow documentation', () => {
+    const content = readFile(ORCHESTRATOR_PATH);
+    expect(content).toContain('config-guide.md');
+  });
+
+  it('references Local Development workflows', () => {
+    const content = readFile(ORCHESTRATOR_PATH);
+    expect(content).toContain('Local Development');
+  });
+
+  it('references Production deployment', () => {
+    const content = readFile(ORCHESTRATOR_PATH);
+    expect(content).toContain('Production');
+  });
+});

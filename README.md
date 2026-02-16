@@ -78,8 +78,8 @@ Instead of one general-purpose AI, SDD uses 7 specialized agents:
 | `/sdd I want to approve the plan` | Approve plan, enable implementation |
 | `/sdd I want to start implementing` | Execute implementation plan |
 | `/sdd I want to verify the implementation` | Verify implementation matches spec |
-| `/sdd-run config generate --env local` | Generate merged config for an environment |
-| `/sdd-run <namespace> <action>` | Direct system CLI operations |
+| `/sdd I want to generate config for local` | Generate merged config for an environment |
+| `/sdd set up the database` | Direct system operations via natural language |
 | `/sdd-help` | Interactive tutor for SDD concepts |
 
 ---

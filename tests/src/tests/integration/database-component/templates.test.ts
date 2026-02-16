@@ -68,13 +68,13 @@ describe('Database README.md Template', () => {
    * WHY: The README must document the SDD commands so users know
    * how to perform database operations without reading the code.
    */
-  it('README.md documents /sdd-run database commands', () => {
+  it('README.md documents database operations', () => {
     const readme = joinPath(DATABASE_TEMPLATES_DIR, 'README.md');
     const content = readFile(readme);
 
-    expect(content).toContain('/sdd-run database migrate');
-    expect(content).toContain('/sdd-run database seed');
-    expect(content).toContain('/sdd-run database reset');
+    expect(content).toContain('migrations');
+    expect(content).toContain('seed');
+    expect(content).toContain('reset');
   });
 });
 

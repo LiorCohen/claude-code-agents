@@ -199,9 +199,9 @@ describe('README Documentation', () => {
     expect(fileExists(DOC_PATH)).toBe(true);
   });
 
-  it('lists /sdd-run config in commands table', () => {
+  it('lists config generation in commands table', () => {
     const content = readFile(DOC_PATH);
-    expect(content).toContain('/sdd-run config');
+    expect(content).toContain('generate config');
   });
 
   it('shows config in project structure', () => {
