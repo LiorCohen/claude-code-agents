@@ -216,6 +216,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
 - **Tutor is read-only**: `/sdd-help` teaches and demonstrates but does not execute actions or modify project state
 - **Major version bump**: This is a breaking change (entire command surface replaced). Triggers version 7.0.0. A new `changelog/v7.md` file will be created.
+- **Full standards audit during review**: Before task completion, the implementation must pass the full standards audit suite — `/critic`, `commands-standards`, `skills-standards`, `agents-standards`, `system-cli-standards`, `docs-standards`, and `plugin-product-standards`. Any hard-block findings must be resolved before the task can move to complete.
 
 ## Changes
 
@@ -286,3 +287,4 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 19. **Old local-env skill removed**: The `local-env` skill no longer exists at its original location. Verify: `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed".
 20. **User-facing references use `/sdd` prompts, not `/sdd-run`**: Docs, README, and non-orchestrator skills reference `/sdd` with natural language prompts. Verify: `grep -rn "/sdd-run" plugin/skills/ docs/ README.md --include="*.md" | grep -v "docs/commands.md" | grep -v "orchestrators/"` returns zero matches (excluding docs/commands.md which documents all three commands, and orchestrators which are internal dispatchers).
 21. **Plugin manifest discovers orchestrator skills**: The `skills` array in `plugin.json` includes paths for each orchestrator directory. Verify: `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns at least 5 matches (change-orchestration, init-orchestration, config-orchestration, version-orchestration, local-env-orchestration).
+22. **Full standards audit passes**: Run `/critic` and all relevant standards skills (`commands-standards`, `skills-standards`, `agents-standards`, `system-cli-standards`, `docs-standards`, `plugin-product-standards`) during review phase. Verify: all audits produce zero hard-block findings.
