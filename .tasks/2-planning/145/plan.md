@@ -61,11 +61,12 @@ In workflows.md (currently 394 lines — **line budget: keep ≤ 490 to leave ma
 - Add "Start Speccing" workflow section for `/tasks spec <id>`:
   - Phase 1 (transition): move folder to `1-speccing/`, update status to `speccing`, update INDEX.md, commit
   - Phase 2 (solicitation): interactively ask guiding questions, maintain open questions list, fill in 5 sections
-  - Also handles back-transition from `2-planning/`: move folder back to `1-speccing/`, update status, commit, then resume solicitation
+  - Also handles back-transition from `2-planning/` (for substantial rework): move folder back to `1-speccing/`, update status, commit, then resume solicitation
 - Update "Start Planning" workflow:
   - Add precondition: task must be in `speccing` status (refuse otherwise with message)
   - Add structural validation gate: verify all 5 sections have meaningful content before transition
   - Add critic invocation as speccing exit gate before transition
+  - Add rule: if planning reveals spec gaps, update task.md directly (never plan.md) and commit as a planning-phase spec update
 - Update "Add New Task" workflow: `0-inbox` replaces `1-inbox`
 - Update skip-forward text: add challenge behavior ("This task hasn't been specced/planned — are you sure?")
 - Add branch isolation rule to workflows
@@ -119,7 +120,8 @@ In `.claude/skills/commit/SKILL.md` (line 157):
 Create `.critic/speccing.md` with initial seed rules:
 - Spec must be complete before planning — all 5 sections with meaningful content
 - Task.md is the source of truth for WHAT; plan.md is purely HOW
-- If planning reveals the spec was wrong, go back to speccing rather than patching in the plan
+- If planning reveals spec gaps, update task.md directly — never add missing spec content to plan.md
+- Back-transition to speccing is for substantial rework; minor spec fixes can be done in-place during planning
 
 ## Dependencies
 

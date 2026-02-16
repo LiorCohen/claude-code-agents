@@ -17,7 +17,7 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 - Task descriptions are often rough sketches that get refined during planning, but refinements end up in plan.md instead of task.md
 - The task description and the plan drift apart over time
 - Planning should take a stable, complete spec as input — not refine the spec itself
-- If planning reveals the spec was wrong, the task should go back to speccing rather than silently patching it in the plan
+- If planning reveals the spec is incomplete, task.md must be updated — never add missing spec content to plan.md instead
 - **Speccing vs planning separation:** The task spec (task.md) must contain a full record of WHAT will change — every behavioral change, every file affected, every constraint. Planning (plan.md) is purely about execution: how to split the work into small steps that minimize context window usage. Compactions and hitting the context limit are the enemy — plans exist to avoid them by breaking work into small, independently executable steps. A plan should never need to figure out *what* to build; that must already be settled in the spec.
 
 ## Scope
@@ -33,7 +33,8 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 - Critic as speccing exit gate: `/tasks plan` invokes `/critic` before transitioning — the critic verifies the spec is complete and coherent before planning begins
 - Hard constraint: planning refuses to start if task hasn't been through speccing
 - Skip-forward transitions (e.g., inbox → implementing) remain possible for simple tasks, but Claude must always challenge the user before skipping phases ("This task hasn't been specced/planned — are you sure?") and require explicit confirmation
-- Back-transition: `/tasks spec <id>` also works on tasks in `2-planning/` to send them back to speccing when planning reveals the spec was wrong
+- Spec updates during planning: if planning reveals the spec is incomplete, update task.md directly (not plan.md) and commit with a clear indication it's a planning-phase spec update. No need to move the task back to speccing for minor spec fixes
+- Back-transition: `/tasks spec <id>` also works on tasks in `2-planning/` to send them back to speccing when the spec needs substantial rework
 - Ensure all phase directories permanently contain `.gitkeep` files (never remove them, even when directory has tasks)
 - Update all references from `1-inbox` to `0-inbox` across task skill files, INDEX.md, and existing task paths
 - Add `📝 Speccing` status to backlog table display
@@ -70,7 +71,8 @@ Add a mandatory speccing phase between inbox and planning in the task lifecycle.
 - [ ] `1-speccing/` directory exists with `.gitkeep`
 - [ ] All phase directories (0-8) have `.gitkeep` files
 - [ ] `/tasks spec <id>` moves a task from inbox to speccing and begins interactive solicitation
-- [ ] `/tasks spec <id>` works on tasks in `2-planning/` to send them back to speccing
+- [ ] `/tasks spec <id>` works on tasks in `2-planning/` to send them back to speccing (for substantial rework)
+- [ ] During planning, spec gaps are fixed in task.md (never in plan.md)
 - [ ] `/tasks plan <id>` refuses if task is not in speccing status
 - [ ] `/tasks plan <id>` refuses if any of the 5 required sections lack meaningful content
 - [ ] `/tasks plan <id>` invokes critic as speccing exit gate before transitioning
