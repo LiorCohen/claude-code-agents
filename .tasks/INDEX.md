@@ -2,6 +2,12 @@
 
 ---
 
+## Speccing
+
+(none)
+
+---
+
 ## Planning
 
 (none)
@@ -30,62 +36,62 @@
 
 ### High Priority
 
-- [#140](1-inbox/140/): Template-to-code drift detection for scaffolded components
-- [#137](1-inbox/137/): Split system CLI commands into internal and public categories
-- [#131](1-inbox/131/): Add Ralph Wiggum mode for task implementation
-- [#130](1-inbox/130/): Add created_by_plugin_version to sdd-settings components
-- [#128](1-inbox/128/): Maintain plugin user stories in product/ folder
-- [#114](1-inbox/114/): Use .temp/ for test environments and preserve on failure
-- [#109](1-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
-- [#67](1-inbox/67/): Store user instructions in plans, specs, and .sdd/
-- [#17](1-inbox/17/): Plans should follow TDD with test review first
+- [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
+- [#137](0-inbox/137/): Split system CLI commands into internal and public categories
+- [#131](0-inbox/131/): Add Ralph Wiggum mode for task implementation
+- [#130](0-inbox/130/): Add created_by_plugin_version to sdd-settings components
+- [#128](0-inbox/128/): Maintain plugin user stories in product/ folder
+- [#114](0-inbox/114/): Use .temp/ for test environments and preserve on failure
+- [#109](0-inbox/109/): Ban Claude's built-in memory - causes non-deterministic behavior
+- [#67](0-inbox/67/): Store user instructions in plans, specs, and .sdd/
+- [#17](0-inbox/17/): Plans should follow TDD with test review first
 
 ### Medium Priority
 
-- [#129](1-inbox/129/): Frontend workflow guidelines — step-by-step recipes for common coding tasks
-- [#119](1-inbox/119/): Add session hook with blurb and plugin update check
-- [#113](1-inbox/113/): Investigate and remove domain dead code across plugin
-- [#71](1-inbox/71/): Anti-stop hook to prevent accidental session termination
-- [#70](1-inbox/70/): Git checkpoint workflow for AI-assisted development
-- [#66](1-inbox/66/): Single context-aware SDD command
-- [#56](1-inbox/56/): Create architecture skill with meaningful guidance
-- [#16](1-inbox/16/): Plan changes should cascade to dependent items
+- [#129](0-inbox/129/): Frontend workflow guidelines — step-by-step recipes for common coding tasks
+- [#119](0-inbox/119/): Add session hook with blurb and plugin update check
+- [#113](0-inbox/113/): Investigate and remove domain dead code across plugin
+- [#71](0-inbox/71/): Anti-stop hook to prevent accidental session termination
+- [#70](0-inbox/70/): Git checkpoint workflow for AI-assisted development
+- [#66](0-inbox/66/): Single context-aware SDD command
+- [#56](0-inbox/56/): Create architecture skill with meaningful guidance
+- [#16](0-inbox/16/): Plan changes should cascade to dependent items
 
 ### Low Priority
 
-- [#86](1-inbox/86/): Consider component-catalog skill for component type definitions
-- [#73](1-inbox/73/): User instructions memory for plugin overrides
-- [#31](1-inbox/31/): Welcome prompt after plugin installation
-- [#26](1-inbox/26/): Better session separators/visual indicators
-- [#24](1-inbox/24/): Add plugin Slack support
-- [#20](1-inbox/20/): Plugin installation debugging skill + workflow fix
-- [#3](1-inbox/3/): Docs missing: CMDO Guide
+- [#86](0-inbox/86/): Consider component-catalog skill for component type definitions
+- [#73](0-inbox/73/): User instructions memory for plugin overrides
+- [#31](0-inbox/31/): Welcome prompt after plugin installation
+- [#26](0-inbox/26/): Better session separators/visual indicators
+- [#24](0-inbox/24/): Add plugin Slack support
+- [#20](0-inbox/20/): Plugin installation debugging skill + workflow fix
+- [#3](0-inbox/3/): Docs missing: CMDO Guide
 
 ### Unprioritized
 
-- [#144](1-inbox/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
-- [#143](1-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis
-- [#142](1-inbox/142/): Add charting library to frontend standards and scaffold
-- [#141](1-inbox/141/): Remove 'implement' from critic auto-triggers
-- [#135](1-inbox/135/): Add installation instructions defaulting to user scope
-- [#133](1-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
-- [#120](1-inbox/120/): Replace Date with DateTime across codebase
-- [#106](1-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
-- [#105](1-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
-- [#102](1-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
-- [#94](1-inbox/94/): local-env is missing settings
-- [#80](1-inbox/80/): Plans should become YAML files
-- [#76](1-inbox/76/): Git worktrees for parallel spec/plan execution
-- [#74](1-inbox/74/): Task performance scoring system
-- [#69](1-inbox/69/): Fix sdd-init workflow test timeout
-- [#43](1-inbox/43/): CI/CD components and .github folder integration
-- [#40](1-inbox/40/): Fix sdd-change-new test - spec format mismatch
-- [#39](1-inbox/39/): Capture ad-hoc code changes and sync specs
-- [#38](1-inbox/38/): Integration and E2E testing should be separate components
-- [#35](1-inbox/35/): Checksumming and drift detection for specs/components
-- [#33](1-inbox/33/): Tests are not useful - need better test creation approach
-- [#21](1-inbox/21/): Project sanity verification command
-- [#12](1-inbox/12/): User onboarding and process state tracking
+- [#144](0-inbox/144/): Remove user-facing commands sdd-config, sdd-run, and sdd-settings
+- [#143](0-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis
+- [#142](0-inbox/142/): Add charting library to frontend standards and scaffold
+- [#141](0-inbox/141/): Remove 'implement' from critic auto-triggers
+- [#135](0-inbox/135/): Add installation instructions defaulting to user scope
+- [#133](0-inbox/133/): Add ESLint to backend scaffolding with allowed-structure enforcement
+- [#120](0-inbox/120/): Replace Date with DateTime across codebase
+- [#106](0-inbox/106/): Add dependency approval rule to standards - never introduce new libs/tech without explicit user approval
+- [#105](0-inbox/105/): Widen permission wildcards to reduce excessive permission prompts
+- [#102](0-inbox/102/): sdd-change verify should never mark complete without explicit user authorization
+- [#94](0-inbox/94/): local-env is missing settings
+- [#80](0-inbox/80/): Plans should become YAML files
+- [#76](0-inbox/76/): Git worktrees for parallel spec/plan execution
+- [#74](0-inbox/74/): Task performance scoring system
+- [#69](0-inbox/69/): Fix sdd-init workflow test timeout
+- [#43](0-inbox/43/): CI/CD components and .github folder integration
+- [#40](0-inbox/40/): Fix sdd-change-new test - spec format mismatch
+- [#39](0-inbox/39/): Capture ad-hoc code changes and sync specs
+- [#38](0-inbox/38/): Integration and E2E testing should be separate components
+- [#35](0-inbox/35/): Checksumming and drift detection for specs/components
+- [#33](0-inbox/33/): Tests are not useful - need better test creation approach
+- [#21](0-inbox/21/): Project sanity verification command
+- [#12](0-inbox/12/): User onboarding and process state tracking
 
 ---
 
