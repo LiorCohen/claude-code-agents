@@ -129,7 +129,15 @@ Scenario: Your team reports that a command isn't working as expected. You run `v
 **Dispatcher architecture**: sdd-run.md does not inline all logic from the 6 old commands. Each namespace section uses INVOKE to delegate to skills. For simple namespaces (database, contract, config, permissions, version), sdd-run.md INVOKEs existing skills directly or inlines the logic (each action is a single `system-run.sh` call). For complex namespaces (change, init), sdd-run.md INVOKEs new **orchestrator skills** that hold the multi-step workflow logic previously in the deleted command files.
 
 **Orchestrator skills** (`plugin/skills/orchestrators/`): New skills that capture the orchestration logic from deleted commands. These are not behavioral changes — they preserve the exact same workflows, just housed in skills instead of commands:
-- `change-orchestration/SKILL.md` — Multi-step change lifecycle (from `sdd-change.md`'s 14 actions, phase gates, INVOKE chains)
+
+- `change-orchestration/` — Multi-step change lifecycle (from `sdd-change.md`'s 14 actions). Broken into phase-based sub-files to keep each file focused:
+  - `SKILL.md` — Dispatcher: routes action → sub-file, shared validation, common output patterns
+  - `creation.md` — `new` action (external spec handling, component discovery, spec solicitation INVOKE)
+  - `spec-review.md` — `approve spec`, `answer`, `assume` (spec review phase operations)
+  - `planning.md` — `plan`, `approve plan` (plan creation and approval)
+  - `implementation.md` — `implement` (enters implementation mode, branch creation)
+  - `verification.md` — `verify`, `review` (post-implementation verification and review)
+  - `management.md` — `status`, `list`, `continue`, `regress`, `request-changes` (cross-cutting lifecycle operations)
 - `init-orchestration/SKILL.md` — 6-phase init workflow (from `sdd-init.md`'s version check, env verification, scaffolding, git init)
 
 Commands that are simple enough to not need an orchestrator skill:
@@ -215,7 +223,13 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/commands/sdd-init.md` | Delete | Absorbed into `/sdd-run init` |
 | `plugin/commands/sdd-settings.md` | Delete | Never user-facing; settings managed internally by `project-settings` skill |
 | `plugin/commands/sdd-version.md` | Delete | Absorbed into `/sdd-run version` |
-| `plugin/skills/orchestrators/change-orchestration/SKILL.md` | Create | Multi-step change lifecycle logic (from sdd-change.md) |
+| `plugin/skills/orchestrators/change-orchestration/SKILL.md` | Create | Dispatcher: routes action → sub-file |
+| `plugin/skills/orchestrators/change-orchestration/creation.md` | Create | `new` action (spec solicitation, external spec, component discovery) |
+| `plugin/skills/orchestrators/change-orchestration/spec-review.md` | Create | `approve spec`, `answer`, `assume` actions |
+| `plugin/skills/orchestrators/change-orchestration/planning.md` | Create | `plan`, `approve plan` actions |
+| `plugin/skills/orchestrators/change-orchestration/implementation.md` | Create | `implement` action |
+| `plugin/skills/orchestrators/change-orchestration/verification.md` | Create | `verify`, `review` actions |
+| `plugin/skills/orchestrators/change-orchestration/management.md` | Create | `status`, `list`, `continue`, `regress`, `request-changes` actions |
 | `plugin/skills/orchestrators/init-orchestration/SKILL.md` | Create | 6-phase init workflow logic (from sdd-init.md) |
 | `plugin/system/src/commands/database/schema.ts` | Update | Add `env` property to database args schema |
 | `plugin/system/src/commands/database/handler.ts` | Update | Thread `--env` arg to action functions |
@@ -257,5 +271,5 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 14. **No stale `sdd-run env` references**: The `env` namespace is renamed to `local-env`. Verify: `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero matches (excluding historical notes in task files).
 15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" .claude/skills/ --include="*.md"` returns zero matches.
 16. **Database CLI accepts --env**: The database schema and handlers accept an `env` parameter. Verify: `grep "env" plugin/system/src/commands/database/schema.ts` returns a match.
-17. **Orchestrator skills exist**: The orchestration logic from deleted commands lives in dedicated skills. Verify: `ls plugin/skills/orchestrators/` shows `change-orchestration/`, `init-orchestration/` — each containing a `SKILL.md`.
+17. **Orchestrator skills exist**: The orchestration logic from deleted commands lives in dedicated skills. Verify: `ls plugin/skills/orchestrators/` shows `change-orchestration/`, `init-orchestration/` — each containing a `SKILL.md`. The change-orchestration directory also contains phase sub-files. Verify: `ls plugin/skills/orchestrators/change-orchestration/` shows `SKILL.md`, `creation.md`, `spec-review.md`, `planning.md`, `implementation.md`, `verification.md`, `management.md`.
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates complex namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 2 matches (change, init).
