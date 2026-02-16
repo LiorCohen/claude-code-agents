@@ -83,8 +83,8 @@ ACTIONS:
   plan               Begin planning phase (after ALL specs approved)
   answer             Answer an open question
   assume             Mark question as assumption
-  regress            Go back to earlier phase
-  request-changes    Request changes during review
+  regress            Go back to earlier phase                   🟡 caution
+  request-changes    Request changes during review              🟡 caution
 
 COMMON WORKFLOWS:
 

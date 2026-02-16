@@ -134,6 +134,8 @@ What acceptance criteria should we have?
 
 ## Action: regress
 
+🟡 **Caution:** This action resets workflow progress. The current plan or implementation is archived, but all progress beyond the target phase is reset. Dependent items are flagged for re-review. **Warn the user and confirm before executing.**
+
 Go back to an earlier phase (e.g., from planning back to spec).
 
 ### Usage
@@ -186,6 +188,8 @@ NEXT STEPS:
 ---
 
 ## Action: request-changes
+
+🟡 **Caution:** This action resets implementation status from `complete` to `in_progress`, requiring the developer to rework. **Warn the user and confirm before executing.**
 
 Request changes during the review phase.
 

@@ -50,12 +50,12 @@ USAGE:
 
 ACTIONS:
   create     Create local k8s cluster + install infra
-  destroy    Delete cluster entirely
+  destroy    Delete cluster entirely                      🔴 destructive
   start      Resume stopped cluster
   stop       Pause cluster (preserves state)
   status     Show cluster and workload status
   deploy     Set up databases, run migrations, deploy helm charts
-  undeploy   Remove helm deployments
+  undeploy   Remove helm deployments                      🟡 caution
   forward    Manage port forwards (start|stop|list)
   infra      Install/reinstall observability infrastructure
 
