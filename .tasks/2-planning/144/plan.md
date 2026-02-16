@@ -130,6 +130,7 @@ Replace 6 user-facing commands (`sdd-change`, `sdd-config`, `sdd-init`, `sdd-run
 | `README.md` | Replace 21 old command refs with `/sdd` prompts |
 | `plugin/.claude-plugin/plugin.json` | Version bump to 7.0.0, add orchestrator skill paths |
 | `.claude-plugin/marketplace.json` | Version bump to 7.0.0 |
+| `changelog/README.md` | Add v7 summary paragraph + version table row |
 
 ### Updated Files — Marketplace Skills (4 files)
 
@@ -249,31 +250,7 @@ The bulk-update phase. Process every file that references old command names.
 3. **Marketplace skills** (.claude/skills/): old commands → `/sdd-run` equivalents (these describe command authoring)
 4. **Tests**: old command names → new equivalents in describe blocks, prompts, and assertions
 
-**Concrete replacement mapping (user-facing context):**
-
-| Old | New |
-|-----|-----|
-| `/sdd-change new --type feature --name X` | `/sdd I want to create a new feature` |
-| `/sdd-change new --spec path/to/spec.md` | `/sdd I want to import an external spec` |
-| `/sdd-change status` | `/sdd` (no-arg — reads context, shows status) |
-| `/sdd-change continue` | `/sdd` (no-arg — reads context, suggests resumption) |
-| `/sdd-change approve spec <id>` | `/sdd I want to approve the spec` |
-| `/sdd-change approve plan <id>` | `/sdd I want to approve the plan` |
-| `/sdd-change plan` | `/sdd I want to start planning` |
-| `/sdd-change implement <id>` | `/sdd I want to start implementing` |
-| `/sdd-change verify <id>` | `/sdd I want to verify the implementation` |
-| `/sdd-change review <id>` | `/sdd I want to submit for review` |
-| `/sdd-change answer <id> "..."` | `/sdd I want to answer an open question` |
-| `/sdd-change regress <id> --to spec` | `/sdd I want to go back to the spec phase` |
-| `/sdd-init` | `/sdd I want to initialize a new project` |
-| `/sdd-config generate --env local` | `/sdd I want to generate config for local` |
-| `/sdd-config validate` | `/sdd I want to validate my config` |
-| `/sdd-config diff local production` | `/sdd I want to compare local and production config` |
-| `/sdd-version` | `/sdd What version am I running?` |
-| `/sdd-run env create` | `/sdd I want to create a local environment` |
-| `/sdd-run env deploy` | `/sdd I want to deploy to my local environment` |
-| `/sdd-run permissions configure` | `/sdd I want to configure permissions` |
-| `/sdd-run database setup my-db` | `/sdd I want to set up my database` |
+**Concrete replacement mapping:** Apply the mapping table from task.md Constraints section ("Concrete replacement mapping" table). Each old command reference becomes a `/sdd` natural language prompt.
 
 **Test file renames:**
 - `sdd-change-new.test.ts` → `change-create.test.ts`
@@ -297,6 +274,11 @@ The bulk-update phase. Process every file that references old command names.
 2. Update `.claude-plugin/marketplace.json`: version to `7.0.0`
 
 3. Create `changelog/v7.md` with the breaking changes entry
+
+4. Update `changelog/README.md`:
+   - Add v7 summary paragraph at the top (after the intro, before v6) — witty, in the established voice
+   - Update the version table: change v6's range to `6.0.0 – 6.x.x` (final 6.x version) and add v7 row
+   - Update v6's date range to end date
 
 ## Dependencies
 

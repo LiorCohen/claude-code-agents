@@ -213,6 +213,31 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 - **References use `/sdd` with natural language prompts**: All user-facing references to commands — in docs, README, scaffolding templates, and orchestrator output messages — are replaced with `/sdd` and a relevant natural language prompt, NOT with `/sdd-run` equivalents. The goal is to funnel users through the Jarvis hub. Example: "Run `/sdd I want to create a new feature`" instead of "Run `/sdd-run change create --type feature`". Exceptions where `/sdd-run` is appropriate: (1) the `/sdd` command itself cross-references `/sdd-run` as "you can also run this directly", (2) `docs/commands.md` documents all three commands explicitly, (3) tests verify explicit `/sdd-run` command behavior, (4) marketplace skills (`.claude/skills/`) that describe how to author commands/skills. Agents are non-interactive and use internal invocations (INVOKE orchestrator skills or `system-run.sh`), not user-facing command references.
 - **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new`, sdd-version says `/sdd-init`). These output patterns inside orchestrator skills must use `/sdd` with natural language prompts.
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
+- **Concrete replacement mapping** (user-facing context — skills, docs, README, scaffolding templates, orchestrator output messages):
+
+| Old | New |
+|-----|-----|
+| `/sdd-change new --type feature --name X` | `/sdd I want to create a new feature` |
+| `/sdd-change new --spec path/to/spec.md` | `/sdd I want to import an external spec` |
+| `/sdd-change status` | `/sdd` (no-arg — reads context, shows status) |
+| `/sdd-change continue` | `/sdd` (no-arg — reads context, suggests resumption) |
+| `/sdd-change approve spec <id>` | `/sdd I want to approve the spec` |
+| `/sdd-change approve plan <id>` | `/sdd I want to approve the plan` |
+| `/sdd-change plan` | `/sdd I want to start planning` |
+| `/sdd-change implement <id>` | `/sdd I want to start implementing` |
+| `/sdd-change verify <id>` | `/sdd I want to verify the implementation` |
+| `/sdd-change review <id>` | `/sdd I want to submit for review` |
+| `/sdd-change answer <id> "..."` | `/sdd I want to answer an open question` |
+| `/sdd-change regress <id> --to spec` | `/sdd I want to go back to the spec phase` |
+| `/sdd-init` | `/sdd I want to initialize a new project` |
+| `/sdd-config generate --env local` | `/sdd I want to generate config for local` |
+| `/sdd-config validate` | `/sdd I want to validate my config` |
+| `/sdd-config diff local production` | `/sdd I want to compare local and production config` |
+| `/sdd-version` | `/sdd What version am I running?` |
+| `/sdd-run env create` | `/sdd I want to create a local environment` |
+| `/sdd-run env deploy` | `/sdd I want to deploy to my local environment` |
+| `/sdd-run permissions configure` | `/sdd I want to configure permissions` |
+| `/sdd-run database setup my-db` | `/sdd I want to set up my database` |
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
 - **Tutor is read-only**: `/sdd-help` teaches and demonstrates but does not execute actions or modify project state
 - **Major version bump**: This is a breaking change (entire command surface replaced). Triggers version 7.0.0. A new `changelog/v7.md` file will be created.
@@ -263,6 +288,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 + add orchestrator skill paths to `skills` array |
 | `.claude-plugin/marketplace.json` | Update | Version bump to 7.0.0 |
 | `changelog/v7.md` | Create | New major version changelog |
+| `changelog/README.md` | Update | Add v7 summary paragraph + version table row |
 
 ## Acceptance Criteria
 
