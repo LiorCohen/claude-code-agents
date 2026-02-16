@@ -43,8 +43,8 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | Namespace | Action | Old Command | New Command | Change |
 |-----------|--------|-------------|-------------|--------|
 | `change` | `new [--type <type>] [--spec <path>]` | `/sdd-change new` | `/sdd-run change new` | Renamed |
-| `change` | `status` | `/sdd-change status` | `/sdd-run change status` | Renamed |
-| `change` | `continue` | `/sdd-change continue` | `/sdd-run change continue` | Renamed |
+| `change` | `status [<change-id>]` | `/sdd-change status` | `/sdd-run change status` | Renamed + optional change-id arg |
+| `change` | `continue <change-id>` | `/sdd-change continue` | `/sdd-run change continue` | Renamed + added change-id arg |
 | `change` | `list` | `/sdd-change list` | `/sdd-run change list` | Renamed |
 | `change` | `approve spec <change-id>` | `/sdd-change approve spec` | `/sdd-run change approve spec` | Renamed |
 | `change` | `approve plan <change-id>` | `/sdd-change approve plan` | `/sdd-run change approve plan` | Renamed |
