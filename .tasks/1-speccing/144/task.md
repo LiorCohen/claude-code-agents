@@ -75,7 +75,6 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | `database` | `psql <component>` | `/sdd-run database psql` | `/sdd-run database psql` | Unchanged |
 | `contract` | `validate <component>` | `/sdd-run contract validate` | `/sdd-run contract validate` | Unchanged |
 | `config` | `generate --env <env> [--component <name>]` | `/sdd-config generate` | `/sdd-run config generate` | Renamed |
-| `config` | `generate-local` | `/sdd-run env config` | `/sdd-run config generate-local` | Moved from env namespace |
 | `config` | `validate [--env <env>]` | `/sdd-config validate` | `/sdd-run config validate` | Renamed |
 | `config` | `diff <env1> <env2>` | `/sdd-config diff` | `/sdd-run config diff` | Renamed |
 | `config` | `add-env <env-name>` | `/sdd-config add-env` | `/sdd-run config add-env` | Renamed |
@@ -205,7 +204,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 
 1. **Exactly three user-facing commands exist**: `ls plugin/commands/` shows `sdd.md`, `sdd-run.md`, and `sdd-help.md` — no other command files. Verify: `ls plugin/commands/ | sort` outputs exactly these 3 files.
 2. **`/sdd-run help` shows all namespaces**: The `sdd-run.md` command file contains documentation for all user-facing namespaces: change, init, local-env, database, contract, config, permissions, version. Verify: `grep -c "^/sdd-run " plugin/commands/sdd-run.md` shows at least 8 namespace entries.
-3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run` (except settings, which becomes internal). Verify: grep the `sdd-run.md` file for each action — `change new`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `config generate-local`, `permissions configure`, `version`.
+3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run` (except settings, which becomes internal). Verify: grep the `sdd-run.md` file for each action — `change new`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `permissions configure`, `version`.
 4. **`/sdd` reads context and suggests**: The `sdd.md` command file includes instructions to read git branch, workflow state, project init state, and sdd-settings. Verify: `grep -E "git branch|workflows/|sdd-settings" plugin/commands/sdd.md` returns matches.
 5. **`/sdd` cross-references other commands**: The `sdd.md` file explicitly references both `/sdd-help` and `/sdd-run`. Verify: `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` returns at least 2.
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
