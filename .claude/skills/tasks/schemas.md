@@ -15,7 +15,7 @@ All task files use YAML frontmatter.
 | `id` | number | yes | Unique task number |
 | `title` | string | yes | Short title |
 | `priority` | enum | no | `low`, `medium`, `high` (unset = unprioritized) |
-| `status` | enum | yes | `inbox`, `planning`, `plan-review`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
+| `status` | enum | yes | `inbox`, `speccing`, `planning`, `plan-review`, `implementing`, `reviewing`, `complete`, `rejected`, `consolidated` |
 | `created` | datetime | yes | `YYYY-MM-DD HH:MM UTC` |
 | `completed` | datetime | no | `YYYY-MM-DD HH:MM UTC` (when status=complete) |
 | `consolidated_into` | number | no | Task ID (when status=consolidated) |
@@ -46,6 +46,51 @@ Full description of what needs to be done.
 
 - [ ] Criterion 1
 - [ ] Criterion 2
+```
+
+### Specced Task Template
+
+After speccing, task.md must have all 5 required sections with meaningful content:
+
+```markdown
+---
+id: 63
+title: Short descriptive title
+priority: medium
+status: speccing
+created: 2026-01-30 14:00 UTC
+---
+
+# Short descriptive title
+
+## Description
+
+What this task does — clear, specific, not a rough sketch.
+
+## Motivation
+
+Why this change is needed. What problem it solves. What breaks without it.
+
+## Scope
+
+### In scope
+
+- Specific change 1
+- Specific change 2
+
+### Out of scope
+
+- What this task explicitly does NOT cover
+
+## Constraints
+
+- Technical constraints, compatibility requirements, limits
+- Rules that must be followed during implementation
+
+## Acceptance Criteria
+
+- [ ] Testable criterion 1
+- [ ] Testable criterion 2
 ```
 
 ### Completed Task Template
@@ -278,6 +323,12 @@ Active tasks (planning through reviewing) have their own top-level sections. Inb
 
 ---
 
+## Speccing
+
+- [#63](1-speccing/63/): New feature idea
+
+---
+
 ## Planning
 
 - [#19](2-planning/19/plan.md): Task management skill
@@ -306,19 +357,19 @@ Active tasks (planning through reviewing) have their own top-level sections. Inb
 
 ### High Priority
 
-- [#59](1-inbox/59/): Audit and update agents
+- [#59](0-inbox/59/): Audit and update agents
 
 ### Medium Priority
 
-- [#10](1-inbox/10/): Missing /sdd-help command
+- [#10](0-inbox/10/): Missing /sdd-help command
 
 ### Low Priority
 
-- [#3](1-inbox/3/): Docs missing: CMDO Guide
+- [#3](0-inbox/3/): Docs missing: CMDO Guide
 
 ### Unprioritized
 
-- [#63](1-inbox/63/): New feature idea
+- [#64](0-inbox/64/): Another idea
 
 ---
 
