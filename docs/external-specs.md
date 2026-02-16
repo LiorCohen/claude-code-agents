@@ -28,15 +28,11 @@ External Product Spec (archived, read-only)
 
 ## Importing an External Spec
 
-```bash
-/sdd-change new --spec /path/to/requirements.md
+```
+/sdd I want to import an external spec
 ```
 
-Or import a directory:
-
-```bash
-/sdd-change new --spec /path/to/spec-directory/
-```
+SDD will ask for the path to your spec file or directory.
 
 For directories, SDD looks for an entry point (README.md, SPEC.md, or index.md).
 
@@ -180,13 +176,11 @@ All questions and answers are preserved in the SPEC.md file's **Requirements Dis
 
 Specs cannot be approved while open questions remain:
 
-```bash
-# Answer a question
-/sdd-change answer O1 "5 attempts per minute, then 15-min lockout"
-
-# Mark as assumption (when user doesn't know)
-/sdd-change assume O1 "Industry standard: 5 attempts/min"
 ```
+/sdd I want to answer an open question
+```
+
+SDD will ask which question you want to answer and whether you want to provide an answer or mark it as an assumption.
 
 Question statuses:
 - **OPEN** - Not yet answered, blocks approval
@@ -240,28 +234,27 @@ Cross-section dependencies are tracked and merged at the end.
 
 ## Workflow Commands
 
-```bash
+```
 # Import external spec
-/sdd-change new --spec /path/to/spec.md
+/sdd I want to import an external spec
 
 # Check status
-/sdd-change status
+/sdd
 
 # Continue with next item
-/sdd-change continue
+/sdd I want to continue
 
 # List all items
-/sdd-change list
+/sdd I want to list my changes
 
 # Answer open questions
-/sdd-change answer O1 "answer text"
-/sdd-change assume O1 "assumption text"
+/sdd I want to answer an open question
 
 # Approve spec (after all questions resolved)
-/sdd-change approve spec <change-id>
+/sdd I want to approve the spec
 
 # Begin planning (after ALL specs approved)
-/sdd-change plan
+/sdd I want to start planning
 ```
 
 ## Tips

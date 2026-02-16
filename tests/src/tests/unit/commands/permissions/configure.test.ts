@@ -2,7 +2,7 @@
  * Unit Tests: Permissions Configure Command
  *
  * WHY: The permissions configure command must work in directories without
- * an existing SDD project (e.g., during sdd-init before structure is created).
+ * an existing SDD project (e.g., during init before structure is created).
  * It should fall back to cwd when no project root markers are found.
  */
 

@@ -2,7 +2,7 @@
  * Settings sync functions.
  *
  * Internal functions for propagating settings changes to config, helm, etc.
- * These are called automatically by /sdd-settings after any setting modification.
+ * These are called automatically by the project-settings skill after any setting modification.
  */
 
 import type {

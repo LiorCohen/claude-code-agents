@@ -28,7 +28,7 @@ It only analyzes and documents. Implementation decides when to actually create c
 
 - After transformation step in external spec workflow
 - Runs ONCE after transformation, before decomposition
-- During `/sdd-change new` interactive mode to identify needed components
+- During `/sdd I want to create a new feature` interactive mode to identify needed components
 
 ## Input
 

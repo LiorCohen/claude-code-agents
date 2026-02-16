@@ -11,7 +11,7 @@ import { SKILLS_DIR, joinPath, fileExists, readFile } from '@/lib';
 
 /**
  * WHY: config-scaffolding is the mandatory skill for creating config components.
- * Without it, sdd-init can't create the required config component.
+ * Without it, init can't create the required config component.
  */
 describe('config-scaffolding Skill', () => {
   const SKILL_PATH = joinPath(SKILLS_DIR, 'components', 'config', 'config-scaffolding', 'SKILL.md');

@@ -1,7 +1,7 @@
 /**
- * Workflow Test: /sdd-change new command
+ * Workflow Test: /sdd-run change create command
  *
- * WHY: Verifies that sdd-change new correctly creates SPEC.md
+ * WHY: Verifies that change create correctly creates SPEC.md
  * with proper structure and content. This ensures the SDD workflow produces
  * valid specifications. Plans are created via separate approval step.
  */
@@ -19,7 +19,7 @@ import {
   type TestProject,
 } from '@/lib';
 
-const NEW_CHANGE_PROMPT = `Run /sdd-change new --type feature --name user-auth to create a new change specification.
+const NEW_CHANGE_PROMPT = `Run /sdd-run change create --type feature --name user-auth to create a new change specification.
 
 Change name: user-auth
 Change type: feature
@@ -36,22 +36,22 @@ When prompted, provide these answers:
 
 IMPORTANT:
 - Do not ask any questions. Use the values provided above.
-- Complete the SPEC.md before finishing (PLAN.md is created via /sdd-change approve spec).
+- Complete the SPEC.md before finishing (PLAN.md is created via /sdd-run change approve spec).
 - Create ALL files in the CURRENT WORKING DIRECTORY (.) - do NOT use absolute paths or navigate elsewhere.
 - The changes/ directory already exists in the current directory.`;
 
 /**
- * WHY: sdd-change new is the primary workflow for creating new feature specs.
+ * WHY: change create is the primary workflow for creating new feature specs.
  * If the workflow fails, specifications will be malformed or missing critical
  * information, breaking the entire SDD process.
  */
-describe('sdd-change new command', () => {
+describe('change create command', () => {
   let testProject: TestProject;
 
   beforeAll(async () => {
-    testProject = await createTestProject('sdd-change-new');
+    testProject = await createTestProject('change-create');
 
-    // Create minimal project structure that /sdd-change new expects
+    // Create minimal project structure that /sdd-run change create expects
     await mkdir(joinPath(testProject.path, 'changes'));
     await mkdir(joinPath(testProject.path, 'specs', 'domain'));
     await mkdir(joinPath(testProject.path, 'components', 'contract'));
@@ -91,7 +91,7 @@ The primary business domain.
   it('creates SPEC.md with proper structure', async () => {
     console.log(`\nTest project directory: ${testProject.path}\n`);
     console.log('Created minimal project structure\n');
-    console.log('Running /sdd-change new...');
+    console.log('Running /sdd-run change create...');
 
     const result = await runClaude(NEW_CHANGE_PROMPT, testProject.path, 420);
 
@@ -116,7 +116,7 @@ The primary business domain.
     expect(specContent).toContain('issue:');
     expect(specContent).toContain('type:');
 
-    // Note: PLAN.md is now created via /sdd-change approve spec
+    // Note: PLAN.md is now created via /sdd-run change approve spec
     // This test only verifies spec creation
 
     console.log('\nAll assertions passed!');

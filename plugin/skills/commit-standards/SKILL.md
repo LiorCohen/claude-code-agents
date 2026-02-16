@@ -16,11 +16,11 @@ Create consistent, well-documented commits that maintain a clear project history
 - User explicitly asks to commit (e.g., "commit this", "let's commit", "/commit")
 - **After any filesystem change** - files created, modified, or deleted
 - After completing an SDD workflow that produces artifacts:
-  - After `sdd-init` creates specs/plans
-  - After `/sdd-change new` creates a change workflow
-  - After `/sdd-change approve spec` creates a PLAN.md
-  - After `/sdd-change implement` completes phases
-  - After `/sdd-change verify` completes a change
+  - After `/sdd I want to initialize a new project` creates specs/plans
+  - After `/sdd I want to create a new feature` creates a change workflow
+  - After `/sdd I want to approve the spec` creates a PLAN.md
+  - After `/sdd I want to start implementing` completes phases
+  - After `/sdd I want to verify the implementation` completes a change
 - Before starting a new task or switching context
 
 ---

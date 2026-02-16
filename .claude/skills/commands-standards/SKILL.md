@@ -189,7 +189,7 @@ Commands must be designed with clear argument requirements and provide helpful g
 
 ### Rules
 
-1. **Never run without arguments unless designed for it** — Commands should not execute their primary workflow when called without arguments, unless the command's only intended use is without arguments (e.g., `/sdd-init` which initializes a new project). Multi-action commands like `/sdd-config` or `/sdd-change` must require at least an action argument.
+1. **Never run without arguments unless designed for it** — Commands should not execute their primary workflow when called without arguments, unless the command's only intended use is without arguments (e.g., `/sdd-run init` which initializes a new project). Multi-action commands like `/sdd-run config` or `/sdd-run change` must require at least an action argument.
 2. **Show focused usage guide for insufficient arguments** — When a command is invoked with missing or insufficient required arguments, display a focused usage guide showing:
    - Command syntax with all actions and arguments
    - Brief description of each action
@@ -198,20 +198,20 @@ Commands must be designed with clear argument requirements and provide helpful g
 
    The usage guide should be tailored to what's missing. For example:
    - Zero arguments → show full command usage
-   - Missing action (e.g., `/sdd-config` without operation) → show all available actions
-   - Missing required flags (e.g., `/sdd-config generate` without `--env`) → show that action's usage with required flags highlighted
+   - Missing action (e.g., `/sdd-run config` without operation) → show all available actions
+   - Missing required flags (e.g., `/sdd-run config generate` without `--env`) → show that action's usage with required flags highlighted
 3. **Fail fast on missing arguments** — Don't prompt for missing arguments interactively when the argument structure is invalid. Show the usage guide and exit. Interactive prompts should only happen during valid workflow execution (e.g., asking which option to select), not to recover from invalid invocation.
 4. **Consistent help patterns** — Commands with a `--help` or `-h` flag should show the same usage guide as when invoked without arguments. The usage guide is the canonical reference.
 
 ### Example: Multi-action command invoked without arguments
 
 ```
-$ /sdd-config
+$ /sdd-run config
 
 ⚠ Missing required action argument.
 
 USAGE:
-  /sdd-config <action> [options]
+  /sdd-run config <action> [options]
 
 ACTIONS:
   generate    Generate merged configuration for an environment
@@ -219,18 +219,18 @@ ACTIONS:
   diff        Compare configurations between environments
 
 EXAMPLES:
-  /sdd-config generate --env production
-  /sdd-config validate
-  /sdd-config diff --from dev --to staging
+  /sdd-run config generate --env production
+  /sdd-run config validate
+  /sdd-run config diff --from dev --to staging
 
 NEXT STEPS:
-  Run /sdd-config <action> to get started, or /sdd-config <action> --help for details.
+  Run /sdd-run config <action> to get started, or /sdd-run config <action> --help for details.
 ```
 
-### Example: Zero-argument command (sdd-init)
+### Example: Zero-argument command (sdd-run init)
 
 ```
-$ /sdd-init
+$ /sdd-run init
 
 # This command is designed to run without arguments, so it proceeds directly
 # to its initialization workflow. It does not show a usage guide.
@@ -280,7 +280,7 @@ Commands with multiple operations use an actions pattern. Each action is a disti
 1. **Actions table first** — Before any action detail sections, provide a summary table of all actions with one-line descriptions and examples.
 2. **One section per action** — Each action gets its own `## Action: <name>` section (or `### <name>` for simpler commands). Never mix multiple actions in one section.
 3. **Consistent subsection order** — Within each action: Usage, Arguments (if any), Flow, Output. Optional: Prerequisites, Examples.
-4. **Simple commands skip actions** — Commands with a single operation (e.g., `/sdd-init`) don't need the actions pattern. Use `## Workflow` or `## Flow` directly.
+4. **Simple commands skip actions** — Commands with a single operation (e.g., `/sdd-run init`) don't need the actions pattern. Use `## Workflow` or `## Flow` directly.
 
 ---
 
@@ -350,7 +350,7 @@ One-line summary paragraph.        <- What this command does
 
 ### Writing rules
 
-- **H1 with slash** — The H1 title includes the leading slash (e.g., `# /sdd-config`), matching how the user invokes it.
+- **H1 with slash** — The H1 title includes the leading slash (e.g., `# /sdd-run config`), matching how the user invokes it.
 - **Headings** — H1 for the title, H2 for major sections, H3 for subsections within actions. No deeper.
 - **Code blocks** — Use language tags for code (`bash`, `yaml`, `typescript`). Use no language tag for terminal output (the formatted text the user sees).
 - **Tables** — Use for arguments, actions summaries, settings, and comparisons.
@@ -407,9 +407,9 @@ Use when creating or reviewing a plugin command:
 - [ ] Frontmatter has exactly `name` and `description`
 - [ ] `name` is kebab-case, prefixed with `sdd-`, and matches the filename (without `.md`)
 - [ ] `description` is 1-2 sentences: what the command does from the user's perspective
-- [ ] H1 title includes the leading slash (e.g., `# /sdd-config`)
+- [ ] H1 title includes the leading slash (e.g., `# /sdd-run config`)
 - [ ] `## Usage` section with syntax code block
-- [ ] Command requires arguments unless designed to run without them (like `sdd-init`)
+- [ ] Command requires arguments unless designed to run without them (like `sdd-run init`)
 - [ ] When called without required arguments, shows comprehensive usage guide (not an error message)
 - [ ] Multi-action commands have a summary table before action detail sections
 - [ ] Each action has: Usage, Arguments (if any), Flow, Output

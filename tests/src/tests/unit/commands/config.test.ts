@@ -1,7 +1,7 @@
 /**
- * /sdd-config Command Tests
+ * /sdd-run config Command Tests
  *
- * WHY: Validates that the sdd-config command documentation exists
+ * WHY: Validates that the config command documentation exists
  * and contains the required operations. The command file is the
  * source of truth for how Claude handles config management.
  */
@@ -9,19 +9,19 @@
 import { describe, expect, it } from 'vitest';
 import { PLUGIN_DIR, joinPath, fileExists, readFile } from '@/lib';
 
-const COMMAND_PATH = joinPath(PLUGIN_DIR, 'commands', 'sdd-config.md');
+const COMMAND_PATH = joinPath(PLUGIN_DIR, 'commands', 'sdd-run.md');
 
 /**
- * WHY: The command file must exist for Claude to know how to handle /sdd-config.
+ * WHY: The command file must exist for Claude to know how to handle /sdd-run config.
  */
-describe('/sdd-config Command File', () => {
-  it('sdd-config.md exists', () => {
+describe('/sdd-run config Command File', () => {
+  it('sdd-run.md exists', () => {
     expect(fileExists(COMMAND_PATH)).toBe(true);
   });
 
   it('has correct frontmatter', () => {
     const content = readFile(COMMAND_PATH);
-    expect(content).toContain('name: sdd-config');
+    expect(content).toContain('name: sdd-run');
     expect(content).toContain('description:');
   });
 });
@@ -30,7 +30,7 @@ describe('/sdd-config Command File', () => {
  * WHY: The generate operation is the primary way to create merged config files.
  * Without it, developers can't get config files for their environments.
  */
-describe('/sdd-config generate Operation', () => {
+describe('/sdd-run config generate Operation', () => {
   it('documents generate operation', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('### generate');
@@ -71,7 +71,7 @@ describe('/sdd-config generate Operation', () => {
  * WHY: The validate operation ensures config is correct before deployment.
  * Without it, invalid configs would only fail at runtime.
  */
-describe('/sdd-config validate Operation', () => {
+describe('/sdd-run config validate Operation', () => {
   it('documents validate operation', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('### validate');
@@ -89,7 +89,7 @@ describe('/sdd-config validate Operation', () => {
  * WHY: The diff operation helps compare environments before deployment.
  * Without it, developers can't easily see what differs between envs.
  */
-describe('/sdd-config diff Operation', () => {
+describe('/sdd-run config diff Operation', () => {
   it('documents diff operation', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('### diff');
@@ -107,7 +107,7 @@ describe('/sdd-config diff Operation', () => {
  * WHY: The add-env operation creates new environment directories.
  * Without it, users would have to manually create env directories.
  */
-describe('/sdd-config add-env Operation', () => {
+describe('/sdd-run config add-env Operation', () => {
   it('documents add-env operation', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('### add-env');
@@ -125,7 +125,7 @@ describe('/sdd-config add-env Operation', () => {
  * WHY: The command must document the merge algorithm.
  * Users need to understand how config inheritance works.
  */
-describe('/sdd-config Merge Algorithm', () => {
+describe('/sdd-run config Merge Algorithm', () => {
   it('documents object merging', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('Object');
@@ -149,7 +149,7 @@ describe('/sdd-config Merge Algorithm', () => {
  * WHY: The command must document common workflows.
  * Users need examples of how to use config in practice.
  */
-describe('/sdd-config Workflow Documentation', () => {
+describe('/sdd-run config Workflow Documentation', () => {
   it('documents local development workflow', () => {
     const content = readFile(COMMAND_PATH);
     expect(content).toContain('Local Development');

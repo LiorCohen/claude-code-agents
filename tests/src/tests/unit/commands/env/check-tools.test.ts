@@ -2,7 +2,7 @@
  * Unit Tests: env check-tools command
  *
  * WHY: The check-tools command provides structured tool availability data
- * for sdd-init. Tests verify version parsing, platform detection, install
+ * for init. Tests verify version parsing, platform detection, install
  * hint generation, and output formatting.
  */
 

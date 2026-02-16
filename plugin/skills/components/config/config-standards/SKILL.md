@@ -155,7 +155,7 @@ import type { ServerConfig } from '@my-project/config/types';
 4. **Update types** in `components/config/types/{component}.ts`
 5. **Generate merged config**:
    ```bash
-   /sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+   /sdd I want to generate config
    ```
 6. **Start server**:
    ```bash
@@ -220,7 +220,7 @@ NODE_ENV is an **infrastructure exception**, not application config. It exists b
 4. **Pattern matching** - Schema can validate string patterns
 
 Validation happens:
-- At `/sdd-config generate` time (CLI)
+- At `/sdd I want to generate config` time (CLI)
 - At server startup (runtime)
 
 ---

@@ -103,8 +103,8 @@ OPEN QUESTIONS (BLOCKING):
   - O2: Should failed logins trigger alerts?
 
   Resolve these questions before spec can be approved:
-    /sdd-change answer O1 "5 attempts per minute"
-    /sdd-change assume O1 "Industry standard: 5 attempts/min"
+    /sdd I want to answer an open question
+    /sdd I want to answer an open question
 ```
 
 ## Open Questions Block Approval

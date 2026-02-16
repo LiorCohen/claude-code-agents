@@ -34,7 +34,7 @@ describe('Config Validate Command', () => {
   let testDir: string;
 
   beforeEach(async () => {
-    testDir = await mkdtemp('sdd-config-validate-');
+    testDir = await mkdtemp('config-validate-');
     await mkdir(join(testDir, 'components', 'config', 'envs', 'default'), { recursive: true });
     await mkdir(join(testDir, 'components', 'config', 'envs', 'local'), { recursive: true });
     await mkdir(join(testDir, 'components', 'config', 'envs', 'staging'), { recursive: true });

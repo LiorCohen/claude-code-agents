@@ -16,14 +16,14 @@ This keeps all change documentation (spec + plan) together in one location.
 
 ## Workflow Integration
 
-Plans are created as part of the `/sdd-change` workflow:
+Plans are created as part of the `/sdd` workflow:
 
-1. User creates or imports a change via `/sdd-change new`
+1. User creates or imports a change via `/sdd I want to create a new feature`
 2. Spec solicitation creates SPEC.md
-3. User reviews and approves spec via `/sdd-change approve spec <change-id>`
+3. User reviews and approves spec via `/sdd I want to approve the spec`
 4. **This skill creates PLAN.md** immediately after spec approval
-5. User reviews and approves plan via `/sdd-change approve plan <change-id>`
-6. Implementation can begin via `/sdd-change implement <change-id>`
+5. User reviews and approves plan via `/sdd I want to approve the plan`
+6. Implementation can begin via `/sdd I want to start implementing`
 
 **Plan creation requires an approved SPEC.md** as input — it does not run independently.
 

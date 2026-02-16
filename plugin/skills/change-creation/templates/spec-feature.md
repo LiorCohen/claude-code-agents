@@ -268,7 +268,7 @@ specs/
 | specs/domain/user.md | Modify | Add `sessions` relationship, `lastLogin` field |
 | specs/domain/session.md | Create | New entity for user sessions |
 
-**Validation**: During `/sdd-change verify`, the system checks that:
+**Validation**: During `/sdd I want to verify the implementation`, the system checks that:
 1. All files listed here were actually created/modified
 2. No specs/ files were changed that aren't listed here
 

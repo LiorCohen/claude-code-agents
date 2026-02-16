@@ -155,7 +155,7 @@ Change IDs are workflow-scoped:
 
 ## Consumers
 
-- `sdd-change` command — creates workflows and manages lifecycle
+- `/sdd` orchestrator — creates workflows and manages lifecycle
 - `spec-solicitation` skill — reads context, saves specs
 - `change-creation` skill — saves plans
 - `external-spec-integration` skill — creates workflows and items from decomposition

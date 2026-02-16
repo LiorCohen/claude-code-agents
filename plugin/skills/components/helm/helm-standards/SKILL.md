@@ -298,7 +298,7 @@ env:
 3. **Never hardcode environment values** - Use values files for all environment differences
 4. **Keep secrets external** - Reference K8s Secrets by name only
 5. **Config component is source of truth** - Helm just mounts it
-6. **Validate config before deploy** - Use `/sdd-config validate` in CI/CD
+6. **Validate config before deploy** - Use `/sdd I want to validate my config` in CI/CD
 7. **Independent scaling** - Use separate deployments for hybrid modes
 
 ---

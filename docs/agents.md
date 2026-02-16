@@ -15,7 +15,7 @@ SDD uses specialized agents instead of one general-purpose AI. Each agent has:
 - Standards and patterns it follows
 
 You can invoke agents in two ways:
-1. **Via SDD commands** - Commands like `/sdd-change implement` automatically orchestrate agents based on the implementation plan
+1. **Via `/sdd`** - Commands like `/sdd I want to start implementing` automatically orchestrate agents based on the implementation plan
 2. **Directly** - Ask Claude to use an agent (e.g., "Use the backend-dev agent to implement this endpoint")
 
 ## The Agents
@@ -78,7 +78,7 @@ Handles infrastructure and CI/CD pipelines.
 
 Reviews code and specs.
 
-**When it's used:** During `/sdd-change verify`
+**When it's used:** During verification (`/sdd I want to verify the implementation`)
 **What it does:** Checks that implementation matches spec, reviews code quality
 
 ---

@@ -179,6 +179,6 @@ Read `plugin/.claude-plugin/plugin.json`:
 - Plugin development workflows
 
 **USER-FIRST LANGUAGE:** Always write from the user's perspective:
-- "Run `/sdd-init`" not "The sdd-init command executes"
+- "Run `/sdd-run init`" not "The sdd-run init command executes"
 - "You'll see a spec file" not "A spec file is generated"
 - "Your project now has" not "The system creates"

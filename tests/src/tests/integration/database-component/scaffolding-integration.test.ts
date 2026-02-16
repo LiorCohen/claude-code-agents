@@ -151,7 +151,7 @@ describe('Scaffolding Integration', () => {
 describe('Documentation Consistency', () => {
   /**
    * WHY: The scaffolding skill doc must list database as a component type.
-   * Without this, users won't know database is an option during sdd-init.
+   * Without this, users won't know database is an option during init.
    */
   it('scaffolding SKILL.md lists database component', () => {
     const skillMd = joinPath(SKILLS_DIR, 'scaffolding', 'SKILL.md');
@@ -176,11 +176,11 @@ describe('Documentation Consistency', () => {
   });
 
   /**
-   * WHY: sdd-init is the user-facing command for project creation.
+   * WHY: init is the user-facing command for project creation.
    * It must list database as an option and show its dependencies.
    */
-  it('sdd-init command includes database option', () => {
-    const commandMd = joinPath(PLUGIN_DIR, 'commands', 'sdd-init.md');
+  it('init command includes database option', () => {
+    const commandMd = joinPath(PLUGIN_DIR, 'commands', 'sdd-run.md');
     const content = readFile(commandMd);
 
     // Verify database is mentioned as a component option

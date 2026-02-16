@@ -10,7 +10,7 @@ Creates the non-component parts of an SDD project: root files and specs director
 
 ## Modes
 
-### Minimal Mode (Default for /sdd-init)
+### Minimal Mode (Default for `/sdd I want to initialize a new project`)
 
 Creates only the essential structure needed to start. Additional components are scaffolded during implementation when the plan includes a scaffolding phase.
 
@@ -86,7 +86,7 @@ This makes it safe to run multiple times for repair/upgrade scenarios.
 ## When to Use
 
 Use during:
-- `/sdd-init` in minimal mode
+- `/sdd I want to initialize a new project` in minimal mode
 - Upgrade/repair workflows in full mode
 
 ## Template Variables
@@ -115,7 +115,7 @@ This file tracks all specifications in the project.
 No changes yet. Create your first change with:
 
 ```
-/sdd-change new --type feature --name <feature-name>
+/sdd I want to create a new feature
 ```text
 
 ## Domain Knowledge

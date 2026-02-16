@@ -7,7 +7,7 @@
 This project was scaffolded with SDD. To add your first feature:
 
 ```bash
-/sdd-change new --type feature --name <your-first-feature>
+/sdd I want to create a new feature
 ```
 
 This will guide you through:

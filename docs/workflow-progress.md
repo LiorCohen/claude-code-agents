@@ -72,8 +72,8 @@ During spec creation, SDD tracks which substep is active:
 
 ### Full Status
 
-```bash
-/sdd-change status
+```
+/sdd
 ```
 
 Output:
@@ -98,13 +98,13 @@ ITEMS:
 
 NEXT ACTION:
   Review spec at: changes/2026/02/05/a1b2c3/01-registration/SPEC.md
-  Then run: /sdd-change approve spec a1b2-1
+  Then run: /sdd I want to approve the spec
 ```
 
 ### List Items
 
-```bash
-/sdd-change list
+```
+/sdd I want to list my changes
 ```
 
 Output:
@@ -213,7 +213,7 @@ Review all specs before proceeding to planning.
 
 NEXT: Begin planning phase
 
-Run: /sdd-change plan
+Run: /sdd I want to start planning
 ```
 
 ### Gate: Plan → Implement
@@ -246,8 +246,7 @@ Cannot approve 02-authentication - 2 open questions remain:
       (Blocks: Monitoring section)
 
 Answer these questions or mark as assumptions:
-  /sdd-change answer O1 "5 attempts per minute"
-  /sdd-change assume O1 "Industry standard: 5/min"
+  /sdd I want to answer an open question
 ```
 
 ### Planning Blocked (Stale Dependencies)
@@ -261,8 +260,7 @@ The following specs have unreviewed upstream changes:
   ❗ 02-authentication (01-user-model changed)
   ❗ 03-password-reset (02-authentication not reviewed)
 
-Review these specs before planning:
-  /sdd-change review 02-authentication
+Review these specs before planning.
 ```
 
 ## Dependency Visualization
@@ -323,8 +321,8 @@ workflow:
 
 ## Resuming Workflows
 
-```bash
-/sdd-change continue
+```
+/sdd I want to continue
 ```
 
 SDD reads the workflow state and resumes from where you left off:

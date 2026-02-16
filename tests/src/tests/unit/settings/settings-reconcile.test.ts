@@ -110,7 +110,7 @@ describe('project field deprecation', () => {
 
   it('removes project.domain', () => {
     expect(content).toContain("'project.domain'");
-    expect(content).toContain('domain inference moved to sdd-change');
+    expect(content).toContain('domain inference moved to change workflow');
   });
 
   it('preserves project name', () => {

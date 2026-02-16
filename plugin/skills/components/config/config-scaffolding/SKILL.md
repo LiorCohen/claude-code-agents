@@ -144,7 +144,7 @@ The config component is a minimal TypeScript project with no runtime code. It ex
 
 1. **Other components can import types** via workspace package `@{project}/config/types`
 2. **YAML files are the source of truth** for configuration values
-3. **The system CLI** (via `/sdd-config`) generates merged configs for each environment
+3. **The system CLI** (via `/sdd I want to generate config`) generates merged configs for each environment
 
 ## Environment Structure
 
@@ -185,7 +185,7 @@ skills/components/config/config-scaffolding/templates/
 
 ## Sync Behavior
 
-When settings change (via `/sdd-settings`), the config component is automatically synced:
+When settings change (via `/sdd` with natural language about settings), the config component is automatically synced:
 
 1. **New component added** → Config section added with defaults
 2. **Database added to server** → Database subsection added
