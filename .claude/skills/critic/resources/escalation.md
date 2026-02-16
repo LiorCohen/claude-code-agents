@@ -20,6 +20,7 @@ Each trigger has a step owner (C = collector, R = reviewer, C+R = both), applica
 | H10 | Unmet acceptance criteria at completion | R | 8 | Ultra | List unmet criteria with evidence gaps |
 | H11 | Files modified but only grepped, not read | C | 2, 3, 5, 6 | Standard | List files only grepped, require full read |
 | H12 | Test assertions weakened to make tests pass | R | 7 | Deep | Show original vs modified assertions |
+| H13 | Incomplete spec sections (speccing gate) | R | 1 | Standard | List empty/trivial sections, require meaningful content |
 
 ---
 

@@ -4,6 +4,20 @@ Each check is annotated with step ownership: **(C)** = collector (session-aware)
 
 ---
 
+## Phase 1: Speccing Exit Gate (`/tasks plan` on a speccing task)
+
+- (R) Are all 5 required sections present and non-empty? (Description, Motivation, Scope, Constraints, Acceptance Criteria)
+- (R) Does each section have meaningful content (not trivial one-liners or placeholders)?
+- (R) Is the scope clear enough that planning can focus purely on execution?
+- (R) Are acceptance criteria testable and specific?
+- (C) Were guiding questions asked? Were open questions resolved?
+
+> *"The user says: Is the spec complete enough to plan against? If I can't tell what's changing from reading task.md alone, it's not ready."*
+
+**Escalation:** Empty/trivial sections = hard block (H13). Vague acceptance criteria = soft warning.
+
+---
+
 ## Phase 2: Starting Planning (`/tasks plan`)
 
 - (C) Which files have you actually Read (full file) vs Grep'd? List them

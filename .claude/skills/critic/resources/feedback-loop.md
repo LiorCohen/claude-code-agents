@@ -15,7 +15,7 @@ The `.critic/` directory at the repo root stores learned patterns from real inte
 
 ## How to Add Entries
 
-1. Identify which file the pattern belongs to: `planning.md`, `implementation.md`, `review.md`, or `completion.md`
+1. Identify which file the pattern belongs to: `speccing.md`, `planning.md`, `implementation.md`, `review.md`, or `completion.md`
 2. Read the existing file
 3. Check for overlap or contradiction with existing rules
 4. Draft the proposed rule as a concise, imperative statement
