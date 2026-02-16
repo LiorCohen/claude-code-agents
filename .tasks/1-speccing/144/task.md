@@ -38,54 +38,50 @@ The three-command model provides:
 
 ### `/sdd-run` — Explicit command
 
-Absorbs all current functionality under namespaced subcommands:
+Absorbs all current functionality under namespaced subcommands. Complete mapping:
 
-```
-/sdd-run change <action>         ← from /sdd-change
-  new [--type <type>] [--spec <path>]
-  status
-  continue
-  list
-  approve spec <change-id>
-  approve plan <change-id>
-  plan
-  implement <change-id>
-  verify <change-id>
-  review <change-id>
-  answer <q-id> "<answer>"
-  assume <q-id> "<assumption>"
-  regress <change-id> --to <phase>
-  request-changes <change-id>
-
-/sdd-run init                    ← from /sdd-init
-
-/sdd-run local-env <action>      ← from /sdd-run env (renamed to avoid collision with config environments)
-  create | destroy | start | stop | status
-  deploy | undeploy | forward | infra
-
-/sdd-run database <action>       ← from /sdd-run database (stays the same)
-  setup | teardown | migrate | seed | reset | port-forward | psql
-
-/sdd-run contract <action>       ← from /sdd-run contract (stays the same)
-  validate
-
-/sdd-run config <action>         ← from /sdd-config + env config
-  generate --env <env> [--component <name>]
-  generate-local                 ← moved from /sdd-run env config (generates local/config.yaml with localhost URLs from port-forwards)
-  validate [--env <env>]
-  diff <env1> <env2>
-  add-env <env-name>
-
-/sdd-run settings [<component>] [<setting>] [<action>] [<value>]  ← from /sdd-settings
-  (preserves full change workflow: working tree check → validation → preview → apply → sync → report)
-
-/sdd-run permissions <action>    ← from /sdd-run permissions (stays the same)
-  configure
-
-/sdd-run version                 ← from /sdd-version
-
-/sdd-run help                    ← show all namespaces and subcommands
-```
+| Namespace | Action | Old Command | New Command | Change |
+|-----------|--------|-------------|-------------|--------|
+| `change` | `new [--type <type>] [--spec <path>]` | `/sdd-change new` | `/sdd-run change new` | Renamed |
+| `change` | `status` | `/sdd-change status` | `/sdd-run change status` | Renamed |
+| `change` | `continue` | `/sdd-change continue` | `/sdd-run change continue` | Renamed |
+| `change` | `list` | `/sdd-change list` | `/sdd-run change list` | Renamed |
+| `change` | `approve spec <change-id>` | `/sdd-change approve spec` | `/sdd-run change approve spec` | Renamed |
+| `change` | `approve plan <change-id>` | `/sdd-change approve plan` | `/sdd-run change approve plan` | Renamed |
+| `change` | `plan` | `/sdd-change plan` | `/sdd-run change plan` | Renamed |
+| `change` | `implement <change-id>` | `/sdd-change implement` | `/sdd-run change implement` | Renamed |
+| `change` | `verify <change-id>` | `/sdd-change verify` | `/sdd-run change verify` | Renamed |
+| `change` | `review <change-id>` | `/sdd-change review` | `/sdd-run change review` | Renamed |
+| `change` | `answer <q-id> "<answer>"` | `/sdd-change answer` | `/sdd-run change answer` | Renamed |
+| `change` | `assume <q-id> "<assumption>"` | `/sdd-change assume` | `/sdd-run change assume` | Renamed |
+| `change` | `regress <change-id> --to <phase>` | `/sdd-change regress` | `/sdd-run change regress` | Renamed |
+| `change` | `request-changes <change-id>` | `/sdd-change request-changes` | `/sdd-run change request-changes` | Renamed |
+| `init` | *(no action — runs full workflow)* | `/sdd-init` | `/sdd-run init` | Renamed |
+| `local-env` | `create [--name] [--provider] [--skip-infra]` | `/sdd-run env create` | `/sdd-run local-env create` | Namespace renamed |
+| `local-env` | `destroy [--name]` | `/sdd-run env destroy` | `/sdd-run local-env destroy` | Namespace renamed |
+| `local-env` | `start [--name]` | `/sdd-run env start` | `/sdd-run local-env start` | Namespace renamed |
+| `local-env` | `stop [--name]` | `/sdd-run env stop` | `/sdd-run local-env stop` | Namespace renamed |
+| `local-env` | `status [--name]` | `/sdd-run env status` | `/sdd-run local-env status` | Namespace renamed |
+| `local-env` | `deploy [chart] [--namespace] [--skip-db] [--skip-migrate] [--exclude]` | `/sdd-run env deploy` | `/sdd-run local-env deploy` | Namespace renamed |
+| `local-env` | `undeploy [chart] [--namespace]` | `/sdd-run env undeploy` | `/sdd-run local-env undeploy` | Namespace renamed |
+| `local-env` | `forward [start\|stop\|list] [--namespace]` | `/sdd-run env forward` | `/sdd-run local-env forward` | Namespace renamed |
+| `local-env` | `infra [--reinstall]` | `/sdd-run env infra` | `/sdd-run local-env infra` | Namespace renamed |
+| `database` | `setup <component>` | `/sdd-run database setup` | `/sdd-run database setup` | Unchanged |
+| `database` | `teardown <component>` | `/sdd-run database teardown` | `/sdd-run database teardown` | Unchanged |
+| `database` | `migrate <component>` | `/sdd-run database migrate` | `/sdd-run database migrate` | Unchanged |
+| `database` | `seed <component>` | `/sdd-run database seed` | `/sdd-run database seed` | Unchanged |
+| `database` | `reset <component>` | `/sdd-run database reset` | `/sdd-run database reset` | Unchanged |
+| `database` | `port-forward <component>` | `/sdd-run database port-forward` | `/sdd-run database port-forward` | Unchanged |
+| `database` | `psql <component>` | `/sdd-run database psql` | `/sdd-run database psql` | Unchanged |
+| `contract` | `validate <component>` | `/sdd-run contract validate` | `/sdd-run contract validate` | Unchanged |
+| `config` | `generate --env <env> [--component <name>]` | `/sdd-config generate` | `/sdd-run config generate` | Renamed |
+| `config` | `generate-local` | `/sdd-run env config` | `/sdd-run config generate-local` | Moved from env namespace |
+| `config` | `validate [--env <env>]` | `/sdd-config validate` | `/sdd-run config validate` | Renamed |
+| `config` | `diff <env1> <env2>` | `/sdd-config diff` | `/sdd-run config diff` | Renamed |
+| `config` | `add-env <env-name>` | `/sdd-config add-env` | `/sdd-run config add-env` | Renamed |
+| `permissions` | `configure` | `/sdd-run permissions configure` | `/sdd-run permissions configure` | Unchanged |
+| `version` | *(no action — displays version info)* | `/sdd-version` | `/sdd-run version` | Renamed |
+| `help` | *(no action — lists all namespaces)* | *(new)* | `/sdd-run help` | New |
 
 When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces and their subcommands.
 
@@ -93,9 +89,9 @@ When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces
 
 **Execution model**: Each namespace+action maps to `system-run.sh <namespace> <action> [args] [options]` — same as current sdd-run. The new sdd-run.md preserves this execution section.
 
-**Internal namespaces** (NOT user-facing, NOT shown in `/sdd-run help`): `scaffolding`, `spec`, `hook`, `contract generate-types`. These are invoked internally by skills/commands via `system-run.sh` and remain unchanged.
+**Internal namespaces** (NOT user-facing, NOT shown in `/sdd-run help`): `scaffolding`, `spec`, `hook`, `contract generate-types`, `settings`. These are invoked internally by skills/commands via `system-run.sh` and remain unchanged. Settings was never user-facing — it is managed internally by the `project-settings` skill (invoked during init, change workflows, and by `/sdd` when users describe settings changes in natural language).
 
-**Dispatcher architecture**: sdd-run.md does not inline all logic from the 6 old commands. Each namespace section uses INVOKE to delegate to the same skills the old commands used (e.g., `change` INVOKEs `change-creation`, `workflow-state`; `init` INVOKEs `project-scaffolding`; `settings` INVOKEs `project-settings`). This keeps sdd-run.md manageable despite absorbing all functionality.
+**Dispatcher architecture**: sdd-run.md does not inline all logic from the 6 old commands. Each namespace section uses INVOKE to delegate to the same skills the old commands used (e.g., `change` INVOKEs `change-creation`, `workflow-state`; `init` INVOKEs `project-scaffolding`; `config` INVOKEs `config-standards`). This keeps sdd-run.md manageable despite absorbing all functionality.
 
 ### `/sdd` — Context-aware workflow assistant (Jarvis)
 
@@ -152,23 +148,11 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 
 - **#66** (Single context-aware SDD command) — subsumed by `/sdd` Jarvis command
 
-### File changes
-
-- **Delete**: `plugin/commands/sdd-change.md`, `sdd-config.md`, `sdd-init.md`, `sdd-settings.md`, `sdd-version.md`
-- **Rewrite**: `plugin/commands/sdd-run.md` as the unified explicit command
-- **Create**: `plugin/commands/sdd.md` as the Jarvis command
-- **Create**: `plugin/commands/sdd-help.md` as the tutor command
-- **Update**: 33 skill files across `plugin/skills/` that reference old command names
-- **Update**: Agent files that reference old command names
-- **Update**: Scaffolding template `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` — this generates the project's CLAUDE.md during `sdd-init` and references old command names
-- **Update**: 14 test files under `tests/` that reference old command names
-- **Update**: Docs (`docs/*.md`, `README.md`)
-
 ## Constraints
 
 - **Clean break**: Old command names are deleted entirely — no aliases or deprecation period
 - **System CLI untouched**: The internal `system-run.sh` CLI and its handlers are not modified
-- **Skills/agents untouched in logic**: Only command *references* in skills and agents are updated; no behavioral changes
+- **Skills/agents untouched in logic**: Only command *references* in skills and agents are updated; no behavioral changes. Note: `system-run.sh` invocations in skills are internal CLI calls, NOT command references — they must NOT be changed.
 - **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new`, sdd-version says `/sdd-init`). These output patterns inside sdd-run.md must reference the new command names.
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
@@ -185,11 +169,12 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/commands/sdd-change.md` | Delete | Absorbed into `/sdd-run change` |
 | `plugin/commands/sdd-config.md` | Delete | Absorbed into `/sdd-run config` |
 | `plugin/commands/sdd-init.md` | Delete | Absorbed into `/sdd-run init` |
-| `plugin/commands/sdd-settings.md` | Delete | Absorbed into `/sdd-run settings` |
+| `plugin/commands/sdd-settings.md` | Delete | Never user-facing; settings managed internally by `project-settings` skill |
 | `plugin/commands/sdd-version.md` | Delete | Absorbed into `/sdd-run version` |
 | `plugin/skills/` (33 files) | Update | Update old command references across all skills |
 | `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — generates project CLAUDE.md with command refs |
 | `plugin/agents/` | Update | Update command references in agent files |
+| `.claude/skills/` (3 files) | Update | Update old command references in marketplace skills (commands-standards, docs-standards, plugin-testing-standards) |
 | `tests/` (14 files) | Update | Update old command references in test files |
 | `README.md` | Update | Update command references (17 occurrences) |
 | `docs/commands.md` | Rewrite | Restructure around 3 new commands |
@@ -208,8 +193,8 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 ## Acceptance Criteria
 
 1. **Exactly three user-facing commands exist**: `ls plugin/commands/` shows `sdd.md`, `sdd-run.md`, and `sdd-help.md` — no other command files. Verify: `ls plugin/commands/ | sort` outputs exactly these 3 files.
-2. **`/sdd-run help` shows all namespaces**: The `sdd-run.md` command file contains documentation for all namespaces: change, init, local-env, database, contract, config, settings, permissions, version. Verify: `grep -c "^/sdd-run " plugin/commands/sdd-run.md` shows at least 9 namespace entries.
-3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run`. Verify: grep the `sdd-run.md` file for each action — `change new`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `config generate-local`, `settings`, `permissions configure`, `version`.
+2. **`/sdd-run help` shows all namespaces**: The `sdd-run.md` command file contains documentation for all user-facing namespaces: change, init, local-env, database, contract, config, permissions, version. Verify: `grep -c "^/sdd-run " plugin/commands/sdd-run.md` shows at least 8 namespace entries.
+3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run` (except settings, which becomes internal). Verify: grep the `sdd-run.md` file for each action — `change new`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `config generate-local`, `permissions configure`, `version`.
 4. **`/sdd` reads context and suggests**: The `sdd.md` command file includes instructions to read git branch, workflow state, project init state, and sdd-settings. Verify: `grep -E "git branch|workflows/|sdd-settings" plugin/commands/sdd.md` returns matches.
 5. **`/sdd` cross-references other commands**: The `sdd.md` file explicitly references both `/sdd-help` and `/sdd-run`. Verify: `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` returns at least 2.
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
@@ -221,4 +206,5 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 12. **No stale references to old commands in docs**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" docs/ README.md` returns zero matches.
 13. **Agents still function**: The devops agent references `/sdd-run local-env` correctly. Verify: `grep "sdd-run local-env" plugin/agents/devops.md` returns matches.
 14. **No stale `sdd-run env` references**: The `env` namespace is renamed to `local-env`. Verify: `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero matches (excluding historical notes in task files).
-15. **System CLI untouched**: No files under `plugin/system/src/` are modified. Verify: `git diff --name-only plugin/system/` returns empty.
+15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" .claude/skills/ --include="*.md"` returns zero matches.
+16. **System CLI untouched**: No files under `plugin/system/src/` are modified. Verify: `git diff --name-only plugin/system/` returns empty.
