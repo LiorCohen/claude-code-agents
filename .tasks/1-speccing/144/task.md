@@ -48,7 +48,7 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | `change` | `list` | `/sdd-change list` | `/sdd-run change list` | Renamed |
 | `change` | `approve spec <change-id>` | `/sdd-change approve spec` | `/sdd-run change approve spec` | Renamed |
 | `change` | `approve plan <change-id>` | `/sdd-change approve plan` | `/sdd-run change approve plan` | Renamed |
-| `change` | `plan` | `/sdd-change plan` | `/sdd-run change plan` | Renamed |
+| `change` | `plan <change-id>` | `/sdd-change plan` | `/sdd-run change plan` | Renamed + added change-id arg |
 | `change` | `implement <change-id>` | `/sdd-change implement` | `/sdd-run change implement` | Renamed |
 | `change` | `verify <change-id>` | `/sdd-change verify` | `/sdd-run change verify` | Renamed |
 | `change` | `review <change-id>` | `/sdd-change review` | `/sdd-run change review` | Renamed |
