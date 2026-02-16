@@ -242,12 +242,38 @@ Add `env` property to database schema and thread through all handlers.
 
 The bulk-update phase. Process every file that references old command names.
 
-**Reference replacement rules:**
-- In plugin skills, docs, README, scaffolding templates: replace old commands with `/sdd` + natural language prompt (e.g., `/sdd-change new --type feature` → `/sdd I want to create a new feature`)
-- In plugin agents: replace `/sdd-run env` with `system-run.sh env` calls (agents use internal invocations, not user-facing commands)
-- In marketplace skills (.claude/skills/): replace old commands with `/sdd-run` equivalents (these describe command authoring)
-- In orchestrator skills: update internal cross-references to use `/sdd` prompts in user-facing output
-- In tests: replace old command names with new equivalents (`sdd-change` → `change`, `sdd-config` → `config`, `sdd-init` → `init`)
+**Reference replacement rules by context:**
+
+1. **User-facing** (skills, docs, README, scaffolding templates, orchestrator output messages): old command → `/sdd` + natural language prompt
+2. **Agents**: `/sdd-run env` → `system-run.sh env` calls (agents are non-interactive, use internal invocations)
+3. **Marketplace skills** (.claude/skills/): old commands → `/sdd-run` equivalents (these describe command authoring)
+4. **Tests**: old command names → new equivalents in describe blocks, prompts, and assertions
+
+**Concrete replacement mapping (user-facing context):**
+
+| Old | New |
+|-----|-----|
+| `/sdd-change new --type feature --name X` | `/sdd I want to create a new feature` |
+| `/sdd-change new --spec path/to/spec.md` | `/sdd I want to import an external spec` |
+| `/sdd-change status` | `/sdd` (no-arg — reads context, shows status) |
+| `/sdd-change continue` | `/sdd` (no-arg — reads context, suggests resumption) |
+| `/sdd-change approve spec <id>` | `/sdd I want to approve the spec` |
+| `/sdd-change approve plan <id>` | `/sdd I want to approve the plan` |
+| `/sdd-change plan` | `/sdd I want to start planning` |
+| `/sdd-change implement <id>` | `/sdd I want to start implementing` |
+| `/sdd-change verify <id>` | `/sdd I want to verify the implementation` |
+| `/sdd-change review <id>` | `/sdd I want to submit for review` |
+| `/sdd-change answer <id> "..."` | `/sdd I want to answer an open question` |
+| `/sdd-change regress <id> --to spec` | `/sdd I want to go back to the spec phase` |
+| `/sdd-init` | `/sdd I want to initialize a new project` |
+| `/sdd-config generate --env local` | `/sdd I want to generate config for local` |
+| `/sdd-config validate` | `/sdd I want to validate my config` |
+| `/sdd-config diff local production` | `/sdd I want to compare local and production config` |
+| `/sdd-version` | `/sdd What version am I running?` |
+| `/sdd-run env create` | `/sdd I want to create a local environment` |
+| `/sdd-run env deploy` | `/sdd I want to deploy to my local environment` |
+| `/sdd-run permissions configure` | `/sdd I want to configure permissions` |
+| `/sdd-run database setup my-db` | `/sdd I want to set up my database` |
 
 **Test file renames:**
 - `sdd-change-new.test.ts` → `change-create.test.ts`
