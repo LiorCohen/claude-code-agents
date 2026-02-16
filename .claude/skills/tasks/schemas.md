@@ -50,7 +50,7 @@ Full description of what needs to be done.
 
 ### Specced Task Template
 
-After speccing, task.md must have all 5 required sections with meaningful content:
+After speccing, task.md must have all 6 required sections with meaningful content:
 
 ```markdown
 ---
@@ -86,6 +86,13 @@ Why this change is needed. What problem it solves. What breaks without it.
 
 - Technical constraints, compatibility requirements, limits
 - Rules that must be followed during implementation
+
+## Changes
+
+| File | Change |
+|------|--------|
+| `path/to/file.md` | What changes and why |
+| `path/to/other.ts` | What changes and why |
 
 ## Acceptance Criteria
 

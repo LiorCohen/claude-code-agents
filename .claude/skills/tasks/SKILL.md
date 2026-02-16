@@ -134,7 +134,7 @@ Moves a task from inbox (or back from planning) to speccing, then interactively 
 
 **From planning (back-transition for substantial rework):** Move folder back to `1-speccing/`, update status to `speccing`, update INDEX.md, commit. Then resume solicitation.
 
-**Solicitation:** Ask guiding questions to fill in the 5 required sections (Description, Motivation, Scope, Constraints, Acceptance Criteria). Maintain a running list of open questions. There is no defined end — the user decides when the spec is complete.
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. There is no defined end — the user decides when the spec is complete.
 
 Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
@@ -148,7 +148,7 @@ Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
 **Precondition:** Task must be in `speccing` status. If not, refuse with: "Task #<id> must be specced before planning. Use `/tasks spec <id>` first."
 
-**Speccing validation gate:** Before transitioning, verify task.md has all 5 required sections (Description, Motivation, Scope, Constraints, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. If any section is missing or insufficient, refuse with details.
+**Speccing validation gate:** Before transitioning, verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. If any section is missing or insufficient, refuse with details.
 
 **Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 

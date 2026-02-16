@@ -6,7 +6,7 @@ Each check is annotated with step ownership: **(C)** = collector (session-aware)
 
 ## Phase 1: Speccing Exit Gate (`/tasks plan` on a speccing task)
 
-- (R) Are all 5 required sections present and non-empty? (Description, Motivation, Scope, Constraints, Acceptance Criteria)
+- (R) Are all 6 required sections present and non-empty? (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria)
 - (R) Does each section have meaningful content (not trivial one-liners or placeholders)?
 - (R) Is the scope clear enough that planning can focus purely on execution?
 - (R) Are acceptance criteria testable and specific?

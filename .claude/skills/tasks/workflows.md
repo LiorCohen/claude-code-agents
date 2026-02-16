@@ -84,7 +84,7 @@ User: /tasks spec 19
 5. Stage changes and use commit skill (e.g., "Tasks: Move #19 back to speccing")
 6. Resume solicitation
 
-**Solicitation:** Ask guiding questions to fill in the 5 required sections (Description, Motivation, Scope, Constraints, Acceptance Criteria). Maintain a running list of open questions. The user decides when the spec is complete — there is no defined end.
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. The user decides when the spec is complete — there is no defined end.
 
 ---
 
@@ -96,7 +96,7 @@ User: /tasks plan 19
 
 **Precondition:** Task must be in `speccing` status. If not, refuse: "Task #19 must be specced before planning. Use `/tasks spec 19` first."
 
-**Speccing validation gate:** Verify task.md has all 5 required sections (Description, Motivation, Scope, Constraints, Acceptance Criteria) with meaningful content. Refuse if any section is missing or trivial.
+**Speccing validation gate:** Verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content. Refuse if any section is missing or trivial.
 
 **Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 
