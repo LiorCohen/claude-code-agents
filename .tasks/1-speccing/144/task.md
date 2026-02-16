@@ -82,7 +82,7 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | `version` | *(no action — displays version info)* | `/sdd-version` | `/sdd-run version` | Renamed |
 | `help` | *(no action — lists all namespaces)* | *(new)* | `/sdd-run help` | New |
 
-When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces and their subcommands.
+When invoked with no arguments (`/sdd-run`): shows help — lists all namespaces and their subcommands. `/sdd-run help` produces the same output. Help is inline in sdd-run.md (not dispatched to an orchestrator or system-run.sh).
 
 **Global options** (preserved from current sdd-run): `--json`, `--verbose`, `--help`.
 
@@ -248,7 +248,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — replace command refs with `/sdd` prompts |
 | `plugin/agents/` | Update | Replace command refs with internal invocations (INVOKE orchestrator skills or `system-run.sh` calls) — agents are non-interactive |
 | `.claude/skills/` (3 files) | Update | Update command refs in marketplace skills (these use `/sdd-run` since they describe command authoring) |
-| `tests/` (14 files) | Update | Update command refs to `/sdd-run` equivalents (tests need explicit commands) |
+| `tests/` (14 files) | Update | Update command refs to `/sdd-run` equivalents + rename test files named after old commands (`sdd-change-new.test.ts` → `change-create.test.ts`, `sdd-change-new-external.test.ts` → `change-create-external.test.ts`, `sdd-config.test.ts` → `config.test.ts`, `sdd-init.test.ts` → `init.test.ts`) |
 | `README.md` | Update | Replace command refs with `/sdd` prompts (17 occurrences) |
 | `docs/commands.md` | Rewrite | Restructure around 3 new commands (documents all three explicitly) |
 | `docs/getting-started.md` | Update | Replace command refs with `/sdd` prompts |
@@ -272,7 +272,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 5. **`/sdd` cross-references other commands**: The `sdd.md` file explicitly references both `/sdd-help` and `/sdd-run`. Verify: `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` returns at least 2.
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
 7. **`/sdd-help` covers core concepts**: The `sdd-help.md` file includes sections on SDD methodology, capability discovery, and guided walkthrough. Verify: `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches.
-8. **`/sdd-help` is read-only**: The tutor does not invoke system CLI, write files, or execute commands. Verify: `grep -E "system-run|Bash|Write|Edit" plugin/commands/sdd-help.md` returns zero matches.
+8. **`/sdd-help` is read-only and unaware of `/sdd-run`**: The tutor does not invoke system CLI, write files, or execute commands. It only references `/sdd`, never `/sdd-run` — users discover `/sdd-run` organically through `/sdd`'s cross-references. Verify: `grep -E "system-run|Bash|Write|Edit|sdd-run" plugin/commands/sdd-help.md` returns zero matches.
 9. **No stale references to old commands in plugin**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md"` returns zero matches.
 10. **No stale references to old commands in tests**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts"` returns zero matches.
 11. **Scaffolding template uses `/sdd` prompts**: The project CLAUDE.md template references `/sdd` with natural language prompts, not `/sdd-run`. Verify: `grep "/sdd " plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns matches AND `grep "/sdd-run" plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns zero matches.
