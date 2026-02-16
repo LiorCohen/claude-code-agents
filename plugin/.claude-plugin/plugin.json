@@ -1,12 +1,13 @@
 {
   "name": "sdd",
-  "version": "6.10.0",
+  "version": "7.0.0",
   "description": "Spec-driven development methodology for full-stack teams",
   "author": {
     "name": "Lior Cohen"
   },
   "skills": [
     "./skills/",
+    "./skills/orchestrators/",
     "./skills/components/backend/",
     "./skills/components/frontend/",
     "./skills/components/database/",
