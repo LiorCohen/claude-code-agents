@@ -66,13 +66,13 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 | `local-env` | `undeploy [chart] [--namespace]` | `/sdd-run env undeploy` | `/sdd-run local-env undeploy` | Namespace renamed |
 | `local-env` | `forward [start\|stop\|list] [--namespace]` | `/sdd-run env forward` | `/sdd-run local-env forward` | Namespace renamed |
 | `local-env` | `infra [--reinstall]` | `/sdd-run env infra` | `/sdd-run local-env infra` | Namespace renamed |
-| `database` | `setup <component>` | `/sdd-run database setup` | `/sdd-run database setup` | Unchanged |
-| `database` | `teardown <component>` | `/sdd-run database teardown` | `/sdd-run database teardown` | Unchanged |
-| `database` | `migrate <component>` | `/sdd-run database migrate` | `/sdd-run database migrate` | Unchanged |
-| `database` | `seed <component>` | `/sdd-run database seed` | `/sdd-run database seed` | Unchanged |
-| `database` | `reset <component>` | `/sdd-run database reset` | `/sdd-run database reset` | Unchanged |
-| `database` | `port-forward <component>` | `/sdd-run database port-forward` | `/sdd-run database port-forward` | Unchanged |
-| `database` | `psql <component>` | `/sdd-run database psql` | `/sdd-run database psql` | Unchanged |
+| `database` | `setup <component> --env <env>` | `/sdd-run database setup` | `/sdd-run database setup` | Added --env |
+| `database` | `teardown <component> --env <env>` | `/sdd-run database teardown` | `/sdd-run database teardown` | Added --env |
+| `database` | `migrate <component> --env <env>` | `/sdd-run database migrate` | `/sdd-run database migrate` | Added --env |
+| `database` | `seed <component> --env <env>` | `/sdd-run database seed` | `/sdd-run database seed` | Added --env |
+| `database` | `reset <component> --env <env>` | `/sdd-run database reset` | `/sdd-run database reset` | Added --env |
+| `database` | `port-forward <component> --env <env>` | `/sdd-run database port-forward` | `/sdd-run database port-forward` | Added --env |
+| `database` | `psql <component> --env <env>` | `/sdd-run database psql` | `/sdd-run database psql` | Added --env |
 | `contract` | `validate <component>` | `/sdd-run contract validate` | `/sdd-run contract validate` | Unchanged |
 | `config` | `generate --env <env> [--component <name>]` | `/sdd-config generate` | `/sdd-run config generate` | Renamed |
 | `config` | `validate [--env <env>]` | `/sdd-config validate` | `/sdd-run config validate` | Renamed |
