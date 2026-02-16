@@ -58,6 +58,7 @@
 
 ### Low Priority
 
+- [#150](0-inbox/150/): Agent Workflow Testing Framework ("Playwright for Claude")
 - [#86](0-inbox/86/): Consider component-catalog skill for component type definitions
 - [#73](0-inbox/73/): User instructions memory for plugin overrides
 - [#31](0-inbox/31/): Welcome prompt after plugin installation
