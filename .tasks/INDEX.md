@@ -4,13 +4,13 @@
 
 ## Speccing
 
-- [#144](1-speccing/144/): Three-command structure: /sdd + /sdd-run + /sdd-help
+(none)
 
 ---
 
 ## Planning
 
-(none)
+- [#144](2-planning/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
 
 ---
 
