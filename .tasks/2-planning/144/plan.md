@@ -320,24 +320,45 @@ Critical path: Phase 1 → Phase 2 → Phase 3 → Phase 5 → Phase 7 → Phase
 
 ## Verification
 
-All acceptance criteria from task.md, verified externally:
+Each check maps to one or more acceptance criteria from task.md. All are externally verifiable.
 
-- [ ] `ls plugin/commands/ | sort` outputs exactly `sdd-help.md`, `sdd-run.md`, `sdd.md`
-- [ ] `grep -c "sdd-run.*\(change\|init\|local-env\|database\|contract\|config\|permissions\|version\)" plugin/commands/sdd-run.md` ≥ 8
-- [ ] `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns ≥ 5 matches
-- [ ] `grep -E "git branch|workflows/|sdd-settings" plugin/commands/sdd.md` returns matches
-- [ ] `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` ≥ 2
-- [ ] `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches
-- [ ] `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches
-- [ ] `grep -E "system-run|Bash|Write|Edit|sdd-run" plugin/commands/sdd-help.md` returns zero matches
-- [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero
-- [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts" | grep -v "sdd-settings\."` returns zero
-- [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero
-- [ ] `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero
-- [ ] `ls plugin/skills/orchestrators/` shows all 5 orchestrator directories
-- [ ] `ls plugin/skills/orchestrators/change-orchestration/` shows SKILL.md + 6 sub-files
-- [ ] `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed"
-- [ ] `grep "env" plugin/system/src/commands/database/schema.ts` returns match
-- [ ] `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns a match
-- [ ] `npm run typecheck:plugin` passes
-- [ ] `npm test` passes
+### Command structure (ACs 1-3)
+
+- [ ] **Only 3 command files exist** — `ls plugin/commands/ | sort` outputs exactly `sdd-help.md`, `sdd-run.md`, `sdd.md`
+- [ ] **All 8 namespaces documented in sdd-run** — `grep -c "sdd-run.*\(change\|init\|local-env\|database\|contract\|config\|permissions\|version\)" plugin/commands/sdd-run.md` ≥ 8
+- [ ] **sdd-run delegates to orchestrators** — `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns ≥ 5 matches
+
+### `/sdd` Jarvis behavior (ACs 4-6)
+
+- [ ] **Reads project context on invocation** — `grep -E "git branch|workflows/|sdd-settings" plugin/commands/sdd.md` returns matches
+- [ ] **Cross-references both `/sdd-help` and `/sdd-run`** — `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` ≥ 2
+- [ ] **Enforces approval before any action** — `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches
+
+### `/sdd-help` tutor behavior (ACs 7-8)
+
+- [ ] **Covers methodology, discovery, walkthroughs** — `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches
+- [ ] **No tools, no `/sdd-run` — read-only and unaware of direct commands** — `grep -E "system-run|Bash|Write|Edit|sdd-run" plugin/commands/sdd-help.md` returns zero matches
+
+### No stale references anywhere (ACs 9-15)
+
+- [ ] **Plugin directory clean of old command names** (both `/sdd-change` and bare `sdd-change`) — `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero
+- [ ] **Test files clean of old command names** (describe blocks, assertions, paths) — `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts" | grep -v "sdd-settings\."` returns zero
+- [ ] **Docs and README clean of old command names** — `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero
+- [ ] **No stale `sdd-run env` anywhere** (renamed to `local-env`) — `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero
+
+### Orchestrator structure (ACs 17-19, 21)
+
+- [ ] **All 5 orchestrator directories exist** — `ls plugin/skills/orchestrators/` shows change-orchestration, init-orchestration, config-orchestration, version-orchestration, local-env-orchestration
+- [ ] **change-orchestration has dispatcher + 6 phase sub-files** — `ls plugin/skills/orchestrators/change-orchestration/` shows SKILL.md, creation.md, spec-review.md, planning.md, implementation.md, verification.md, management.md
+- [ ] **Old local-env skill location removed** — `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed"
+- [ ] **Manifest discovers orchestrators** — `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns a match
+
+### Database --env support (AC 16)
+
+- [ ] **Schema includes env property** — `grep "env" plugin/system/src/commands/database/schema.ts` returns match
+
+### Build and test (AC 22)
+
+- [ ] **TypeScript compiles** — `npm run typecheck:plugin` passes
+- [ ] **All tests pass** — `npm test` passes
+- [ ] **Full standards audit** — `/critic`, `commands-standards`, `skills-standards`, `agents-standards`, `system-cli-standards`, `docs-standards`, `plugin-product-standards` all produce zero hard-block findings
