@@ -270,12 +270,11 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/system/src/commands/database/schema.ts` | Update | Add `env` property to database args schema |
 | `plugin/system/src/commands/database/handler.ts` | Update | Thread `--env` arg to action functions |
 | `plugin/system/src/commands/database/*.ts` (7 action files) | Update | Accept and use env parameter |
-| `plugin/skills/` (19 files) | Update | Replace old command refs with `/sdd` + natural language prompts |
-| `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — replace command refs with `/sdd` prompts |
+| `plugin/skills/` (19 files, includes scaffolding template) | Update | Replace old command refs with `/sdd` + natural language prompts |
 | `plugin/agents/` | Update | Replace command refs with internal invocations (INVOKE orchestrator skills or `system-run.sh` calls) — agents are non-interactive |
-| `.claude/skills/` (3 files) | Update | Update command refs in marketplace skills (these use `/sdd-run` since they describe command authoring) |
+| `.claude/skills/` (4 files) | Update | Update command refs in marketplace skills (these use `/sdd-run` since they describe command authoring) |
 | `tests/` (14 files) | Update | Update command refs to `/sdd-run` equivalents + rename test files named after old commands (`sdd-change-new.test.ts` → `change-create.test.ts`, `sdd-change-new-external.test.ts` → `change-create-external.test.ts`, `sdd-config.test.ts` → `config.test.ts`, `sdd-init.test.ts` → `init.test.ts`) |
-| `README.md` | Update | Replace command refs with `/sdd` prompts (17 occurrences) |
+| `README.md` | Update | Replace command refs with `/sdd` prompts (18 refs) |
 | `docs/commands.md` | Rewrite | Restructure around 3 new commands (documents all three explicitly) |
 | `docs/getting-started.md` | Update | Replace command refs with `/sdd` prompts |
 | `docs/workflows.md` | Update | Replace command refs with `/sdd` prompts |
@@ -300,13 +299,13 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
 7. **`/sdd-help` covers core concepts**: The `sdd-help.md` file includes sections on SDD methodology, capability discovery, and guided walkthrough. Verify: `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches.
 8. **`/sdd-help` is read-only and unaware of `/sdd-run`**: The tutor does not invoke system CLI, write files, or execute commands. It only references `/sdd`, never `/sdd-run` — users discover `/sdd-run` organically through `/sdd`'s cross-references. Verify: `grep -E "system-run|Bash|Write|Edit|sdd-run" plugin/commands/sdd-help.md` returns zero matches.
-9. **No stale references to old commands in plugin**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero matches.
+9. **No stale references to old commands in plugin**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero matches.
 10. **No stale references to old commands in tests**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts" | grep -v "sdd-settings\."` returns zero matches.
 11. **Scaffolding template uses `/sdd` prompts**: The project CLAUDE.md template references `/sdd` with natural language prompts, not `/sdd-run`. Verify: `grep "/sdd " plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns matches AND `grep "/sdd-run" plugin/skills/project-scaffolding/templates/project/CLAUDE.md` returns zero matches.
-12. **No stale references to old commands in docs**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero matches.
+12. **No stale references to old commands in docs**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero matches.
 13. **Agents use internal invocations**: Agent files reference orchestrator skills or `system-run.sh`, not user-facing commands. Verify: `grep -rE "/sdd-change|/sdd-config|/sdd-init|/sdd-settings|/sdd-version|/sdd-run env " plugin/agents/ --include="*.md" | grep -v "sdd-settings\."` returns zero matches.
 14. **No stale `sdd-run env` references**: The `env` namespace is renamed to `local-env`. Verify: `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero matches (excluding historical notes in task files).
-15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" .claude/skills/ --include="*.md" | grep -v "sdd-settings\."` returns zero matches.
+15. **No stale references to old commands in marketplace skills**: Verify: `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" .claude/skills/ --include="*.md" | grep -v "sdd-settings\."` returns zero matches.
 16. **Database CLI accepts --env**: The database schema and handlers accept an `env` parameter. Verify: `grep "env" plugin/system/src/commands/database/schema.ts` returns a match.
 17. **Orchestrator skills exist**: Each namespace with non-trivial logic delegates to an orchestrator skill. Verify: `ls plugin/skills/orchestrators/` shows `change-orchestration/`, `init-orchestration/`, `config-orchestration/`, `version-orchestration/`, `local-env-orchestration/` — each containing a `SKILL.md`. The change-orchestration directory also contains phase sub-files. Verify: `ls plugin/skills/orchestrators/change-orchestration/` shows `SKILL.md`, `creation.md`, `spec-review.md`, `planning.md`, `implementation.md`, `verification.md`, `management.md`.
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 5 matches (change, init, config, version, local-env).

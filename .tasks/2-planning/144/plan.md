@@ -128,7 +128,7 @@ Replace 6 user-facing commands (`sdd-change`, `sdd-config`, `sdd-init`, `sdd-run
 
 | File | Change |
 |------|--------|
-| `README.md` | Replace 21 old command refs with `/sdd` prompts |
+| `README.md` | Replace 18 old command refs with `/sdd` prompts |
 | `plugin/.claude-plugin/plugin.json` | Version bump to 7.0.0, add `./skills/orchestrators/` to skills array |
 | `.claude-plugin/marketplace.json` | Version bump to 7.0.0 |
 | `changelog/README.md` | Add v7 summary paragraph + version table row |
@@ -330,9 +330,9 @@ All acceptance criteria from task.md, verified externally:
 - [ ] `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches
 - [ ] `grep -E "methodology|capability|walkthrough|progressive" plugin/commands/sdd-help.md` returns matches
 - [ ] `grep -E "system-run|Bash|Write|Edit|sdd-run" plugin/commands/sdd-help.md` returns zero matches
-- [ ] `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero
+- [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" plugin/ --include="*.md" | grep -v "sdd-settings\."` returns zero
 - [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|sdd-settings\|sdd-version" tests/ --include="*.ts" | grep -v "sdd-settings\."` returns zero
-- [ ] `grep -r "\/sdd-change\|\/sdd-config\|\/sdd-init\|\/sdd-settings\|\/sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero
+- [ ] `grep -r "sdd-change\|sdd-config\|sdd-init\|\/sdd-settings\|sdd-version" docs/ README.md | grep -v "sdd-settings\."` returns zero
 - [ ] `grep -r "sdd-run env" plugin/ docs/ tests/ README.md --include="*.md" --include="*.ts"` returns zero
 - [ ] `ls plugin/skills/orchestrators/` shows all 5 orchestrator directories
 - [ ] `ls plugin/skills/orchestrators/change-orchestration/` shows SKILL.md + 6 sub-files
