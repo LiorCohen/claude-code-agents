@@ -42,7 +42,7 @@ Absorbs all current functionality under namespaced subcommands. Complete mapping
 
 | Namespace | Action | Old Command | New Command | Change |
 |-----------|--------|-------------|-------------|--------|
-| `change` | `new [--type <type>] [--spec <path>]` | `/sdd-change new` | `/sdd-run change new` | Renamed |
+| `change` | `create [--type <type>] [--spec <path>]` | `/sdd-change new` | `/sdd-run change create` | Renamed + action renamed |
 | `change` | `status [<change-id>]` | `/sdd-change status` | `/sdd-run change status` | Renamed + optional change-id arg |
 | `change` | `continue <change-id>` | `/sdd-change continue` | `/sdd-run change continue` | Renamed + added change-id arg |
 | `change` | `list` | `/sdd-change list` | `/sdd-run change list` | Renamed |
@@ -94,7 +94,7 @@ Each namespace must include: a description, when to use it, and a concrete usage
 
 **`change`** — Manage the full change lifecycle: create, spec, plan, implement, verify, review.
 When to use: You're building a feature, fixing a bug, or refactoring — any work that follows the spec-driven lifecycle. This is the primary namespace most users interact with.
-Scenario: You've been asked to add user authentication. You create a change (`change new --type feature`), iterate on the spec with your stakeholder, approve it (`change approve spec C1`), plan the implementation (`change plan C1`), approve the plan, implement, verify, and review. If open questions come up during spec review, you answer them (`change answer C1 O1 "Use JWT tokens"`). If the spec needs rework after planning, you regress (`change regress C1 --to soliciting`).
+Scenario: You've been asked to add user authentication. You create a change (`change create --type feature`), iterate on the spec with your stakeholder, approve it (`change approve spec C1`), plan the implementation (`change plan C1`), approve the plan, implement, verify, and review. If open questions come up during spec review, you answer them (`change answer C1 O1 "Use JWT tokens"`). If the spec needs rework after planning, you regress (`change regress C1 --to soliciting`).
 
 **`init`** — Initialize or upgrade an SDD project.
 When to use: You're starting a new project from scratch, or you've upgraded the plugin and need to reconcile settings with the new version.
@@ -132,7 +132,7 @@ Scenario: Your team reports that a command isn't working as expected. You run `v
 
 - `change-orchestration/` — Multi-step change lifecycle (14 actions). Broken into phase-based sub-files to keep each file focused:
   - `SKILL.md` — Dispatcher: routes action → sub-file, shared validation, common output patterns
-  - `creation.md` — `new` action (external spec handling, component discovery, spec solicitation INVOKE)
+  - `creation.md` — `create` action (external spec handling, component discovery, spec solicitation INVOKE)
   - `spec-review.md` — `approve spec`, `answer`, `assume` (spec review phase operations)
   - `planning.md` — `plan`, `approve plan` (plan creation and approval)
   - `implementation.md` — `implement` (enters implementation mode, branch creation)
@@ -158,7 +158,7 @@ The hub command. Aware of `/sdd-help` and `/sdd-run` and cross-references them.
 1. **Understand** — read context, interpret the user's request
 2. **Explain** — tell the user what it understood and what it intends to do (including the specific `/sdd-run` command it would invoke)
 3. **Ask** — request explicit approval before proceeding
-4. **Execute** — only after the user approves, by invoking the Skill tool with the `sdd-run` command (e.g., `Skill(sdd-run, args: "change new --type feature")`)
+4. **Execute** — only after the user approves, by invoking the Skill tool with the `sdd-run` command (e.g., `Skill(sdd-run, args: "change create --type feature")`)
 
 This is non-negotiable. The Jarvis interprets natural language, which means it can misinterpret. The approval step catches misunderstandings before they become actions.
 
@@ -179,7 +179,7 @@ When invoked with no arguments:
 
 When invoked with arguments (e.g., `/sdd I want to add user auth`):
 1. Interprets the request
-2. Explains: "I understand you want to create a new feature change. I would run `/sdd-run change new --type feature`."
+2. Explains: "I understand you want to create a new feature change. I would run `/sdd-run change create --type feature`."
 3. Waits for user approval before executing
 
 Cross-referencing behavior:
@@ -210,7 +210,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 - **Clean break**: Old command names are deleted entirely — no aliases or deprecation period
 - **System CLI mostly untouched**: The internal `system-run.sh` CLI and its handlers are not modified, except for the database namespace which adds `--env <env>` support (schema + handler changes in `plugin/system/src/commands/database/`)
 - **Skills/agents untouched in logic**: Only command *references* in skills and agents are updated; no behavioral changes. Note: `system-run.sh` invocations in skills are internal CLI calls, NOT command references — they must NOT be changed.
-- **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new`, sdd-version says `/sdd-init`). These output patterns inside sdd-run.md must reference the new command names.
+- **Command output messages updated**: Several commands have structured NEXT STEPS sections in their user-facing output that reference other commands by name (e.g., sdd-init Phase 6 says `/sdd-change new` (now `change create`), sdd-version says `/sdd-init`). These output patterns inside sdd-run.md must reference the new command names.
 - **Backwards incompatible**: Users of current commands must learn the new names. This is acceptable given the plugin's maturity stage.
 - **Single command file per command**: Each command (`sdd.md`, `sdd-run.md`, `sdd-help.md`) is one markdown file in `plugin/commands/`
 - **Tutor is read-only**: `/sdd-help` teaches and demonstrates but does not execute actions or modify project state
@@ -229,7 +229,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/commands/sdd-settings.md` | Delete | Never user-facing; settings managed internally by `project-settings` skill |
 | `plugin/commands/sdd-version.md` | Delete | Absorbed into `/sdd-run version` |
 | `plugin/skills/orchestrators/change-orchestration/SKILL.md` | Create | Dispatcher: routes action → sub-file |
-| `plugin/skills/orchestrators/change-orchestration/creation.md` | Create | `new` action (spec solicitation, external spec, component discovery) |
+| `plugin/skills/orchestrators/change-orchestration/creation.md` | Create | `create` action (spec solicitation, external spec, component discovery) |
 | `plugin/skills/orchestrators/change-orchestration/spec-review.md` | Create | `approve spec`, `answer`, `assume` actions |
 | `plugin/skills/orchestrators/change-orchestration/planning.md` | Create | `plan`, `approve plan` actions |
 | `plugin/skills/orchestrators/change-orchestration/implementation.md` | Create | `implement` action |
@@ -266,7 +266,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 
 1. **Exactly three user-facing commands exist**: `ls plugin/commands/` shows `sdd.md`, `sdd-run.md`, and `sdd-help.md` — no other command files. Verify: `ls plugin/commands/ | sort` outputs exactly these 3 files.
 2. **`/sdd-run help` shows all namespaces**: The `sdd-run.md` command file contains documentation for all user-facing namespaces: change, init, local-env, database, contract, config, permissions, version. Verify: `grep -c "^/sdd-run " plugin/commands/sdd-run.md` shows at least 8 namespace entries.
-3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run` (except settings, which becomes internal). Verify: grep the `sdd-run.md` file for each action — `change new`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `permissions configure`, `version`.
+3. **`/sdd-run` preserves all current functionality**: Every subcommand from the old commands exists under `/sdd-run` (except settings, which becomes internal). Verify: grep the `sdd-run.md` file for each action — `change create`, `init`, `local-env create`, `database setup`, `contract validate`, `config generate`, `permissions configure`, `version`.
 4. **`/sdd` reads context and suggests**: The `sdd.md` command file includes instructions to read git branch, workflow state, project init state, and sdd-settings. Verify: `grep -E "git branch|workflows/|sdd-settings" plugin/commands/sdd.md` returns matches.
 5. **`/sdd` cross-references other commands**: The `sdd.md` file explicitly references both `/sdd-help` and `/sdd-run`. Verify: `grep -c "sdd-help\|sdd-run" plugin/commands/sdd.md` returns at least 2.
 6. **`/sdd` requires explicit approval before any action**: The `sdd.md` file includes the strict approval protocol — understand, explain, ask, execute. Verify: `grep -E "approval|NEVER execute|confirm|approve" plugin/commands/sdd.md` returns matches.
