@@ -1,217 +1,17 @@
 ---
 name: sdd-run
-description: Manage local development environment and validate artifacts.
+description: Explicit command with namespaced subcommands covering all SDD functionality.
 ---
 
 # /sdd-run
 
-Manage your local development environment and validate artifacts.
+The explicit command for all SDD operations. Each namespace maps to a specific domain — use this when you know exactly what you want to do.
 
 ## Usage
 
 ```
 /sdd-run <namespace> <action> [args] [options]
 ```
-
-### When Called Without Arguments
-
-When invoked without namespace and action, displays a usage guide:
-
-```
-⚠ Missing required arguments.
-
-USAGE:
-  /sdd-run <namespace> <action> [args] [options]
-
-NAMESPACES:
-  database      Manage local PostgreSQL databases (setup, migrate, seed, reset, psql)
-  contract      Validate OpenAPI specifications
-  env           Manage local Kubernetes environments (create, deploy, status)
-  permissions   Configure Claude Code permissions for SDD
-
-EXAMPLES:
-  /sdd-run database setup my-db
-  /sdd-run contract validate my-api
-  /sdd-run env create
-  /sdd-run env deploy
-  /sdd-run permissions configure
-
-GLOBAL OPTIONS:
-  --json       Output in JSON format
-  --verbose    Enable verbose logging
-  --help       Show help for namespace/action
-
-NEXT STEPS:
-  Run /sdd-run <namespace> <action> to get started, or see details below.
-```
-
-## When to Use
-
-While workflow commands (`/sdd-init`, `/sdd-change`, etc.) orchestrate multi-step processes with agents, `/sdd-run` gives you direct control over local dev operations—spinning up databases, running migrations, or validating your API contract.
-
-## Database Operations
-
-Manage your local PostgreSQL database:
-
-```bash
-# Start a local database
-/sdd-run database setup my-db
-
-# Run migrations
-/sdd-run database migrate my-db
-
-# Seed with test data
-/sdd-run database seed my-db
-
-# Reset database (teardown + setup + migrate + seed)
-/sdd-run database reset my-db
-
-# Open psql shell for debugging
-/sdd-run database psql my-db
-
-# Port forward to access remote database locally
-/sdd-run database port-forward my-db
-
-# Tear down when done
-/sdd-run database teardown my-db
-```
-
-## Contract Validation
-
-Validate your OpenAPI specification:
-
-```bash
-# Validate the API contract
-/sdd-run contract validate my-api
-```
-
-## Environment Commands
-
-Manage local Kubernetes development environments.
-
-### Create Environment
-
-```bash
-/sdd-run env create [--name=cluster-name] [--provider=kind|minikube|docker-desktop] [--skip-infra]
-```
-
-Creates a local k8s cluster and installs the observability stack (Victoria Metrics + Victoria Logs).
-
-Options:
-- `--name`: Cluster name (default: sdd-local)
-- `--provider`: Cluster provider (default: auto-detected)
-  - `kind`: Kubernetes IN Docker (fast, lightweight)
-  - `minikube`: Full-featured local k8s
-  - `docker-desktop`: Uses Docker Desktop's built-in Kubernetes
-- `--skip-infra`: Skip installing observability stack
-
-### Destroy Environment
-
-```bash
-/sdd-run env destroy [--name=cluster-name]
-```
-
-Completely removes the local cluster (not available for docker-desktop).
-
-### Start/Stop Environment
-
-```bash
-/sdd-run env start [--name=cluster-name]
-/sdd-run env stop [--name=cluster-name]
-```
-
-Pause and resume the cluster. State is preserved when stopped.
-
-### Environment Status
-
-```bash
-/sdd-run env status [--name=cluster-name]
-```
-
-Shows cluster status, node health, and deployed workloads.
-
-### Deploy Applications
-
-```bash
-/sdd-run env deploy [chart-name] [--namespace=<app-name>] [--skip-db] [--skip-migrate] [--exclude=name,...]
-```
-
-Deploys the full application stack in order:
-1. **Databases** - Sets up PostgreSQL instances for each `type: database` component
-2. **Migrations** - Runs database migrations
-3. **Helm charts** - Deploys application charts from `components/helm_charts/`
-
-Options:
-- `--namespace`: Override namespace (default: app name from sdd-settings.yaml)
-- `--skip-db`: Skip database setup (useful for redeploying apps only)
-- `--skip-migrate`: Skip running migrations
-- `--exclude`: Comma-separated list of charts to skip (for hybrid development)
-
-### Hybrid Development
-
-Run most services in k8s while developing one locally:
-
-```bash
-# Deploy everything except main-server
-/sdd-run env deploy --exclude=main-server-api
-
-# Start port forwards
-/sdd-run env forward
-
-# Run your service locally
-cd components/servers/main-server && npm run dev
-```
-
-### Undeploy Applications
-
-```bash
-/sdd-run env undeploy [chart-name] [--namespace=<app-name>]
-```
-
-Removes deployed applications (keeps infrastructure).
-
-### Port Forwarding
-
-```bash
-/sdd-run env forward [start|stop|list] [--namespace=<app-name>]
-```
-
-Manages port forwards for local access to services.
-
-### Generate Local Config
-
-```bash
-/sdd-run env config
-```
-
-Generates [local/config.yaml](components/config/envs/local/config.yaml) with localhost URLs matching port-forwarded services.
-
-### Install Infrastructure
-
-```bash
-/sdd-run env infra [--reinstall]
-```
-
-Install or reinstall the observability infrastructure stack.
-
-## Permission Management
-
-Configure Claude Code permissions for SDD.
-
-### Configure Permissions
-
-```bash
-/sdd-run permissions configure
-```
-
-Merges SDD recommended permissions into your project's `.claude/settings.local.json`:
-
-1. Creates backup of existing settings (if any)
-2. Reads SDD recommended permissions from `~/.claude/plugins/sdd/hooks/recommended-permissions.json`
-3. Merges permissions (preserving your existing settings, adding SDD permissions)
-4. Writes updated settings file
-
-This is typically invoked during `/sdd-init` but can be run manually to refresh permissions after a plugin update or to add permissions to an existing project.
 
 ## Global Options
 
@@ -221,9 +21,198 @@ This is typically invoked during `/sdd-init` but can be run manually to refresh 
 | `--verbose` | Enable verbose logging |
 | `--help` | Show help for namespace/action |
 
+---
+
+## When Called Without Arguments (or with `help`)
+
+When invoked without a namespace, or with `help`, display the full namespace reference:
+
+```
+SDD Run — Explicit command interface
+
+USAGE:
+  /sdd-run <namespace> <action> [args] [options]
+
+NAMESPACES:
+  change        Manage the full change lifecycle (create, approve, implement, verify)
+  init          Initialize or upgrade an SDD project
+  local-env     Manage local Kubernetes development environments
+  database      Manage PostgreSQL databases across environments
+  contract      Validate OpenAPI specifications
+  config        Manage project configuration across environments
+  permissions   Configure Claude Code permissions for SDD
+  version       Show installed and project plugin versions
+
+GLOBAL OPTIONS:
+  --json        Output in JSON format
+  --verbose     Enable verbose logging
+  --help        Show help for namespace/action
+
+EXAMPLES:
+  /sdd-run change create --type feature --name user-auth
+  /sdd-run init
+  /sdd-run local-env create
+  /sdd-run database setup my-db --env local
+  /sdd-run config generate --env production
+  /sdd-run version
+
+TIP: Use /sdd for guided, context-aware assistance.
+     Use /sdd-help to learn SDD concepts and methodology.
+```
+
+---
+
+## Namespace Routing
+
+### `change` — Manage the full change lifecycle
+
+Route to the change-orchestration skill:
+
+```yaml
+INVOKE change-orchestration skill with:
+  action: <action>
+  args: <remaining args>
+```
+
+**Actions:** `create`, `status`, `continue`, `list`, `approve spec`, `approve plan`, `plan`, `implement`, `verify`, `review`, `answer`, `assume`, `regress`, `request-changes`
+
+**When to use:** You're building a feature, fixing a bug, or refactoring — any work that follows the spec-driven lifecycle. This is the primary namespace most users interact with.
+
+**Scenario:** You've been asked to add user authentication. You create a change (`change create --type feature`), iterate on the spec with your stakeholder, approve it (`change approve spec C1`), plan the implementation (`change plan C1`), approve the plan, implement, verify, and review. If open questions come up during spec review, you answer them (`change answer C1 O1 "Use JWT tokens"`). If the spec needs rework after planning, you regress (`change regress C1 --to soliciting`).
+
+---
+
+### `init` — Initialize or upgrade an SDD project
+
+Route to the init-orchestration skill:
+
+```yaml
+INVOKE init-orchestration skill
+```
+
+No arguments — runs the full 6-phase workflow.
+
+**When to use:** You're starting a new project from scratch, or you've upgraded the plugin and need to reconcile settings with the new version.
+
+**Scenario:** You create a new directory for your project, open Claude Code, and run `/sdd-run init`. It detects the project name, verifies your environment (tools, permissions), scaffolds the minimal config structure, and commits. On an existing project after a plugin upgrade, it detects the version mismatch, reconciles settings, and reports what changed.
+
+---
+
+### `local-env` — Manage local Kubernetes development environments
+
+Route to the local-env-orchestration skill:
+
+```yaml
+INVOKE local-env-orchestration skill with:
+  action: <action>
+  args: <remaining args>
+```
+
+**Actions:** `create`, `destroy`, `start`, `stop`, `status`, `deploy`, `undeploy`, `forward`, `infra`
+
+**When to use:** You need a local k8s cluster to test your application stack — databases, services, helm charts — as they'd run in production, but on your machine.
+
+**Scenario:** You're ready to test your server with its database and dependencies. You create a cluster (`local-env create`), deploy everything (`local-env deploy`), then set up port forwards (`local-env forward start`) so your locally-running service can reach the in-cluster database. When done for the day, you stop the cluster (`local-env stop`) and resume tomorrow (`local-env start`).
+
+---
+
+### `database` — Manage PostgreSQL databases across environments
+
+Pass-through to system CLI:
+
+```bash
+<plugin-root>/system/system-run.sh database <action> <component> [--env <env>] [args]
+```
+
+**Actions:** `setup`, `teardown`, `migrate`, `seed`, `reset`, `port-forward`, `psql`
+
+**When to use:** You need to set up, migrate, seed, reset, or connect to a database. The `--env` flag specifies which environment's database you're targeting.
+
+**Scenario:** You've added a new migration file. You run `database migrate my-db --env local` to apply it locally. To verify the seed data, you open a shell with `database psql my-db --env local`. Before a demo, you reset everything clean with `database reset my-db --env local`. To debug a staging issue, you port-forward the staging database: `database port-forward my-db --env staging`.
+
+---
+
+### `contract` — Validate OpenAPI specifications
+
+Pass-through to system CLI:
+
+```bash
+<plugin-root>/system/system-run.sh contract validate <component>
+```
+
+**Actions:** `validate`
+
+**When to use:** You've modified an API contract and want to verify it's valid before generating types or deploying.
+
+**Scenario:** You've added a new endpoint to your OpenAPI spec. You run `contract validate my-api` to check for schema errors, missing references, or invalid patterns before the types get generated.
+
+---
+
+### `config` — Manage project configuration across environments
+
+Route to the config-orchestration skill:
+
+```yaml
+INVOKE config-orchestration skill with:
+  operation: <operation>
+  args: <remaining args>
+```
+
+**Operations:** `generate`, `validate`, `diff`, `add-env`
+
+**When to use:** You're working with environment-specific config — generating merged configs, validating them, comparing environments, or adding new environments.
+
+**Scenario:** You've added a new service and need config for it. You add a staging environment (`config add-env staging`), generate the merged config (`config generate --env staging`), then diff it against production to verify the differences are intentional (`config diff staging production`). Before deploying, you validate all environments (`config validate`).
+
+---
+
+### `permissions` — Configure Claude Code permissions for SDD
+
+Pass-through to system CLI:
+
+```bash
+<plugin-root>/system/system-run.sh permissions configure
+```
+
+**Actions:** `configure`
+
+**When to use:** After installing or upgrading the plugin, you need to set up the recommended permissions so SDD commands can run without constant approval prompts.
+
+**Scenario:** You've just initialized a project and the init workflow offered to configure permissions. You declined then, but now you want them: `permissions configure`. It merges SDD's recommended permissions into `.claude/settings.local.json`. You restart your session for them to take effect.
+
+---
+
+### `version` — Show installed and project plugin versions
+
+Route to the version-orchestration skill:
+
+```yaml
+INVOKE version-orchestration skill
+```
+
+No arguments — displays version info.
+
+**When to use:** You want to check if your project is up to date with the installed plugin, or diagnose version mismatches.
+
+**Scenario:** Your team reports that a command isn't working as expected. You run `version` and see the project was last reconciled with v6.2.0 but the installed plugin is v7.0.0. The output tells you to run `/sdd-run init` to reconcile.
+
+---
+
+## Internal Namespaces
+
+The following namespaces are used internally by other skills and should not be invoked directly by users. They are NOT shown in the help output:
+
+- `scaffolding` - Used by init-orchestration for project setup
+- `spec` - Used for spec validation, indexing, and snapshots
+- `hook` - Hook handlers for internal use
+- `contract generate-types` - Invoked automatically during implementation plans
+- `settings` - Used internally by the `project-settings` skill
+- `workflow` - Workflow state management
+- `archive` - Archive storage management
+
 ## Execution
 
-When you invoke `/sdd-run`, execute the following:
+For pass-through namespaces (database, contract, permissions), execute:
 
 ```bash
 <plugin-root>/system/system-run.sh <namespace> <action> [args] [options]
@@ -231,14 +220,6 @@ When you invoke `/sdd-run`, execute the following:
 
 Where `<plugin-root>` is the plugin's absolute path, resolved by the agent from its Claude Code plugin context.
 
----
+For orchestrated namespaces (change, init, config, version, local-env), INVOKE the corresponding orchestrator skill which may internally call `system-run.sh`.
 
-## Internal Namespaces
-
-The following namespaces are used internally by other commands and should not be invoked directly:
-
-- `scaffolding` - Used by `/sdd-init` for project setup
-- `spec` - Used for spec validation, indexing, and snapshots
-- `hook` - Hook handlers for internal use
-- `contract generate-types` - Invoked automatically during implementation plans
-- `permissions` - Used by `/sdd-init` for auto-configuring permissions
+**Note:** The system CLI uses `env` as the namespace name; the `local-env` orchestrator maps `local-env` (user-facing) → `env` (system CLI).
