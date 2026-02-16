@@ -47,7 +47,7 @@ Replace 6 user-facing commands (`sdd-change`, `sdd-config`, `sdd-init`, `sdd-run
 |------|-------------|
 | `plugin/commands/sdd-run.md` | Thin dispatcher with all namespaces, help output, namespace docs |
 
-### Updated Files — Plugin Skills (18 files)
+### Updated Files — Plugin Skills (19 files)
 
 | File | Change |
 |------|--------|
@@ -68,6 +68,7 @@ Replace 6 user-facing commands (`sdd-change`, `sdd-config`, `sdd-init`, `sdd-run
 | `plugin/skills/components/config/config-scaffolding/SKILL.md` | Replace 1 `/sdd-config` + 1 `/sdd-settings` ref |
 | `plugin/skills/components/config/config-standards/SKILL.md` | Replace 2 `/sdd-config` + 2 `/sdd-run` refs |
 | `plugin/skills/components/database/database-scaffolding/templates/README.md` | Replace 10 `/sdd-run database` refs with `/sdd` prompts, consider `--env` addition |
+| `plugin/skills/workflow-state/SKILL.md` | Replace 1 `sdd-change` ref (line 158 — no leading `/`, missed by slash-prefixed grep) |
 | `plugin/skills/project-settings/SKILL.md` | Replace 1 `/sdd-settings` command ref (line 263, 292) |
 
 ### Updated Files — Plugin Agents (1 file)

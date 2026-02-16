@@ -270,7 +270,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `plugin/system/src/commands/database/schema.ts` | Update | Add `env` property to database args schema |
 | `plugin/system/src/commands/database/handler.ts` | Update | Thread `--env` arg to action functions |
 | `plugin/system/src/commands/database/*.ts` (7 action files) | Update | Accept and use env parameter |
-| `plugin/skills/` (33 files) | Update | Replace old command refs with `/sdd` + natural language prompts |
+| `plugin/skills/` (19 files) | Update | Replace old command refs with `/sdd` + natural language prompts |
 | `plugin/skills/project-scaffolding/templates/project/CLAUDE.md` | Update | Scaffolding template — replace command refs with `/sdd` prompts |
 | `plugin/agents/` | Update | Replace command refs with internal invocations (INVOKE orchestrator skills or `system-run.sh` calls) — agents are non-interactive |
 | `.claude/skills/` (3 files) | Update | Update command refs in marketplace skills (these use `/sdd-run` since they describe command authoring) |
