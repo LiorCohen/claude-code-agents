@@ -1,7 +1,7 @@
 ---
 id: 145
 title: Add speccing phase to task lifecycle with structural validation gate
-status: planning
+status: implementing
 priority: null
 created: 2026-02-15
 ---

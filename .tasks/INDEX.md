@@ -4,7 +4,7 @@
 
 ## Planning
 
-- [#145](2-planning/145/plan.md): Add speccing phase to task lifecycle with structural validation gate
+(none)
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Implementing
 
-(none)
+- [#145](4-implementing/145/plan.md): Add speccing phase to task lifecycle with structural validation gate
 
 ---
 
