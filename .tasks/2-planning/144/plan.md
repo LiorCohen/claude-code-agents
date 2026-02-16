@@ -129,7 +129,7 @@ Replace 6 user-facing commands (`sdd-change`, `sdd-config`, `sdd-init`, `sdd-run
 | File | Change |
 |------|--------|
 | `README.md` | Replace 21 old command refs with `/sdd` prompts |
-| `plugin/.claude-plugin/plugin.json` | Version bump to 7.0.0, add orchestrator skill paths |
+| `plugin/.claude-plugin/plugin.json` | Version bump to 7.0.0, add `./skills/orchestrators/` to skills array |
 | `.claude-plugin/marketplace.json` | Version bump to 7.0.0 |
 | `changelog/README.md` | Add v7 summary paragraph + version table row |
 
@@ -265,12 +265,7 @@ The bulk-update phase. Process every file that references old command names.
 
 1. Update `plugin/.claude-plugin/plugin.json`:
    - Version to `7.0.0`
-   - Add orchestrator skill paths to `skills` array:
-     - `./skills/orchestrators/change-orchestration/`
-     - `./skills/orchestrators/init-orchestration/`
-     - `./skills/orchestrators/config-orchestration/`
-     - `./skills/orchestrators/version-orchestration/`
-     - `./skills/orchestrators/local-env-orchestration/`
+   - Add `./skills/orchestrators/` to `skills` array (single entry — discovers all orchestrator subdirectories, same pattern as `./skills/components/backend/`)
 
 2. Update `.claude-plugin/marketplace.json`: version to `7.0.0`
 
@@ -343,6 +338,6 @@ All acceptance criteria from task.md, verified externally:
 - [ ] `ls plugin/skills/orchestrators/change-orchestration/` shows SKILL.md + 6 sub-files
 - [ ] `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed"
 - [ ] `grep "env" plugin/system/src/commands/database/schema.ts` returns match
-- [ ] `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns ≥ 5 matches
+- [ ] `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns a match
 - [ ] `npm run typecheck:plugin` passes
 - [ ] `npm test` passes

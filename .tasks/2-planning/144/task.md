@@ -285,7 +285,7 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 | `docs/components.md` | Update | Replace command refs with `/sdd` prompts |
 | `docs/agents.md` | Update | Replace command refs with `/sdd` prompts |
 | `docs/workflow-progress.md` | Update | Replace command refs with `/sdd` prompts |
-| `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 + add orchestrator skill paths to `skills` array |
+| `plugin/.claude-plugin/plugin.json` | Update | Version bump to 7.0.0 + add `./skills/orchestrators/` to `skills` array |
 | `.claude-plugin/marketplace.json` | Update | Version bump to 7.0.0 |
 | `changelog/v7.md` | Create | New major version changelog |
 | `changelog/README.md` | Update | Add v7 summary paragraph + version table row |
@@ -312,5 +312,5 @@ The tutor does not execute actions itself — it teaches and demonstrates, refer
 18. **Orchestrator skills are INVOKEd by sdd-run**: The `sdd-run.md` command file delegates namespaces to orchestrator skills. Verify: `grep -E "INVOKE.*orchestration" plugin/commands/sdd-run.md` returns at least 5 matches (change, init, config, version, local-env).
 19. **Old local-env skill removed**: The `local-env` skill no longer exists at its original location. Verify: `test ! -d plugin/skills/local-env/ && echo "removed"` outputs "removed".
 20. **User-facing references use `/sdd` prompts, not `/sdd-run`**: Docs, README, and non-orchestrator skills reference `/sdd` with natural language prompts. Verify: `grep -rn "/sdd-run" plugin/skills/ docs/ README.md --include="*.md" | grep -v "docs/commands.md" | grep -v "orchestrators/"` returns zero matches (excluding docs/commands.md which documents all three commands, and orchestrators which are internal dispatchers).
-21. **Plugin manifest discovers orchestrator skills**: The `skills` array in `plugin.json` includes paths for each orchestrator directory. Verify: `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns at least 5 matches (change-orchestration, init-orchestration, config-orchestration, version-orchestration, local-env-orchestration).
+21. **Plugin manifest discovers orchestrator skills**: The `skills` array in `plugin.json` includes `./skills/orchestrators/`. Verify: `grep "orchestrators" plugin/.claude-plugin/plugin.json` returns a match.
 22. **Full standards audit passes**: Run `/critic` and all relevant standards skills (`commands-standards`, `skills-standards`, `agents-standards`, `system-cli-standards`, `docs-standards`, `plugin-product-standards`) during review phase. Verify: all audits produce zero hard-block findings.
