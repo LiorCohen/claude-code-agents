@@ -473,7 +473,7 @@ After presenting the report, **ask the user** whether to create a task to track 
 Create a task via `/tasks add "Fix skills standards violations from audit report"`. The task's purpose is to **fix the violations** — the audit report is supporting evidence, not the deliverable. Save the report with a timestamped filename inside the task folder:
 
 ```
-.tasks/1-inbox/<N>/
+.tasks/0-inbox/<N>/
 ├── task.md                                    # Task to fix violations, with key findings summary
 └── skills-audit-YYYY-MM-DD_HH-MM.md           # Full audit report (e.g., skills-audit-2026-02-07_14-30.md)
 ```
