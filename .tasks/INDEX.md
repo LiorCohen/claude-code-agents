@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#151](0-inbox/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
 - [#149](0-inbox/149/): Add D2 skill
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
