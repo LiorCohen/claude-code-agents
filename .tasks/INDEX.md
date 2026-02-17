@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#151](1-speccing/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
 
 ---
 
@@ -36,7 +36,6 @@
 
 ### High Priority
 
-- [#151](0-inbox/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
