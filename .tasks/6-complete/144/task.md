@@ -1,9 +1,10 @@
 ---
 id: 144
 title: "Three-command structure: /sdd + /sdd-run + /sdd-help"
-status: reviewing
+status: complete
 priority: null
 created: 2026-02-15
+completed: 2026-02-17 11:13 UTC
 ---
 
 # Three-command structure: /sdd + /sdd-run + /sdd-help

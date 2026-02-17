@@ -28,7 +28,7 @@
 
 ## Reviewing
 
-- [#144](5-reviewing/144/plan.md): Three-command structure: /sdd + /sdd-run + /sdd-help
+(none)
 
 ---
 
@@ -100,6 +100,7 @@
 
 ## Complete
 
+- [#144](6-complete/144/): Three-command structure: /sdd + /sdd-run + /sdd-help ✓ (2026-02-17)
 - [#145](6-complete/145/): Add speccing phase to task lifecycle with structural validation gate ✓ (2026-02-16)
 - [#138](6-complete/138/): Separate component discovery from scaffolding in sdd-change new flow ✓ (2026-02-14)
 - [#134](6-complete/134/): Fix CLI invocation: replace broken CLAUDE_PLUGIN_ROOT pattern, add command validation, fix permissions precondition ✓ (2026-02-14)
