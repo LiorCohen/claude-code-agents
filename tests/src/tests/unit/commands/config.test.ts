@@ -168,7 +168,7 @@ describe('/sdd-run config Merge Algorithm', () => {
 
 /**
  * WHY: Workflow documentation (local development, production deployment) moved
- * from the old sdd-config.md command to docs/config-guide.md. The orchestrator
+ * from the old config command file to docs/config-guide.md. The orchestrator
  * must link to it so users can find these workflows.
  */
 describe('config-orchestration Workflow Documentation', () => {
