@@ -36,6 +36,7 @@
 
 ### High Priority
 
+- [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
 - [#131](0-inbox/131/): Add Ralph Wiggum mode for task implementation
@@ -70,7 +71,6 @@
 ### Unprioritized
 
 - [#149](0-inbox/149/): Add D2 skill
-- [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
 - [#143](0-inbox/143/): Add sdd-architect skill for architectural Q&A and gap analysis

@@ -2,7 +2,7 @@
 id: 148
 title: "Implicit /sdd invocation: make Jarvis behavior ambient without explicit command"
 status: inbox
-priority: null
+priority: high
 created: 2026-02-16
 ---
 
