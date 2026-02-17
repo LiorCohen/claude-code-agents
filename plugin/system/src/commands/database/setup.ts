@@ -13,11 +13,12 @@ import { parseNamedArgs } from '@/lib/args';
 
 export const setup = async (
   componentName: string,
-  args: readonly string[]
+  args: readonly string[],
+  env: string = 'local'
 ): Promise<CommandResult> => {
   const { named } = parseNamedArgs(args);
 
-  const namespace = named['namespace'] ?? process.env['DB_NAMESPACE'] ?? 'default';
+  const namespace = named['namespace'] ?? process.env['DB_NAMESPACE'] ?? env;
   const releaseName = named['release-name'] ?? process.env['DB_RELEASE_NAME'] ?? `${componentName}-db`;
 
   console.log(`Deploying PostgreSQL to namespace: ${namespace}`);

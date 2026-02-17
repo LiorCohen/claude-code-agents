@@ -7,15 +7,42 @@ To update, invoke the docs-writer agent with your changes.
 
 > Reference for all SDD slash commands.
 
-## /sdd-init
+SDD has three commands:
 
-Initialize a new SDD project with minimal structure.
+| Command | Purpose |
+|---------|---------|
+| `/sdd` | The hub — context-aware entry point for all workflows |
+| `/sdd-run` | Direct access to namespaced system CLI operations |
+| `/sdd-help` | Interactive tutor for learning SDD concepts |
+
+---
+
+## /sdd
+
+The main entry point for all SDD workflows. Context-aware — it reads your project state and guides you to the right action.
+
+### No Arguments (Context-Aware)
 
 ```
-/sdd-init
+/sdd
 ```
 
-**No arguments required.** Project name is derived from the current directory.
+When invoked without arguments, `/sdd` reads your current project state and determines what to do:
+- If no project exists, offers to initialize one
+- If a workflow is active, shows status and suggests the next action
+- If no workflow is active, asks what you'd like to do
+
+### Natural Language Prompts
+
+Tell `/sdd` what you want in plain English:
+
+#### Project Initialization
+
+```
+/sdd I want to initialize a new project
+```
+
+Creates a new SDD project with minimal structure. Project name is derived from the current directory.
 
 **What it does:**
 1. Detects project name from current directory
@@ -24,300 +51,230 @@ Initialize a new SDD project with minimal structure.
 4. Creates minimal structure (config component only)
 5. Initializes git and commits
 
-**What it does NOT do (deferred to implementation):**
-- Domain population (glossary, entity definitions, use-cases)
-- Full component scaffolding
-
 **Example:**
 ```bash
 cd inventory-tracker
-/sdd-init
+claude
+/sdd I want to initialize a new project
 ```
 
----
-
-## /sdd-change
-
-Unified command for managing change workflows. All state is persisted in `.sdd/workflows/`.
-
-### Subcommands
-
-#### /sdd-change new
-
-Start a new feature, bugfix, refactor, epic, or import from an external spec.
+#### Creating Changes
 
 ```
-/sdd-change new --type <type> --name <name>
-/sdd-change new --spec <path>
+/sdd I want to create a new feature
 ```
 
-**Arguments:**
-- `--type` (required without `--spec`) - One of: `feature`, `bugfix`, `refactor`, `epic`
-- `--name` (required without `--spec`) - Short identifier for the change
-- `--spec` (alternative mode) - Path to external specification file
+Starts a new feature workflow. SDD guides you through requirements gathering (solicitation), recommends affected components, scaffolds components on-demand, updates the domain glossary, and creates a spec (`SPEC.md`).
 
-**What it does:**
-
-*Interactive mode (`--type` and `--name`):*
-1. Creates a workflow in `.sdd/workflows/<workflow-id>/`
-2. Runs guided requirements gathering (solicitation)
-3. Recommends affected components
-4. **Scaffolds components on-demand** (if not yet scaffolded)
-5. Updates domain glossary with new entities
-6. Creates a spec (`SPEC.md`) with Domain Model and Specs Directory Changes sections
-7. Status becomes `spec_review` - awaiting approval
-
-*External spec mode (`--spec`):*
-1. Archives spec to `.sdd/archive/external-specs/`
-2. Analyzes with thinking step (domain extraction, gap analysis)
-3. Creates workflow items with context files
-4. Status becomes `spec_review` for each item
-
-**Examples:**
-```bash
-# Interactive mode
-/sdd-change new --type feature --name user-preferences
-
-# From external spec
-/sdd-change new --spec /path/to/requirements.md
+Also works for other change types:
+```
+/sdd I want to create a bugfix
+/sdd I want to create a refactor
+/sdd I want to create an epic
 ```
 
----
-
-#### /sdd-change status
-
-Show current workflow status.
+#### Importing External Specs
 
 ```
-/sdd-change status
+/sdd I want to import an external spec
 ```
 
-**What it shows:**
-- Active workflow ID and current item
-- Workflow status (spec_review, plan_review, implementing, etc.)
-- Items pending, in progress, and completed
-- Next action to take
+Imports an external product specification document and transforms it into SDD tech specs. Archives the original, analyzes gaps, asks clarifying questions, and decomposes into epics and features.
 
----
-
-#### /sdd-change continue
-
-Resume the current workflow from where you left off.
+#### Spec and Plan Approval
 
 ```
-/sdd-change continue
+/sdd I want to approve the spec
+/sdd I want to approve the plan
 ```
 
-**What it does:**
-1. Reads workflow state from `.sdd/workflows/<workflow-id>/workflow.yaml`
-2. Determines current status and next action
-3. Continues from that point (spec solicitation, plan review, implementation, etc.)
+Approving a spec validates it and creates an implementation plan (`PLAN.md`). Approving a plan enables implementation.
 
----
-
-#### /sdd-change list
-
-List all active workflows.
+#### Planning and Implementation
 
 ```
-/sdd-change list
+/sdd I want to start planning
+/sdd I want to start implementing
 ```
 
----
+Planning creates `PLAN.md` files for approved specs. Implementation creates a feature branch and executes each phase using specialized agents, with checkpoint commits after each phase.
 
-#### /sdd-change approve spec
-
-Approve a spec and create an implementation plan.
+#### Verification and Review
 
 ```
-/sdd-change approve spec <change-id>
+/sdd I want to verify the implementation
+/sdd I want to submit for review
 ```
 
-**What it does:**
-1. Validates the spec is complete
-2. Creates `PLAN.md` with implementation phases
-3. Advances status to `plan_review`
+Verification checks that implementation matches the spec and acceptance criteria. Review submits the implementation for user review.
 
----
-
-#### /sdd-change approve plan
-
-Approve a plan and enable implementation.
+#### Continuing Work
 
 ```
-/sdd-change approve plan <change-id>
+/sdd I want to continue
 ```
 
-**What it does:**
-1. Validates the plan is complete
-2. Advances status to `plan_approved`
-3. Implementation can now begin
+Resumes the current workflow from where you left off. Reads workflow state and determines the next action.
 
----
-
-#### /sdd-change implement
-
-Execute an approved implementation plan.
+#### Open Questions
 
 ```
-/sdd-change implement <change-id>
+/sdd I want to answer an open question
 ```
 
-**What it does:**
-1. Creates a feature branch
-2. Executes each phase using specialized agents
-3. Creates checkpoint commits after each phase
-4. Runs tests as specified in the plan
+Answers or assumes open questions that block spec approval. SDD will ask which question and what the answer is.
 
----
-
-#### /sdd-change verify
-
-Verify implementation matches the spec.
+#### Regression and Changes
 
 ```
-/sdd-change verify <change-id>
+/sdd I want to go back to the spec phase
+/sdd I want to request changes
 ```
 
-**What it does:**
-1. Reads the spec and acceptance criteria
-2. Reviews the implemented code
-3. Reports any discrepancies
-4. Advances status to `complete` on success
+Regression archives discarded work and moves back to an earlier phase. Requesting changes during review sends the implementation back for revision.
 
----
-
-## /sdd-config
-
-Manage project configuration.
+#### Listing Changes
 
 ```
-/sdd-config <operation> [options]
+/sdd I want to list my changes
 ```
 
-**Operations:**
-- `generate` - Generate merged config for an environment
-- `validate` - Validate config against schemas
-- `diff` - Show differences between environments
-- `add-env` - Add a new environment
+Lists all active workflows and their statuses.
 
-**Examples:**
-```bash
-# Generate config for local development
-/sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+#### Configuration
 
-# Validate all environments
-/sdd-config validate
-
-# Compare local vs production
-/sdd-config diff local production
-
-# Add staging environment
-/sdd-config add-env staging
+```
+/sdd I want to generate config for local
+/sdd I want to validate my config
+/sdd I want to compare local and production config
+/sdd I want to add a staging environment
 ```
 
-See [Configuration Guide](config-guide.md) for detailed usage.
+Manages project configuration — generating merged configs, validating against schemas, comparing environments, and adding new environments.
+
+#### Version
+
+```
+/sdd What version am I running?
+```
+
+Shows the installed plugin version, the project's current plugin version, and whether the project is up to date.
 
 ---
 
 ## /sdd-run
 
-Manage your local development environment and validate artifacts.
+Direct access to namespaced system CLI operations. Use this when you need explicit control over specific operations.
 
 ```
 /sdd-run <namespace> <action> [args] [options]
 ```
 
-**When to use:** While workflow commands (`/sdd-init`, `/sdd-change`, etc.) orchestrate multi-step processes with agents, `/sdd-run` gives you direct control over local dev operations—spinning up databases, running migrations, or validating your API contract.
+### Namespaces
 
-### Database Operations
+#### database
 
-Manage your local PostgreSQL database:
-
-```bash
-# Start a local database
-/sdd-run database setup my-db
-
-# Run migrations
-/sdd-run database migrate my-db
-
-# Seed with test data
-/sdd-run database seed my-db
-
-# Reset database (teardown + setup + migrate + seed)
-/sdd-run database reset my-db
-
-# Open psql shell for debugging
-/sdd-run database psql my-db
-
-# Port forward to access remote database locally
-/sdd-run database port-forward my-db
-
-# Tear down when done
-/sdd-run database teardown my-db
-```
-
-### Contract Validation
-
-Validate your OpenAPI specification:
+Manage local PostgreSQL databases:
 
 ```bash
-# Validate the API contract
-/sdd-run contract validate my-api
+/sdd-run database setup <name>          # Start a local database
+/sdd-run database migrate <name>        # Run migrations
+/sdd-run database seed <name>           # Seed with test data
+/sdd-run database reset <name>          # Teardown + setup + migrate + seed
+/sdd-run database psql <name>           # Open psql shell
+/sdd-run database port-forward <name>   # Port forward remote database
+/sdd-run database teardown <name>       # Tear down database
 ```
 
-### Permission Management
+#### contract
+
+Validate API specifications:
+
+```bash
+/sdd-run contract validate <name>       # Validate OpenAPI spec
+```
+
+#### permissions
 
 Configure Claude Code permissions for SDD:
 
 ```bash
-# Merge SDD recommended permissions into your settings
-/sdd-run permissions configure
+/sdd-run permissions configure          # Merge SDD recommended permissions
 ```
 
-**Global Options:**
+#### config
+
+Configuration operations:
+
+```bash
+/sdd-run config generate --env <env> --component <name> --output <path>
+/sdd-run config validate [--env <env>]
+/sdd-run config diff <env-a> <env-b>
+/sdd-run config add-env <name>
+```
+
+#### workflow
+
+Workflow state operations:
+
+```bash
+/sdd-run workflow status                # Show workflow status
+/sdd-run workflow list                  # List all workflows
+```
+
+#### scaffold
+
+Component scaffolding:
+
+```bash
+/sdd-run scaffold <component-type> <name>   # Scaffold a component
+```
+
+#### domain
+
+Domain management:
+
+```bash
+/sdd-run domain glossary                # Show domain glossary
+```
+
+#### version
+
+Version information:
+
+```bash
+/sdd-run version                        # Show plugin version info
+```
+
+### Global Options
+
 - `--json` - Output in JSON format
 - `--verbose` - Enable verbose logging
 - `--help` - Show help for namespace/action
 
 ---
 
-## /sdd-version
+## /sdd-help
 
-Show the installed plugin version and the project's plugin version, highlighting when the project is outdated.
+Interactive tutor for learning SDD concepts and getting help.
 
 ```
-/sdd-version
+/sdd-help
 ```
 
-**No arguments required.**
+Ask questions about SDD in natural language:
 
-**What it shows:**
-- The installed SDD plugin version (from `plugin.json`)
-- The project's current plugin version (from `sdd.updated_by_plugin_version` in `.sdd/sdd-settings.yaml`)
-- The version that originally created the project (from `sdd.initialized_by_plugin_version`)
-- Whether the project is up to date, outdated, or newer than the installed plugin
-
-**Example output (versions match):**
 ```
-SDD Plugin
-
-  Installed:       6.5.0
-  Project:         6.5.0  ✓ match
-  Originally from: 6.2.0
+/sdd-help What is a spec?
+/sdd-help How do I create a feature?
+/sdd-help What agents are available?
+/sdd-help How does config work?
 ```
 
-**Example output (project outdated):**
-```
-SDD Plugin
-
-  Installed:       6.5.0
-  Project:         6.2.0  ⚠ outdated
-  Originally from: 6.0.0
-
-The project settings were last reconciled with an older plugin version.
-Run /sdd-init to reconcile settings with the current plugin.
-```
+**What it does:**
+- Answers questions about SDD concepts, workflows, and commands
+- Provides examples and guidance
+- Links to relevant documentation
 
 ---
 

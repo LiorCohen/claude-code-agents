@@ -35,7 +35,7 @@ Use this when adding new functionality.
 ### 1. Create the Feature Spec
 
 ```
-/sdd-change new --type feature --name checkout-flow
+/sdd I want to create a new feature
 ```
 
 You'll go through a guided solicitation workflow:
@@ -59,7 +59,7 @@ The spec is created with new sections:
 Review the spec. Status is now `spec_review`.
 
 ```
-/sdd-change approve spec <change-id>
+/sdd I want to approve the spec
 ```
 
 This creates the implementation plan (`PLAN.md`). Status advances to `plan_review`.
@@ -69,13 +69,13 @@ This creates the implementation plan (`PLAN.md`). Status advances to `plan_revie
 Review the plan, then approve it:
 
 ```
-/sdd-change approve plan <change-id>
+/sdd I want to approve the plan
 ```
 
 Now implement:
 
 ```
-/sdd-change implement <change-id>
+/sdd I want to start implementing
 ```
 
 Specialized agents execute each phase of the plan:
@@ -91,13 +91,13 @@ Checkpoint commits are created after each phase for recovery.
 After implementation, submit for user review:
 
 ```
-/sdd-change review <change-id>
+/sdd I want to submit for review
 ```
 
 Review the implementation against the spec. If changes are needed:
 
 ```
-/sdd-change request-changes <change-id> --reason "Error messages unclear"
+/sdd I want to request changes
 ```
 
 ### 5. Verify
@@ -105,7 +105,7 @@ Review the implementation against the spec. If changes are needed:
 When the review passes:
 
 ```
-/sdd-change verify <change-id>
+/sdd I want to verify the implementation
 ```
 
 The `reviewer` agent checks that the implementation matches the spec.
@@ -119,7 +119,7 @@ See [External Specs](external-specs.md) for complete details.
 ### Quick Overview
 
 ```
-/sdd-change new --spec /path/to/requirements.md
+/sdd I want to import an external spec
 ```
 
 The workflow:
@@ -156,7 +156,7 @@ Progress: 1/5 specs approved
 
 NEXT: Complete 02-authentication spec
 
-Run: /sdd-change continue
+Run: /sdd I want to continue
 ```
 
 The workflow GUIDES you through this sequence - it's not optional.
@@ -166,7 +166,7 @@ The workflow GUIDES you through this sequence - it's not optional.
 Use this when fixing existing behavior.
 
 ```
-/sdd-change new --type bugfix --name login-timeout-error
+/sdd I want to create a bugfix
 ```
 
 Bugfix specs require:
@@ -181,7 +181,7 @@ The implementation plan is typically shorter - focused on the fix and regression
 Use this when restructuring code without changing behavior.
 
 ```
-/sdd-change new --type refactor --name extract-auth-service
+/sdd I want to create a refactor
 ```
 
 Refactor specs require:
@@ -196,7 +196,7 @@ The plan emphasizes maintaining behavior while changing structure.
 Use this when a goal requires multiple features working together.
 
 ```
-/sdd-change new --type epic --name checkout-system
+/sdd I want to create an epic
 ```
 
 Epic specs require:
@@ -211,7 +211,7 @@ The command creates workflow items for each child feature, tracking them in `.sd
 Each child change is implemented in dependency order:
 
 ```
-/sdd-change implement <change-id>
+/sdd I want to start implementing
 ```
 
 The workflow tracks dependency order and implements child changes sequentially, creating checkpoint commits after each phase.
@@ -219,7 +219,7 @@ The workflow tracks dependency order and implements child changes sequentially, 
 ### Verification
 
 ```
-/sdd-change verify <change-id>
+/sdd I want to verify the implementation
 ```
 
 Verifies each child change individually, then checks that the combined implementation satisfies all epic-level acceptance criteria.
@@ -228,15 +228,10 @@ Verifies each child change individually, then checks that the combined implement
 
 Sometimes you need to go back to an earlier phase:
 
-```bash
-# Go back to spec phase
-/sdd-change regress <change-id> --to spec --reason "Need OAuth support"
-
-# Go back to plan phase
-/sdd-change regress <change-id> --to plan --reason "Missing caching layer"
-
-# Request changes during review (implicit regression to implement)
-/sdd-change request-changes <change-id> --reason "Error messages unclear"
+```
+/sdd I want to go back to the spec phase
+/sdd I want to go back to the plan phase
+/sdd I want to request changes
 ```
 
 Regression:
@@ -259,8 +254,7 @@ Cannot approve 02-authentication - 2 open questions remain:
   O2: Should failed logins trigger alerts?
 
 Answer these questions or mark as assumptions:
-  /sdd-change answer O1 "5 attempts per minute"
-  /sdd-change assume O1 "Industry standard: 5/min"
+  /sdd I want to answer an open question
 ```
 
 ## Configuration Workflow
@@ -300,7 +294,7 @@ export type ServerConfig = Readonly<{
 ### 4. Generate and Run
 
 ```bash
-/sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+/sdd I want to generate config for local
 SDD_CONFIG_PATH=./local-config.yaml npm run dev
 ```
 
@@ -322,15 +316,15 @@ This means your project grows organically - you only have what you've actually n
 
 **Small changes are better.** A feature that takes 6 phases is harder to review than three 2-phase features.
 
-**Specs are living documents.** If requirements change during implementation, use `/sdd-change regress` to go back to the spec phase.
+**Specs are living documents.** If requirements change during implementation, use `/sdd I want to go back to the spec phase` to regress.
 
 **Trust the agents.** Each agent has specific expertise. Let `backend-dev` handle server code, `frontend-dev` handle UI.
 
 **Config before code.** When adding features that need configuration, add the config properties first, then implement the feature.
 
-**Answer open questions early.** Specs with open questions cannot be approved. Use `/sdd-change answer` or `/sdd-change assume` to resolve them.
+**Answer open questions early.** Specs with open questions cannot be approved. Use `/sdd I want to answer an open question` to resolve them.
 
-**Watch the progress display.** Every command shows your progress. Use `/sdd-change status` to see the full picture.
+**Watch the progress display.** Every command shows your progress. Use `/sdd` to see the full picture.
 
 ## Next Steps
 

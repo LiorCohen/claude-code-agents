@@ -4,8 +4,21 @@ From a 36-file scaffolding tool to a full spec-driven development platform — i
 
 ---
 
+## v7 — Three Commands, Three Personas
+*Feb 16 – present*
+
+Six commands collapsed into three with distinct personalities: **`/sdd`** is the Jarvis-style hub that reads your project state and speaks natural language, **`/sdd-run`** is the thin dispatcher for when you know exactly what you want, and **`/sdd-help`** is the patient tutor for newcomers. Under the hood, all workflow logic moved into **orchestrator skills** — the commands are just routing, the brains live in skills.
+
+- **Context-aware hub** — `/sdd` with no args reads your branch, workflow state, and settings to tell you where you are and what to do next
+- **Natural language routing** — "I want to create a feature" maps to the right orchestrator automatically
+- **Orchestrator skills** — 5 skill sets (11 files) extracted from the old command monoliths, now independently testable
+- **Database --env flag** — all 7 database actions accept `--env` for multi-environment targeting
+- **45-file reference migration** — every old command reference replaced with the correct new pattern
+
+---
+
 ## v6 — One Command to Rule Them All
-*Feb 5 – present*
+*Feb 5 – Feb 16*
 
 Three separate commands collapsed into a single **`/sdd-change`** with subcommands, but the real shift was architectural: all workflow state now lives in `.sdd/workflows/`, meaning **any new session can pick up exactly where you left off** — no conversation history needed. Then the plugin kept going and basically rebuilt itself from the inside out.
 
@@ -75,7 +88,8 @@ The initial release shipped with **10 agents**, **4 skills**, and **5 commands**
 
 | File | Version Range | Description |
 |------|---------------|-------------|
-| [v6.md](v6.md) | 6.0.0 – current | Unified sdd-change command, zero session context |
+| [v7.md](v7.md) | 7.0.0 – current | Three-command structure, orchestrator skills |
+| [v6.md](v6.md) | 6.0.0 – 6.10.0 | Unified sdd-change command, zero session context |
 | [v5.md](v5.md) | 5.0.0 – 5.13.0 | Settings-driven scaffolding, unified CLI |
 | [v4.md](v4.md) | 4.0.0 – 4.9.0 | Product discovery, multi-instance components |
 | [v3.md](v3.md) | 3.0.0 – 3.10.0 | CMDO architecture, change abstraction |

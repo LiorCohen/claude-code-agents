@@ -114,7 +114,7 @@ Verify generated output actually works.
 ### Stream-JSON Output Structure
 
 ```json
-{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"sdd-init"}}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"init"}}]}}
 {"type":"assistant","message":{"content":[{"type":"tool_use","name":"Task","input":{"subagent_type":"spec-writer"}}]}}
 ```
 
@@ -172,11 +172,11 @@ THIS IS AN AUTOMATED TEST. You MUST:
 
 ```typescript
 /**
- * WHY: Verifies that sdd-init generates projects that actually compile.
+ * WHY: Verifies that init generates projects that actually compile.
  * Catches issues like invalid TypeScript, missing dependencies, or
  * broken import paths that would break users immediately.
  */
-describe('sdd-init functional verification', () => {
+describe('init functional verification', () => {
   /**
    * WHY: npm install must succeed for users to run the project.
    * Catches invalid package.json, missing dependencies, or

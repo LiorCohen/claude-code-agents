@@ -1,23 +1,20 @@
 ---
-name: sdd-init
-description: Initialize a new SDD project with minimal structure.
+name: init-orchestration
+description: Orchestrates SDD project initialization — version detection, environment verification, scaffolding, and git setup.
+user-invocable: false
 ---
 
-# /sdd-init
+# Init Orchestration
 
 Initialize a new spec-driven project with minimal structure. Components are scaffolded during implementation when the plan includes a scaffolding phase.
 
-## Usage
+## Input
 
-```
-/sdd-init
-```
-
-**No arguments required.** Project name is derived from the current directory.
+Invoked by `sdd-run.md` with no arguments. Project name is derived from the current directory.
 
 ## Workflow
 
-This command follows an approval-based workflow that verifies environment, creates minimal structure, and prepares for change-driven development.
+This skill follows an approval-based workflow that verifies environment, creates minimal structure, and prepares for change-driven development.
 
 | Phase | Purpose |
 |-------|---------|
@@ -111,7 +108,7 @@ Would you like to add missing components? (yes/no)
 If yes: Add only missing pieces, **never overwrite existing files**.
 If no: Exit gracefully.
 
-**Running sdd-init multiple times is always safe.**
+**Running init multiple times is always safe.**
 
 ---
 
@@ -224,9 +221,8 @@ Run `<plugin-root>/system/system-run.sh permissions configure` to merge SDD perm
 
 **If no:**
 ```
-You can configure permissions later by running:
-
-  /sdd-run permissions configure
+You can configure permissions later:
+  /sdd I want to configure permissions
 
 This will merge SDD recommended permissions into your .claude/settings.local.json
 ```
@@ -281,7 +277,7 @@ Stage and commit all created files following the `commit-standards` skill.
 Location: /path/to/my-app
 
 ENVIRONMENT:
-  ✓ Plugin v5.11.0 (up to date)
+  ✓ Plugin v7.0.0 (up to date)
   ✓ All required tools available
   ✓ Permissions configured
 
@@ -296,11 +292,41 @@ IMPORTANT: Start a new Claude session before using SDD commands.
 NEXT STEPS:
 
   Start with a feature idea:
-    /sdd-change new --type feature --name <your-first-feature>
+    /sdd I want to create a new feature
 
   Or import an existing spec:
-    /sdd-change new --spec path/to/requirements.md
+    /sdd I want to import an external spec
 
   Components (server, webapp, database, contract, testing, cicd)
   are scaffolded during implementation when the plan includes them.
 ```
+
+## Important Notes
+
+### Zero Session Context
+
+All workflow state is persisted. A new session can resume at any point by reading the files - no conversation history needed.
+
+### Two-Stage Approval
+
+Implementation cannot begin until both SPEC.md and PLAN.md are explicitly approved:
+1. Spec created → spec_review → user approves → plan created
+2. Plan created → plan_review → user approves → implementation enabled
+
+### Checkpoint Commits
+
+All state changes create checkpoint commits on feature branches:
+- Checkpoints use `--no-verify` to skip hooks
+- Checkpoints can be squashed into final commit
+- Enables recovery from any interruption
+
+### Change IDs
+
+- Format: `<workflow-short>-<seq>` (e.g., `a1b2-1`)
+- Unique across concurrent workflows
+- Displayed in all status output
+- Used for all commands that operate on a specific change
+
+## Output
+
+Returns the Phase 6 completion message or an error if any hard blocker is encountered.

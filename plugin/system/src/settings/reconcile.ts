@@ -202,7 +202,7 @@ export const reconcileSettings = (
           {
             type: 'removed' as const,
             field: 'project.domain',
-            detail: 'Deprecated — domain inference moved to sdd-change',
+            detail: 'Deprecated — domain inference moved to change workflow',
           },
         ]
       : []),
@@ -391,12 +391,12 @@ export const reconcileSettings = (
             const subDirWarnings: readonly ReconciliationWarning[] = subDirs
               .filter((subDir) => !trackedPaths.has(`components/${dirName}/${subDir}`))
               .map((subDir) => ({
-                message: `Directory "components/${dirName}/${subDir}" exists on disk but is not tracked in sdd-settings`,
+                message: `Directory "components/${dirName}/${subDir}" exists on disk but is not tracked in sdd-settings.yaml`,
               }));
 
             const flatWarning: readonly ReconciliationWarning[] =
               subDirs.length === 0 && !trackedPaths.has(flatPath)
-                ? [{ message: `Directory "${flatPath}" exists on disk but is not tracked in sdd-settings` }]
+                ? [{ message: `Directory "${flatPath}" exists on disk but is not tracked in sdd-settings.yaml` }]
                 : [];
 
             return [...subDirWarnings, ...flatWarning];

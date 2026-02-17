@@ -45,8 +45,8 @@ export type ServerConfig = Readonly<{
 
 ### 4. Generate Merged Config
 
-```bash
-/sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+```
+/sdd I want to generate config for local
 ```
 
 ### 5. Start Server
@@ -116,8 +116,8 @@ server-task-service:
 
 To add a new environment (e.g., staging):
 
-```bash
-/sdd-config add-env staging
+```
+/sdd I want to add a staging environment
 ```
 
 This creates `envs/staging/config.yaml` which inherits from `envs/default/`.
@@ -156,7 +156,7 @@ Update `schemas/config.schema.json` as your config evolves:
 ```
 
 Validation runs:
-- At `/sdd-config generate` time
+- When you generate config
 - At server startup (if schema file exists alongside config)
 
 ## Secrets
@@ -186,8 +186,8 @@ env:
 
 1. **Edit config** in `envs/default/` or `envs/local/`
 2. **Generate merged config**:
-   ```bash
-   /sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+   ```
+   /sdd I want to generate config for local
    ```
 3. **Start server**:
    ```bash
@@ -199,8 +199,8 @@ The generated `local-config.yaml` is gitignored.
 ## Production Deployment
 
 1. **Generate config for production**:
-   ```bash
-   /sdd-config generate --env production --component server-task-service --output production-config.yaml
+   ```
+   /sdd I want to generate config for production
    ```
 
 2. **Deploy with Helm**:
@@ -214,22 +214,16 @@ The generated `local-config.yaml` is gitignored.
 
 To see differences between environments:
 
-```bash
-/sdd-config diff local production
+```
+/sdd I want to compare local and production config
 ```
 
 ## Validating Config
 
 To validate all environments:
 
-```bash
-/sdd-config validate
 ```
-
-To validate a specific environment:
-
-```bash
-/sdd-config validate --env production
+/sdd I want to validate my config
 ```
 
 ## Environment Agnosticism
@@ -267,16 +261,16 @@ SDD_CONFIG_PATH=./local-config.yaml npm start
 
 Generate the config file first:
 
-```bash
-/sdd-config generate --env local --component server-task-service --output ./local-config.yaml
+```
+/sdd I want to generate config for local
 ```
 
 ### "Config validation failed"
 
 Check your config against the schema:
 
-```bash
-/sdd-config validate --env local
+```
+/sdd I want to validate my config
 ```
 
 The error message will include which fields are invalid.

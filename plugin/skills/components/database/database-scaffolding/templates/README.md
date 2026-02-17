@@ -14,23 +14,23 @@ PostgreSQL database migrations, seeds, and management scripts. Deployed to local
 Database operations are performed via SDD commands in your Claude Code session:
 
 ```
-/sdd-run database setup        # Deploy PostgreSQL to k8s
-/sdd-run database port-forward  # Forward port (run in separate terminal)
-/sdd-run database migrate       # Run migrations
-/sdd-run database seed          # (Optional) Load seed data
+/sdd set up the database        # Deploy PostgreSQL to k8s
+/sdd forward the database port  # Forward port (run in separate terminal)
+/sdd run database migrations    # Run migrations
+/sdd seed the database          # (Optional) Load seed data
 ```
 
-## Available Commands
+## Available Operations
 
-| Command | Description |
-|---------|-------------|
-| `/sdd-run database setup` | Deploy PostgreSQL to local Kubernetes cluster |
-| `/sdd-run database teardown` | Remove PostgreSQL from cluster |
-| `/sdd-run database port-forward` | Forward localhost:5432 to database pod |
-| `/sdd-run database psql` | Connect to database via psql |
-| `/sdd-run database migrate` | Run all pending migrations |
-| `/sdd-run database seed` | Load seed data |
-| `/sdd-run database reset` | Drop, recreate, migrate, and seed |
+| Prompt | Description |
+|--------|-------------|
+| `/sdd set up the database` | Deploy PostgreSQL to local Kubernetes cluster |
+| `/sdd tear down the database` | Remove PostgreSQL from cluster |
+| `/sdd forward the database port` | Forward localhost:5432 to database pod |
+| `/sdd connect to the database` | Connect to database via psql |
+| `/sdd run database migrations` | Run all pending migrations |
+| `/sdd seed the database` | Load seed data |
+| `/sdd reset the database` | Drop, recreate, migrate, and seed |
 
 ## Adding Migrations
 

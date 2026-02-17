@@ -246,7 +246,7 @@ Get the actual directory names for all components.
 
 ```text
 ┌─────────────────┐
-│   sdd-init      │  Settings defined during project creation
+│   /sdd (init)   │  Settings defined during project creation
 └────────┬────────┘
          │
          ▼
@@ -260,7 +260,7 @@ Get the actual directory names for all components.
 │  Development    │  Settings changes come from:
 │                 │  - Specs (new components, capability changes)
 │                 │  - Plans (implementation decisions)
-│                 │  - /sdd-settings command (manual adjustments)
+│                 │  - /sdd with natural language about settings (manual adjustments)
 └────────┬────────┘
          │
          ▼
@@ -289,7 +289,7 @@ Template for initializing a new `.sdd/sdd-settings.yaml`:
 # SDD PROJECT SETTINGS - DO NOT EDIT MANUALLY
 # ============================================================================
 # This file is generated and maintained by SDD commands.
-# To modify settings, use: /sdd-settings
+# To modify settings, use: /sdd with natural language about settings
 # ============================================================================
 
 sdd:

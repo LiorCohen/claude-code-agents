@@ -1,7 +1,7 @@
 /**
  * Unit Tests: settings reconciliation module
  *
- * WHY: The reconciliation module transforms older sdd-settings formats
+ * WHY: The reconciliation module transforms older sdd-settings.yaml formats
  * into the latest schema during plugin upgrades. Incorrect reconciliation
  * would lose user data, break settings, or fail silently.
  */
@@ -110,7 +110,7 @@ describe('project field deprecation', () => {
 
   it('removes project.domain', () => {
     expect(content).toContain("'project.domain'");
-    expect(content).toContain('domain inference moved to sdd-change');
+    expect(content).toContain('domain inference moved to change workflow');
   });
 
   it('preserves project name', () => {
@@ -186,7 +186,7 @@ describe('directory mismatch detection', () => {
   });
 
   it('detects untracked component directories', () => {
-    expect(content).toContain('not tracked in sdd-settings');
+    expect(content).toContain('not tracked in sdd-settings.yaml');
     expect(content).toContain('componentsDir');
   });
 

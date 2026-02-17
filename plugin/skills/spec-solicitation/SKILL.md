@@ -110,7 +110,7 @@ During spec review, when user provides feedback:
 ### Interactive Path (No External Context)
 
 ```typescript
-User: /sdd-change new --type feature --name user-auth
+User: /sdd I want to create a new feature
 
 Agent: Starting spec solicitation for: user-auth
 
@@ -131,13 +131,13 @@ User: Secure login with session management
 
 Agent: Generating SPEC.md from collected requirements...
 Agent: Spec created at: changes/2026/02/05/a1b2c3/01-user-auth/SPEC.md
-Agent: Please review the spec. When satisfied, run /sdd-change approve spec a1b2-1
+Agent: Please review the spec. When satisfied, tell me: /sdd I want to approve the spec
 ```
 
 ### External Path (With Context)
 
 ```yaml
-User: /sdd-change continue
+User: /sdd I want to continue
 
 Agent: Resuming workflow a1b2c3
 Agent: Current item: API Contracts (a1b2-1)
@@ -160,7 +160,7 @@ Agent: Got it. Adding password reset to the requirements.
 ### Resume Mid-Solicitation
 
 ```yaml
-User: /sdd-change continue
+User: /sdd I want to continue
 
 Agent: Resuming spec solicitation for: API Contracts (a1b2-1)
 

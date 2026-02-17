@@ -24,7 +24,7 @@ This skill coordinates multiple component scaffolding skills:
 
 ## When to Use
 
-Scaffolding runs during the **implementation phase only** — never during `sdd-change new`. The plan determines when scaffolding is needed (as "Phase 1: Component Scaffolding" when new components are identified in SPEC.md).
+Scaffolding runs during the **implementation phase only** — never during `/sdd I want to create a new feature`. The plan determines when scaffolding is needed (as "Phase 1: Component Scaffolding" when new components are identified in SPEC.md).
 
 ### No-Op Rule
 
@@ -92,7 +92,7 @@ The `scaffolding project` command uses the engine internally — it builds a spe
 
 ## Usage
 
-After gathering project configuration in `/sdd-init`, run `<plugin-root>/system/system-run.sh scaffolding project` with a config JSON file containing the project settings. The config must include:
+After gathering project configuration in `/sdd I want to initialize a new project`, run `<plugin-root>/system/system-run.sh scaffolding project` with a config JSON file containing the project settings. The config must include:
 
 ```json
 {

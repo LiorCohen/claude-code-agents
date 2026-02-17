@@ -31,13 +31,13 @@ cd my-app
 
 ## Step 2: Initialize Your Project
 
-Run the initialization command (no arguments needed):
+Run the initialization command:
 
 ```
-/sdd-init
+/sdd I want to initialize a new project
 ```
 
-The command will:
+SDD will:
 1. **Detect project name** from the current directory (`my-app`)
 2. **Verify environment** - check that required tools are installed
 3. **Check permissions** - offer to configure Claude Code permissions
@@ -76,7 +76,7 @@ my-app/
 Ready to add a feature? Create a change spec:
 
 ```
-/sdd-change new --type feature --name user-login
+/sdd I want to create a new feature
 ```
 
 This is where the magic happens:
@@ -128,9 +128,9 @@ This means:
 After creating your change spec, review and approve it:
 
 ```
-/sdd-change approve spec <change-id>   # Review spec, create plan
-/sdd-change approve plan <change-id>   # Approve plan
-/sdd-change implement <change-id>      # Execute implementation
+/sdd I want to approve the spec
+/sdd I want to approve the plan
+/sdd I want to start implementing
 ```
 
 ## Key Concepts

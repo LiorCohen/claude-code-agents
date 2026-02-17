@@ -16,7 +16,8 @@ import { findProjectRoot } from '@/lib/config';
 
 export const migrate = async (
   componentName: string,
-  args: readonly string[]
+  args: readonly string[],
+  env: string = 'local'
 ): Promise<CommandResult> => {
   const { named } = parseNamedArgs(args);
 
@@ -50,7 +51,7 @@ export const migrate = async (
   const pgPassword = named['password'] ?? process.env['PGPASSWORD'] ?? `${componentName}-local`;
 
   // Set environment for psql
-  const env = {
+  const pgEnv = {
     ...process.env,
     PGHOST: pgHost,
     PGPORT: pgPort,
@@ -61,11 +62,11 @@ export const migrate = async (
 
   // Verify PostgreSQL connection
   try {
-    execSync('psql -c "SELECT 1"', { stdio: 'pipe', env });
+    execSync('psql -c "SELECT 1"', { stdio: 'pipe', env: pgEnv });
   } catch {
     return {
       success: false,
-      error: `Cannot connect to PostgreSQL at ${pgHost}:${pgPort}. Make sure port-forward is running: sdd-system database port-forward ${componentName}`,
+      error: `Cannot connect to PostgreSQL at ${pgHost}:${pgPort}. Make sure port-forward is running: sdd-system database port-forward ${componentName} --env ${env}`,
     };
   }
 
@@ -94,7 +95,7 @@ export const migrate = async (
     const fileName = path.basename(migrationFile);
     console.log(`  ${fileName}`);
     try {
-      execSync(`psql -f "${migrationFile}"`, { stdio: 'inherit', env });
+      execSync(`psql -f "${migrationFile}"`, { stdio: 'inherit', env: pgEnv });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       return { completed, error: errorMessage };

@@ -1,19 +1,16 @@
 ---
-name: sdd-version
-description: Show the installed plugin version and the project's plugin version, highlighting mismatches.
+name: version-orchestration
+description: Displays installed and project plugin versions with mismatch detection.
+user-invocable: false
 ---
 
-# /sdd-version
+# Version Orchestration
 
 Display the installed SDD plugin version and the project's plugin version, highlighting when the project is outdated.
 
-## Usage
+## Input
 
-```
-/sdd-version
-```
-
-**No arguments required.**
+Invoked by `sdd-run.md` with no arguments.
 
 ## Preconditions
 
@@ -31,7 +28,7 @@ Display the installed SDD plugin version and the project's plugin version, highl
    - **Project newer** — project version is newer than installed (unusual — may indicate a downgraded plugin)
 6. Display the version report
 
-## Output
+## Output Scenarios
 
 ### When versions match
 
@@ -53,7 +50,7 @@ SDD Plugin
   Originally from: 6.0.0
 
 The project settings were last reconciled with an older plugin version.
-Run /sdd-init to reconcile settings with the current plugin.
+  /sdd I want to initialize a new project
 ```
 
 ### When project is newer than installed (unusual)
@@ -78,9 +75,13 @@ SDD Plugin
   Project:    (no SDD project detected)
 
 NEXT STEPS:
-  Run /sdd-init to initialize a new SDD project.
+  /sdd I want to initialize a new project
 ```
 
 ## Related
 
 - `project-settings` skill - Owns the `sdd-settings.yaml` schema
+
+## Output
+
+Returns the version report as formatted text.

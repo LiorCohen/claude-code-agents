@@ -80,7 +80,7 @@ All servers automatically expose metrics on port 9090 regardless of settings. Bu
 
 ### Cluster-Level
 
-Cluster observability infrastructure is managed via `/sdd-run env` commands:
+Cluster observability infrastructure is managed via the system CLI:
 
 - Victoria Metrics in `telemetry` namespace (Prometheus-compatible)
 - Victoria Logs in `telemetry` namespace (log aggregation)
@@ -88,30 +88,30 @@ Cluster observability infrastructure is managed via `/sdd-run env` commands:
 
 ## Local Environment Workflow
 
-Use `/sdd-run env` commands to manage local Kubernetes environments:
+Use the system CLI to manage local Kubernetes environments:
 
 ```bash
 # Create local cluster with observability stack
-/sdd-run env create
+<plugin-root>/system/system-run.sh env create
 
 # Deploy full application stack (databases, migrations, helm charts)
-/sdd-run env deploy
+<plugin-root>/system/system-run.sh env deploy
 
 # Start port forwards for local access
-/sdd-run env forward
+<plugin-root>/system/system-run.sh env forward
 
 # Check status
-/sdd-run env status
+<plugin-root>/system/system-run.sh env status
 
 # Hybrid development: exclude a service to run locally
-/sdd-run env deploy --exclude=main-server-api
-/sdd-run env forward
+<plugin-root>/system/system-run.sh env deploy --exclude=main-server-api
+<plugin-root>/system/system-run.sh env forward
 cd components/servers/main-server && npm run dev
 
 # Lifecycle management
-/sdd-run env stop     # Pause (preserves state)
-/sdd-run env start    # Resume
-/sdd-run env destroy  # Full cleanup
+<plugin-root>/system/system-run.sh env stop     # Pause (preserves state)
+<plugin-root>/system/system-run.sh env start    # Resume
+<plugin-root>/system/system-run.sh env destroy  # Full cleanup
 ```
 
 The deploy command reads `.sdd/sdd-settings.yaml` to:

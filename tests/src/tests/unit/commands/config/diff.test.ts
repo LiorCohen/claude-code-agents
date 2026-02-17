@@ -34,7 +34,7 @@ describe('Config Diff Command', () => {
   let testDir: string;
 
   beforeEach(async () => {
-    testDir = await mkdtemp('sdd-config-diff-');
+    testDir = await mkdtemp('config-diff-');
     await mkdir(join(testDir, 'components', 'config', 'envs', 'default'), { recursive: true });
     await mkdir(join(testDir, 'components', 'config', 'envs', 'local'), { recursive: true });
     await mkdir(join(testDir, 'components', 'config', 'envs', 'production'), { recursive: true });

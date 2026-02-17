@@ -9,7 +9,7 @@ To update, invoke the docs-writer agent with your changes.
 
 ## Overview
 
-Components are the building blocks of an SDD project. Each component lives under `components/` and is recommended during `/sdd-init` based on your project's needs.
+Components are the building blocks of an SDD project. Each component lives under `components/` and is recommended during project initialization based on your project's needs.
 
 ## Available Components
 

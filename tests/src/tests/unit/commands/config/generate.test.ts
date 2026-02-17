@@ -38,7 +38,7 @@ describe('Config Generate Command', () => {
   let testDir: string;
 
   beforeEach(async () => {
-    testDir = await mkdtemp('sdd-config-generate-');
+    testDir = await mkdtemp('config-generate-');
     // Create config component structure
     await mkdir(join(testDir, 'components', 'config', 'envs', 'default'), { recursive: true });
     await mkdir(join(testDir, 'components', 'config', 'envs', 'local'), { recursive: true });

@@ -1,7 +1,7 @@
 /**
- * Workflow Test: /sdd-change new --spec with external spec
+ * Workflow Test: /sdd-run change create --spec with external spec
  *
- * WHY: Verifies that sdd-change new properly handles external specifications:
+ * WHY: Verifies that change create properly handles external specifications:
  * - Archives external spec to .sdd/archive/external-specs/ (audit only)
  * - Creates workflow items with context files
  * - Performs domain analysis with thinking step
@@ -84,7 +84,7 @@ Users should be able to view and update their profile.
 - POST /api/users/me/password
 `;
 
-const EXTERNAL_SPEC_PROMPT = `Run /sdd-change new --spec ./external-spec.md
+const EXTERNAL_SPEC_PROMPT = `Run /sdd-run change create --spec ./external-spec.md
 
 AUTOMATED TEST MODE - SKIP ALL INTERACTIVE PHASES:
 - For external spec decomposition:
@@ -104,13 +104,13 @@ CRITICAL INSTRUCTIONS:
  * WHY: External spec handling is critical for importing existing requirements.
  * If it doesn't work correctly, users can't effectively migrate to SDD.
  */
-describe('sdd-change new with external spec', () => {
+describe('change create with external spec', () => {
   let testProject: TestProject;
 
   beforeAll(async () => {
-    testProject = await createTestProject('sdd-change-new-external');
+    testProject = await createTestProject('change-create-external');
 
-    // Set up minimal SDD project structure (like sdd-change-new.test.ts does)
+    // Set up minimal SDD project structure (like change-create.test.ts does)
     // This mimics an already-initialized SDD project
     // Create .sdd directory first
     const { execSync } = await import('child_process');
@@ -151,7 +151,7 @@ components: []
 `
     );
 
-    // Initialize git (sdd-change new checks git branch)
+    // Initialize git (change create checks git branch)
     execSync('git init && git checkout -b feature/external-spec-test', {
       cwd: testProject.path,
       encoding: 'utf-8',
@@ -159,7 +159,7 @@ components: []
   });
 
   /**
-   * WHY: This test validates that sdd-change new with --spec creates:
+   * WHY: This test validates that change create with --spec creates:
    * 1. Archive of external spec in .sdd/archive/external-specs/
    * 2. Workflow items with context files
    * 3. Domain analysis with thinking step
@@ -175,9 +175,9 @@ components: []
     );
     console.log('Created external spec file');
 
-    console.log('Running /sdd-change new --spec...');
+    console.log('Running /sdd-run change create --spec...');
 
-    // sdd-change new with external spec - needs extended timeout
+    // change create with external spec - needs extended timeout
     const result = await runClaude(EXTERNAL_SPEC_PROMPT, testProject.path, 600);
 
     // Save output for debugging

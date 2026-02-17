@@ -7,7 +7,7 @@
 This project was scaffolded with SDD. To add your first feature:
 
 ```bash
-/sdd-change new --type feature --name <your-first-feature>
+/sdd I want to create a new feature
 ```
 
 This will guide you through:
@@ -30,9 +30,9 @@ npm run dev
 Database and contract operations are performed via SDD commands:
 
 ```
-/sdd-run database setup        # Deploy local database (requires K8s)
-/sdd-run database port-forward  # Forward database port
-/sdd-run contract generate-types # Generate TypeScript types from OpenAPI
+/sdd set up the database        # Deploy local database (requires K8s)
+/sdd forward the database port  # Forward database port
+/sdd generate TypeScript types  # Generate TypeScript types from OpenAPI
 ```
 
 ## Project Structure

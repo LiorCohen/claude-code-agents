@@ -18,7 +18,7 @@ During implementation, this skill:
 
 ## When to Use
 
-- During `/sdd-change implement` to execute domain updates from SPEC.md
+- During `/sdd I want to start implementing` to execute domain updates from SPEC.md
 - When importing domain concepts from external specs during implementation
 
 ## Usage

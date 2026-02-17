@@ -38,7 +38,7 @@ claude
 ### Step 1.2: Run SDD Init
 
 ```
-/sdd-init
+/sdd I want to initialize a new project
 ```
 
 SDD verifies your environment, detects the project name from the directory, and creates a minimal project structure with just a config component.
@@ -64,7 +64,7 @@ git checkout -b feature/menu-management
 ### Step 2.2: Create the Feature Spec
 
 ```
-/sdd-change new --type feature --name menu-management
+/sdd I want to create a new feature
 ```
 
 SDD guides you through a solicitation workflow with questions about:
@@ -108,7 +108,7 @@ Edit the spec if you need changes. The spec is the source of truth for implement
 Review the spec, then approve it to create the plan:
 
 ```
-/sdd-change approve spec <change-id>
+/sdd I want to approve the spec
 ```
 
 ### Step 3.2: Approve the Plan
@@ -116,13 +116,13 @@ Review the spec, then approve it to create the plan:
 Review the plan, then approve it to enable implementation:
 
 ```
-/sdd-change approve plan <change-id>
+/sdd I want to approve the plan
 ```
 
 ### Step 3.3: Run Implementation
 
 ```
-/sdd-change implement <change-id>
+/sdd I want to start implementing
 ```
 
 SDD reads your spec and executes implementation phases using specialized agents:
@@ -150,7 +150,7 @@ Each agent works autonomously based on the spec. You'll see progress as files ar
 ### Step 4.1: Create the Order Feature
 
 ```
-/sdd-change new --type feature --name order-management
+/sdd I want to create a new feature
 ```
 
 **Describe it**: Process customer orders with status tracking and total calculation
@@ -158,9 +158,9 @@ Each agent works autonomously based on the spec. You'll see progress as files ar
 ### Step 4.2: Review, Approve, and Implement
 
 ```
-/sdd-change approve spec <change-id>
-/sdd-change approve plan <change-id>
-/sdd-change implement <change-id>
+/sdd I want to approve the spec
+/sdd I want to approve the plan
+/sdd I want to start implementing
 /commit
 ```
 
@@ -171,11 +171,7 @@ Each agent works autonomously based on the spec. You'll see progress as files ar
 ### Step 5.1: Verify Each Feature
 
 ```
-/sdd-change verify <menu-change-id>
-```
-
-```
-/sdd-change verify <order-change-id>
+/sdd I want to verify the implementation
 ```
 
 SDD checks that:
@@ -190,19 +186,19 @@ SDD checks that:
 ### Step 6.1: Start the Database
 
 ```
-/sdd-run database setup restaurant-db
+/sdd set up the restaurant-db database
 ```
 
 ### Step 6.2: Run Migrations
 
 ```
-/sdd-run database migrate restaurant-db
+/sdd run migrations for restaurant-db
 ```
 
 ### Step 6.3: Generate Local Config
 
 ```
-/sdd-config generate --env local --component server
+/sdd I want to generate config for local
 ```
 
 ### Step 6.4: Start the Services
@@ -239,13 +235,13 @@ Each new feature follows the same pattern:
 
 ```
 git checkout -b feature/your-feature
-/sdd-change new --type feature --name your-feature
+/sdd I want to create a new feature
 # Review SPEC.md
-/sdd-change approve spec <change-id>
-/sdd-change approve plan <change-id>
-/sdd-change implement <change-id>
+/sdd I want to approve the spec
+/sdd I want to approve the plan
+/sdd I want to start implementing
 /commit
-/sdd-change verify <change-id>
+/sdd I want to verify the implementation
 git checkout main && git merge feature/your-feature
 ```
 
@@ -255,15 +251,15 @@ git checkout main && git merge feature/your-feature
 
 | Step | Command |
 |------|---------|
-| Initialize project | `/sdd-init` |
-| Create feature spec | `/sdd-change new --type feature --name <name>` |
-| Approve spec | `/sdd-change approve spec <change-id>` |
-| Approve plan | `/sdd-change approve plan <change-id>` |
-| Implement feature | `/sdd-change implement <change-id>` |
-| Verify feature | `/sdd-change verify <change-id>` |
-| Check status | `/sdd-change status` |
-| Manage config | `/sdd-config generate --env <env>` |
-| Database operations | `/sdd-run database <action>` |
+| Initialize project | `/sdd I want to initialize a new project` |
+| Create feature spec | `/sdd I want to create a new feature` |
+| Approve spec | `/sdd I want to approve the spec` |
+| Approve plan | `/sdd I want to approve the plan` |
+| Implement feature | `/sdd I want to start implementing` |
+| Verify feature | `/sdd I want to verify the implementation` |
+| Check status | `/sdd` |
+| Manage config | `/sdd I want to generate config for local` |
+| Database operations | `/sdd set up the database` |
 
 **The SDD workflow:**
 
@@ -277,7 +273,7 @@ git checkout main && git merge feature/your-feature
 
 ## Troubleshooting
 
-### "Command not found: /sdd-init"
+### "Command not found"
 
 Install the SDD plugin:
 ```bash
@@ -287,8 +283,8 @@ claude mcp add-plugin "https://raw.githubusercontent.com/LiorCohen/sdd/main/.cla
 ### "Database connection refused"
 
 Start the database:
-```bash
-/sdd-run database setup restaurant-db
+```
+/sdd set up the restaurant-db database
 ```
 
 ### "Tests failing"
@@ -299,8 +295,8 @@ npm test -- --reporter verbose
 ```
 
 Ensure migrations are current:
-```bash
-/sdd-run database migrate restaurant-db
+```
+/sdd run migrations for restaurant-db
 ```
 
 ---
@@ -309,9 +305,9 @@ Ensure migrations are current:
 
 Ideas for extending your restaurant app:
 
-- `/sdd-change new --type feature --name user-authentication`
-- `/sdd-change new --type feature --name payment-processing`
-- `/sdd-change new --type feature --name table-reservations`
+- `/sdd I want to create a new feature` - user authentication
+- `/sdd I want to create a new feature` - payment processing
+- `/sdd I want to create a new feature` - table reservations
 
 ---
 

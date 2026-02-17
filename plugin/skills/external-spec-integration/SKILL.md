@@ -10,7 +10,7 @@ Processes external specification files into the SDD workflow structure. Transfor
 
 ## Purpose
 
-When a user provides an external specification via `/sdd-change new --spec`:
+When a user provides an external specification via `/sdd I want to import an external spec`:
 - Archive the external spec to `.sdd/archive/external-specs/` (single copy, yyyymmdd-HHmm-filename format)
 - **TRANSFORM** the spec: classify information, identify gaps, ask clarifying questions
 - **DISCOVER** required components through targeted questions
@@ -40,7 +40,7 @@ When a user provides an external specification via `/sdd-change new --spec`:
 
 ## When to Use
 
-- During `/sdd-change new --spec <path>` when external spec is provided
+- During `/sdd I want to import an external spec` when external spec is provided
 
 ## Input
 
@@ -93,7 +93,7 @@ This skill orchestrates:
 - `component-discovery` - Identifies needed components (NEW)
 - `spec-decomposition` - Analyzes spec structure with thinking step
 
-Trigger: `/sdd-change new --spec` command.
+Trigger: `/sdd I want to import an external spec` command.
 
 ## Workflow Steps Summary
 

@@ -26,11 +26,11 @@ Checkpoints are created automatically on workflow state changes:
 
 | From | To | Trigger | Effect |
 |------|-----|---------|--------|
-| plan | spec | `/sdd-change regress <id> --to spec` | Plan invalidated, spec needs revision |
-| impl | plan | `/sdd-change regress <id> --to plan` | Impl discarded, plan invalidated |
-| impl | spec | `/sdd-change regress <id> --to spec` | Impl discarded, plan invalidated, spec needs revision |
-| review | impl | `/sdd-change request-changes <id>` | Implementation needs changes |
-| review | spec | `/sdd-change regress <id> --to spec` | Major revision needed |
+| plan | spec | `/sdd I want to go back to the spec phase` | Plan invalidated, spec needs revision |
+| impl | plan | `/sdd I want to go back to the plan phase` | Impl discarded, plan invalidated |
+| impl | spec | `/sdd I want to go back to the spec phase` | Impl discarded, plan invalidated, spec needs revision |
+| review | impl | `/sdd I want to request changes` | Implementation needs changes |
+| review | spec | `/sdd I want to go back to the spec phase` | Major revision needed |
 
 Regression archives discarded work to `.sdd/archive/workflow-regressions/`.
 

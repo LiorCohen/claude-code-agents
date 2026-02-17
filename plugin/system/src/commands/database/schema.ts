@@ -17,6 +17,11 @@ export const schema: CommandSchema = {
       description: 'Component name (e.g., "my-db")',
       pattern: '^[a-z][a-z0-9-]*$',
     },
+    env: {
+      type: 'string',
+      description: 'Target environment (e.g., "local", "staging", "production")',
+      default: 'local',
+    },
   },
   required: ['action', 'name'],
 } as const;
@@ -24,4 +29,5 @@ export const schema: CommandSchema = {
 export type DatabaseArgs = {
   readonly action: Action;
   readonly name: string;
+  readonly env?: string;
 }

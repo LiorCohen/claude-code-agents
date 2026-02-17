@@ -18,12 +18,12 @@ claude plugin install sdd
 ## Quick Start
 
 ```
-/sdd-init --name my-app                           # Initialize a new project
-/sdd-change new --type feature --name user-auth   # Create a spec
-/sdd-change approve spec <change-id>              # Review spec, create plan
-/sdd-change approve plan <change-id>              # Approve plan, enable implementation
-/sdd-change implement <change-id>                 # Execute the plan
-/sdd-change verify <change-id>                    # Verify it matches the spec
+/sdd I want to initialize a new project              # Initialize a new project
+/sdd I want to create a new feature                   # Create a spec
+/sdd I want to approve the spec                       # Review spec, create plan
+/sdd I want to approve the plan                       # Approve plan, enable implementation
+/sdd I want to start implementing                     # Execute the plan
+/sdd I want to verify the implementation              # Verify it matches the spec
 ```
 
 **[Get started with the tutorial →](./docs/getting-started.md)**
@@ -71,17 +71,16 @@ Instead of one general-purpose AI, SDD uses 7 specialized agents:
 
 | Command | Purpose |
 |---------|---------|
-| `/sdd-init --name [name]` | Initialize new project |
-| `/sdd-change new --type [type] --name [name]` | Create new change spec |
-| `/sdd-change new --spec [path]` | Import changes from external spec |
-| `/sdd-change status` | Show current workflow status |
-| `/sdd-change continue` | Resume current workflow |
-| `/sdd-change approve spec [id]` | Approve spec, create plan |
-| `/sdd-change approve plan [id]` | Approve plan, enable implementation |
-| `/sdd-change implement [id]` | Execute implementation plan |
-| `/sdd-change verify [id]` | Verify implementation matches spec |
-| `/sdd-config <operation>` | Manage configuration (generate, validate, diff) |
-| `/sdd-run <namespace> <action>` | Run sdd-system CLI operations |
+| `/sdd` | Context-aware hub — reads project state and guides you |
+| `/sdd I want to create a new feature` | Create new change spec |
+| `/sdd I want to import an external spec` | Import changes from external spec |
+| `/sdd I want to approve the spec` | Approve spec, create plan |
+| `/sdd I want to approve the plan` | Approve plan, enable implementation |
+| `/sdd I want to start implementing` | Execute implementation plan |
+| `/sdd I want to verify the implementation` | Verify implementation matches spec |
+| `/sdd I want to generate config for local` | Generate merged config for an environment |
+| `/sdd set up the database` | Direct system operations via natural language |
+| `/sdd-help` | Interactive tutor for SDD concepts |
 
 ---
 
@@ -128,7 +127,7 @@ See **[Permissions Setup](./plugin/hooks/PERMISSIONS.md)** for full configuratio
 
 ## Project Structure
 
-When you run `/sdd-init`, you get:
+When you run `/sdd I want to initialize a new project`, you get:
 
 ```
 your-project/

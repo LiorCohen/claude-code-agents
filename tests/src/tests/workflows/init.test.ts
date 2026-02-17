@@ -1,17 +1,17 @@
 /**
- * Workflow Test: /sdd-init command
+ * Workflow Test: /sdd-run init command
  *
- * WHY: Verifies that sdd-init creates the expected minimal project structure.
+ * WHY: Verifies that init creates the expected minimal project structure.
  * This is a workflow test that runs Claude with a predefined prompt
  * and validates the generated output deterministically.
  *
- * The new sdd-init creates MINIMAL structure:
+ * The new init command creates MINIMAL structure:
  * - .sdd/sdd-settings.yaml (config component only)
  * - specs/INDEX.md (empty registry)
  * - components/config/ (only config scaffolded)
  * - README.md, CLAUDE.md, .gitignore
  *
- * Full component scaffolding happens on-demand via /sdd-change new.
+ * Full component scaffolding happens on-demand via /sdd-run change create.
  */
 
 import { describe, expect, it, beforeAll } from 'vitest';
@@ -27,7 +27,7 @@ import {
   type TestProject,
 } from '@/lib';
 
-const EXISTING_PROJECT_PROMPT = `Run /sdd-init on this existing project.
+const EXISTING_PROJECT_PROMPT = `Run /sdd-run init on this existing project.
 
 AUTOMATED TEST MODE - SKIP ALL INTERACTIVE PHASES:
 - This is an existing SDD project (sdd-settings.yaml already exists)
@@ -43,7 +43,7 @@ CRITICAL INSTRUCTIONS:
 4. Load the project name from settings (do NOT prompt for it)
 5. Complete the workflow without stopping`;
 
-const MINIMAL_INIT_PROMPT = `Run /sdd-init to create a new project.
+const MINIMAL_INIT_PROMPT = `Run /sdd-run init to create a new project.
 
 AUTOMATED TEST MODE - SKIP ALL INTERACTIVE PHASES:
 - The current directory is named "test-minimal-project"
@@ -65,10 +65,10 @@ CRITICAL INSTRUCTIONS:
 6. Complete the entire workflow without stopping`;
 
 /**
- * WHY: sdd-init is the primary entry point for new projects. If it doesn't
+ * WHY: init is the primary entry point for new projects. If it doesn't
  * create the correct minimal structure, the change-driven workflow is broken.
  */
-describe('sdd-init command', () => {
+describe('init command', () => {
   let testProject: TestProject;
 
   beforeAll(async () => {
@@ -76,15 +76,15 @@ describe('sdd-init command', () => {
   });
 
   /**
-   * WHY: This test validates that sdd-init creates a minimal, functional
+   * WHY: This test validates that init creates a minimal, functional
    * project structure. Only config component should be scaffolded.
-   * Other components are scaffolded on-demand by /sdd-change new.
+   * Other components are scaffolded on-demand by /sdd-run change create.
    */
   it('creates minimal project structure', async () => {
     console.log(`\nTest directory: ${testProject.path}\n`);
-    console.log('Running /sdd-init (minimal mode)...');
+    console.log('Running /sdd-run init (minimal mode)...');
 
-    // sdd-init minimal should be faster than full scaffolding
+    // init minimal should be faster than full scaffolding
     const result = await runClaude(MINIMAL_INIT_PROMPT, testProject.path, 300);
 
     // Save output for debugging
@@ -144,10 +144,10 @@ describe('sdd-init command', () => {
 });
 
 /**
- * WHY: When sdd-init runs on an existing project, it should detect the
+ * WHY: When init runs on an existing project, it should detect the
  * existing settings and NOT prompt for project name.
  */
-describe('sdd-init existing project detection', () => {
+describe('init existing project detection', () => {
   let testProject: TestProject;
 
   beforeAll(async () => {
@@ -194,7 +194,7 @@ components:
 
   it('detects existing project and skips name prompt', async () => {
     console.log(`\nTest directory: ${testProject.path}\n`);
-    console.log('Running /sdd-init on existing project...');
+    console.log('Running /sdd-run init on existing project...');
 
     const result = await runClaude(EXISTING_PROJECT_PROMPT, testProject.path, 180);
 
