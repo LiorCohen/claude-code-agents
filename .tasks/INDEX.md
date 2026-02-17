@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#152](0-inbox/152/): Add name field to workflow state
 - [#149](0-inbox/149/): Add D2 skill
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
