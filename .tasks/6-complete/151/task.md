@@ -1,9 +1,10 @@
 ---
 id: 151
 title: "Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE"
-status: implementing
+status: complete
 priority: high
 created: 2026-02-17
+completed: 2026-02-18 09:42 UTC
 ---
 
 # Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE

@@ -22,7 +22,7 @@
 
 ## Implementing
 
-- [#151](4-implementing/151/plan.md): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
+(none)
 
 ---
 
@@ -102,6 +102,7 @@
 
 ## Complete
 
+- [#151](6-complete/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE ✓ (2026-02-18)
 - [#144](6-complete/144/): Three-command structure: /sdd + /sdd-run + /sdd-help ✓ (2026-02-17)
 - [#145](6-complete/145/): Add speccing phase to task lifecycle with structural validation gate ✓ (2026-02-16)
 - [#138](6-complete/138/): Separate component discovery from scaffolding in sdd-change new flow ✓ (2026-02-14)
