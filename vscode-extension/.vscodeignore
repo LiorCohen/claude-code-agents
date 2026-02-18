@@ -1,0 +1,8 @@
+src/**
+webview/**
+node_modules/**
+*.ts
+!dist/**
+tsconfig*.json
+webpack.config.js
+.gitignore
