@@ -1,7 +1,7 @@
 ---
 id: 151
 title: "Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE"
-status: speccing
+status: planning
 priority: high
 created: 2026-02-17
 ---
@@ -46,13 +46,15 @@ A VS Code extension provides:
 - Sideloaded installation (no marketplace publishing)
 - Always-active extension with "No SDD project" indication when `.sdd/` doesn't exist
 - User-selectable focus item for status bar (show all until user picks one)
+- Unit tests for core non-visual logic: YAML parsing, state diffing/notification detection, tree data generation
 
 ### Out of scope
 
 - Writing to any project files (read-only only)
 - Bidirectional communication with Claude Code or terminal injection
 - VS Code marketplace publishing
-- Automated tests (ship first, add tests later)
+- E2E / integration tests requiring a running VS Code instance (ship first, add later)
+- Full test coverage — only core logic (parser, state differ, tree data) needs unit tests
 - Component health tree from `sdd-settings.yaml` (future)
 - File decorations for files in current change scope (future)
 - Task backlog view from `.tasks/` directory (future)
@@ -76,14 +78,15 @@ A VS Code extension provides:
 - **Debouncing** — file watcher events are debounced (300ms) to avoid excessive re-parsing and notification spam
 - **Single webview panel** — one stepper panel that updates when the user selects a different item, not one panel per item
 - **Artifact resolution** — "View Spec" and "View Plan" resolve paths from the item's `location` field: `{location}/SPEC.md` and `{location}/PLAN.md`
-- **Epic nesting in tree** — epics render as collapsible parent nodes with children nested underneath; epic node shows aggregate progress across its children
+- **Epic nesting in tree** — epics render as collapsible parent nodes with children nested underneath; epic node shows aggregate progress across its children. Nesting is determined by `depends_on`: any item whose `depends_on` array contains an epic's `id` is rendered as a child of that epic
+- **Workflow display name** — `WorkflowState` has no `title` field. Tree nodes for workflows display as `{id}` (the short hash). `WorkflowItem` has a `title` field which is used for item display names
 - **Manual refresh command** — register `sdd.refreshWorkflows` command as a fallback if the file watcher misses a change
 
 ## Changes
 
 | File/Directory | Change |
 |------|--------|
-| `vscode-extension/package.json` | New — extension manifest with activationEvents, contributes (viewsContainers, views, commands), dependencies (React, YAML parser, vscode types) |
+| `vscode-extension/package.json` | New — extension manifest with activationEvents, contributes (viewsContainers, views, commands), dependencies (React, YAML parser, vscode types), devDependencies (`@vscode/vsce`), scripts (`build`, `package`, `test`) |
 | `vscode-extension/tsconfig.json` | New — TypeScript config for extension + webview |
 | `vscode-extension/src/extension.ts` | New — activation point, registers all providers (tree, webview, status bar, file watchers) |
 | `vscode-extension/src/workflow-watcher.ts` | New — FileSystemWatcher on `.sdd/workflows/`, emits parsed state on change, tracks previous state for diffing |
@@ -97,16 +100,20 @@ A VS Code extension provides:
 | `vscode-extension/media/icons/` | New — SVG icons for phases and statuses |
 | `vscode-extension/.vscodeignore` | New — exclude source files from packaged extension |
 | `vscode-extension/webpack.config.js` | New — bundles extension + React webview separately |
+| `vscode-extension/src/test/workflow-parser.test.ts` | New — unit tests for YAML parsing, malformed input handling, graceful degradation |
+| `vscode-extension/src/test/approval-gates.test.ts` | New — unit tests for state diffing and notification trigger detection |
+| `vscode-extension/src/test/workflow-tree.test.ts` | New — unit tests for tree data generation (flat items, epic nesting, empty states) |
+| `vscode-extension/vitest.config.ts` | New — Vitest configuration for unit tests |
 
 ## Acceptance Criteria
 
-- [ ] Extension activates in VS Code when opened as a sideloaded extension — **verify:** `code --install-extension vscode-extension/sdd-workflows-0.1.0.vsix` installs without error, extension appears in Extensions sidebar
+- [ ] Extension activates in VS Code when sideloaded — **verify:** `cd vscode-extension && npx vsce package` produces `.vsix`; `code --install-extension sdd-workflows-0.1.0.vsix` installs without error; extension appears in Extensions sidebar
 - [ ] Activity bar shows an SDD icon that opens a sidebar panel — **verify:** open VS Code in a directory with `.sdd/workflows/`, SDD icon visible in activity bar, clicking it reveals the sidebar tree view
 - [ ] Tree view lists all active workflows from `.sdd/workflows/*/workflow.yaml` — **verify:** create two `workflow.yaml` files in `.sdd/workflows/abc123/` and `.sdd/workflows/xyz789/`, both appear as top-level nodes in the tree
 - [ ] Each workflow item shows 4-phase status indicators (spec/plan/impl/review) — **verify:** workflow item with `spec_status: approved, plan_status: in_progress, impl_status: pending, review_status: pending` shows checkmark, spinner, empty, empty indicators
 - [ ] Clicking a workflow item opens the lifecycle stepper webview — **verify:** click any item in the tree, a webview panel opens showing the 4-phase stepper with the correct current phase highlighted
 - [ ] Stepper webview shows dependency information for items with `depends_on` — **verify:** item with `depends_on: [01-api-contracts]` shows the dependency and its current status in the webview
-- [ ] Status bar shows aggregate workflow summary — **verify:** with 2 workflows active, status bar shows something like `SDD: 2 workflows (3/8 items complete)` rather than picking one arbitrarily
+- [ ] Status bar shows aggregate workflow summary — **verify:** with 2 workflows active, status bar shows `$(list-tree) SDD: N/M phase` format (e.g., `4/8 specced, 2/8 planned`) aggregated across all workflows, not picking one arbitrarily
 - [ ] Status bar allows user to select a focus item — **verify:** click status bar item, quick pick appears listing all workflow items, selecting one changes the status bar to show that item's details
 - [ ] Approval gate notifications fire on relevant state transitions — **verify:** modify a `workflow.yaml` to change `spec_status` from `in_progress` to `ready_for_review`, a VS Code notification appears saying "Spec for [title] is ready for review"
 - [ ] Extension shows "No SDD project" when `.sdd/` doesn't exist — **verify:** open VS Code in a directory without `.sdd/`, tree view shows "No SDD project detected" message, status bar shows `SDD: No project`
@@ -115,3 +122,10 @@ A VS Code extension provides:
 - [ ] Focused status bar item persists across VS Code restarts — **verify:** select a focus item, restart VS Code, status bar still shows the focused item (or gracefully clears if that workflow no longer exists)
 - [ ] Tree view updates in real-time when `workflow.yaml` changes — **verify:** modify a `workflow.yaml` file externally (e.g., via Claude Code), tree view reflects the change within 2 seconds without manual refresh
 - [ ] Extension handles malformed/missing `workflow.yaml` gracefully — **verify:** create a `workflow.yaml` with invalid YAML content, extension logs a warning but doesn't crash; tree shows the workflow as "Error loading workflow"
+- [ ] Manual refresh command works — **verify:** run `SDD: Refresh Workflows` from the command palette (or `sdd.refreshWorkflows` via keybinding), tree view re-reads all `workflow.yaml` files and reflects current state
+- [ ] Inline "View Spec" action opens SPEC.md — **verify:** hover over a tree item with a `location` field, click the `$(file-text)` icon, `{location}/SPEC.md` opens in the editor
+- [ ] Inline "View Plan" action opens PLAN.md and is hidden when plan is pending — **verify:** item with `plan_status: approved` shows `$(notebook)` icon on hover that opens `{location}/PLAN.md`; item with `plan_status: pending` does not show the icon
+- [ ] Inline "Set Focus" action sets status bar focus — **verify:** hover over a tree item, click the `$(target)` icon, status bar switches from aggregate to showing that item's details
+- [ ] `vsce package` produces a valid .vsix — **verify:** `cd vscode-extension && npx vsce package` succeeds without error and produces `sdd-workflows-0.1.0.vsix`
+- [ ] `package.json` declares expected VS Code contributions — **verify:** `node -e "const p=require('./vscode-extension/package.json'); const c=p.contributes; console.log(Object.keys(c))"` outputs `viewsContainers`, `views`, `commands` (at minimum)
+- [ ] Unit tests pass for core logic — **verify:** `cd vscode-extension && npx vitest run` passes with tests covering workflow-parser (valid/invalid YAML, missing files), approval-gates (state transition detection), and workflow-tree (flat items, epic nesting, empty states)

@@ -4,13 +4,13 @@
 
 ## Speccing
 
-- [#151](1-speccing/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
+(none)
 
 ---
 
 ## Planning
 
-(none)
+- [#151](2-planning/151/plan.md): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
 
 ---
 
