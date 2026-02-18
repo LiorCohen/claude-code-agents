@@ -15,7 +15,7 @@ When a user provides an external specification via `/sdd I want to import an ext
 - **TRANSFORM** the spec: classify information, identify gaps, ask clarifying questions
 - **DISCOVER** required components through targeted questions
 - **DECOMPOSE** into workflow items with classified context
-- Create workflow items with context in `.sdd/workflows/<workflow-id>/`
+- Create workflow items with context in `.sdd/workflows/<id>-<name>/`
 - **DO NOT** create SPEC.md or PLAN.md files - those are created interactively
 
 **CRITICAL: External specs are product specs (WHAT/WHY). This skill transforms them into tech spec context (HOW) before decomposition.**

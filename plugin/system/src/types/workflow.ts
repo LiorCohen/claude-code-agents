@@ -28,6 +28,7 @@ export type WorkflowItem = {
 // Workflow state from workflow.yaml
 export type WorkflowState = {
   readonly id: string;
+  readonly name: string;
   readonly source: 'external' | 'interactive';
   readonly created: string;
   readonly current?: string;

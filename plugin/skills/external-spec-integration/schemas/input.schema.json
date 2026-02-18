@@ -14,7 +14,7 @@
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID from workflow-state for tracking"
+      "description": "Workflow ID from workflow-state for tracking (directory format: <id>-<name>)"
     },
     "primary_domain": {
       "type": "string",

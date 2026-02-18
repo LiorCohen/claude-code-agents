@@ -6,7 +6,7 @@
   "properties": {
     "change_id": {
       "type": "string",
-      "description": "Workflow-scoped change ID identifying the change to plan"
+      "description": "Workflow-scoped change ID identifying the change to plan (format: <name>-<seq>, e.g. user-auth-1)"
     },
     "spec_path": {
       "type": "string",
@@ -14,7 +14,7 @@
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID for tracking"
+      "description": "Workflow ID for tracking (directory format: <id>-<name>)"
     }
   },
   "required": [

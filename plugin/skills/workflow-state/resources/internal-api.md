@@ -2,27 +2,33 @@
 
 Available operations:
 
-## workflow_state.create_workflow(source)
+## workflow_state.create_workflow(source, name)
 
-Create a new workflow with unique ID.
+Create a new workflow with unique ID and user-chosen name.
 
 **Input:**
 ```yaml
 source: external | interactive
+name: user-auth  # Required. Lowercase alphanumeric + hyphens, 3-50 chars.
 ```
+
+**Name Validation:**
+- Pattern: `^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$`
+- Name must be unique among active workflows
 
 **Output:**
 ```yaml
 workflow_id: a1b2c3
-workflow_path: .sdd/workflows/a1b2c3/
-workflow_yaml_path: .sdd/workflows/a1b2c3/workflow.yaml
+workflow_name: user-auth
+workflow_path: .sdd/workflows/a1b2c3-user-auth/
+workflow_yaml_path: .sdd/workflows/a1b2c3-user-auth/workflow.yaml
 ```
 
 **Side Effects:**
-- Creates `.sdd/workflows/<id>/` directory
-- Creates `workflow.yaml` with initial state
+- Creates `.sdd/workflows/<id>-<name>/` directory
+- Creates `workflow.yaml` with initial state (includes `name` field)
 - Creates `drafts/` subdirectory
-- Creates checkpoint commit: `checkpoint: workflow <id> created`
+- Creates checkpoint commit: `checkpoint: workflow <id> (<name>) created`
 
 ## workflow_state.create_item(workflow_id, item_metadata)
 
@@ -41,48 +47,58 @@ depends_on: []
 
 **Output:**
 ```yaml
-change_id: a1b2-1  # Assigned by skill
-location: .sdd/workflows/a1b2c3/drafts/01-api-contracts
+change_id: user-auth-1  # Derived from workflow name + sequence
+location: .sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts
 ```
 
 **Side Effects:**
 - Creates item directory in `drafts/`
 - Creates `context.md` with extracted sections
 - Updates `workflow.yaml` with new item
-- Assigns unique change_id within workflow
+- Assigns change_id as `<workflow-name>-<seq>`
 
-## workflow_state.list()
+## workflow_state.list(workflow_id)
 
-Returns all items with their statuses.
+Returns all items with their statuses for the specified workflow (or all workflows if omitted).
+
+**Input:**
+```yaml
+workflow_id: a1b2c3  # Optional. If omitted, lists items from all active workflows.
+```
 
 **Output:**
 ```yaml
 items:
-  - change_id: a1b2-1
+  - change_id: user-auth-1
     title: API Contracts
     type: feature
     spec_status: approved
     plan_status: in_progress
     impl_status: pending
     review_status: pending
-    location: changes/2026/02/05/a1b2c3/01-api-contracts
-  - change_id: a1b2-2
+    location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
+  - change_id: user-auth-2
     title: Backend Service
     type: feature
     spec_status: in_progress
     plan_status: pending
     impl_status: pending
     review_status: pending
-    location: .sdd/workflows/a1b2c3/drafts/01-user-management/02-backend-service
+    location: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
 ```
 
-## workflow_state.get_current()
+## workflow_state.get_current(workflow_id)
 
-Returns current item being worked on.
+Returns current item being worked on for the specified workflow.
+
+**Input:**
+```yaml
+workflow_id: a1b2c3  # Required.
+```
 
 **Output:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 title: API Contracts
 type: feature
 spec_status: ready_for_review
@@ -90,21 +106,26 @@ plan_status: pending
 impl_status: pending
 review_status: pending
 substep: null
-location: changes/2026/02/05/a1b2c3/01-api-contracts
-context_path: .sdd/workflows/a1b2c3/drafts/01-user-management/01-api-contracts/context.md
+location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
+context_path: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/01-api-contracts/context.md
 ```
 
-## workflow_state.advance()
+## workflow_state.advance(workflow_id)
 
 Move to next item in order. Returns the new current item.
 
+**Input:**
+```yaml
+workflow_id: a1b2c3  # Required.
+```
+
 **Output:**
 ```yaml
-change_id: a1b2-2
+change_id: user-auth-2
 title: Backend Service
 type: feature
 status: pending
-previous: a1b2-1
+previous: user-auth-1
 ```
 
 **Side Effects:**
@@ -116,7 +137,7 @@ Update a specific status field in workflow.yaml. Validates state transitions and
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 field: spec_status | plan_status | impl_status | review_status
 status: <valid status for field>
 ```
@@ -161,7 +182,7 @@ Update the current substep within spec creation.
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 substep: transformation | discovery | solicitation | writing
 ```
 
@@ -169,9 +190,14 @@ substep: transformation | discovery | solicitation | writing
 - Updates `substep` field in item
 - Updates `step` field in workflow if needed
 
-## workflow_state.get_progress()
+## workflow_state.get_progress(workflow_id)
 
-Returns aggregate progress for the workflow.
+Returns aggregate progress for the specified workflow.
+
+**Input:**
+```yaml
+workflow_id: a1b2c3  # Required.
+```
 
 **Output:**
 ```yaml
@@ -190,12 +216,13 @@ next_phase_blocked: true
 blocking_reason: "6 specs still pending"
 ```
 
-## workflow_state.check_phase_gate(target_phase)
+## workflow_state.check_phase_gate(workflow_id, target_phase)
 
 Check if the workflow can advance to a target phase.
 
 **Input:**
 ```yaml
+workflow_id: a1b2c3  # Required.
 target_phase: plan | implement | review
 ```
 
@@ -203,11 +230,11 @@ target_phase: plan | implement | review
 ```yaml
 can_advance: false
 blocking_items:
-  - change_id: a1b2-4
+  - change_id: user-auth-4
     title: Analytics
     spec_status: in_progress
     reason: "Spec not approved"
-  - change_id: a1b2-5
+  - change_id: user-auth-5
     title: Settings
     spec_status: pending
     reason: "Spec not started"
@@ -220,7 +247,7 @@ Regress an item to an earlier phase. Archives discarded work.
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 to_phase: spec | plan
 reason: "Need to add OAuth support"
 ```
@@ -230,12 +257,12 @@ reason: "Need to add OAuth support"
 success: true
 from_phase: implement
 to_phase: spec
-archived_to: .sdd/archive/workflow-regressions/20260205-1430-a1b2-1-impl/
+archived_to: .sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/
 cascade_effects:
-  - change_id: a1b2-2
+  - change_id: user-auth-2
     current_spec_status: approved
     new_spec_status: needs_rereview
-    reason: "Depends on a1b2-1 which regressed"
+    reason: "Depends on user-auth-1 which regressed"
 ```
 
 **Side Effects:**
@@ -252,16 +279,16 @@ Flag all items that depend on a changed item.
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 ```
 
 **Output:**
 ```yaml
 flagged:
-  - change_id: a1b2-2
+  - change_id: user-auth-2
     previous_spec_status: approved
     new_spec_status: needs_rereview
-  - change_id: a1b2-3
+  - change_id: user-auth-3
     previous_spec_status: approved
     new_spec_status: needs_rereview
 ```
@@ -289,7 +316,7 @@ Write SPEC.md to item folder (in drafts/).
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 content: |
   ---
   title: API Contracts
@@ -310,18 +337,18 @@ Move item from drafts to changes/. Sets `spec_status` to `ready_for_review`.
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 ```
 
 **Output:**
 ```yaml
-new_location: changes/2026/02/05/a1b2c3/01-api-contracts
+new_location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
 sequence_number: 1  # NN- prefix within workflow
 ```
 
 **Side Effects:**
 - Determines next sequence number within workflow
-- Moves item folder from `.sdd/workflows/<wf-id>/drafts/` to `changes/YYYY/MM/DD/<wf-id>/NN-slug/`
+- Moves item folder from `.sdd/workflows/<id>-<name>/drafts/` to `changes/YYYY/MM/DD/<id>-<name>/NN-slug/`
 - Updates `workflow.yaml` with new location
 - Updates `changes/INDEX.md` with new entry
 - Sets `spec_status` to `ready_for_review`
@@ -335,7 +362,7 @@ Write PLAN.md to item folder (now in changes/).
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 content: |
   ---
   title: API Contracts - Implementation Plan
@@ -356,7 +383,7 @@ Mark item as complete. Item already in changes/.
 
 **Input:**
 ```yaml
-change_id: a1b2-1
+change_id: user-auth-1
 ```
 
 **Side Effects:**
@@ -364,7 +391,7 @@ change_id: a1b2-1
 - Updates `progress` aggregates (reviewed count)
 - Removes entry from `workflow.yaml` items array (keeps manifest lean)
 - Updates `INDEX.md` to show completion
-- If all items complete: deletes entire `.sdd/workflows/<workflow-id>/` directory
+- If all items complete: deletes entire `.sdd/workflows/<id>-<name>/` directory
 - Creates checkpoint commit: `checkpoint: <change_id> complete`
 
 ## workflow_state.revise_decomposition(revision)
@@ -375,9 +402,9 @@ Revise the decomposition structure (merge, split, add, remove changes).
 ```yaml
 revision_type: merge | split | add | remove
 items:
-  - a1b2-2   # For merge: list items to combine
-  - a1b2-3
-target_id: a1b2-2  # For merge: which ID survives
+  - user-auth-2   # For merge: list items to combine
+  - user-auth-3
+target_id: user-auth-2  # For merge: which ID survives
 new_title: "User Authentication"  # For merge: combined title
 reason: "These changes heavily overlap in the session model"
 ```
@@ -387,13 +414,13 @@ reason: "These changes heavily overlap in the session model"
 success: true
 revision_type: merge
 affected_items:
-  - change_id: a1b2-2
+  - change_id: user-auth-2
     action: preserved_as_target
-  - change_id: a1b2-3
+  - change_id: user-auth-3
     action: archived
-    archive_path: .sdd/archive/revised-specs/20260205-1430-a1b2c3-03-password-reset/
+    archive_path: .sdd/archive/revised-specs/20260205-1430-a1b2c3-user-auth-03-password-reset/
 rereviews_needed:
-  - change_id: a1b2-4
+  - change_id: user-auth-4
     reason: "Dependency on merged item"
 progress_update:
   previous_total: 9
@@ -413,13 +440,21 @@ Create checkpoint commit on feature branch.
 
 **Input:**
 ```yaml
-message: "checkpoint: a1b2-1 spec created"
+message: "checkpoint: user-auth-1 spec created"
 files:
-  - .sdd/workflows/a1b2c3/drafts/01-api-contracts/SPEC.md
-  - .sdd/workflows/a1b2c3/workflow.yaml
+  - .sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts/SPEC.md
+  - .sdd/workflows/a1b2c3-user-auth/workflow.yaml
 ```
 
 **Behavior:**
 - Uses `--no-verify` to skip hooks
 - No-op if on main/master branch
 - Only stages workflow-related files (`.sdd/`, `changes/`, implementation files)
+
+## Backward Compatibility
+
+When loading a `workflow.yaml` without a `name` field (pre-name workflows):
+- Derive `name` from the first item's title, slugified (e.g., "API Contracts" → `api-contracts`)
+- Write the derived `name` back to `workflow.yaml`
+- Directory remains as-is (no rename) — only new workflows get `<id>-<name>` directories
+- Change IDs remain in their original format — only new items get name-based IDs

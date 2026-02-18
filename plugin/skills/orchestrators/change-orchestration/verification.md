@@ -84,8 +84,8 @@ For each affected component:
 ```markdown
 ## Verification Report: Registration
 
-**Change ID:** [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/)
-**Spec:** [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
+**Change ID:** [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
+**Spec:** [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md)
 **Date:** 2026-02-05
 
 ### Specs Traceability
@@ -125,13 +125,14 @@ INVOKE workflow-state.complete_item with:
 
 Move to next item:
 ```yaml
-INVOKE workflow-state.advance
+INVOKE workflow-state.advance with:
+  workflow_id: <workflow_id>
 ```
 
 ### Output
 
 ```
-Verifying: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Verifying: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
 Step 1: Loading spec...
 Step 2: Validating specs traceability...
@@ -146,10 +147,10 @@ Step 5: Verifying implementation...
 
 VERIFICATION PASSED
 
-Change [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) marked complete.
+Change [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) marked complete.
 
 NEXT:
-  Next change: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication)
+  Next change: [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) (Authentication)
   /sdd I want to continue
 ```
 
@@ -174,12 +175,12 @@ Submit a change for user review after implementation.
 ### Output
 
 ```
-Submitting for review: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Submitting for review: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
 Implementation complete. Ready for user review.
 
 REVIEW CHECKLIST:
-  [ ] Check [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md) requirements are met
+  [ ] Check [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md) requirements are met
   [ ] Review changed files in git diff
   [ ] Verify tests pass
   [ ] Check specs/ changes match declaration

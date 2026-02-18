@@ -82,7 +82,7 @@ Run `<plugin-root>/system/system-run.sh spec validate <path>` to check:
 Validation should return clear, actionable error messages:
 
 ```text
-Spec validation failed: changes/2026/02/05/a1b2c3/01-auth/SPEC.md
+Spec validation failed: changes/2026/02/05/a1b2c3-user-auth/01-auth/SPEC.md
 
 FRONTMATTER ERRORS:
   - Missing required field: issue

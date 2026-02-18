@@ -322,8 +322,9 @@ All state changes create checkpoint commits on feature branches:
 
 ### Change IDs
 
-- Format: `<workflow-short>-<seq>` (e.g., `a1b2-1`)
-- Unique across concurrent workflows
+- Format: `<name>-<seq>` (e.g., `user-auth-1`)
+- Derived from the workflow's user-chosen name
+- Unique across concurrent workflows (different names = different prefixes)
 - Displayed in all status output
 - Used for all commands that operate on a specific change
 

@@ -130,7 +130,7 @@ User: Secure login with session management
 [... continues through all steps ...]
 
 Agent: Generating SPEC.md from collected requirements...
-Agent: Spec created at: changes/2026/02/05/a1b2c3/01-user-auth/SPEC.md
+Agent: Spec created at: changes/2026/02/05/a1b2c3-user-auth/01-user-auth/SPEC.md
 Agent: Please review the spec. When satisfied, tell me: /sdd I want to approve the spec
 ```
 
@@ -139,8 +139,8 @@ Agent: Please review the spec. When satisfied, tell me: /sdd I want to approve t
 ```yaml
 User: /sdd I want to continue
 
-Agent: Resuming workflow a1b2c3
-Agent: Current item: API Contracts (a1b2-1)
+Agent: Resuming workflow a1b2c3 (user-auth)
+Agent: Current item: API Contracts (user-auth-1)
 Agent: Loading context...
 
 Step 1: Context & Goal
@@ -162,7 +162,7 @@ Agent: Got it. Adding password reset to the requirements.
 ```yaml
 User: /sdd I want to continue
 
-Agent: Resuming spec solicitation for: API Contracts (a1b2-1)
+Agent: Resuming spec solicitation for: API Contracts (user-auth-1)
 
 Previously collected:
   - Problem: User authentication needs API endpoints

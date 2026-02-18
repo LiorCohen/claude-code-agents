@@ -6,7 +6,7 @@ Checkpoints are created automatically on workflow state changes:
 
 | Event | Commit Message | Files Committed |
 |-------|----------------|-----------------|
-| Workflow created | `checkpoint: workflow <id> created` | `workflow.yaml` |
+| Workflow created | `checkpoint: workflow <id> (<name>) created` | `workflow.yaml` |
 | Spec solicitation progress | `checkpoint: <change-id> solicitation progress` | `solicitation-workflow.yaml` |
 | SPEC.md created | `checkpoint: <change-id> spec created` | `SPEC.md`, `workflow.yaml` |
 | SPEC.md approved | `checkpoint: <change-id> spec approved` | `workflow.yaml` |
@@ -39,8 +39,8 @@ Regression archives discarded work to `.sdd/archive/workflow-regressions/`.
 When work is archived during regression:
 
 ```yaml
-# .sdd/archive/workflow-regressions/20260205-1430-a1b2-1-impl/metadata.yaml
-change_id: a1b2-1
+# .sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/metadata.yaml
+change_id: user-auth-1
 from_phase: implement
 to_phase: spec
 reason: "Need to add OAuth support"

@@ -113,7 +113,7 @@ SDD projects are organized into **components** — servers, frontends, databases
 
 ### Changes
 
-A **change** is the unit of work in SDD. It has a unique ID (e.g., `a1b2-1`), a type (feature, bugfix, refactor, epic), and progresses through the lifecycle phases.
+A **change** is the unit of work in SDD. It has a unique ID derived from the workflow name (e.g., `user-auth-1`), a type (feature, bugfix, refactor, epic), and progresses through the lifecycle phases.
 
 ---
 

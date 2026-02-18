@@ -236,7 +236,7 @@ Epics group multiple feature-type changes under a single goal. The creation work
 
 ### Workflow Tracking
 
-Epics are tracked in `.sdd/workflows/<workflow-id>/workflow.yaml`:
+Epics are tracked in `.sdd/workflows/<id>-<name>/workflow.yaml`:
 
 ```yaml
 items:
@@ -246,7 +246,7 @@ items:
     status: pending
     children:
       - id: 01-registration
-        change_id: a1b2-1
+        change_id: user-auth-1
         title: Registration
         type: feature
         status: pending

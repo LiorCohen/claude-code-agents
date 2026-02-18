@@ -323,7 +323,7 @@ thinking_output:
   gaps_identified: [...]
   recommended_order: [...]
 first_item:
-  change_id: a1b2-1
+  change_id: user-auth-1
   title: Registration
   status: pending
 ```
