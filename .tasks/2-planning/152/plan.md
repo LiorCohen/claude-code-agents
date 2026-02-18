@@ -296,19 +296,7 @@ Within each group, files are independent and can be done in any order. Build (`n
 
 ## Tests
 
-### Unit Tests
-
-- [ ] `test_workflow_state_type_has_name_field` — verify `WorkflowState` includes `name: string` (grep-based AC, no runtime test needed since this is a type)
-- [ ] `test_prompt_commit_changes_path_extraction` — existing tests in `tests/src/tests/unit/hooks/prompt-commit-after-write.test.ts` still pass (path extraction logic unchanged)
-
-### Integration Tests
-
-- [ ] `test_build_succeeds` — `npm run build:plugin` passes after type change
-- [ ] `test_typecheck_passes` — `npm run typecheck:plugin` passes
-
-### Verification (AC-based)
-
-All 18 acceptance criteria from task.md are verified by grep commands. Run each after implementation to confirm.
+No new tests. This task changes a type definition, a comment, and 28 markdown prompt files — no new runtime behavior. Verification is the AC grep commands and the build checks below.
 
 ## Verification
 
