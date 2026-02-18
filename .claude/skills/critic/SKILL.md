@@ -184,9 +184,13 @@ Always end the critic output with a single ready-to-use challenge prompt the use
 
 The prompt should be a single block of text covering as many points as needed — every finding, every area of low confidence, every unverified claim. Don't split it into separate prompts. One prompt, all the pressure.
 
+**Format:** Present the challenge prompt inside a fenced code block (triple backticks) so the user gets a copy-to-clipboard button in the IDE. Do NOT use blockquotes — use a code block.
+
 Generate the prompt tailored to the current phase, findings, and areas of low confidence. Example:
 
-> "Are you sure you're done? Walk me through every acceptance criterion and show me evidence — not assertions — that each one is met. Did you actually read [specific file] or are you assuming you know what's in it? Show me the part that confirms [specific claim]. The plan says to modify [file list] — show me exactly what changed and why each change is justified. You said [check] passed — prove it, what command did you run and what was the output? What would break if I reverted [specific file]? If nothing, why did you change it? Did you miss anything? Did you break anything? Verify."
+```
+Are you sure you're done? Walk me through every acceptance criterion and show me evidence — not assertions — that each one is met. Did you actually read [specific file] or are you assuming you know what's in it? Show me the part that confirms [specific claim]. The plan says to modify [file list] — show me exactly what changed and why each change is justified. You said [check] passed — prove it, what command did you run and what was the output? What would break if I reverted [specific file]? If nothing, why did you change it? Did you miss anything? Did you break anything? Verify.
+```
 
 Don't generate a generic prompt. Reference actual files, acceptance criteria, and specific areas where the critic had medium or low confidence.
 
