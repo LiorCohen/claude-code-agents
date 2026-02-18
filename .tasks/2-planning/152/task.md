@@ -1,7 +1,7 @@
 ---
 id: 152
 title: Workflows must have user-chosen names
-status: speccing
+status: planning
 priority: high
 created: 2026-02-17 20:00 UTC
 depends_on: []

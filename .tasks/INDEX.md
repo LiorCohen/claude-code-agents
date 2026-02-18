@@ -4,13 +4,13 @@
 
 ## Speccing
 
-- [#152](1-speccing/152/): Workflows must have user-chosen names
+(none)
 
 ---
 
 ## Planning
 
-(none)
+- [#152](2-planning/152/plan.md): Workflows must have user-chosen names
 
 ---
 
