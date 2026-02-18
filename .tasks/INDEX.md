@@ -10,13 +10,13 @@
 
 ## Planning
 
-- [#152](2-planning/152/plan.md): Workflows must have user-chosen names
+(none)
 
 ---
 
 ## Plan Review
 
-(none)
+- [#152](3-plan-review/152/plan.md): Workflows must have user-chosen names
 
 ---
 
