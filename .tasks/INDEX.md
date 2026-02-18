@@ -36,6 +36,7 @@
 
 ### High Priority
 
+- [#152](0-inbox/152/): Workflows must have user-chosen names
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
@@ -71,7 +72,6 @@
 ### Unprioritized
 
 - [#153](0-inbox/153/): /sdd command should surface Claude and plugin limitations, especially during reviews
-- [#152](0-inbox/152/): Add name field to workflow state
 - [#149](0-inbox/149/): Add D2 skill
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
 - [#146](0-inbox/146/): Add instructions for installing a specific plugin version and locking with extraknownmarketplaces
