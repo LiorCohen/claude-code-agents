@@ -10,7 +10,7 @@
 
 ## Planning
 
-- [#151](2-planning/151/plan.md): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
+(none)
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## Implementing
 
-(none)
+- [#151](4-implementing/151/plan.md): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE
 
 ---
 
@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#153](0-inbox/153/): /sdd command should surface Claude and plugin limitations, especially during reviews
 - [#152](0-inbox/152/): Add name field to workflow state
 - [#149](0-inbox/149/): Add D2 skill
 - [#147](0-inbox/147/): Add backwards compatibility check to sdd-init plugin updates
