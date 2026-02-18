@@ -43,7 +43,6 @@ Workflows are identified only by auto-generated 6-character alphanumeric IDs (`a
 | 28 | `plugin/commands/sdd-run.md` | Document workflow name in change create examples |
 | 29 | `plugin/commands/sdd-help.md` | Update workflow path references |
 | 30 | `plugin/system/src/commands/workflow/check-gate.ts` | Update usage comment paths |
-| 31 | `plugin/system/src/commands/hook/prompt-commit.ts` | Review `changes/` path extraction (no change needed — `parts.slice(0, 5)` still correct) |
 
 ## Changes
 
@@ -76,7 +75,7 @@ Add `readonly name: string` to `WorkflowState` type (after `id` field, line 30).
 
 **File 4: `plugin/skills/workflow-state/resources/internal-api.md`**
 
-This is the heaviest change. Update every operation:
+This is the heaviest change (currently 425 lines). Estimated final: ~454 lines (under 500). Net additions: ~29 lines (5x `workflow_id` param blocks at +3 each, name validation/uniqueness at +6, backward compat section at +8). If it exceeds 500, move backward compat into `recovery.md` (currently 64 lines). Update every operation:
 
 **`create_workflow` (lines 5-25):**
 - Add `name` as required input alongside `source`
@@ -280,9 +279,7 @@ Update all output examples:
 - Lines 7-8: Update usage comment paths from `.sdd/workflows/a1b2c3/` to `.sdd/workflows/a1b2c3-user-auth/`
 - No logic changes — check-gate reads `workflow.yaml` and validates item statuses; the `name` field is irrelevant to gating logic
 
-**File 31: `plugin/system/src/commands/hook/prompt-commit.ts`**
-
-- Review only — no changes needed. The `getContextDir` function extracts `changes/YYYY/MM/DD/<dir>` (first 5 path segments), which works regardless of whether `<dir>` is `a1b2c3` or `a1b2c3-user-auth`. The path structure depth is unchanged.
+**Note:** `plugin/system/src/commands/hook/prompt-commit.ts` was reviewed and needs no changes — `getContextDir` extracts `changes/YYYY/MM/DD/<dir>` (first 5 path segments), which works regardless of whether `<dir>` is `a1b2c3` or `a1b2c3-user-auth`.
 
 ## Dependencies
 
