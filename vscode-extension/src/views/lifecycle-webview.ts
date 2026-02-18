@@ -38,7 +38,7 @@ export class LifecycleStepperPanel implements vscode.Disposable {
     this._disposables = [sub];
   }
 
-  showItem(item: ParsedItem): void {
+  showItem(item: ParsedItem): ExtensionToWebviewMessage | undefined {
     this._currentItem = item;
 
     if (!this._panel) {
@@ -77,14 +77,14 @@ export class LifecycleStepperPanel implements vscode.Disposable {
     }
 
     const allItems = this._getAllItemsForWorkflow(item.workflowId);
-    this._postUpdate(item, allItems);
+    return this._postUpdate(item, allItems);
   }
 
   private _postUpdate(
     item: ParsedItem,
     allItems: ReadonlyArray<ParsedItem>,
-  ): void {
-    if (!this._panel) return;
+  ): ExtensionToWebviewMessage | undefined {
+    if (!this._panel) return undefined;
     const message: ExtensionToWebviewMessage = {
       type: 'showItem',
       item,
@@ -92,6 +92,7 @@ export class LifecycleStepperPanel implements vscode.Disposable {
       workflowId: item.workflowId,
     };
     void this._panel.webview.postMessage(message);
+    return message;
   }
 
   private _findItem(
@@ -119,6 +120,9 @@ export class LifecycleStepperPanel implements vscode.Disposable {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js'),
     );
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.css'),
+    );
     const nonce = getNonce();
 
     return `<!DOCTYPE html>
@@ -126,7 +130,8 @@ export class LifecycleStepperPanel implements vscode.Disposable {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src ${webview.cspSource};">
+  <link rel="stylesheet" href="${styleUri}">
   <title>SDD Lifecycle Stepper</title>
 </head>
 <body>

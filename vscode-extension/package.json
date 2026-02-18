@@ -33,18 +33,18 @@
         }
       ]
     },
-    "viewsWelcome": {
-      "sddWorkflows": [
-        {
-          "contents": "No SDD project detected.\n\nOpen a workspace with an `.sdd/` directory to see workflows.",
-          "when": "sdd.noProject"
-        },
-        {
-          "contents": "No active workflows.\n\nStart a workflow with `/sdd` to see it here.",
-          "when": "sdd.noWorkflows"
-        }
-      ]
-    },
+    "viewsWelcome": [
+      {
+        "view": "sddWorkflows",
+        "contents": "No SDD project detected.\n\nOpen a workspace with an `.sdd/` directory to see workflows.",
+        "when": "sdd.noProject"
+      },
+      {
+        "view": "sddWorkflows",
+        "contents": "No active workflows.\n\nStart a workflow with `/sdd` to see it here.",
+        "when": "sdd.noWorkflows"
+      }
+    ],
     "commands": [
       {
         "command": "sdd.refreshWorkflows",
@@ -53,15 +53,18 @@
       },
       {
         "command": "sdd.openSpec",
-        "title": "SDD: View Spec"
+        "title": "SDD: View Spec",
+        "icon": "$(file-text)"
       },
       {
         "command": "sdd.openPlan",
-        "title": "SDD: View Plan"
+        "title": "SDD: View Plan",
+        "icon": "$(notebook)"
       },
       {
         "command": "sdd.setFocus",
-        "title": "SDD: Set Focus"
+        "title": "SDD: Set Focus",
+        "icon": "$(target)"
       },
       {
         "command": "sdd.showStepper",
@@ -103,20 +106,20 @@
     "typecheck": "tsc --noEmit -p tsconfig.extension.json && tsc --noEmit -p tsconfig.webview.json"
   },
   "dependencies": {
-    "yaml": "^2.7.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
-    "@types/vscode": "^1.96.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/vscode": "^1.96.0",
     "@vscode/vsce": "^3.2.0",
+    "css-loader": "^7.1.0",
+    "mini-css-extract-plugin": "^2.10.0",
+    "ts-loader": "^9.5.0",
     "typescript": "^5.7.0",
     "webpack": "^5.97.0",
-    "webpack-cli": "^6.0.0",
-    "ts-loader": "^9.5.0",
-    "css-loader": "^7.1.0",
-    "style-loader": "^4.0.0"
+    "webpack-cli": "^6.0.0"
   }
 }

@@ -82,7 +82,7 @@ export type LeafItemYaml = WorkflowItemYamlBase & {
   readonly plan_status: PlanStatus;
   readonly impl_status: ImplStatus;
   readonly review_status: ReviewStatus;
-  readonly substep?: string | null;
+  readonly substep?: string;
   readonly regression?: RegressionYaml;
 };
 

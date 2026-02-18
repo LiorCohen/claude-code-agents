@@ -67,21 +67,23 @@ export class StatusBarManager implements vscode.Disposable {
     this._update();
   }
 
-  setFocus(item: ParsedLeafItem): void {
+  setFocus(item: ParsedLeafItem): FocusState {
     this._focus = { workflowId: item.workflowId, itemId: item.id };
     void this._workspaceState.update(FOCUS_KEY, this._focus);
     this._update();
+    return this._focus;
   }
 
-  clearFocus(): void {
+  clearFocus(): FocusState | undefined {
     this._focus = undefined;
     void this._workspaceState.update(FOCUS_KEY, undefined);
     this._update();
+    return this._focus;
   }
 
-  async showQuickPick(): Promise<void> {
+  async showQuickPick(): Promise<ParsedLeafItem | undefined> {
     const leaves = getLeafItems(this._watcher.workflows);
-    if (leaves.length === 0) return;
+    if (leaves.length === 0) return undefined;
 
     const items: ReadonlyArray<vscode.QuickPickItem> = [
       { label: '$(list-tree) Show aggregate', description: 'Clear focus' },
@@ -96,16 +98,19 @@ export class StatusBarManager implements vscode.Disposable {
       placeHolder: 'Select a workflow item to focus on',
     });
 
-    if (!picked) return;
+    if (!picked) return undefined;
 
     if (picked.label.startsWith('$(list-tree)')) {
       this.clearFocus();
-    } else {
-      const index = items.indexOf(picked) - 1;
-      if (index >= 0 && index < leaves.length) {
-        this.setFocus(leaves[index]);
-      }
+      return undefined;
     }
+
+    const index = items.indexOf(picked) - 1;
+    if (index >= 0 && index < leaves.length) {
+      this.setFocus(leaves[index]);
+      return leaves[index];
+    }
+    return undefined;
   }
 
   private _update(): void {
