@@ -28,7 +28,7 @@
 
 ## Reviewing
 
-- [#152](5-reviewing/152/plan.md): Workflows must have user-chosen names
+(none)
 
 ---
 
@@ -104,6 +104,7 @@
 
 ## Complete
 
+- [#152](6-complete/152/): Workflows must have user-chosen names ✓ (2026-02-18)
 - [#151](6-complete/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE ✓ (2026-02-18)
 - [#144](6-complete/144/): Three-command structure: /sdd + /sdd-run + /sdd-help ✓ (2026-02-17)
 - [#145](6-complete/145/): Add speccing phase to task lifecycle with structural validation gate ✓ (2026-02-16)

@@ -1,14 +1,15 @@
 ---
 id: 152
 title: Workflows must have user-chosen names
-status: reviewing
+status: complete
 priority: high
 created: 2026-02-17 20:00 UTC
+completed: 2026-02-18 17:40 UTC
 depends_on: []
 blocks: []
 ---
 
-# Task 152: Workflows must have user-chosen names
+# Task 152: Workflows must have user-chosen names ✓
 
 ## Description
 
