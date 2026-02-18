@@ -8,7 +8,7 @@ user-invocable: false
 
 ## Purpose
 
-Manages `.sdd/workflows/<workflow-id>/` state - tracking where each item is in the solicitation → review → approval → implementation lifecycle.
+Manages `.sdd/workflows/<id>-<name>/` state - tracking where each item is in the solicitation → review → approval → implementation lifecycle.
 
 This is **process state management**, not project task management.
 
@@ -30,16 +30,16 @@ Read the files, know the state. This enables aggressive context compaction and a
 │   ├── external-specs/         # External specs archived here (read-only)
 │   │   └── 20260205-1430-feature-spec.md  # yyyymmdd-HHmm-lowercased-filename.md
 │   ├── revised-specs/          # Specs removed during decomposition revision
-│   │   └── 20260205-1430-a1b2c3-03-password-reset/
+│   │   └── 20260205-1430-a1b2c3-user-auth-03-password-reset/
 │   │       └── SPEC.md
 │   └── workflow-regressions/   # Work archived during phase regression
-│       └── 20260205-1430-a1b2-1-impl/
+│       └── 20260205-1430-user-auth-1-impl/
 │           ├── changes.patch   # Git patch for committed changes
 │           ├── stash.patch     # Git stash for uncommitted changes
 │           ├── src/            # Implementation files
 │           └── metadata.yaml   # Regression context
 └── workflows/                  # Multiple concurrent workflows supported
-    ├── a1b2c3/                 # One workflow (user A, branch feature-x)
+    ├── a1b2c3-user-auth/       # One workflow (user A, branch feature-x)
     │   ├── workflow.yaml       # This workflow's state
     │   └── drafts/
     │       ├── 01-user-management/
@@ -50,7 +50,7 @@ Read the files, know the state. This enables aggressive context compaction and a
     │       │       └── context.md
     │       └── 02-notifications/
     │           └── context.md
-    └── x7y8z9/                 # Another workflow (user B, branch feature-y)
+    └── x7y8z9-notifications/   # Another workflow (user B, branch feature-y)
         ├── workflow.yaml
         └── drafts/...
 ```
@@ -119,12 +119,12 @@ Workflow IDs are short, unique identifiers:
 
 ## Change ID Format
 
-Change IDs are workflow-scoped:
+Change IDs are derived from the workflow name:
 
-- Format: `<workflow-short>-<seq>` (e.g., `a1b2-1`, `a1b2-2`)
-- `workflow-short`: First 4 characters of workflow ID
+- Format: `<name>-<seq>` (e.g., `user-auth-1`, `user-auth-2`)
+- `name`: The workflow's user-chosen name
 - `seq`: Sequence number within workflow (1, 2, 3, ...)
-- Unique across concurrent workflows (different workflows = different prefix)
+- Unique across concurrent workflows (different workflows = different name prefix)
 
 ## Epic Handling
 
@@ -144,7 +144,7 @@ Change IDs are workflow-scoped:
 - When item is marked `complete`:
   - Remove from `workflow.yaml` items array
 - When all items complete:
-  - Delete entire `.sdd/workflows/<workflow-id>/` directory including `workflow.yaml`
+  - Delete entire `.sdd/workflows/<id>-<name>/` directory including `workflow.yaml`
 - Completed items remain in `changes/` permanently (that's the source of truth)
 
 ## INDEX.md Handling

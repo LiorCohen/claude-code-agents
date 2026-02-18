@@ -8,6 +8,10 @@
       "type": "string",
       "description": "Workflow identifier"
     },
+    "name": {
+      "type": "string",
+      "description": "Workflow name chosen by the user"
+    },
     "phase": {
       "type": "string",
       "enum": [

@@ -18,7 +18,12 @@
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID for operations on existing workflows"
+      "description": "Workflow ID for operations on existing workflows (directory format: <id>-<name>)"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$",
+      "description": "Workflow name (lowercase alphanumeric + hyphens, 3-50 chars). Required for create_workflow."
     },
     "source": {
       "type": "string",

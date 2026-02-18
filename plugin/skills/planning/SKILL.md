@@ -10,7 +10,7 @@ user-invocable: false
 
 Plans are stored alongside their specs:
 
-`changes/YYYY/MM/DD/<workflow-id>/<NN-change-name>/PLAN.md`
+`changes/YYYY/MM/DD/<id>-<name>/<NN-change-name>/PLAN.md`
 
 This keeps all change documentation (spec + plan) together in one location.
 

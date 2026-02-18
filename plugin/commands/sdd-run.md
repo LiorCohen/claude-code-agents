@@ -135,7 +135,7 @@ INVOKE change-orchestration skill with:
 
 **When to use:** You're building a feature, fixing a bug, or refactoring — any work that follows the spec-driven lifecycle. This is the primary namespace most users interact with.
 
-**Scenario:** You've been asked to add user authentication. You create a change (`change create --type feature`), iterate on the spec with your stakeholder, approve it (`change approve spec C1`), plan the implementation (`change plan C1`), approve the plan, implement, verify, and review. If open questions come up during spec review, you answer them (`change answer C1 O1 "Use JWT tokens"`). If the spec needs rework after planning, you regress (`change regress C1 --to soliciting`).
+**Scenario:** You've been asked to add user authentication. You create a change (`change create --type feature --name user-auth`), iterate on the spec with your stakeholder, approve it (`change approve spec user-auth-1`), plan the implementation (`change plan user-auth-1`), approve the plan, implement, verify, and review. If open questions come up during spec review, you answer them (`change answer user-auth-1 O1 "Use JWT tokens"`). If the spec needs rework after planning, you regress (`change regress user-auth-1 --to soliciting`).
 
 ---
 

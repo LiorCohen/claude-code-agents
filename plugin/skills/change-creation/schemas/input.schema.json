@@ -45,11 +45,11 @@
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID for change-id assignment"
+      "description": "Workflow ID for change-id assignment (directory format: <id>-<name>)"
     },
     "change_id": {
       "type": "string",
-      "description": "Pre-assigned change ID from workflow-state"
+      "description": "Pre-assigned change ID from workflow-state (format: <name>-<seq>, e.g. user-auth-1)"
     },
     "source_content": {
       "type": "string",

@@ -24,7 +24,7 @@ Approve PLAN.md and enable implementation.
 ### Output
 
 ```
-Approving plan for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Approving plan for: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
 Status: plan_approved
 
@@ -33,7 +33,7 @@ NEXT STEPS:
     /sdd I want to start implementing
 
   Option 2: Continue with next change
-    Next: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication)
+    Next: [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) (Authentication)
     /sdd I want to continue
 ```
 
@@ -72,12 +72,12 @@ Checking phase gate: ALL specs approved ✓
 
 Creating plans in dependency order:
 
-  [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
-    [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md) created
+  [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
+    [PLAN.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/PLAN.md) created
     Status: plan_ready_for_review
 
-  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication) [depends on: a1b2-1]
-    [PLAN.md](changes/2026/02/05/a1b2c3/02-authentication/PLAN.md) created
+  [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) (Authentication) [depends on: user-auth-1]
+    [PLAN.md](changes/2026/02/05/a1b2c3-user-auth/02-authentication/PLAN.md) created
     Status: plan_ready_for_review
 
 Plans created: 2

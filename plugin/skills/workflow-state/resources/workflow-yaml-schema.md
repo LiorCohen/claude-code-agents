@@ -1,7 +1,8 @@
 # workflow.yaml Schema
 
 ```yaml
-id: a1b2c3                      # Short unique workflow ID (used in changes/ path)
+id: a1b2c3                      # Short unique workflow ID
+name: user-auth                  # User-chosen workflow name (lowercase alphanumeric + hyphens, 3-50 chars)
 source: external | interactive
 created: YYYY-MM-DD
 current: 01-user-management/01-api-contracts  # Path to current item
@@ -30,10 +31,10 @@ items:
     context_sections: ["# User Management"]
     children:
       - id: 01-api-contracts
-        change_id: a1b2-1       # Unique ID for user reference
+        change_id: user-auth-1   # Derived from workflow name + sequence
         title: API Contracts
         type: feature
-        location: changes/2026/02/05/a1b2c3/01-api-contracts
+        location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
         context_sections: ["## API Design", "## Endpoints"]
         depends_on: []
 
@@ -47,10 +48,10 @@ items:
         substep: null            # transformation | discovery | solicitation | writing
 
       - id: 02-backend-service
-        change_id: a1b2-2
+        change_id: user-auth-2
         title: Backend Service
         type: feature
-        location: .sdd/workflows/a1b2c3/drafts/01-user-management/02-backend-service
+        location: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
         context_sections: ["## Backend Logic", "## Data Model"]
         depends_on: [01-api-contracts]
         spec_status: in_progress

@@ -6,11 +6,11 @@
   "properties": {
     "change_id": {
       "type": "string",
-      "description": "Workflow-scoped change ID for the spec being solicited"
+      "description": "Workflow-scoped change ID for the spec being solicited (format: <name>-<seq>, e.g. user-auth-1)"
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID for tracking the solicitation"
+      "description": "Workflow ID for tracking the solicitation (directory format: <id>-<name>)"
     },
     "context_path": {
       "type": "string",

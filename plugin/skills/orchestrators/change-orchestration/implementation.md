@@ -61,11 +61,11 @@ INVOKE workflow-state.update_status with:
 ## Output
 
 ```
-Implementing: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Implementing: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
 Step 1: Loading spec and plan...
-  Read [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md)
-  Read [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
+  Read [PLAN.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/PLAN.md)
+  Read [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md)
   [Displays comprehensive summary]
 
 Step 2: Executing Domain Updates...

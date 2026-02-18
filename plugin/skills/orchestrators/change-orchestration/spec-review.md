@@ -31,12 +31,12 @@ Approve SPEC.md and trigger PLAN.md creation.
 ### Output
 
 ```
-Approving spec for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Approving spec for: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
-Reading [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)...
+Reading [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md)...
 Generating PLAN.md...
 
-PLAN.md created at: [PLAN.md](changes/2026/02/05/a1b2c3/01-registration/PLAN.md)
+PLAN.md created at: [PLAN.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/PLAN.md)
 
 Status: plan_review
 

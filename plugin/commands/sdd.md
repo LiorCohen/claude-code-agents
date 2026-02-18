@@ -63,12 +63,12 @@ Read project context and suggest the most relevant next action.
 **On a feature branch:** Focus on the workflow matching that branch. Show its current phase and suggest the next action.
 
     Current branch: feature/user-auth
-    Active change: a1b2-1 (User Authentication) — spec_review
+    Active change: user-auth-1 (User Authentication) — spec_review
 
     The spec is ready for your review.
 
     SUGGESTED: Review the spec, then approve it.
-      I would run: /sdd-run change approve spec a1b2-1
+      I would run: /sdd-run change approve spec user-auth-1
 
     Shall I proceed, or would you like to do something else?
 
@@ -76,9 +76,9 @@ Read project context and suggest the most relevant next action.
 
     You have 2 active workflows:
 
-    1. a1b2-1 (User Authentication) — plan_review
+    1. user-auth-1 (User Authentication) — plan_review
        Branch: feature/user-auth
-    2. c3d4-1 (Payment Integration) — implementing
+    2. payment-1 (Payment Integration) — implementing
        Branch: feature/payment
 
     Which would you like to work on, or would you like to create a new change?
@@ -148,7 +148,8 @@ When the user's intent is ambiguous, ask for clarification before suggesting a c
 When the change-id is needed but not provided, infer it from context:
 - If on a feature branch, look up the associated workflow
 - If only one active workflow exists, use that
-- Otherwise, ask which change they mean
+- If a change-id IS provided, match it directly via name prefix (e.g., `user-auth-1` belongs to workflow `user-auth`) — no scanning needed
+- Otherwise, list active workflows by name and ask which change they mean
 
 ### Settings Management
 
@@ -170,7 +171,7 @@ If the user seems unfamiliar with a concept:
 After completing or suggesting an action, show the direct equivalent:
 
     You can also run this directly next time:
-      /sdd-run change approve spec a1b2-1
+      /sdd-run change approve spec user-auth-1
 
 ### On First Use in Uninitialized Project
 

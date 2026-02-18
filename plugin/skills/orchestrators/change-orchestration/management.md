@@ -30,21 +30,21 @@ Show current workflow state and all change IDs.
  WORKFLOW STATUS
 ===============================================================
 
-Workflow: a1b2c3
+Workflow: a1b2c3 (user-auth)
 Source: external
 Created: 2026-02-05
 
-Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration) - spec_review
+Current: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration) - spec_review
 
 ITEMS:
-  a1b2-1  Registration         spec_review    [changes/...](changes/2026/02/05/a1b2c3/01-registration/)
-  a1b2-2  Authentication       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
-  a1b2-3  Password Reset       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
-  a1b2-4  Analytics            pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
-  a1b2-5  Settings             pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/...)
+  user-auth-1  Registration         spec_review    [changes/...](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
+  user-auth-2  Authentication       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-3  Password Reset       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-4  Analytics            pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-5  Settings             pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
 
 NEXT ACTION:
-  Review spec at: [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md)
+  Review spec at: [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md)
   Then: /sdd I want to approve the spec
 ```
 
@@ -52,7 +52,7 @@ NEXT ACTION:
 
 ## Action: list
 
-List all changes in current workflow.
+List all changes in the specified workflow (or all workflows if multiple exist).
 
 ### Usage
 
@@ -62,25 +62,25 @@ List all changes in current workflow.
 
 ### Flow
 
-1. Read workflow state
-2. Display all items with details
+1. Read workflow state for specified workflow (or all active workflows)
+2. Display all items with details, grouped by workflow if multiple exist
 
 ### Output
 
 ```
 ===============================================================
- CHANGES IN WORKFLOW a1b2c3
+ CHANGES IN WORKFLOW a1b2c3 (user-auth)
 ===============================================================
 
 ID        TITLE                 TYPE      STATUS         LOCATION
 ───────── ───────────────────── ───────── ────────────── ─────────────────────────
-a1b2-1    Registration          feature   spec_review    [changes/...](changes/2026/02/05/a1b2c3/01-registration/)
-a1b2-2    Authentication        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/02-authentication/)
-a1b2-3    Password Reset        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3/drafts/03-password-reset/)
+user-auth-1    Registration          feature   spec_review    [changes/...](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
+user-auth-2    Authentication        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/02-authentication/)
+user-auth-3    Password Reset        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/03-password-reset/)
 
 Dependencies:
-  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) depends on: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/)
-  [a1b2-3](changes/2026/02/05/a1b2c3/03-password-reset/) depends on: [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/)
+  [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) depends on: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
+  [user-auth-3](changes/2026/02/05/a1b2c3-user-auth/03-password-reset/) depends on: [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/)
 ```
 
 ---
@@ -114,9 +114,9 @@ Resume current workflow from persisted state.
 ### Output (example: soliciting)
 
 ```
-Resuming workflow a1b2c3...
+Resuming workflow a1b2c3 (user-auth)...
 
-Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Current: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 Status: soliciting (spec creation in progress)
 
 Previously collected:
@@ -166,22 +166,22 @@ Go back to an earlier phase (e.g., from planning back to spec).
 ### Output
 
 ```
-Regressing [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) to spec phase...
+Regressing [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) to spec phase...
 
 Reason: Need to add OAuth support
 
 Archived:
-  [PLAN.md](.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md) → [.sdd/archive/...](.sdd/archive/workflow-regressions/20260205-1200-a1b2-1-impl/PLAN.md)
+  [PLAN.md](.sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md) → [.sdd/archive/...](.sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md)
 
 Status changes:
   spec_status: approved → needs_rereview
   plan_status: approved → pending
 
 Dependent items flagged for re-review:
-  [a1b2-2](changes/2026/02/05/a1b2c3/02-authentication/) (Authentication) - depends on a1b2-1
+  [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) (Authentication) - depends on user-auth-1
 
 NEXT STEPS:
-  Edit [SPEC.md](changes/2026/02/05/a1b2c3/01-registration/SPEC.md) to add OAuth requirements
+  Edit [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md) to add OAuth requirements
   Then: /sdd I want to approve the spec
 ```
 
@@ -216,7 +216,7 @@ Request changes during the review phase.
 ### Output
 
 ```
-Requesting changes for: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Requesting changes for: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 
 Reason: Error messages need to be more user-friendly
 

@@ -34,16 +34,24 @@ Handles the `create` action for the change orchestration skill.
    - Create branch if approved
 3. Otherwise proceed on current branch
 
-### Step 3: Create Workflow
+### Step 3: Choose Workflow Name
+
+Prompt the user for a workflow name:
+- Suggest a name derived from `--name` (the change name), e.g., if `--name api-contracts`, suggest `api-contracts`
+- User confirms or provides their own name
+- Workflow name and change name are distinct — a workflow named `user-auth` might contain a change named `api-contracts`
+
+### Step 4: Create Workflow
 
 ```yaml
 INVOKE workflow-state.create_workflow with:
   source: interactive
+  name: <workflow name from step 3>
 ```
 
-Returns `workflow_id` for tracking.
+Returns `workflow_id` and `workflow_name` for tracking.
 
-### Step 4: Component Discovery
+### Step 5: Component Discovery
 
 ```yaml
 INVOKE component-discovery skill with:
@@ -52,28 +60,28 @@ INVOKE component-discovery skill with:
   existing_components: <from sdd-settings.yaml>
 ```
 
-### Step 5: Create Workflow Item
+### Step 6: Create Workflow Item
 
 ```yaml
 INVOKE workflow-state.create_item with:
-  workflow_id: <from step 3>
+  workflow_id: <from step 4>
   id: <change-name>
   title: <formatted title>
   type: <change-type>
   depends_on: []
 ```
 
-### Step 6: Spec Solicitation
+### Step 7: Spec Solicitation
 
 ```yaml
 INVOKE spec-solicitation skill with:
-  change_id: <from step 5>
-  workflow_id: <from step 3>
+  change_id: <from step 6>
+  workflow_id: <from step 4>
 ```
 
 The skill guides user through requirements gathering and creates SPEC.md.
 
-### Step 7: Move to Review
+### Step 8: Move to Review
 
 When spec is complete:
 ```yaml
@@ -83,15 +91,15 @@ INVOKE workflow-state.ready_for_review with:
 
 This moves the item from drafts to changes/ and sets status to `spec_review`.
 
-### Step 8: Display Next Steps
+### Step 9: Display Next Steps
 
 ```
 ===============================================================
  SPEC READY FOR REVIEW
 ===============================================================
 
-Change: a1b2-1 (User Authentication)
-Spec: [SPEC.md](changes/2026/02/05/a1b2c3/01-user-auth/SPEC.md)
+Change: user-auth-1 (User Authentication)
+Spec: [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-user-auth/SPEC.md)
 
 Please review the specification.
 
@@ -171,6 +179,7 @@ Output is documented in SPEC.md, NOT applied to sdd-settings.yaml yet.
 ```yaml
 INVOKE workflow-state.create_workflow with:
   source: external
+  name: <suggest from spec title, user confirms or provides own>
 ```
 
 ### Step 8: Decomposition (with Thinking Step)
@@ -201,13 +210,13 @@ I found the following structure in this spec:
 
 EPICS (from H1 sections):
   01 User Management (lines 10-150)
-     ├── 01 Registration (a1b2-1)
-     ├── 02 Authentication (a1b2-2)
-     └── 03 Password Reset (a1b2-3)
+     ├── 01 Registration (user-auth-1)
+     ├── 02 Authentication (user-auth-2)
+     └── 03 Password Reset (user-auth-3)
 
   02 Dashboard (lines 151-300) [depends on: User Management]
-     ├── 01 Analytics (a1b2-4)
-     └── 02 Settings (a1b2-5)
+     ├── 01 Analytics (user-auth-4)
+     └── 02 Settings (user-auth-5)
 
 Total: 2 epics, 5 features
 Implementation order: 01 → 02 (API-first within each epic)
@@ -254,10 +263,10 @@ INVOKE spec-solicitation skill with:
  EXTERNAL SPEC IMPORTED
 ===============================================================
 
-Created workflow: a1b2c3
+Created workflow: a1b2c3 (user-auth)
 Items: 5 features across 2 epics
 
-Current: [a1b2-1](changes/2026/02/05/a1b2c3/01-registration/) (Registration)
+Current: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Registration)
 Status: Spec solicitation in progress
 
 IMPORTANT: Specs are created interactively, one at a time.

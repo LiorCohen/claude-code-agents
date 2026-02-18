@@ -120,7 +120,7 @@ NEXT STEPS:
 
 Always render change references as clickable markdown links:
 ```
-[<change-id>](changes/YYYY/MM/DD/<workflow-id>/<seq>-<name>/)
+[<change-id>](changes/YYYY/MM/DD/<id>-<name>/<seq>-<slug>/)
 ```
 
 ## Output

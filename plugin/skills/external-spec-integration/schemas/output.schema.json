@@ -10,7 +10,7 @@
     },
     "workflow_id": {
       "type": "string",
-      "description": "Workflow ID associated with this integration"
+      "description": "Workflow ID associated with this integration (directory format: <id>-<name>)"
     },
     "is_hierarchical": {
       "type": "boolean",
@@ -35,7 +35,7 @@
               "string",
               "null"
             ],
-            "description": "Assigned change ID, or null if not yet assigned"
+            "description": "Assigned change ID (format: <name>-<seq>, e.g. user-auth-1), or null if not yet assigned"
           },
           "type": {
             "type": "string",

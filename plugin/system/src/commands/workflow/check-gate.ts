@@ -4,8 +4,8 @@
  * Validates that all prerequisites are met before advancing to a target phase.
  *
  * Usage:
- *   sdd-system workflow check-gate --target plan --workflow-file .sdd/workflows/a1b2c3/workflow.yaml
- *   sdd-system workflow check-gate --target implement --workflow-file .sdd/workflows/a1b2c3/workflow.yaml
+ *   sdd-system workflow check-gate --target plan --workflow-file .sdd/workflows/a1b2c3-user-auth/workflow.yaml
+ *   sdd-system workflow check-gate --target implement --workflow-file .sdd/workflows/a1b2c3-user-auth/workflow.yaml
  */
 
 import type { CommandResult } from '@/lib/args';
