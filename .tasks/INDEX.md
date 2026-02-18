@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#155](0-inbox/155/): Add human-code-review skill to root .claude
 - [#154](0-inbox/154/): Specs change predictor
 - [#153](0-inbox/153/): /sdd command should surface Claude and plugin limitations, especially during reviews
 - [#149](0-inbox/149/): Add D2 skill
