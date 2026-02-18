@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#152](1-speccing/152/): Workflows must have user-chosen names
 
 ---
 
@@ -36,7 +36,6 @@
 
 ### High Priority
 
-- [#152](0-inbox/152/): Workflows must have user-chosen names
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
