@@ -1,0 +1,125 @@
+{
+  "name": "sdd-workflows",
+  "displayName": "SDD Workflows",
+  "description": "Ambient workflow visualization for SDD projects — tree view, status bar, lifecycle stepper, and approval notifications",
+  "version": "0.1.0",
+  "publisher": "sdd-project",
+  "private": true,
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sdd",
+          "title": "SDD",
+          "icon": "media/icons/sdd-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "sdd": [
+        {
+          "id": "sddWorkflows",
+          "name": "Workflows"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "sddWorkflows",
+        "contents": "No SDD project detected.\n\nOpen a workspace with an `.sdd/` directory to see workflows.",
+        "when": "sdd.noProject"
+      },
+      {
+        "view": "sddWorkflows",
+        "contents": "No active workflows.\n\nStart a workflow with `/sdd` to see it here.",
+        "when": "sdd.noWorkflows"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sdd.refreshWorkflows",
+        "title": "SDD: Refresh Workflows",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "sdd.openSpec",
+        "title": "SDD: View Spec",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "sdd.openPlan",
+        "title": "SDD: View Plan",
+        "icon": "$(notebook)"
+      },
+      {
+        "command": "sdd.setFocus",
+        "title": "SDD: Set Focus",
+        "icon": "$(target)"
+      },
+      {
+        "command": "sdd.showStepper",
+        "title": "SDD: Show Lifecycle Stepper"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "sdd.refreshWorkflows",
+          "when": "view == sddWorkflows",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sdd.openSpec",
+          "when": "view == sddWorkflows && viewItem =~ /hasLocation/",
+          "group": "inline@1"
+        },
+        {
+          "command": "sdd.openPlan",
+          "when": "view == sddWorkflows && viewItem =~ /hasPlan/",
+          "group": "inline@2"
+        },
+        {
+          "command": "sdd.setFocus",
+          "when": "view == sddWorkflows && viewItem =~ /isLeaf/",
+          "group": "inline@3"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
+    "package": "vsce package",
+    "typecheck": "tsc --noEmit -p tsconfig.extension.json && tsc --noEmit -p tsconfig.webview.json"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/vscode": "^1.96.0",
+    "@vscode/vsce": "^3.2.0",
+    "css-loader": "^7.1.0",
+    "mini-css-extract-plugin": "^2.10.0",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.7.0",
+    "webpack": "^5.97.0",
+    "webpack-cli": "^6.0.0"
+  }
+}
