@@ -22,13 +22,13 @@
 
 ## Implementing
 
-- [#152](4-implementing/152/plan.md): Workflows must have user-chosen names
+(none)
 
 ---
 
 ## Reviewing
 
-(none)
+- [#152](5-reviewing/152/plan.md): Workflows must have user-chosen names
 
 ---
 
