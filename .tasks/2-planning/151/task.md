@@ -70,8 +70,9 @@ A VS Code extension provides:
 - **TypeScript** — extension and webview code in TypeScript
 - **Workspace-scoped** — operates within the open VS Code workspace; multi-root workspaces show the first workspace with `.sdd/`
 - **Graceful degradation** — when `.sdd/` doesn't exist, show "No SDD project" in the tree and status bar instead of erroring
-- **Type definitions mirror the YAML schema** — the extension defines its own types in `types.ts` based on the full YAML schema (`workflow-yaml-schema.md`), not the incomplete `plugin/system/src/types/workflow.ts`. The YAML has additional fields (`children` on epics, `context_sections`, `substep`) that the plugin types omit. Copy the status const arrays from the plugin types, but define the full item/workflow shape from the schema
+- **Type definitions mirror the YAML schema** — the extension defines its own types in `types.ts` based on the full YAML schema (`workflow-yaml-schema.md`). All types and const arrays are written from scratch inside `vscode-extension/` — nothing is imported from `plugin/`. The YAML has fields (`children` on epics, `context_sections`, `substep`) that the plugin types omit; the extension types must cover the full schema
 - **Theme-aware** — all UI elements (tree view icons, webview stepper, status bar) must use VS Code's theme colors and CSS variables (`--vscode-*`). The webview must adapt to light, dark, and high-contrast themes automatically. Never hardcode colors
+- **Fully self-contained** — `vscode-extension/` has zero runtime or build-time imports from anything outside its directory. No `import` or `require` referencing `plugin/`, `.claude/`, `.tasks/`, or any other repo path. All types are defined locally in the extension's own `types.ts` (informed by the YAML schema docs, but not imported from `plugin/system/`). All dependencies come from npm
 - **Extension lives in `vscode-extension/`** at the repo root — separate `package.json`, separate build, no coupling to the plugin build system
 - **Minimum VS Code version** — target latest stable (1.96+)
 - **Focus persistence** — user's selected focus item is stored in `workspaceState` and survives VS Code restarts

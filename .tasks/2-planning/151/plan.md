@@ -43,13 +43,13 @@ All files are new — the `vscode-extension/` directory does not exist yet.
 
 ### 1. Project Setup and Build System
 
-Set up the `vscode-extension/` directory as a standalone project with its own `package.json`, TypeScript configs, and webpack build. Two build targets: extension host code (Node.js, CommonJS for VS Code) and webview code (browser, bundled React). Vitest for unit tests. `@vscode/vsce` for packaging.
+Set up the `vscode-extension/` directory as a **fully self-contained** project — zero imports from anything outside this directory. Own `package.json`, own TypeScript configs, own webpack build. No references to `plugin/`, `.claude/`, `.tasks/`, or any other repo path. All dependencies come from npm. Two build targets: extension host code (Node.js, CommonJS for VS Code) and webview code (browser, bundled React). Vitest for unit tests. `@vscode/vsce` for packaging.
 
 The extension activates via `onStartupFinished` (preferred over the deprecated `*` event) since it needs to watch for `.sdd/` presence. When `.sdd/` doesn't exist, it shows "No SDD project" — low cost, no file watching until `.sdd/` appears.
 
 ### 2. Type Definitions (`types.ts`)
 
-Define types that match the **actual YAML schema** (from `workflow-yaml-schema.md`), not the plugin's incomplete TypeScript types. Key differences from plugin types:
+All types are written from scratch inside `vscode-extension/src/types.ts` — nothing imported from `plugin/`. The types match the **actual YAML schema** (documented in `workflow-yaml-schema.md`, used as a reference, not an import). Key aspects:
 - `WorkflowItemYaml` includes optional `children: WorkflowItemYaml[]` for epics
 - `context_sections` and `substep` fields included
 - Epics have `type: 'epic'` and no `change_id`; they also lack the four status fields (`spec_status`, etc.) — aggregate status for epic tree nodes is computed from children
