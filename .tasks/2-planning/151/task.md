@@ -70,7 +70,7 @@ A VS Code extension provides:
 - **TypeScript** — extension and webview code in TypeScript
 - **Workspace-scoped** — operates within the open VS Code workspace; multi-root workspaces show the first workspace with `.sdd/`
 - **Graceful degradation** — when `.sdd/` doesn't exist, show "No SDD project" in the tree and status bar instead of erroring
-- **No bundled YAML parser duplication** — reuse `WorkflowState` types from `plugin/system/src/types/workflow.ts` (copy the type definitions, don't import at runtime since the extension has a separate build)
+- **Type definitions mirror the YAML schema** — the extension defines its own types in `types.ts` based on the full YAML schema (`workflow-yaml-schema.md`), not the incomplete `plugin/system/src/types/workflow.ts`. The YAML has additional fields (`children` on epics, `context_sections`, `substep`) that the plugin types omit. Copy the status const arrays from the plugin types, but define the full item/workflow shape from the schema
 - **Theme-aware** — all UI elements (tree view icons, webview stepper, status bar) must use VS Code's theme colors and CSS variables (`--vscode-*`). The webview must adapt to light, dark, and high-contrast themes automatically. Never hardcode colors
 - **Extension lives in `vscode-extension/`** at the repo root — separate `package.json`, separate build, no coupling to the plugin build system
 - **Minimum VS Code version** — target latest stable (1.96+)
@@ -78,7 +78,7 @@ A VS Code extension provides:
 - **Debouncing** — file watcher events are debounced (300ms) to avoid excessive re-parsing and notification spam
 - **Single webview panel** — one stepper panel that updates when the user selects a different item, not one panel per item
 - **Artifact resolution** — "View Spec" and "View Plan" resolve paths from the item's `location` field: `{location}/SPEC.md` and `{location}/PLAN.md`
-- **Epic nesting in tree** — epics render as collapsible parent nodes with children nested underneath; epic node shows aggregate progress across its children. Nesting is determined by `depends_on`: any item whose `depends_on` array contains an epic's `id` is rendered as a child of that epic
+- **Epic nesting in tree** — epics render as collapsible parent nodes with children nested underneath; epic node shows aggregate progress across its children. In the YAML, epics have `type: epic` with a `children` array containing their child items. The extension parses this hierarchy directly from the YAML
 - **Workflow display name** — `WorkflowState` has no `title` field. Tree nodes for workflows display as `{id}` (the short hash). `WorkflowItem` has a `title` field which is used for item display names
 - **Manual refresh command** — register `sdd.refreshWorkflows` command as a fallback if the file watcher misses a change
 
