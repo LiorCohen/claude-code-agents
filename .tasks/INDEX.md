@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#156](0-inbox/156/): VSCode status bar should show the selected workflow name
 - [#155](0-inbox/155/): Add human-code-review skill to root .claude
 - [#154](0-inbox/154/): Specs change predictor
 - [#153](0-inbox/153/): /sdd command should surface Claude and plugin limitations, especially during reviews
