@@ -29,8 +29,8 @@ Without names, workflows are opaque. Users see `a1b2c3` and have to look at the 
 
 ## Constraints
 
-- The name must be chosen by the user, never auto-generated
 - The name is required — workflows cannot be created without one
+- The creation flow should suggest a name (e.g., derived from the spec title or first item) but the user must confirm or provide their own
 - Existing auto-generated IDs remain for internal references; name is for display
 
 ## Changes
