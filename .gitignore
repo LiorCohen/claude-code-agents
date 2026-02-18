@@ -11,7 +11,7 @@ test-apps/
 .temp/
 
 # System logs
-.sdd/system-logs/
+.sdd/
 
 # Worktrees
 .worktrees/
