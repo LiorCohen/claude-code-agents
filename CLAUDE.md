@@ -24,7 +24,7 @@
 **NEVER:**
 - Jump straight into code changes without a task
 - Make implementation changes on main branch
-- Skip the planning phase for non-trivial work
+- Skip any lifecycle phase — every task must go through: inbox → speccing → planning → plan-review → implementing → reviewing → complete. Never suggest skipping a phase.
 - Advance a task to the next status without explicit user approval (e.g., don't auto-plan after adding, don't auto-implement after planning)
 
 **Exceptions (no task needed):**

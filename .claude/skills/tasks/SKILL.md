@@ -304,6 +304,8 @@ Write report to `.temp/tasks-audit-<datetime>.md`.
 
 The user decides when to advance. Always wait for their instruction.
 
+**No phase skipping:** The lifecycle is strictly sequential: inbox → speccing → planning → plan-review → implementing → reviewing → complete. Never skip a phase and never suggest skipping one. For example, after `/tasks add`, do not offer to go "straight to planning" — the next step is always speccing.
+
 **Branch isolation:** When working inside a feature branch or worktree, only modify the task associated with that branch. Never touch other tasks. Never create new tasks in a feature branch — create and commit them directly on main.
 
 ---
