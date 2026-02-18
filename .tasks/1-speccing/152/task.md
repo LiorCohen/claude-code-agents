@@ -54,7 +54,7 @@ Without names, workflows are opaque. Users see `a1b2c3` and have to look at the 
 Every component type has spec files that define Why and What. All specs must be updated before any code. Grouped by component type:
 
 *Skill specs:*
-- `plugin/skills/workflow-state/SKILL.md` — update directory layout from `<id>` to `<id>-<name>`, add `name` to workflow identity, update ID generation rules
+- `plugin/skills/workflow-state/SKILL.md` — update `.sdd/workflows/<workflow-id>/` references (lines 11, 147) to `<id>-<name>` format, add `name` to workflow identity, update ID generation rules
 - `plugin/skills/workflow-state/resources/workflow-yaml-schema.md` — add `name` as a required field, update directory layout, update all example paths and YAML samples
 - `plugin/skills/workflow-state/resources/internal-api.md` — add `name` param to `create_workflow`, add uniqueness enforcement, change all path references, update change-ID derivation to `<name>-<seq>`, add backward-compat derivation, add `workflow_id` param to `list()`, `get_current()`, `advance()`, `get_progress()`, `check_phase_gate()` (fix single-workflow assumptions)
 - `plugin/skills/workflow-state/resources/recovery.md` — update recovery scenarios with name-based paths
@@ -98,16 +98,17 @@ Every component type has spec files that define Why and What. All specs must be 
 - [ ] Workflow YAML schema docs list `name` as a required field — verify with `grep 'name' plugin/skills/workflow-state/resources/workflow-yaml-schema.md`
 - [ ] Workflow directory layout uses `<id>-<name>`: `.sdd/workflows/<id>-<name>/` — verify with `grep 'workflows/' plugin/skills/workflow-state/resources/internal-api.md` shows `<id>-<name>` not bare `<id>`
 - [ ] `create_workflow` API accepts and requires `name` — verify with `grep 'name' plugin/skills/workflow-state/resources/internal-api.md`
-- [ ] Creation orchestration prompts the user for a workflow name — verify with `grep -i 'name' plugin/skills/orchestrators/change-orchestration/creation.md`
+- [ ] Creation orchestration prompts the user for a workflow name — verify with `grep -i 'workflow.*name\|name.*workflow' plugin/skills/orchestrators/change-orchestration/creation.md` (currently returns 0; must not match existing `--name` flag for change names)
 - [ ] Input schema includes `name` property — verify with `grep 'name' plugin/skills/workflow-state/schemas/input.schema.json`
 - [ ] Output schema includes `name` in workflow output — verify with `grep 'name' plugin/skills/workflow-state/schemas/output.schema.json`
-- [ ] Active workflow display includes the name — verify with `grep 'name' plugin/commands/sdd.md`
-- [ ] Name uniqueness is enforced among active workflows — verify with `grep -i 'unique\|duplicate' plugin/skills/workflow-state/resources/internal-api.md`
+- [ ] Active workflow display includes the name — verify with `grep -i 'workflow.*name\|name.*workflow' plugin/commands/sdd.md` (currently returns 0; must not match existing `name: sdd` frontmatter or change `--name` flag)
+- [ ] Name uniqueness is enforced among active workflows — verify with `grep -i 'name.*unique\|unique.*name' plugin/skills/workflow-state/resources/internal-api.md` (currently returns 0; existing "unique ID" mentions must not match)
 - [ ] Completed changes path uses `<id>-<name>`: `changes/YYYY/MM/DD/<id>-<name>/` — verify with `grep 'changes/YYYY' plugin/skills/workflow-state/resources/internal-api.md` shows `<id>-<name>` not bare `<wf-id>`
 - [ ] Change IDs derive from workflow name (e.g., `user-auth-1`) — verify with `grep 'change_id' plugin/skills/workflow-state/resources/internal-api.md`
-- [ ] No remaining references to bare `.sdd/workflows/<id>/` or `<wf-id>` pattern in plugin (all should be `<id>-<name>`) — verify with `grep -rE 'workflows/.*<(id|wf-id|workflow-id)>/' plugin/` returns no matches
+- [ ] No remaining references to bare `.sdd/workflows/<id>/` or `<wf-id>` pattern in plugin specs/code (all should be `<id>-<name>`) — verify with `grep -rE 'workflows/.*<(id|wf-id|workflow-id)>/' plugin/ --include='*.md' --include='*.ts'` returns no matches
+- [ ] No remaining hardcoded example IDs using bare ID directory format — verify with `grep -rn 'workflows/a1b2c3/' plugin/ --include='*.md' --include='*.ts'` returns no matches (currently returns 9+ matches across internal-api.md, workflow-yaml-schema.md, check-gate.ts, management.md)
 - [ ] Backward compat: loading a workflow YAML without `name` derives one from the first item title — verify with `grep -i 'derive\|fallback\|migration' plugin/skills/workflow-state/resources/internal-api.md`
-- [ ] All internal API operations accept `workflow_id` — verify with `grep -c 'workflow_id' plugin/skills/workflow-state/resources/internal-api.md` (no parameterless workflow-scoped operations remain)
-- [ ] `list` action in management handles multiple workflows — verify with `grep -i 'workflow' plugin/skills/orchestrators/change-orchestration/management.md` in the list section
+- [ ] All internal API operations accept `workflow_id` — verify with `grep -c 'workflow_id' plugin/skills/workflow-state/resources/internal-api.md` returns at least 8 (currently 3; adding `workflow_id` to `list`, `get_current`, `advance`, `get_progress`, `check_phase_gate` adds 5+)
+- [ ] `list` action in management handles multiple workflows — verify with `grep -B2 -A10 'List all changes' plugin/skills/orchestrators/change-orchestration/management.md` shows iteration over all workflows (not just "current workflow")
 - [ ] `advance` call site passes `workflow_id` — verify with `grep -A2 'advance' plugin/skills/orchestrators/change-orchestration/verification.md`
-- [ ] Change-id inference in `sdd.md` handles multi-workflow disambiguation correctly — verify with `grep -A5 'infer' plugin/commands/sdd.md`
+- [ ] Change-id inference in `sdd.md` handles multi-workflow disambiguation — verify with `grep -A8 'infer' plugin/commands/sdd.md` shows disambiguation logic that uses workflow name when multiple active workflows exist
