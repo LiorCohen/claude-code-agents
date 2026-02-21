@@ -1,0 +1,55 @@
+direction: right
+
+claude_code: Claude Code Runtime {
+  style.fill: "#f5f5f5"
+  context: LLM Context Window
+}
+
+sdd_core: sdd-core plugin {
+  style.fill: "#e1f5fe"
+  core_skills: |md
+    **Core Skills**
+    spec-writing
+    planning
+    change-orchestration
+    component-discovery
+    workflow-state
+  |
+  core_cmds: |md
+    **Commands**
+    /sdd
+    /sdd-run
+    /sdd-help
+  |
+}
+
+tech_pack: sdd-fullstack-ts plugin {
+  style.fill: "#fff3e0"
+  tp_skills: |md
+    **Tech Pack Skills**
+    backend-standards
+    backend-scaffolding
+    frontend-standards
+    frontend-scaffolding
+    database-standards
+    contract-standards
+  |
+  tp_agents: |md
+    **Agents**
+    backend-dev
+    frontend-dev
+    api-designer
+    db-advisor
+    devops
+    tester
+  |
+  tp_manifest: |md
+    **tech-pack.yaml**
+    (readable by core skills)
+  |
+}
+
+sdd_core.core_skills -> claude_code.context: loaded into
+sdd_core.core_cmds -> claude_code.context: loaded into
+tech_pack.tp_skills -> claude_code.context: loaded into
+tech_pack.tp_agents -> claude_code.context: loaded into

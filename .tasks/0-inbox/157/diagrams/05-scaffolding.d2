@@ -1,0 +1,33 @@
+scaffolding: {
+  shape: sequence_diagram
+
+  User
+  Core: sdd-core scaffolding engine
+  TP: tech-pack.yaml
+  Templates: Tech Pack templates/
+  FS: User Project
+
+  User -> Core: /sdd init (with components configured)
+
+  Core."Create core structure"
+  Core -> FS: specs/, changes/, .sdd/
+  Core -> FS: CLAUDE.md, README.md, package.json
+
+  Core -> TP: read tech-pack.yaml
+  TP -> Core: component_types with scaffolding_skill, scripts, description
+
+  per_component: for each component in settings {
+    Core -> Core: resolve component type -> scaffolding_skill
+    Core -> Templates: read template directory
+    Templates -> Core: template files
+    Core -> Core: executeSpec(): variable substitution, copy files
+    Core -> FS: write component directory
+  }
+
+  Core -> TP: read scripts for each component type
+  Core -> FS: merge scripts into package.json
+
+  Core -> TP: read descriptions for each component type
+  Core -> FS: generate specs/architecture/overview.md
+  Core -> User: scaffolding complete
+}

@@ -1,0 +1,20 @@
+registration: {
+  shape: sequence_diagram
+
+  User
+  Core: sdd-core init-orchestration
+  FS: File System
+  TP: tech-pack.yaml
+
+  User -> Core: /sdd init
+  Core -> FS: scan .claude/plugins/ for directories with tech-pack.yaml
+  FS -> Core: found: sdd-fullstack-ts/
+  Core -> TP: read tech-pack.yaml
+  TP -> Core: name: fullstack-ts, version: 1.0.0, requires_sdd_core: ">=8.0.0"
+  Core -> Core: validate version compatibility
+  Core -> FS: write .sdd/tech-packs.yaml
+  FS."tech_packs:\n  - name: fullstack-ts\n    version: 1.0.0\n    manifest: .claude/plugins/..."
+  Core -> FS: write .sdd/sdd-settings.yaml
+  FS."tech_packs:\n  fullstack-ts:\n    components: []"
+  Core -> User: registered tech pack: fullstack-ts
+}

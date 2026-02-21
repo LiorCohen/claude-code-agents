@@ -1,0 +1,48 @@
+direction: down
+
+settings_file: ".sdd/sdd-settings.yaml" {
+  core_envelope: Core Envelope (owned by sdd-core) {
+    style.fill: "#e1f5fe"
+    sdd: |md
+      **sdd:**
+      initialized_by: 8.0.0
+      updated_by: 8.0.0
+    |
+    project: |md
+      **project:**
+      name: my-app
+    |
+    system: |md
+      **system:**
+      logging: { enabled: true }
+    |
+  }
+
+  tp_ns: tech_packs (namespaced) {
+    fts: fullstack-ts {
+      style.fill: "#fff3e0"
+      fts_comp: |md
+        **components:**
+        - name: main-server
+          type: server
+          settings: { server_type: api }
+        - name: app-db
+          type: database
+          settings: { provider: postgresql }
+      |
+    }
+    pyapi: python-api {
+      style.fill: "#f3e5f5"
+      py_comp: |md
+        **components:**
+        - name: ml-service
+          type: server
+          settings: { framework: fastapi }
+      |
+    }
+  }
+}
+
+core_read: sdd-core reads/writes -> settings_file.core_envelope: owns
+fts_read: sdd-fullstack-ts reads/writes -> settings_file.tp_ns.fts: owns
+py_read: sdd-python-api reads/writes -> settings_file.tp_ns.pyapi: owns
