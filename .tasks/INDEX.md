@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#157](1-speccing/157/): Extract sdd-core from monolithic plugin into core + tech pack architecture
 
 ---
 
@@ -36,7 +36,6 @@
 
 ### High Priority
 
-- [#157](0-inbox/157/): Extract sdd-core from monolithic plugin into core + tech pack architecture
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
