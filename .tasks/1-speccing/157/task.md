@@ -16,7 +16,7 @@ Separate the SDD plugin into two independent plugins: **sdd-core** (pure methodo
 
 sdd-core provides the spec-driven development methodology — spec writing, domain modeling, change lifecycle, planning, workflow enforcement, hooks, and config management. It works for any project regardless of language, framework, or infrastructure.
 
-Tech packs are separate Claude Code plugins that register with sdd-core via `.sdd/tech-packs.yaml` and provide component types, standards skills, scaffolding skills, agents, templates, and scoped CLI actions.
+Tech packs are separate Claude Code plugins that register with sdd-core via `sdd/tech-packs.yaml` and provide component types, standards skills, scaffolding skills, agents, templates, and scoped CLI actions.
 
 ## Motivation
 
@@ -29,8 +29,8 @@ Tech packs are separate Claude Code plugins that register with sdd-core via `.sd
 - Create `plugins/` directory with three plugins: `sdd` (legacy), `sdd-core`, `sdd-fullstack-ts`
 - Extract 16 core skills, 3 commands, hooks, and ~50 CLI source files into sdd-core
 - Extract 20 tech-specific skills, 7 agents, and ~37 CLI source files into sdd-fullstack-ts
-- Implement tech pack registration via `.sdd/tech-packs.yaml` → `tech-pack.yaml`
-- Implement namespaced settings (`tech_packs.<name>.components` in sdd-settings.yaml)
+- Implement tech pack registration via `sdd/tech-packs.yaml` → `tech-pack.yaml`
+- Implement namespaced settings (`tech_packs.<name>.components` in `sdd/settings.yaml`)
 - Implement CLI namespace isolation (tech pack actions scoped under `sdd-system <pack-name>`)
 - Implement separate CLI binaries (core CLI delegates to tech pack CLI via subprocess)
 - Implement compatibility contract (semver, manifest validation, runtime checks)
@@ -44,35 +44,38 @@ Tech packs are separate Claude Code plugins that register with sdd-core via `.sd
 - Tech pack CLI is a separate binary, not dynamically loaded
 - Tech packs register component types + settings schemas — core validates generically
 - No SDK required — tech pack scaffolder provides structure, sdd-core provides methodology
-- **sdd-core must not assume anything about the user's project structure** aside from the `.sdd/` directory it manages
+- **sdd-core must not assume anything about the user's project structure** aside from the `sdd/` directory it manages
+- **sdd-core must not touch language/framework files** — `package.json`, `tsconfig.json`, lock files, etc. are tech pack territory
+
+## Resolved Questions
+
+### RQ-1: Where do methodology artifacts live?
+
+**Decision:** All SDD-managed artifacts live in a visible `sdd/` directory at the project root. No hidden `.sdd/` directory.
+
+```
+project/
+├── sdd/
+│   ├── settings.yaml       # project settings (was .sdd/sdd-settings.yaml)
+│   ├── tech-packs.yaml     # registered tech packs
+│   ├── specs/              # architecture, domain, change specs
+│   ├── changes/            # change lifecycle tracking
+│   ├── logs/               # system logs
+│   └── ...
+├── CLAUDE.md               # generated (stays at root — Claude Code requires it)
+└── <everything else>       # user's / tech pack's domain
+```
+
+**Rationale:** Specs, changes, and domain models are project documentation — first-class artifacts that developers should see and browse, not hidden tool internals. A single visible directory keeps things simple and signals "this project uses SDD."
+
+**Ownership boundary:**
+- sdd-core owns `sdd/` and nothing outside it (except root `CLAUDE.md` which Claude Code mandates at project root)
+- Tech packs own everything outside `sdd/` — they scaffold `src/`, `components/`, `package.json`, `tsconfig.json`, etc.
+- Language/framework files (`package.json`, lock files, etc.) are strictly tech pack territory — sdd-core never touches them
 
 ## Open Questions
 
-### OQ-1: Where do methodology artifacts live?
-
-sdd-core must not assume anything about the user's project structure outside `.sdd/`. The current plugin assumes root-level `specs/`, `changes/`, and `components/` directories exist. This needs to be resolved.
-
-**Current state (monolithic plugin):**
-- `specs/` at project root — architecture specs, domain specs
-- `changes/` at project root — change specs, INDEX.md
-- `components/` at project root — scaffolded component directories
-- `package.json` at project root — assumed to exist
-- `CLAUDE.md` at project root — generated with project-specific content
-
-**Options:**
-
-**A) Move methodology artifacts inside `.sdd/`** — sdd-core owns `.sdd/specs/`, `.sdd/changes/`, etc. Core manages these directly. Tech packs and users own everything outside `.sdd/`.
-
-**B) Configurable paths in `.sdd/sdd-settings.yaml`** — sdd-core reads paths like `specs_dir: specs/` or `specs_dir: .sdd/specs/` from settings. Tech packs or users set them. Defaults to `.sdd/` subdirectories.
-
-**C) Tech packs declare preferred structure** — each tech pack's `tech-pack.yaml` declares project layout preferences. sdd-core scaffolds according to the active tech pack's declared structure.
-
-**Sub-questions:**
-- **CLAUDE.md generation**: Currently sdd-core would generate a project-root `CLAUDE.md`. Should this be a tech pack responsibility? Should sdd-core only contribute a `.sdd/`-scoped instruction file?
-- **Project scaffolding**: If sdd-core only owns `.sdd/`, all project-level scaffolding (directories, files, `package.json` scripts) becomes purely tech pack territory. The core scaffolding engine only creates `.sdd/` internals.
-- **Spec referencing**: If specs move inside `.sdd/`, all prompt files, skills, and CLI commands that reference `specs/` need updating.
-
-**Leaning:** Option A — specs and changes are methodology artifacts, so they belong inside `.sdd/` (owned by core). Everything outside `.sdd/` is the tech pack's or user's domain. This keeps sdd-core truly project-structure-agnostic.
+(none)
 
 ## Changes
 
@@ -90,8 +93,8 @@ sdd-core must not assume anything about the user's project structure outside `.s
 - [ ] `plugins/sdd-fullstack-ts/` installs alongside sdd-core and provides all current tech-specific capabilities
 - [ ] `sdd-system spec validate` works (core CLI, top-level namespace)
 - [ ] `sdd-system fullstack-ts database setup` works (tech pack CLI, scoped namespace)
-- [ ] `.sdd/sdd-settings.yaml` uses namespaced `tech_packs.<name>.components` structure
-- [ ] `.sdd/tech-packs.yaml` correctly points to tech pack manifest
+- [ ] `sdd/settings.yaml` uses namespaced `tech_packs.<name>.components` structure
+- [ ] `sdd/tech-packs.yaml` correctly points to tech pack manifest
 - [ ] Version compatibility check works: core rejects incompatible tech packs
 - [ ] `tech-pack.schema.json` validates the fullstack-ts `tech-pack.yaml` successfully
 - [ ] Tech pack scaffolder creates a valid tech pack project structure
