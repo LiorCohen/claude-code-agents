@@ -44,6 +44,35 @@ Tech packs are separate Claude Code plugins that register with sdd-core via `.sd
 - Tech pack CLI is a separate binary, not dynamically loaded
 - Tech packs register component types + settings schemas — core validates generically
 - No SDK required — tech pack scaffolder provides structure, sdd-core provides methodology
+- **sdd-core must not assume anything about the user's project structure** aside from the `.sdd/` directory it manages
+
+## Open Questions
+
+### OQ-1: Where do methodology artifacts live?
+
+sdd-core must not assume anything about the user's project structure outside `.sdd/`. The current plugin assumes root-level `specs/`, `changes/`, and `components/` directories exist. This needs to be resolved.
+
+**Current state (monolithic plugin):**
+- `specs/` at project root — architecture specs, domain specs
+- `changes/` at project root — change specs, INDEX.md
+- `components/` at project root — scaffolded component directories
+- `package.json` at project root — assumed to exist
+- `CLAUDE.md` at project root — generated with project-specific content
+
+**Options:**
+
+**A) Move methodology artifacts inside `.sdd/`** — sdd-core owns `.sdd/specs/`, `.sdd/changes/`, etc. Core manages these directly. Tech packs and users own everything outside `.sdd/`.
+
+**B) Configurable paths in `.sdd/sdd-settings.yaml`** — sdd-core reads paths like `specs_dir: specs/` or `specs_dir: .sdd/specs/` from settings. Tech packs or users set them. Defaults to `.sdd/` subdirectories.
+
+**C) Tech packs declare preferred structure** — each tech pack's `tech-pack.yaml` declares project layout preferences. sdd-core scaffolds according to the active tech pack's declared structure.
+
+**Sub-questions:**
+- **CLAUDE.md generation**: Currently sdd-core would generate a project-root `CLAUDE.md`. Should this be a tech pack responsibility? Should sdd-core only contribute a `.sdd/`-scoped instruction file?
+- **Project scaffolding**: If sdd-core only owns `.sdd/`, all project-level scaffolding (directories, files, `package.json` scripts) becomes purely tech pack territory. The core scaffolding engine only creates `.sdd/` internals.
+- **Spec referencing**: If specs move inside `.sdd/`, all prompt files, skills, and CLI commands that reference `specs/` need updating.
+
+**Leaning:** Option A — specs and changes are methodology artifacts, so they belong inside `.sdd/` (owned by core). Everything outside `.sdd/` is the tech pack's or user's domain. This keeps sdd-core truly project-structure-agnostic.
 
 ## Changes
 
