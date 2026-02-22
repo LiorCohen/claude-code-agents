@@ -30,7 +30,9 @@ Tech packs can be **internal** (inside the plugin directory, shipped with the pl
 | **Agent** | A markdown file (`.md`) registered in `plugin.json` that defines a specialized persona with specific skills and constraints. Agents are assigned to components during planning and implementation phases. |
 | **Standards skill** | A skill that defines coding conventions, architecture patterns, and best practices for a specific domain (e.g., `backend-standards` defines CMDO architecture rules). |
 | **Scaffolding skill** | A skill that defines the file structure and templates for creating a new component instance. |
-| **Orchestrator** | A skill that coordinates multi-step workflows by invoking other skills and system commands in sequence. |
+| **Skills router** | A tech pack skill that is the single entry point for all tech pack skill loading. Contains a mapping table of contexts (component types, lifecycle phases, agent contexts) to specific skills. Core loads this whenever it needs tech-pack-specific knowledge. Declared in the registry as `skills.router`. |
+| **Command router** | A tech pack skill that receives all `sdd-run <namespace> *` commands and dispatches them internally. Declared in the registry as `commands.router`. |
+| **Orchestrator** | A skill that coordinates multi-step workflows by invoking other skills and system commands in sequence (e.g., `config-orchestration`, `local-env-orchestration`). |
 | **System CLI** (`system-run.sh`) | A shell entrypoint to a TypeScript CLI binary that performs file operations skills cannot do directly (scaffolding, settings I/O, spec parsing, workflow state management). Skills invoke it via `system-run.sh <command> [args]`. |
 | **`plugin.json`** | The Claude Code plugin manifest — declares which commands, skills, and agents the plugin provides, with paths to each file. |
 | **`sdd-settings.yaml`** | Core-owned per-project configuration at `sdd/sdd-settings.yaml`. Stores project name, SDD version, installed tech packs, and a minimal component manifest (name, type, directory). Tech-specific component details live in separate tech pack settings files (`sdd/<namespace>-settings.yaml`). |
@@ -160,6 +162,57 @@ The current plugin is a monolith — SDD methodology and fullstack-typescript im
 - **Zero functionality loss.** Every command, skill, agent, standard, scaffolding template, plan template, and system CLI command that exists before the split must exist and work identically after. This is a structural refactor — no capabilities, knowledge, or content may be dropped. A pre-split inventory must be created and verified against the post-split result.
 - **Backward compatibility.** Existing SDD projects must continue to work. The `sdd-settings.yaml` migration adds the `tech_packs` namespace.
 - **Build rules.** Each system directory has its own `package.json`, `tsconfig.json`, and build step. Root `package.json` scripts must continue to work.
+- **Single tech pack gateway.** All core→tech-pack interactions flow through a single gateway module (`TechPackGateway`). No core file reads `techpack.yaml` directly, resolves tech pack paths, or loads tech pack skills on its own. The gateway is the only module that imports/reads tech pack artifacts.
+
+### Tech Pack Gateway Pattern
+
+Every interaction between core and a tech pack is funneled through a single gateway with a finite set of typed operations. This makes all touch points greppable, auditable, and validatable.
+
+**Gateway operations (exhaustive list):**
+
+| Operation | Purpose | Returns |
+|---|---|---|
+| `gateway.registry(namespace)` | Parse and return validated `techpack.yaml` | Typed registry object |
+| `gateway.resolve(namespace, path)` | Resolve a relative path from registry to absolute path | Absolute file path |
+| `gateway.loadSkill(namespace, skillPath, context)` | Load a tech pack skill into Claude's context with attribution | Skill content + attribution block |
+| `gateway.loadAgent(namespace, agentPath)` | Load a tech pack agent with attribution | Agent content + attribution block |
+| `gateway.routeCommand(namespace, command, args)` | Validate command against `commands.available`, load command router | Router skill content + context block |
+| `gateway.routeSkills(namespace, context)` | Load skills router with structured context | Router skill content + context block |
+| `gateway.delegateSystem(namespace, args)` | Delegate to tech pack system CLI, process side effects | Command result + processed side effects |
+| `gateway.listComponents(namespace)` | Read component types from registry | Component type list with metadata |
+| `gateway.dependencyOrder(namespace)` | Build and return topologically sorted dependency graph | Ordered component type list |
+
+**Enforcement rules:**
+
+1. **Grep-auditable.** Every tech pack interaction in core must call `gateway.*`. Running `grep -r "gateway\." core/` produces the complete list of touch points.
+2. **No direct reads.** Core skills and system commands never read `techpack.yaml`, tech pack skill files, or tech pack agent files directly. They always go through the gateway.
+3. **Attribution on every load.** Every `loadSkill` and `loadAgent` call emits an attribution block into Claude's context:
+   ```
+   [TECH PACK SKILL]
+     Tech pack: fs-ts (fullstack-typescript)
+     Operation: loadSkill
+     Integration point: components.server.scaffolding
+     Path: <resolved-path>
+   ```
+4. **Validation at startup.** When core initializes, the gateway validates all installed tech packs: parses registries, checks referenced paths exist, validates dependency graphs are acyclic, and verifies schema compliance. Failures are reported immediately, not deferred to first use.
+5. **Typed operations.** The gateway exposes only the operations listed above. Adding a new interaction type requires extending the gateway — no backdoors.
+
+**Core files that use the gateway (expected list):**
+
+| Core File | Gateway Operations Used |
+|---|---|
+| `techpacks` skill | `registry`, `listComponents`, `resolve` |
+| `planning` skill | `loadAgent`, `routeSkills`, `dependencyOrder` |
+| `project-scaffolding` skill | `routeSkills`, `resolve` |
+| `component-discovery` skill | `listComponents` |
+| `change-creation` skill | `routeSkills`, `dependencyOrder`, `loadAgent` |
+| `change-orchestration/verification` skill | `loadAgent`, `routeSkills` |
+| `change-orchestration/implementation` skill | `loadAgent`, `routeSkills` |
+| `init-orchestration` skill | `routeCommand` |
+| `sdd.md` command | `routeSkills` (documentation.capabilities) |
+| `sdd-help.md` command | `routeSkills` (documentation.help) |
+| `sdd-run.md` command | `routeCommand`, `delegateSystem` |
+| Core system CLI | `delegateSystem`, `registry` |
 
 ## Changes
 
@@ -171,87 +224,361 @@ Tech packs provide a `techpack.yaml` at their root declaring everything they off
 tech_pack:
   name: fullstack-typescript
   namespace: fs-ts
+  description: >
+    Production-ready fullstack TypeScript stack. Node.js backends
+    with CMDO architecture, React frontends with MVVM, PostgreSQL
+    databases, OpenAPI contracts with generated types, Kubernetes
+    deployment via Helm, and CI/CD through GitHub Actions.
   version: "1.0.0"
-  min_core_version: "8.0.0"
+  min_sdd_version: "8.0.0"
   system_path: ./system/system-run.sh
 
-requires_core:
-  - project-settings
-  - project-scaffolding
-
 components:
-  server:
-    description: "Node.js/TypeScript backend (CMDO architecture)"
-    directory_pattern: "components/servers/{name}/"
-    scaffolding: backend-scaffolding
-    agent: backend-dev
-  webapp:
-    description: "React/TypeScript frontend (MVVM architecture)"
-    directory_pattern: "components/webapps/{name}/"
-    scaffolding: frontend-scaffolding
-    agent: frontend-dev
-  database:
-    description: "PostgreSQL database (migrations and seeds)"
-    directory_pattern: "components/databases/{name}/"
-    scaffolding: database-scaffolding
-    agent: db-advisor
-  contract:
-    description: "OpenAPI specification and type generation"
-    directory_pattern: "components/contracts/{name}/"
-    scaffolding: contract-scaffolding
-    agent: api-designer
+
   config:
-    description: "YAML configuration (mandatory singleton)"
+    description: >
+      Centralized YAML configuration for the project. Mandatory singleton
+      that all other components read from. Generates environment-specific
+      config files from a single source of truth.
     directory_pattern: components/config/
-    scaffolding: config-scaffolding
+    depends_on: []
+    scaffolding: skills/components/config/config-scaffolding/SKILL.md
+
+  contract:
+    description: >
+      OpenAPI 3.x specifications that define the API surface between
+      frontend and backend. Generates TypeScript types, request/response
+      validators, and API client code from the spec.
+    directory_pattern: "components/contracts/{name}/"
+    depends_on: [config]
+    scaffolding: skills/components/contract/contract-scaffolding/SKILL.md
+    agent: agents/api-designer.md
+
+  database:
+    description: >
+      PostgreSQL database with versioned migrations, seed data, and
+      a data access layer. Manages schema evolution through sequential
+      migration files and provides typed query functions.
+    directory_pattern: "components/databases/{name}/"
+    depends_on: [config]
+    scaffolding: skills/components/database/database-scaffolding/SKILL.md
+    agent: agents/db-advisor.md
+
+  server:
+    description: >
+      Node.js/TypeScript backend following CMDO architecture
+      (Controller → Model → DAL → Orchestrator). Exposes HTTP APIs
+      defined by contracts, connects to databases, and runs
+      background workers.
+    directory_pattern: "components/servers/{name}/"
+    depends_on: [contract, config, database]
+    scaffolding: skills/components/backend/backend-scaffolding/SKILL.md
+    agent: agents/backend-dev.md
+
+  webapp:
+    description: >
+      React/TypeScript frontend following MVVM architecture
+      (View → ViewModel → Model). Consumes contracts for type-safe
+      API calls via TanStack Query and renders UI with a component
+      library.
+    directory_pattern: "components/webapps/{name}/"
+    depends_on: [contract]
+    scaffolding: skills/components/frontend/frontend-scaffolding/SKILL.md
+    agent: agents/frontend-dev.md
+
   helm:
-    description: "Kubernetes Helm charts"
+    description: >
+      Kubernetes Helm charts that package servers and webapps for
+      deployment. Defines services, deployments, ingress rules,
+      config maps, and secrets. Supports local dev (minikube/kind)
+      and production clusters.
     directory_pattern: "components/helm_charts/{name}/"
-    scaffolding: helm-scaffolding
-    agent: devops
+    depends_on: [server, webapp]
+    scaffolding: skills/components/helm/helm-scaffolding/SKILL.md
+    agent: agents/devops.md
+
   integration-testing:
-    description: "Integration test suites (Testkube)"
+    description: >
+      Integration test suites that verify component interactions
+      against real dependencies (databases, APIs). Runs via Vitest
+      with Testkube for Kubernetes-native execution.
     directory_pattern: "components/testing/integration/{name}/"
-    scaffolding: integration-testing-scaffolding
-    agent: tester
+    depends_on: [contract, server, database, helm]
+    scaffolding: skills/components/integration-testing/integration-testing-scaffolding/SKILL.md
+    agent: agents/tester.md
+
   e2e-testing:
-    description: "End-to-end test suites (Testkube)"
+    description: >
+      End-to-end test suites that verify complete user workflows
+      through the browser. Runs via Playwright with Testkube for
+      Kubernetes-native execution against a running stack.
     directory_pattern: "components/testing/e2e/{name}/"
-    scaffolding: e2e-testing-scaffolding
-    agent: tester
+    depends_on: [server, webapp, database, helm]
+    scaffolding: skills/components/e2e-testing/e2e-testing-scaffolding/SKILL.md
+    agent: agents/tester.md
+
   cicd:
-    description: "CI/CD pipelines (GitHub Actions)"
+    description: >
+      CI/CD pipeline definitions for GitHub Actions. Automates
+      build, test, lint, and deploy workflows. Depends on Helm
+      charts for deployment stages.
     directory_pattern: "components/cicds/{name}/"
-    scaffolding: cicd-scaffolding
-    agent: devops
+    depends_on: [helm]
+    scaffolding: skills/components/cicd/cicd-scaffolding/SKILL.md
+    agent: agents/devops.md
 
-project_templates: templates/project/             # tech-pack-specific project init templates
-plan_templates: templates/plans/                 # tech-pack-specific plan phase descriptions
+# --- Commands ---
+# Tech-pack-specific CLI commands, routed via sdd-run <namespace> <command>.
+# Core validates command names against `available` before dispatching to the router.
+#
+# user_facing: true  — exposed via sdd-run, shown in help and autocomplete.
+# user_facing: false — internal, invoked by skills via system-run.sh only.
 
-documentation:
-  capabilities: skills/capabilities/SKILL.md    # intent→command mappings loaded into /sdd context
-  help: skills/help-content/SKILL.md            # tech pack section loaded into /sdd-help context
+commands:
+  router: skills/command-router/SKILL.md
+  available:
 
-standards_router: skills/standards-router/SKILL.md   # single entry point for all standards loading
+    # config
+    - name: config generate
+      description: "Generate merged config file for a target environment"
+      user_facing: false
+      args:
+        env:
+          type: string
+          required: true
+          description: "Target environment (e.g., local, staging, production)"
+        component:
+          type: string
+          required: false
+          description: "Extract config for a single component"
+        output:
+          type: string
+          required: false
+          description: "Write output to file path instead of stdout"
+
+    - name: config validate
+      description: "Validate config files against JSON schema"
+      user_facing: false
+      args:
+        env:
+          type: string
+          required: false
+          description: "Validate a specific environment (default: all)"
+
+    - name: config add-env
+      description: "Add a new environment configuration"
+      user_facing: true
+      args:
+        env_name:
+          type: string
+          required: true
+          description: "Environment name (e.g., staging, production)"
+
+    - name: config diff
+      description: "Show differences between two environment configs"
+      user_facing: true
+      args:
+        env_a:
+          type: string
+          required: true
+          description: "First environment to compare"
+        env_b:
+          type: string
+          required: true
+          description: "Second environment to compare"
+
+    # contract
+    - name: contract generate-types
+      description: "Generate TypeScript types from OpenAPI spec"
+      user_facing: false
+      args:
+        name:
+          type: string
+          required: true
+          description: "Contract component name"
+
+    - name: contract validate
+      description: "Validate OpenAPI spec for correctness"
+      user_facing: false
+      args:
+        name:
+          type: string
+          required: true
+          description: "Contract component name"
+
+    # database
+    - name: database setup
+      description: "Initialize database schema, run migrations, and seed"
+      user_facing: true
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database migrate
+      description: "Run pending database migrations"
+      user_facing: false
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database seed
+      description: "Populate database with seed data"
+      user_facing: false
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database reset
+      description: "Drop and recreate database from scratch"
+      user_facing: true
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database teardown
+      description: "Remove database and all associated resources"
+      user_facing: true
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database psql
+      description: "Open interactive PostgreSQL shell"
+      user_facing: true
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    - name: database port-forward
+      description: "Forward local port to database pod in Kubernetes"
+      user_facing: true
+      args:
+        name:
+          type: string
+          required: true
+          description: "Database component name"
+        env:
+          type: string
+          required: false
+          default: local
+          description: "Target environment"
+
+    # local-env
+    - name: local-env check-tools
+      description: "Verify required toolchain is installed (node, npm, kubectl, helm)"
+      user_facing: true
+
+    - name: local-env create
+      description: "Create local Kubernetes cluster for development"
+      user_facing: true
+
+    - name: local-env destroy
+      description: "Remove local Kubernetes cluster and all resources"
+      user_facing: true
+
+    - name: local-env start
+      description: "Start a stopped local Kubernetes cluster"
+      user_facing: true
+
+    - name: local-env stop
+      description: "Stop the local Kubernetes cluster without destroying it"
+      user_facing: true
+
+    - name: local-env status
+      description: "Show status of local cluster, pods, and services"
+      user_facing: true
+
+    - name: local-env restart
+      description: "Restart the local Kubernetes cluster"
+      user_facing: true
+
+    - name: local-env deploy
+      description: "Deploy application to Kubernetes via Helm charts"
+      user_facing: true
+
+    - name: local-env undeploy
+      description: "Remove deployed application from Kubernetes"
+      user_facing: true
+
+    - name: local-env forward
+      description: "Forward local ports to running services"
+      user_facing: true
+
+    - name: local-env config
+      description: "Show or update local environment configuration"
+      user_facing: true
+
+    - name: local-env infra
+      description: "Manage infrastructure components (ingress, cert-manager)"
+      user_facing: true
+
+# --- Skills ---
+# Single entry point for all tech pack skill loading. Core loads the
+# skills router with a structured context (phase, component_type, agent)
+# and the router maps it to the minimal set of relevant skills.
+
+skills:
+  router: skills/skills-router/SKILL.md
+
+# --- Lifecycle ---
+# Agents assigned to cross-cutting lifecycle phases. Core reads these
+# during verification (code review) and testing (test execution).
 
 lifecycle:
   verification:
-    agent: reviewer
+    agent: agents/reviewer.md
   testing:
-    agent: tester
+    agent: agents/tester.md
 
-dependency_graph:
-  config: []
-  contract: [config]
-  database: [config]
-  server: [contract, config, database]
-  webapp: [contract]
-  helm: [server, webapp]
-  integration-testing: [contract, server, database, helm]
-  e2e-testing: [server, webapp, database, helm]
-  cicd: [helm]
+# --- Documentation ---
+# Skills loaded into context when core commands need tech-pack-specific
+# knowledge for user-facing help and intent-to-command mapping.
 
-orchestrator: skills/orchestrators/orchestrator/SKILL.md
+documentation:
+  capabilities: skills/capabilities/SKILL.md
+  help: skills/help-content/SKILL.md
 ```
 
 **Core defines the integration points** that tech packs can fill:
@@ -262,34 +589,78 @@ orchestrator: skills/orchestrators/orchestrator/SKILL.md
 | `components.*.directory_pattern` | Per-component | Path resolution — core resolves `{name}` to get the component's directory in the user project |
 | `components.*.scaffolding` | Per-component (required) | Scaffolding phase — invokes the skill to create file structure |
 | `components.*.agent` | Per-component | Plan generation — assigns agent to component phase |
-| `project_templates` | Tech-pack-level | Project init — core generates generic base, then applies tech pack's project templates (CLAUDE.md tech section, README.md tech section, package.json) |
-| `plan_templates` | Tech-pack-level | Plan generation — core provides generic plan structure (phases, acceptance criteria), tech pack contributes phase-specific content (agent assignments, standards, architecture-specific tasks like "CMDO layers", "MVVM layers") |
 | `documentation.capabilities` | Tech-pack-level | `/sdd` command — loaded into context so core can map natural language to tech pack commands (e.g., "set up my database" → `fs-ts database setup`) |
 | `documentation.help` | Tech-pack-level | `/sdd-help` command — loaded into context to display tech-pack-specific help (available commands, stack description, getting started) |
-| `standards_router` | Tech-pack-level | **Sole authority for all standards loading.** Core loads this single skill into context whenever standards are needed (implementation, planning, verification, testing). The router contains a table mapping component types and lifecycle phases to their standards skills, with explicit instructions for Claude to load only the subset relevant to the current context. Replaces per-component `standards` fields and lifecycle-level `standards` fields. |
+| `skills.router` | Tech-pack-level | **Single entry point for all tech pack skill loading.** Core loads this skill with a structured context block (phase, component_type, agent). The router maps context to specific skills. See **Skills router contract** below for required sections and invocation format. |
 | `lifecycle.verification.agent` | Tech-pack-level | Review phase — assigns the reviewer agent |
 | `lifecycle.testing.agent` | Tech-pack-level | Testing phase — assigns the tester agent |
-| `orchestrator` | Tech-pack-level | `sdd-run <namespace> *` routing — core delegates all namespaced commands to this single entry point skill, which handles internal routing within the tech pack |
-| `dependency_graph` | Tech-pack-level | Plan generation and scaffolding order — core reads the DAG to determine component build order and validate dependency references |
+| `commands.router` | Tech-pack-level | `sdd-run <namespace> *` routing — core validates the command name against `commands.available`, then loads this skill with a structured context block (command, args, namespace). See **Command router contract** below for required sections and invocation format. |
+| `commands.available` | Tech-pack-level | Command manifest — core reads this to display help text, validate command names, and provide autocomplete for tech pack commands |
+| `components.*.depends_on` | Per-component | Plan generation and scaffolding order — core builds the DAG from per-component `depends_on` arrays to determine build order and validate dependency references |
 
 **Registry field requirements:**
 
 | Field | Required | Notes |
 |---|---|---|
-| `tech_pack.*` | Yes | All tech pack metadata fields (name, namespace, version, min_core_version, system_path) |
+| `tech_pack.*` | Yes | All tech pack metadata fields (name, namespace, version, min_sdd_version, system_path) |
 | `components.*.description` | Yes | Core displays this during component discovery |
 | `components.*.directory_pattern` | Yes | Core needs this for all path resolution |
 | `components.*.scaffolding` | Yes | Every component must declare a scaffolding skill |
 | `components.*.agent` | No | Components without an agent won't have one assigned during planning |
-| `project_templates` | No | If absent, core generates generic project files only |
-| `plan_templates` | No | If absent, core generates generic plan structure only |
 | `documentation.capabilities` | No | If absent, `/sdd` won't show tech-pack-specific command mappings |
 | `documentation.help` | No | If absent, `/sdd-help` won't show tech-pack-specific help |
-| `standards_router` | Yes | Single entry point for all standards loading — prevents Claude from loading all standards at once |
+| `skills.router` | Yes | Single entry point for all tech pack skill loading — prevents Claude from loading all skills at once |
 | `lifecycle.*` | No | If absent, lifecycle phases use no tech-pack-specific agents |
-| `orchestrator` | Yes | Required for `sdd-run <namespace> *` command routing |
-| `dependency_graph` | Yes | Required for scaffolding order and plan generation |
-| `requires_core` | No | Declares which core skills the tech pack depends on |
+| `commands.router` | Yes | Required for `sdd-run <namespace> *` command routing |
+| `commands.available` | Yes | Core needs this for help, validation, and autocomplete |
+| `components.*.depends_on` | Yes | Core builds dependency DAG from these arrays |
+
+**Router contracts:**
+
+Both routers follow a defined contract between core and the tech pack. Core provides structured context when invoking a router; the router skill must contain specific sections that fulfill the contract.
+
+**Skills router contract (`skills.router`):**
+
+Core invokes the skills router by loading it into Claude's context with a structured context block:
+
+```
+SKILLS ROUTER CONTEXT:
+  phase: <project-scaffolding|plan-generation|implementation|verification|testing>
+  component_type: <server|webapp|database|...>    # if applicable
+  component_name: <name>                           # if applicable
+  agent: <agent-name>                              # if applicable
+```
+
+The skills router SKILL.md must contain:
+
+| Required Section | Purpose |
+|---|---|
+| **Component Standards Table** | Maps `component_type` → list of skills to load (e.g., `server` → `backend-standards`, `typescript-standards`) |
+| **Phase Skills Table** | Maps `phase` → list of skills to load (e.g., `planning` → `planning-standards`, `project-scaffolding` → project template skill, `plan-generation` → plan template skill) |
+| **Agent Context Table** | Maps `agent` → list of internal skills to load (e.g., `db-advisor` → `postgresql/`) |
+| **Loading Instructions** | Explicit instructions for Claude: "Load ONLY the skills matching the provided context. Do NOT load all skills." |
+
+Each table entry contains relative paths to the skill files within the tech pack. Claude reads the router, matches the context, and loads only the relevant subset.
+
+**Command router contract (`commands.router`):**
+
+Core invokes the command router by loading it into Claude's context with a structured context block:
+
+```
+COMMAND ROUTER CONTEXT:
+  command: <command-name>          # e.g., "database setup"
+  args: <remaining-args>           # e.g., "main-db"
+  namespace: <tech-pack-namespace> # e.g., "fs-ts"
+```
+
+The command router SKILL.md must contain:
+
+| Required Section | Purpose |
+|---|---|
+| **Dispatch Table** | Maps `command` → skill or system action to invoke (e.g., `database setup` → `skills/orchestrators/database-orchestration/SKILL.md`, `env check-tools` → `system-run.sh env check-tools`) |
+| **Dispatch Instructions** | Explicit instructions for Claude: "Match the command against the dispatch table. Load the target skill or invoke the system command. Do NOT load unrelated skills." |
+
+Core validates the command name against `commands.available` in the registry *before* invoking the command router. The router can assume the command is valid.
 
 ### 2. Directory Structure
 
@@ -348,12 +719,12 @@ plugin/
     ├── skills/
     │   ├── capabilities/               # documentation.capabilities — /sdd intent mappings
     │   ├── help-content/               # documentation.help — /sdd-help tech pack section
-    │   ├── planning-standards/         # internal: loaded via standards-router during planning
-    │   ├── standards-router/              # standards_router — index of all standards with loading instructions
-    │   ├── typescript-standards/          # internal: loaded via standards-router when TS code is involved
-    │   ├── unit-testing/                  # internal: loaded via standards-router or agents
+    │   ├── planning-standards/         # internal: loaded via skills router during planning
+    │   ├── skills-router/                 # skills.router — maps contexts to skills with loading instructions
+    │   ├── typescript-standards/          # internal: loaded via skills router when TS code is involved
+    │   ├── unit-testing/                  # internal: loaded via skills router or agents
+    │   ├── command-router/                # commands.router — single entry point for sdd-run fs-ts *
     │   ├── orchestrators/
-    │   │   ├── orchestrator/          # single entry point for sdd-run fs-ts *
     │   │   ├── config-orchestration/
     │   │   └── local-env-orchestration/
     │   └── components/
@@ -568,12 +939,12 @@ Core skills that currently hardcode tech-specific names must be rewritten to rea
 | Core Skill | Current Behavior | New Behavior |
 |---|---|---|
 | `project-settings` | Hardcoded type→directory mapping table (`server → components/servers/`), component type definitions | Split: core owns the settings *mechanism* (read/write `sdd-settings.yaml`, base schema validation). Type→directory mapping removed — core reads `components.*.directory_pattern` from registry. Component type definitions removed — types come from registry `components` keys. |
-| `planning` | Hardcoded agent→component table, standards names | Reads `components.*.agent` from registry for agent assignments. Standards loaded via standards router (not from registry directly). |
-| `change-creation` | Hardcoded dependency graph, agent assignments, plan templates reference CMDO/MVVM/TailwindCSS | Reads `dependency_graph` and `components.*.agent` from registry. Plan templates split — generic structure stays in core, tech-specific phase descriptions move to tech pack (see Templates below). |
+| `planning` | Hardcoded agent→component table, standards names | Reads `components.*.agent` from registry for agent assignments. Standards loaded via skills router (not from registry directly). |
+| `change-creation` | Hardcoded dependency graph, agent assignments, plan templates reference CMDO/MVVM/TailwindCSS | Reads `components.*.depends_on` and `components.*.agent` from registry. Plan templates split — generic structure stays in core, tech-specific phase descriptions loaded via skills router (`phase: plan-generation`). |
 | `component-discovery` | Hardcoded "Available Components" table with tech descriptions ("Node.js backend (CMDO)", "React frontend (MVVM)", "PostgreSQL", "Testkube") and scaffolding skill names | Reads `components` keys from registry. Component descriptions come from registry (new `description` field per component). |
 | `project-scaffolding` | References tech scaffolding skills by name, hardcoded template source/dest paths, project templates (`CLAUDE.md`, `README.md`) hardcode entire tech stack | Reads `components.*.scaffolding` from registry. Template paths resolved via tech pack. Project templates split (see Templates below). |
-| `init-orchestration` | Checks for `components/config/` as mandatory | Delegates prerequisite verification to tech pack via orchestrator. Core does not check specific directories. |
-| `change-orchestration/verification` | Hardcoded standards-per-component table with tech names | Reads `lifecycle.verification.agent` from registry for reviewer agent. Standards loaded via standards router (not from registry directly). |
+| `init-orchestration` | Checks for `components/config/` as mandatory | Delegates prerequisite verification to tech pack via command router. Core does not check specific directories. |
+| `change-orchestration/verification` | Hardcoded standards-per-component table with tech names | Reads `lifecycle.verification.agent` from registry for reviewer agent. Standards loaded via skills router (not from registry directly). |
 | `change-orchestration/implementation` | Hardcoded agent names | Reads `components.*.agent` from registry |
 | `scaffolding` (router skill) | Hardcoded delegation table | **Eliminated** — core reads registry directly |
 
@@ -593,7 +964,7 @@ The `project-scaffolding/templates/project/` directory currently generates proje
 | `README.md` (project) | Generic project description, SDD workflow reference | Tech-specific directory structure, tech stack badges, framework-specific getting started |
 | `package.json` (project) | — | **Entirely tech-pack-specific** (npm workspaces, Node.js scripts) |
 
-Core's project scaffolding invokes the tech pack's template contribution after generating the generic base. The tech pack declares a `project_templates` path in the registry.
+Core's project scaffolding invokes the skills router with `phase: project-scaffolding`, which routes to the tech pack's template contribution skill. The skill knows where its template files are and how to apply them.
 
 **Commands that need tech-specific content removed:**
 
@@ -626,17 +997,17 @@ Skills that move to the tech pack:
 When core loads a tech pack skill at an integration point, it must explicitly attribute it:
 
 ```
-Loading tech pack skill: standards-router
+Loading tech pack skill: skills-router
   Tech pack: fs-ts (fullstack-typescript)
-  Integration point: standards_router
-  Path: <resolved-path>/skills/standards-router/SKILL.md
+  Integration point: skills.router
+  Path: <resolved-path>/skills/skills-router/SKILL.md
 ```
 
 ### 6. Tech Pack Skill Changes
 
-Tech pack skills that reference core skills must do so through declared `requires_core` dependencies:
+Tech pack skills never directly reference core skills. Core drives all interactions via integration points. Changes needed:
 
-- Remove all `commit-standards` references from `cicd-standards` (cicd-standards does not depend on core)
+- Remove all `commit-standards` references from `cicd-standards` (cicd-standards is fully internal to the tech pack)
 - `typescript-standards`, `unit-testing`, `integration-testing-standards`, `e2e-testing-standards` move to tech pack — all internal references stay within the pack
 - Agents stop declaring `skills:` in frontmatter that reference core skills — core loads the appropriate skills via integration points
 - All `system-run.sh` references change to use the tech pack's own system binary
@@ -667,7 +1038,360 @@ sdd-run tech-pack remove <namespace>
 
 1. **Core orchestrated** → core skills (`change`, `init`, `version`)
 2. **Core pass-through** → core system (`permissions`, `tech-pack`)
-3. **`<namespace> *`** → tech pack orchestrator. Core reads the registry, finds the tech pack by namespace, and delegates everything after the namespace to the tech pack's single orchestrator entry point. The tech pack handles all internal routing. Example: `sdd-run fs-ts database setup main-db` → core invokes the fs-ts orchestrator with args `database setup main-db`
+3. **`<namespace> *`** → tech pack command router. Core reads `commands.available` from the registry to validate the command name, then delegates to `commands.router` with the remaining args. The command router handles all internal dispatch. Example: `sdd-run fs-ts database setup main-db` → core validates `database setup` exists in `commands.available`, then invokes the command router with args `database setup main-db`
+
+### 8. Schemas
+
+All contracts and configuration files have a JSON Schema (2020-12) definition. These schemas are the source of truth for validation at build time and runtime.
+
+#### 8.1 techpack.yaml
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/techpack.json",
+  "title": "Tech Pack Registry",
+  "description": "Declares everything a tech pack offers to the SDD core.",
+  "type": "object",
+  "required": ["tech_pack", "components", "commands", "skills"],
+  "additionalProperties": false,
+  "properties": {
+    "tech_pack": {
+      "type": "object",
+      "required": ["name", "namespace", "description", "version", "min_sdd_version", "system_path"],
+      "additionalProperties": false,
+      "properties": {
+        "name":            { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "namespace":       { "type": "string", "pattern": "^[a-z][a-z0-9-]+$", "maxLength": 10 },
+        "description":     { "type": "string" },
+        "version":         { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "min_sdd_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "system_path":     { "type": "string", "description": "Relative path to system CLI entrypoint" }
+      }
+    },
+    "components": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "commands": {
+      "type": "object",
+      "required": ["router", "available"],
+      "additionalProperties": false,
+      "properties": {
+        "router": { "type": "string", "description": "Relative path to command router skill" },
+        "available": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/command" }
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "required": ["router"],
+      "additionalProperties": false,
+      "properties": {
+        "router": { "type": "string", "description": "Relative path to skills router skill" }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verification": { "$ref": "#/$defs/lifecycle_phase" },
+        "testing":      { "$ref": "#/$defs/lifecycle_phase" }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": { "type": "string", "description": "Relative path to capabilities skill" },
+        "help":         { "type": "string", "description": "Relative path to help content skill" }
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["description", "directory_pattern", "depends_on", "scaffolding"],
+      "additionalProperties": false,
+      "properties": {
+        "description":       { "type": "string" },
+        "directory_pattern":  { "type": "string" },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Component type keys this component depends on"
+        },
+        "scaffolding": { "type": "string", "description": "Relative path to scaffolding skill" },
+        "agent":       { "type": "string", "description": "Relative path to agent file" }
+      }
+    },
+    "command": {
+      "type": "object",
+      "required": ["name", "description", "user_facing"],
+      "additionalProperties": false,
+      "properties": {
+        "name":        { "type": "string" },
+        "description": { "type": "string" },
+        "user_facing": { "type": "boolean" },
+        "args": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/command_arg" }
+        }
+      }
+    },
+    "command_arg": {
+      "type": "object",
+      "required": ["type", "required", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "type":        { "type": "string", "enum": ["string", "number", "boolean"] },
+        "required":    { "type": "boolean" },
+        "description": { "type": "string" },
+        "default":     {}
+      }
+    },
+    "lifecycle_phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent": { "type": "string", "description": "Relative path to agent file" }
+      }
+    }
+  }
+}
+```
+
+#### 8.2 sdd-settings.yaml (core-owned)
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/sdd-settings.json",
+  "title": "SDD Project Settings",
+  "description": "Core-owned per-project configuration.",
+  "type": "object",
+  "required": ["sdd", "project"],
+  "additionalProperties": false,
+  "properties": {
+    "sdd": {
+      "type": "object",
+      "required": ["version"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" }
+      }
+    },
+    "tech_packs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/tech_pack_entry"
+      }
+    }
+  },
+  "$defs": {
+    "tech_pack_entry": {
+      "type": "object",
+      "required": ["name", "namespace", "version", "mode", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string" },
+        "namespace": { "type": "string" },
+        "version":   { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "mode":      { "type": "string", "enum": ["internal", "external"] },
+        "path":      { "type": "string", "description": "Relative to plugin root if internal" },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/component_manifest" }
+        }
+      }
+    },
+    "component_manifest": {
+      "type": "object",
+      "required": ["name", "type", "directory"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" }
+      }
+    }
+  }
+}
+```
+
+#### 8.3 Tech pack settings (e.g., fs-ts-settings.yaml)
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/techpack-settings.json",
+  "title": "Tech Pack Settings",
+  "description": "Tech-pack-owned per-project component configuration.",
+  "type": "object",
+  "required": ["components"],
+  "additionalProperties": false,
+  "properties": {
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component_settings" }
+    }
+  },
+  "$defs": {
+    "component_settings": {
+      "type": "object",
+      "required": ["name", "type", "directory", "depends_on"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Tech-specific settings — schema defined by the tech pack per component type"
+        }
+      }
+    }
+  }
+}
+```
+
+#### 8.4 Side effects response
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/side-effects-response.json",
+  "title": "Tech System Side Effects Response",
+  "description": "Structured JSON returned by the tech system on successful command execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "result": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Tech-specific command output"
+    },
+    "side_effects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/side_effect" },
+      "description": "Declared state changes for core to execute"
+    }
+  },
+  "$defs": {
+    "side_effect": {
+      "type": "object",
+      "required": ["action"],
+      "oneOf": [
+        { "$ref": "#/$defs/register_component" },
+        { "$ref": "#/$defs/unregister_component" }
+      ]
+    },
+    "register_component": {
+      "type": "object",
+      "required": ["action", "name", "type", "directory"],
+      "additionalProperties": false,
+      "properties": {
+        "action":    { "const": "register_component" },
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" }
+      }
+    },
+    "unregister_component": {
+      "type": "object",
+      "required": ["action", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "action": { "const": "unregister_component" },
+        "name":   { "type": "string" }
+      }
+    }
+  }
+}
+```
+
+#### 8.5 Skills router context
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/skills-router-context.json",
+  "title": "Skills Router Context",
+  "description": "Structured context block core passes when invoking the skills router.",
+  "type": "object",
+  "required": ["phase"],
+  "additionalProperties": false,
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": ["project-scaffolding", "plan-generation", "implementation", "verification", "testing"]
+    },
+    "component_type": {
+      "type": "string",
+      "description": "Component type key from the registry (e.g., server, webapp)"
+    },
+    "component_name": {
+      "type": "string",
+      "description": "Instance name of the component (e.g., main-server)"
+    },
+    "agent": {
+      "type": "string",
+      "description": "Agent currently active (e.g., backend-dev)"
+    }
+  }
+}
+```
+
+#### 8.6 Command router context
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/command-router-context.json",
+  "title": "Command Router Context",
+  "description": "Structured context block core passes when invoking the command router.",
+  "type": "object",
+  "required": ["command", "namespace"],
+  "additionalProperties": false,
+  "properties": {
+    "command": {
+      "type": "string",
+      "description": "Validated command name (e.g., database setup)"
+    },
+    "args": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Parsed arguments matching the command's args schema"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Tech pack namespace (e.g., fs-ts)"
+    }
+  }
+}
+```
 
 ## Open Questions (Resolve During Planning)
 
