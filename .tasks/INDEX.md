@@ -4,13 +4,13 @@
 
 ## Speccing
 
-- [#158](1-speccing/158/): Split plugin into core/ and fullstack-typescript/ subdirectories
+(none)
 
 ---
 
 ## Planning
 
-(none)
+- [#158](2-planning/158/): Split plugin into core/ and fullstack-typescript/ subdirectories
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: 158
 title: Split plugin into core/ and fullstack-typescript/ subdirectories
-status: speccing
+status: planning
 created: 2026-02-22 12:00 UTC
 depends_on: []
 blocks: []
