@@ -175,42 +175,76 @@ Every interaction between core and a tech pack is funneled through a single gate
 | `gateway.registry(namespace)` | Parse and return validated `techpack.yaml` | Typed registry object |
 | `gateway.resolve(namespace, path)` | Resolve a relative path from registry to absolute path | Absolute file path |
 | `gateway.loadSkill(namespace, skillPath, context)` | Load a tech pack skill into Claude's context with attribution | Skill content + attribution block |
-| `gateway.loadAgent(namespace, agentPath)` | Load a tech pack agent with attribution | Agent content + attribution block |
+| `gateway.loadAgent(namespace, agentRef)` | Read agent file, parse frontmatter, resolve skills, spawn as Task subagent | Task subagent with composed prompt |
 | `gateway.routeCommand(namespace, command, args)` | Validate command against `commands.available`, load command router | Router skill content + context block |
 | `gateway.routeSkills(namespace, context)` | Load skills router with structured context | Router skill content + context block |
 | `gateway.delegateSystem(namespace, args)` | Delegate to tech pack system CLI, process side effects | Command result + processed side effects |
 | `gateway.listComponents(namespace)` | Read component types from registry | Component type list with metadata |
 | `gateway.dependencyOrder(namespace)` | Build and return topologically sorted dependency graph | Ordered component type list |
 
+**Agent loading via `gateway.loadAgent`:**
+
+Agents are loaded through the gateway as Task subagents. This is a universal mechanism that works identically for internal and external tech packs.
+
+**Prompt isolation guarantee:** The agent's markdown body and resolved skill contents NEVER enter the main conversation context. The main context only receives structured frontmatter metadata (name, model, tools, skills list) via a system CLI call — enough for orchestration decisions but no prompt leakage. The subagent self-bootstraps by reading its own agent file and skill files.
+
+The gateway:
+
+1. Calls `system-run.sh agent frontmatter <agent-path>` — the system CLI reads the agent `.md` file, parses YAML frontmatter, and returns ONLY the structured metadata as JSON: `{"name", "model", "tools", "skills": [...]}`. The agent's markdown body is never returned to the main context.
+2. Resolves skill paths — maps each skill name from the frontmatter `skills` list to its absolute file path using the registry. This is path resolution only (string manipulation from registry data), not file reading.
+3. Logs attribution via `system-run.sh log` before spawning.
+4. Spawns a Task subagent with a bootstrap prompt and the specified `model`. The bootstrap prompt instructs the subagent to read and follow the agent file, and to load the resolved skill files:
+
+   ```
+   You are a tech pack agent. Read and follow your instructions from:
+     Agent: <agent-path>
+     Skills: <skill-path-1>, <skill-path-2>, ...
+
+   Read the agent file first, then read each skill file. Follow all
+   instructions from the agent file. The skill files provide domain
+   knowledge and standards you must follow.
+   ```
+
+5. The subagent reads the agent `.md` file and skill files itself — these contents exist only in the subagent's context, never in the main conversation.
+
+Core reads agent names from the registry (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `gateway.loadAgent` with the agent ref to spawn the subagent.
+
 **Enforcement rules:**
 
 1. **Grep-auditable.** Every tech pack interaction in core must call `gateway.*`. Running `grep -r "gateway\." core/` produces the complete list of touch points.
 2. **No direct reads.** Core skills and system commands never read `techpack.yaml`, tech pack skill files, or tech pack agent files directly. They always go through the gateway.
-3. **Attribution on every load.** Every `loadSkill` and `loadAgent` call emits an attribution block into Claude's context:
-   ```
-   [TECH PACK SKILL]
-     Tech pack: fs-ts (fullstack-typescript)
-     Operation: loadSkill
-     Integration point: components.server.scaffolding
-     Path: <resolved-path>
-   ```
-4. **Validation at startup.** When core initializes, the gateway validates all installed tech packs: parses registries, checks referenced paths exist, validates dependency graphs are acyclic, and verifies schema compliance. Failures are reported immediately, not deferred to first use.
-5. **Typed operations.** The gateway exposes only the operations listed above. Adding a new interaction type requires extending the gateway — no backdoors.
+3. **Agent prompt isolation.** Agent markdown bodies and resolved skill contents must NEVER appear in the main conversation context. The gateway uses `system-run.sh agent frontmatter` to extract only structured metadata — it never reads the agent file directly. The subagent self-bootstraps by reading its own files. This prevents prompt pollution and keeps the main context focused on orchestration.
+4. **Attribution on every load.** Every tech pack artifact load is attributed:
+   - **Skills** (`loadSkill`, `routeSkills`, `routeCommand`): emit an attribution block into Claude's context:
+     ```
+     [TECH PACK SKILL]
+       Tech pack: fs-ts (fullstack-typescript)
+       Integration point: components.server.scaffolding
+       Path: <resolved-path>
+     ```
+   - **Agents** (`loadAgent`): write a structured log entry via `system-run.sh log` before spawning. The subagent runs in its own isolated context and doesn't see the attribution:
+     ```
+     system-run.sh log --level info --source gateway.loadAgent \
+       --message "Spawning tech pack agent" \
+       --data '{"tech_pack":"fs-ts","agent":"backend-dev","integration_point":"components.server.agent","path":"<resolved-path>"}'
+     ```
+5. **Validation at startup.** When core initializes, the gateway validates all installed tech packs: parses registries, checks referenced paths exist, validates dependency graphs are acyclic, and verifies schema compliance. Failures are reported immediately, not deferred to first use.
+6. **Typed operations.** The gateway exposes only the operations listed above. Adding a new interaction type requires extending the gateway — no backdoors.
 
 **Core files that use the gateway (expected list):**
 
 | Core File | Gateway Operations Used |
 |---|---|
-| `techpacks` skill | `registry`, `listComponents`, `resolve` |
-| `planning` skill | `loadAgent`, `routeSkills`, `dependencyOrder` |
+| `techpacks` skill | `registry`, `listComponents`, `resolve`, `loadSkill` |
+| `planning` skill | `registry` (agent names), `routeSkills`, `dependencyOrder` |
 | `project-scaffolding` skill | `routeSkills`, `resolve` |
 | `component-discovery` skill | `listComponents` |
-| `change-creation` skill | `routeSkills`, `dependencyOrder`, `loadAgent` |
+| `change-creation` skill | `registry` (agent names), `routeSkills`, `dependencyOrder` |
 | `change-orchestration/verification` skill | `loadAgent`, `routeSkills` |
 | `change-orchestration/implementation` skill | `loadAgent`, `routeSkills` |
 | `init-orchestration` skill | `routeCommand` |
-| `sdd.md` command | `routeSkills` (documentation.capabilities) |
-| `sdd-help.md` command | `routeSkills` (documentation.help) |
+| `sdd.md` command | `loadSkill` (documentation.capabilities) |
+| `sdd-help.md` command | `loadSkill` (documentation.help) |
 | `sdd-run.md` command | `routeCommand`, `delegateSystem` |
 | Core system CLI | `delegateSystem`, `registry` |
 
@@ -252,7 +286,9 @@ components:
     directory_pattern: "components/contracts/{name}/"
     depends_on: [config]
     scaffolding: skills/components/contract/contract-scaffolding/SKILL.md
-    agent: agents/api-designer.md
+    agent:
+      name: api-designer
+      path: agents/api-designer.md
 
   database:
     description: >
@@ -262,7 +298,9 @@ components:
     directory_pattern: "components/databases/{name}/"
     depends_on: [config]
     scaffolding: skills/components/database/database-scaffolding/SKILL.md
-    agent: agents/db-advisor.md
+    agent:
+      name: db-advisor
+      path: agents/db-advisor.md
 
   server:
     description: >
@@ -273,7 +311,9 @@ components:
     directory_pattern: "components/servers/{name}/"
     depends_on: [contract, config, database]
     scaffolding: skills/components/backend/backend-scaffolding/SKILL.md
-    agent: agents/backend-dev.md
+    agent:
+      name: backend-dev
+      path: agents/backend-dev.md
 
   webapp:
     description: >
@@ -284,7 +324,9 @@ components:
     directory_pattern: "components/webapps/{name}/"
     depends_on: [contract]
     scaffolding: skills/components/frontend/frontend-scaffolding/SKILL.md
-    agent: agents/frontend-dev.md
+    agent:
+      name: frontend-dev
+      path: agents/frontend-dev.md
 
   helm:
     description: >
@@ -295,7 +337,9 @@ components:
     directory_pattern: "components/helm_charts/{name}/"
     depends_on: [server, webapp]
     scaffolding: skills/components/helm/helm-scaffolding/SKILL.md
-    agent: agents/devops.md
+    agent:
+      name: devops
+      path: agents/devops.md
 
   integration-testing:
     description: >
@@ -305,7 +349,9 @@ components:
     directory_pattern: "components/testing/integration/{name}/"
     depends_on: [contract, server, database, helm]
     scaffolding: skills/components/integration-testing/integration-testing-scaffolding/SKILL.md
-    agent: agents/tester.md
+    agent:
+      name: tester
+      path: agents/tester.md
 
   e2e-testing:
     description: >
@@ -315,7 +361,9 @@ components:
     directory_pattern: "components/testing/e2e/{name}/"
     depends_on: [server, webapp, database, helm]
     scaffolding: skills/components/e2e-testing/e2e-testing-scaffolding/SKILL.md
-    agent: agents/tester.md
+    agent:
+      name: tester
+      path: agents/tester.md
 
   cicd:
     description: >
@@ -325,7 +373,9 @@ components:
     directory_pattern: "components/cicds/{name}/"
     depends_on: [helm]
     scaffolding: skills/components/cicd/cicd-scaffolding/SKILL.md
-    agent: agents/devops.md
+    agent:
+      name: devops
+      path: agents/devops.md
 
 # --- Commands ---
 # Tech-pack-specific CLI commands, routed via sdd-run <namespace> <command>.
@@ -568,9 +618,13 @@ skills:
 
 lifecycle:
   verification:
-    agent: agents/reviewer.md
+    agent:
+      name: reviewer
+      path: agents/reviewer.md
   testing:
-    agent: agents/tester.md
+    agent:
+      name: tester
+      path: agents/tester.md
 
 # --- Documentation ---
 # Skills loaded into context when core commands need tech-pack-specific
@@ -697,6 +751,8 @@ plugin/
 │       │   │   ├── settings/
 │       │   │   ├── archive/
 │       │   │   ├── permissions/
+│       │   │   ├── agent/             # NEW: frontmatter extraction for prompt isolation
+│       │   │   ├── log/              # NEW: structured logging for prompt-layer operations
 │       │   │   └── tech-pack/        # NEW: validate, list, info, install, remove
 │       │   ├── lib/
 │       │   ├── settings/
@@ -994,14 +1050,16 @@ Skills that move to the tech pack:
 | `config-orchestration` | Config management is tech-specific |
 | `local-env-orchestration` | Kubernetes local environments are tech-specific |
 
-When core loads a tech pack skill at an integration point, it must explicitly attribute it:
+**Tech pack artifact loading (context isolation model):**
 
-```
-Loading tech pack skill: skills-router
-  Tech pack: fs-ts (fullstack-typescript)
-  Integration point: skills.router
-  Path: <resolved-path>/skills/skills-router/SKILL.md
-```
+- **Skills** are loaded into Claude's main context with an inline attribution block (see Tech Pack Gateway Pattern, enforcement rule 4). Skills become part of the main conversation and are visible to the orchestrating agent.
+- **Agents** are loaded via `gateway.loadAgent` and spawned as **Task subagents** in a separate context. The main context receives only structured frontmatter metadata via `system-run.sh agent frontmatter` — it never reads the agent file directly. The subagent self-bootstraps: it receives a bootstrap prompt with paths to the agent file and resolved skill files, reads them itself, and follows the instructions. This ensures:
+  - Agent instructions never enter the main conversation context (the system CLI extracts only metadata)
+  - Resolved skill contents are scoped to the subagent that reads them
+  - The main context stays focused on orchestration — it sees only agent name, model, tools, and skill names
+  - Works identically for internal and external tech packs
+
+  Core reads agent names from the registry (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `gateway.loadAgent` with the agent ref — the main context never reads the agent file directly.
 
 ### 6. Tech Pack Skill Changes
 
@@ -1009,10 +1067,55 @@ Tech pack skills never directly reference core skills. Core drives all interacti
 
 - Remove all `commit-standards` references from `cicd-standards` (cicd-standards is fully internal to the tech pack)
 - `typescript-standards`, `unit-testing`, `integration-testing-standards`, `e2e-testing-standards` move to tech pack — all internal references stay within the pack
-- Agents stop declaring `skills:` in frontmatter that reference core skills — core loads the appropriate skills via integration points
+- Agent frontmatter `skills:` fields reference tech pack skills by name. The gateway resolves skill names to absolute paths using the registry (string manipulation, no file reading), then passes those paths to the subagent's bootstrap prompt. The subagent reads and loads the skills itself — skill contents never enter the main context (see enforcement rule 3: prompt isolation). Agents must NOT reference core skills in frontmatter; core loads its own skills independently via its own mechanisms.
 - All `system-run.sh` references change to use the tech pack's own system binary
 
-### 7. Tech Pack Management Commands
+### 7. New Core System Commands
+
+#### 7.1 Agent Command
+
+Core gains an `agent` command in the system CLI to support prompt isolation for agent loading. This command reads agent files at the system layer and returns only structured metadata, so the prompt layer never needs to read agent files directly.
+
+| System Command | Purpose |
+|---|---|
+| `agent frontmatter <agent-path>` | Read an agent `.md` file, parse YAML frontmatter, return structured JSON. Returns only metadata — never the markdown body. |
+
+Output format:
+
+```json
+{
+  "name": "backend-dev",
+  "model": "sonnet",
+  "tools": ["Read", "Write", "Grep", "Glob", "Bash"],
+  "skills": ["backend-standards", "typescript-standards", "unit-testing"]
+}
+```
+
+The `skills` field contains skill names as declared in the agent's frontmatter. The gateway maps these names to absolute paths using the registry — this is string manipulation, not file I/O.
+
+Not exposed through `sdd-run` — this is an internal command used by `gateway.loadAgent` only.
+
+#### 7.2 Log Command
+
+Core gains a `log` command in the system CLI for prompt-layer operations (skills, commands, agents) to write structured log entries to the same log files that system operations use.
+
+| System Command | Purpose |
+|---|---|
+| `log --level <level> --source <source> --message <text> [--data <json>]` | Write a structured log entry. `level`: `debug`, `info`, `warn`, `error`. `source`: dot-path identifier (e.g., `gateway.loadAgent`, `planning.phaseStart`). `data`: optional JSON blob for structured context. |
+
+Usage from prompt-layer operations:
+
+```
+system-run.sh log --level info --source gateway.loadSkill \
+  --message "Loading tech pack skill" \
+  --data '{"tech_pack":"fs-ts","integration_point":"components.server.scaffolding","path":"..."}'
+```
+
+Writes to `sdd/system-logs/` alongside existing system CLI logs. Prompt-layer and system-layer entries are interleaved chronologically, distinguishable by `source`.
+
+Not exposed through `sdd-run` — this is an internal command for prompt-layer use only.
+
+#### 7.3 Tech Pack Management Commands
 
 Core gains a `tech-pack` command namespace in the system CLI:
 
@@ -1021,8 +1124,8 @@ Core gains a `tech-pack` command namespace in the system CLI:
 | `tech-pack validate <path>` | Parse and validate `techpack.yaml` at the given path. Checks: required fields present, integration point names are valid, referenced skill paths exist, dependency graph is a valid DAG, namespace is valid. Returns structured validation result. |
 | `tech-pack info <namespace>` | Read a tech pack's registry and return structured data: name, version, component types, lifecycle integration points, documentation paths. Used by the `techpacks` skill. |
 | `tech-pack list` | List all installed tech packs with namespace, version, mode (internal/external), component count. |
-| `tech-pack install <path>` | Register an external tech pack: validate its registry, build its system CLI, add to `sdd-settings.yaml` under `tech_packs`. |
-| `tech-pack remove <namespace>` | Unregister a tech pack: remove from `sdd-settings.yaml`, warn if components are still configured. |
+| `tech-pack install <path>` | Register an external tech pack: (1) validate its registry, (2) build its system CLI, (3) add to `sdd-settings.yaml` under `tech_packs`. Agents and skills are loaded at runtime via the gateway (not pre-registered with Claude Code). |
+| `tech-pack remove <namespace>` | Unregister a tech pack: (1) remove from `sdd-settings.yaml`, (2) warn if components are still configured. |
 
 Exposed through `sdd-run`:
 
@@ -1037,8 +1140,8 @@ sdd-run tech-pack remove <namespace>
 `sdd-run` command routing becomes three tiers:
 
 1. **Core orchestrated** → core skills (`change`, `init`, `version`)
-2. **Core pass-through** → core system (`permissions`, `tech-pack`)
-3. **`<namespace> *`** → tech pack command router. Core reads `commands.available` from the registry to validate the command name, then delegates to `commands.router` with the remaining args. The command router handles all internal dispatch. Example: `sdd-run fs-ts database setup main-db` → core validates `database setup` exists in `commands.available`, then invokes the command router with args `database setup main-db`
+2. **Core pass-through** → core system (`permissions`, `tech-pack`, `scaffolding`, `settings`, `archive`, `spec`, `workflow`). Note: `log` is internal-only — not exposed through `sdd-run`.
+3. **`<namespace> *`** → tech pack command router. Core reads `commands.available` from the registry to validate the command name, then delegates to `commands.router` with the remaining args. The command router handles all internal dispatch. Example: `sdd-run fs-ts database setup main-db` → core validates `database setup` exists in `commands.available`, then invokes the command router with command=`database setup`, args=`{name: "main-db"}`.
 
 ### 8. Schemas
 
@@ -1127,7 +1230,7 @@ All contracts and configuration files have a JSON Schema (2020-12) definition. T
           "description": "Component type keys this component depends on"
         },
         "scaffolding": { "type": "string", "description": "Relative path to scaffolding skill" },
-        "agent":       { "type": "string", "description": "Relative path to agent file" }
+        "agent":       { "$ref": "#/$defs/agent_ref", "description": "Agent assigned to this component type" }
       }
     },
     "command": {
@@ -1159,7 +1262,16 @@ All contracts and configuration files have a JSON Schema (2020-12) definition. T
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "agent": { "type": "string", "description": "Relative path to agent file" }
+        "agent": { "$ref": "#/$defs/agent_ref" }
+      }
+    },
+    "agent_ref": {
+      "type": "object",
+      "required": ["name", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "description": "Agent name as registered with Claude Code (matches frontmatter name)" },
+        "path": { "type": "string", "description": "Relative path to agent .md file within the tech pack" }
       }
     }
   }
