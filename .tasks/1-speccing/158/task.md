@@ -844,7 +844,7 @@ plugin/
         │   │   ├── config/
         │   │   ├── contract/
         │   │   ├── database/
-        │   │   └── local-env/         # check-tools, deploy — backs `sdd-run local-env *`
+        │   │   └── local-env/         # all 21 env/ files — backs `sdd-run fs-ts local-env *`
         │   ├── lib/
         │   └── types/
         ├── dist/
@@ -1038,7 +1038,9 @@ Core skills that currently hardcode tech-specific names must be rewritten to rea
 | `change-orchestration/implementation` | Hardcoded agent names | Reads `components.*.agent` from manifest |
 | `scaffolding` (router skill) | Hardcoded delegation table | **Split** — generic engine stays in core system CLI, tech-specific orchestration (ordering, delegation, directory patterns) moves to new tech pack `scaffolding` skill |
 
-**Core skills with no changes needed:** `workflow-state`, `spec-decomposition`, `spec-index`, `spec-solicitation`, `spec-writing`, `domain-population`, `external-spec-integration`, `commit-standards`, `version-orchestration`. These are pure SDD methodology with no tech-specific references.
+**Core skills with no changes needed:** `workflow-state`, `spec-index`, `spec-solicitation`, `spec-writing`, `domain-population`, `commit-standards`, `version-orchestration`. These are pure SDD methodology with no tech-specific references.
+
+**Core skills with minor changes needed:** `external-spec-integration` (strip generic "Infrastructure / DevOps" category label from `resources/workflow-steps.md` line 228 — replace with tech-agnostic term like "Infrastructure"), `spec-decomposition` (strip "Infrastructure / DevOps last" from `resources/outline-modes.md` line 173 — replace with "Infrastructure last").
 
 **New core skill:**
 
@@ -1066,12 +1068,14 @@ Core's project scaffolding invokes the skills router with `phase: project-scaffo
 | `sdd-help.md` | "SDD currently scaffolds Node.js/TypeScript backends, React/TypeScript frontends, PostgreSQL databases..." | Replace with generic text. Reference `techpacks` skill, which loads `documentation.help` from active tech packs. |
 | `sdd-run.md` | `--spec <path>` flag defaults to `components/<component>/openapi.yaml` | Remove OpenAPI-specific default. Tech pack provides defaults via manifest. |
 
-**System CLI commands that move to tech pack:**
+**System CLI command directories that move to tech pack:**
 
-| Command | Reason |
-|---|---|
-| `env/check-tools.ts` → `local-env/check-tools.ts` | Checks for Node.js, npm, kubectl, helm — tech-specific tool requirements |
-| `env/deploy.ts` → `local-env/deploy.ts` | Kubernetes/Helm deployment — entirely tech-specific |
+| Directory | Files | Reason |
+|---|---|---|
+| `env/` → `local-env/` | 21 files (check-tools, config, create, deploy, destroy, forward, handler, index, infra, restart, schema, start, status, stop, types, undeploy + 4 provider files + provider index) | Kubernetes/minikube/kind local environment management — entirely tech-specific |
+| `config/` | All files | YAML config generation and validation — tech-specific |
+| `contract/` | All files | OpenAPI spec processing — tech-specific |
+| `database/` | All files | PostgreSQL migrations and seed — tech-specific |
 
 **Breaking change — project metadata directory rename:**
 
@@ -1607,7 +1611,7 @@ Options:
 - [ ] Tech system abstracts core — **verify:** `grep -r "core/system" plugin/fullstack-typescript/skills/` returns zero matches (tech skills never reference core's system)
 - [ ] Settings namespace works — **verify:** `npm test` passes with updated settings schema including `tech_packs` key
 - [ ] Single `plugin.json` — **verify:** `cat plugin/.claude-plugin/plugin.json` lists only `core/` paths (commands, skills). No `fullstack-typescript/` paths — tech pack artifacts are loaded dynamically via the techpacks.
-- [ ] No soft cross-boundary references — **verify:** every skill name referenced in core traces to a manifest integration point, not a hardcoded name
+- [ ] No soft cross-boundary references — **verify:** `grep -rn "techpacks\." plugin/core/skills/ plugin/core/commands/` returns only calls through the `techpacks` skill operations (`techpacks.readManifest`, `techpacks.loadSkill`, `techpacks.loadAgent`, `techpacks.routeSkills`, `techpacks.routeCommand`, `techpacks.listComponents`, `techpacks.dependencyOrder`, `techpacks.resolvePath`). No core file references a tech pack skill or agent by filename or path outside of a `techpacks.*` call.
 - [ ] `techpacks` skill works — **verify:** invoking `tech-pack info fs-ts` returns component list, lifecycle integration points, and documentation paths
 - [ ] `tech-pack validate` catches errors — **verify:** a malformed manifest (missing required field) returns a clear validation error
 - [ ] **Skill coverage — static matrix.** Every pre-split artifact (38 skills, 7 agents) maps to a post-split loading path in the Skill Coverage Matrix below. No artifact is orphaned. **Verify:** every row in the matrix has a non-empty "Post-split mechanism" column. Cross-check with `find plugin/ -name "SKILL.md" -o -name "*.md" -path "*/agents/*" | wc -l` pre-split to confirm no artifact is missing from the matrix.
@@ -1633,15 +1637,15 @@ Options:
 
 | # | Skill | Post-split Status |
 |---|---|---|
-| 1 | change-creation | unchanged |
+| 1 | change-creation | modified — reads manifest for dependency graph, agent assignments. Plan templates split: generic structure stays in core, tech-specific content (CMDO/MVVM/TailwindCSS references) moves to tech pack `templates/plans/` |
 | 2 | commit-standards | unchanged |
 | 3 | component-discovery → **tech-discovery** | renamed + heavy rewrite: 71 tech-specific references stripped. Core keeps the discovery framework; tech pack supplies component types, descriptions, and discovery question sets via skills router (`phase: component-discovery`) |
 | 4 | domain-population | unchanged |
-| 5 | external-spec-integration | unchanged |
+| 5 | external-spec-integration | modified (minor) — strip generic "DevOps" category label from `resources/workflow-steps.md` |
 | 6 | planning | modified — reads manifest for agent assignments, standards via skills router |
 | 7 | project-scaffolding | modified — delegates to tech pack for component scaffolding and templates |
 | 8 | project-settings | modified — type→directory mapping removed, reads manifest |
-| 9 | spec-decomposition | unchanged |
+| 9 | spec-decomposition | modified (minor) — strip generic "DevOps" reference from `resources/outline-modes.md` |
 | 10 | spec-index | unchanged |
 | 11 | spec-solicitation | unchanged |
 | 12 | spec-writing | unchanged |
@@ -1691,8 +1695,8 @@ Skills loaded into the main conversation context via the techpacks. Pre-split th
 
 | # | Skill | Command Route | Loaded During |
 |---|---|---|---|
-| 37 | config-orchestration | `sdd-run config *` | config management |
-| 38 | local-env-orchestration | `sdd-run local-env *` | local env management |
+| 37 | config-orchestration | `sdd-run fs-ts config *` | config management |
+| 38 | local-env-orchestration | `sdd-run fs-ts local-env *` | local env management |
 
 #### E. Tech Pack Skills — NEW (did not exist pre-split)
 
@@ -1755,8 +1759,8 @@ Run each scenario and verify `sdd/system-logs/` contains the expected `techpacks
 | 9 | Bugfix planning | `sdd-run change create --type bugfix` | `techpacks.routeSkills`: planning-standards |
 | 10 | Refactor planning | `sdd-run change create --type refactor` | `techpacks.routeSkills`: planning-standards |
 | 11 | Project init | `sdd-run init` | `techpacks.routeSkills`: scaffolding (entry point), per-component scaffolding skills, project templates |
-| 12 | Config management | `sdd-run config generate` | `techpacks.routeCommand`: config → config-orchestration |
-| 13 | Local env | `sdd-run local-env create` | `techpacks.routeCommand`: local-env → local-env-orchestration |
+| 12 | Config management | `sdd-run fs-ts config generate` | `techpacks.routeCommand`: config generate → config-orchestration |
+| 13 | Local env | `sdd-run fs-ts local-env create` | `techpacks.routeCommand`: local-env create → local-env-orchestration |
 | 14 | DB management | `sdd-run fs-ts database setup --name main-db` | `techpacks.routeCommand`: database setup → system CLI delegation |
 | 15 | Contract management | `sdd-run fs-ts contract validate` | `techpacks.routeCommand`: contract validate → system CLI delegation |
 | 16 | /sdd hub | `/sdd` (with active tech pack) | `techpacks.loadSkill`: documentation.capabilities |
