@@ -24,7 +24,7 @@ Tech packs can be **internal** (inside the plugin directory, shipped with the pl
 
 | Term | Definition |
 |---|---|
-| **Plugin** | A Claude Code plugin — a directory containing a `plugin.json` manifest that registers commands, skills, and agents for Claude to use. |
+| **Plugin** | A Claude Code plugin — a directory containing a `plugin.json` file that registers commands, skills, and agents for Claude to use. |
 | **Command** | A markdown file (`.md`) registered in `plugin.json` that defines a user-invocable `/slash-command`. Commands orchestrate skills. |
 | **Skill** | A markdown file (`SKILL.md`) with optional schemas that provides domain knowledge or step-by-step instructions to Claude. Skills are invoked by commands, agents, or other skills — not directly by users. |
 | **Agent** | A markdown file (`.md`) registered in `plugin.json` that defines a specialized persona with specific skills and constraints. Agents are assigned to components during planning and implementation phases. |
@@ -33,9 +33,9 @@ Tech packs can be **internal** (inside the plugin directory, shipped with the pl
 | **Skills router** | A tech pack skill that is the single entry point for all tech pack skill loading. Contains a mapping table of contexts (component types, lifecycle phases, agent contexts) to specific skills. Core loads this whenever it needs tech-pack-specific knowledge. Declared in the manifest as `skills.router`. |
 | **Command router** | A tech pack skill that receives all `sdd-run <namespace> *` commands and dispatches them internally. Declared in the manifest as `commands.router`. |
 | **Orchestrator** | A skill that coordinates multi-step workflows by invoking other skills and system commands in sequence (e.g., `config-orchestration`, `local-env-orchestration`). |
-| **System CLI** (`system-run.sh`) | A shell entrypoint to a TypeScript CLI binary that performs file operations skills cannot do directly (scaffolding, settings I/O, spec parsing, workflow state management). Skills invoke it via `system-run.sh <command> [args]`. |
-| **`plugin.json`** | The Claude Code plugin manifest — declares which commands, skills, and agents the plugin provides, with paths to each file. |
-| **`sdd-settings.yaml`** | Core-owned per-project configuration at `sdd/sdd-settings.yaml`. Stores project name, SDD version, installed tech packs, and a minimal component manifest (name, type, directory). Tech-specific component details live in separate tech pack settings files (`sdd/<namespace>-settings.yaml`). |
+| **System CLI** (`system-run.sh`) | A shell entrypoint to a TypeScript CLI binary for deterministic, performance-sensitive operations (scaffolding, settings I/O, spec parsing, workflow state management). Skills can do these things directly but non-deterministically and slowly — the system CLI provides fast, reliable execution. Skills invoke it via `system-run.sh <command> [args]`. |
+| **`plugin.json`** | The Claude Code plugin configuration file — declares which commands, skills, and agents the plugin provides, with paths to each file. Not to be confused with `techpack.yaml` (the tech pack manifest). |
+| **`sdd-settings.yaml`** | Core-owned per-project configuration at `sdd/sdd-settings.yaml`. Stores project name, SDD version, installed tech packs, and a minimal component list (name, type, directory). Tech-specific component details live in separate tech pack settings files (`sdd/<namespace>-settings.yaml`). |
 | **Tech pack manifest** (`techpack.yaml`) | A static declaration file at the tech pack root that tells core what the tech pack offers — component types, agents, scaffolding skills, command and skills routers, documentation skills, and lifecycle integration points. |
 | **Tech pack** | A self-contained directory providing agents, standards, scaffolding skills, templates, and a system CLI for a specific technology stack. Fills integration points declared in the tech pack manifest (`techpack.yaml`). |
 | **Integration point** | A named slot in the manifest contract that core reads at runtime to discover tech-pack-provided capabilities (e.g., `components.server.agent` → which agent handles server components). |
@@ -142,7 +142,7 @@ The current plugin is a monolith — SDD methodology and fullstack-typescript im
 - Core integration points (planning, verification, testing — per-component and lifecycle-level)
 - Core system CLI changes (tech-pack routing, `tech-pack install|list|remove` commands)
 - Tech pack system CLI (own binary, abstracts core commands behind own API)
-- Update `plugin.json` manifest paths
+- Update `plugin.json` paths
 - Update all internal references (skill paths, system-run.sh paths, template paths)
 
 ### Out of scope
@@ -155,7 +155,7 @@ The current plugin is a monolith — SDD methodology and fullstack-typescript im
 
 ## Constraints
 
-- **Single plugin.** One `plugin.json` manifest. Only `core/` artifacts (commands, skills) are registered in it. Tech pack artifacts are not registered in plugin.json — they are loaded dynamically at runtime via the techpacks. This applies equally to internal and external tech packs.
+- **Single plugin.** One `plugin.json` file. Only `core/` artifacts (commands, skills) are registered in it. Tech pack artifacts are not registered in plugin.json — they are loaded dynamically at runtime via the techpacks. This applies equally to internal and external tech packs.
 - **No soft references.** All cross-boundary references are declared in the tech pack manifest. No casual "delegate to backend-standards" in prose — every reference traces to a manifest entry.
 - **Explicit integration point attribution.** When core loads a tech pack skill, it explicitly indicates which tech pack, which integration point, and which skill file is being used.
 - **Core assumes nothing about the user project's directory structure** aside from the `sdd/` directory and the root `CLAUDE.md` file. All directory conventions (`components/servers/`, `components/config/`, etc.) are tech pack knowledge, declared via `directory_pattern` in the manifest.
@@ -657,7 +657,7 @@ documentation:
 | `commands.available` | Tech-pack-level | Command manifest — core reads this to display help text, validate command names, and provide autocomplete for tech pack commands |
 | `components.*.depends_on` | Per-component | Plan generation and scaffolding order — core builds the DAG from per-component `depends_on` arrays to determine build order and validate dependency references |
 
-**Registry field requirements:**
+**Manifest field requirements:**
 
 | Field | Required | Notes |
 |---|---|---|
@@ -728,7 +728,7 @@ Core validates the command name against `commands.available` in the manifest *be
 ```
 plugin/
 ├── .claude-plugin/
-│   └── plugin.json                    # Single manifest, core/ paths only (tech packs loaded via `techpacks`)
+│   └── plugin.json                    # Core paths only (tech packs loaded via `techpacks`)
 ├── core/
 │   ├── commands/
 │   │   ├── sdd.md
@@ -1195,7 +1195,7 @@ All contracts and configuration files have a JSON Schema (2020-12) definition. T
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sdd.dev/schemas/techpack.json",
-  "title": "Tech Pack Registry",
+  "title": "Tech Pack Manifest",
   "description": "Declares everything a tech pack offers to the SDD core.",
   "type": "object",
   "required": ["tech_pack", "components", "commands", "skills"],
@@ -1606,7 +1606,7 @@ Options:
 - [ ] Inter-system protocol works — **verify:** `plugin/core/system/system-run.sh fs-ts database --help` routes to tech system and returns usage text
 - [ ] Tech system abstracts core — **verify:** `grep -r "core/system" plugin/fullstack-typescript/skills/` returns zero matches (tech skills never reference core's system)
 - [ ] Settings namespace works — **verify:** `npm test` passes with updated settings schema including `tech_packs` key
-- [ ] Single plugin manifest — **verify:** `cat plugin/.claude-plugin/plugin.json` lists only `core/` paths (commands, skills). No `fullstack-typescript/` paths — tech pack artifacts are loaded dynamically via the techpacks.
+- [ ] Single `plugin.json` — **verify:** `cat plugin/.claude-plugin/plugin.json` lists only `core/` paths (commands, skills). No `fullstack-typescript/` paths — tech pack artifacts are loaded dynamically via the techpacks.
 - [ ] No soft cross-boundary references — **verify:** every skill name referenced in core traces to a manifest integration point, not a hardcoded name
 - [ ] `techpacks` skill works — **verify:** invoking `tech-pack info fs-ts` returns component list, lifecycle integration points, and documentation paths
 - [ ] `tech-pack validate` catches errors — **verify:** a malformed manifest (missing required field) returns a clear validation error
