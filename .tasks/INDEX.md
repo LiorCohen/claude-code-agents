@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#158](1-speccing/158/): Split plugin into core/ and fullstack-typescript/ subdirectories
 
 ---
 
@@ -70,7 +70,6 @@
 
 ### Unprioritized
 
-- [#158](0-inbox/158/): Split plugin into core/ and fullstack-typescript/ subdirectories
 - [#156](0-inbox/156/): VSCode status bar should show the selected workflow name
 - [#155](0-inbox/155/): Add human-code-review skill to root .claude
 - [#154](0-inbox/154/): Specs change predictor
