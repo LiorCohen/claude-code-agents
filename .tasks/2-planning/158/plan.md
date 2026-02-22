@@ -170,7 +170,7 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `tests/src/tests/unit/commands/permissions/configure.test.ts` | Update CLI path → `plugin/core/system/dist/cli.js` |
 | `tests/src/tests/integration/scaffolding/engine-integration.test.ts` | Update CLI path → `plugin/core/system/dist/cli.js`. Update `SKILLS_DIR` refs to `TECH_SKILLS_DIR` |
 | `tests/src/tests/integration/database-component/scaffolding-integration.test.ts` | Update `SKILLS_DIR` refs (lines 51, 86) to `TECH_SKILLS_DIR` |
-| `tests/src/tests/workflows/init.test.ts` | Update `.sdd/sdd-settings.yaml` references to `sdd/sdd-settings.yaml` |
+| `tests/src/tests/workflows/init.test.ts` | 11 `.sdd` references: change most to `sdd/`, but keep `.sdd/` in migration test setup (lines 158, 164) to simulate pre-migration project |
 | Root `package.json` | Update workspaces: `["plugin/core/system", "plugin/fullstack-typescript/system", "tests"]`. Update `logs` script: `.sdd/system-logs` → `sdd/system-logs` |
 
 ## Changes
@@ -203,7 +203,7 @@ Set up both system CLIs to compile independently.
 9. Update root `package.json` scripts: `build:plugin` builds both systems, `typecheck:plugin` checks both, `logs` script updates `.sdd/system-logs` → `sdd/system-logs`
 10. Run `npm install` after workspace update (required before builds can succeed)
 11. Update test infrastructure — 10 test files/utilities need path updates:
-    - `tests/src/lib/paths.ts` (line 16): split `SKILLS_DIR` into `CORE_SKILLS_DIR` (`plugin/core/skills`) and `TECH_SKILLS_DIR` (`plugin/fullstack-typescript/skills`) — used in 21 places across 4 test files
+    - `tests/src/lib/paths.ts` (line 16): split `SKILLS_DIR` into `CORE_SKILLS_DIR` (`plugin/core/skills`) and `TECH_SKILLS_DIR` (`plugin/fullstack-typescript/skills`). Also update `tests/src/lib/index.ts` barrel re-export — 21 total references across 4 files (paths.ts, index.ts, engine-integration.test.ts, scaffolding-integration.test.ts)
     - `tests/src/lib/process.ts` (line 89): update `PLUGIN_DIR/system/dist/cli.js` — split into core and tech system CLI paths based on command namespace
     - `tests/src/tests/unit/lib/json-schema.test.ts`: update `PLUGIN_SYSTEM_DIR` to `plugin/core/system`
     - `tests/src/tests/unit/commands/archive/store.test.ts`: update to `plugin/core/system` (archive is a core command)
@@ -214,7 +214,10 @@ Set up both system CLIs to compile independently.
     - `tests/src/tests/integration/scaffolding/engine-integration.test.ts`: update CLI path to `plugin/core/system` + update `SKILLS_DIR` refs to `TECH_SKILLS_DIR` (scaffolding engine is core but skill configs reference tech pack skills)
     - `tests/src/tests/integration/database-component/scaffolding-integration.test.ts`: update `SKILLS_DIR` refs to `TECH_SKILLS_DIR` (lines 51, 86) + `runScaffolding()` fix from process.ts
 12. Delete `tests/src/tests/unit/hooks/prompt-commit-after-write.test.ts` — tests the hook system which is deleted in Phase 1 step 6
-13. Update `tests/src/tests/workflows/init.test.ts` — references `.sdd/sdd-settings.yaml` (line 9); update to `sdd/sdd-settings.yaml` to match the `.sdd/` → `sdd/` migration
+13. Update `tests/src/tests/workflows/init.test.ts` — 11 `.sdd` references need nuanced handling:
+    - **Change to `sdd/`** (new format): lines 9, 60 (comment/prompt text), 101-102 (first test assertions), 121-122 (first test settings assertions)
+    - **Keep as `.sdd/`** (migration test setup): lines 158, 164 (second test creates `.sdd/` to simulate pre-migration project)
+    - **Change assertions to `sdd/`** (migration test expectations): lines 204, 205, 208 (second test should verify migration output uses new format)
 14. Verify `npm run build:plugin` succeeds for both systems
 15. Verify `npm run typecheck:plugin` passes for both systems
 16. Verify `npm test` passes
