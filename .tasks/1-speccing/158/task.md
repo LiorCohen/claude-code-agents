@@ -207,7 +207,7 @@ The `techpacks` skill:
 
 5. The subagent reads the agent `.md` file and skill files itself — these contents exist only in the subagent's context, never in the main conversation.
 
-Core reads agent names from the manifest (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `techpacks.loadAgent` with the agent ref to spawn the subagent.
+Core reads agent names via `techpacks.readManifest` (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `techpacks.loadAgent` with the agent ref to spawn the subagent.
 
 **Enforcement rules:**
 
@@ -1099,7 +1099,7 @@ Skills that move to the tech pack:
   - The main context stays focused on orchestration — it sees only agent name, model, tools, and skill names
   - Works identically for internal and external tech packs
 
-  Core reads agent names from the manifest (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `techpacks.loadAgent` with the agent ref — the main context never reads the agent file directly.
+  Core reads agent names via `techpacks.readManifest` (`components.*.agent.name`, `lifecycle.*.agent.name`) during planning and writes them into plans. During implementation, core invokes `techpacks.loadAgent` with the agent ref — the main context never reads the agent file directly.
 
 ### 6. Tech Pack Skill Changes
 
