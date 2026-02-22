@@ -2,7 +2,8 @@
 id: 157
 title: Extract sdd-core from monolithic plugin into core + tech pack architecture
 priority: high
-status: speccing
+status: rejected
+rejected_reason: Obsolete — trying a different approach
 created: 2026-02-21 18:00 UTC
 depends_on: []
 blocks: []

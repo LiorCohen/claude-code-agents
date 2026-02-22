@@ -4,7 +4,7 @@
 
 ## Speccing
 
-- [#157](1-speccing/157/): Extract sdd-core from monolithic plugin into core + tech pack architecture
+(none)
 
 ---
 
@@ -169,6 +169,7 @@
 
 ## Rejected
 
+- [#157](7-rejected/157/): Extract sdd-core from monolithic plugin into core + tech pack architecture — obsolete, trying a different approach
 - [#103](7-rejected/103/): Validate sdd-settings writes against schema — obsolete, implemented via reconciliation system
 - [#91](7-rejected/91/): Fix agents standards violations from audit report — obsolete
 - [#84](7-rejected/84/): Apply zero session context to sdd-init workflow — obsolete, superseded by #81 and #85
