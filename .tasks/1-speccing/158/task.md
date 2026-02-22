@@ -179,7 +179,6 @@ Every interaction between core and a tech pack is funneled through the `techpack
 | `gateway.loadAgent(namespace, agentRef)` | Read agent file, parse frontmatter, resolve skills, spawn as Task subagent | Task subagent with composed prompt |
 | `gateway.routeCommand(namespace, command, args)` | Validate command against `commands.available`, load command router | Router skill content + context block |
 | `gateway.routeSkills(namespace, context)` | Load skills router with structured context | Router skill content + context block |
-| `gateway.delegateSystem(namespace, args)` | Delegate to tech pack system CLI, process declared actions | Command result + processed actions |
 | `gateway.listComponents(namespace)` | Read component types from registry | Component type list with metadata |
 | `gateway.dependencyOrder(namespace)` | Build and return topologically sorted dependency graph | Ordered component type list |
 
@@ -244,15 +243,15 @@ Core reads agent names from the registry (`components.*.agent.name`, `lifecycle.
 | `techpacks` skill | `registry`, `listComponents`, `resolve`, `loadSkill` |
 | `planning` skill | `registry` (agent names), `routeSkills`, `dependencyOrder` |
 | `project-scaffolding` skill | `routeSkills`, `resolve` |
-| `tech-discovery` skill | `listComponents` |
+| `tech-discovery` skill | `routeSkills` |
 | `change-creation` skill | `registry` (agent names), `routeSkills`, `dependencyOrder` |
 | `change-orchestration/verification` skill | `loadAgent`, `routeSkills` |
 | `change-orchestration/implementation` skill | `loadAgent`, `routeSkills` |
 | `init-orchestration` skill | `routeCommand` |
 | `sdd.md` command | `loadSkill` (documentation.capabilities) |
 | `sdd-help.md` command | `loadSkill` (documentation.help) |
-| `sdd-run.md` command | `routeCommand`, `delegateSystem` |
-| Core system CLI | `delegateSystem`, `registry` |
+| `sdd-run.md` command | `routeCommand` |
+| Core system CLI | `registry` |
 
 ## Changes
 
@@ -401,15 +400,15 @@ commands:
       args:
         env:
           type: string
-          required: true
+          mandatory: true
           description: "Target environment (e.g., local, staging, production)"
         component:
           type: string
-          required: false
+          mandatory: false
           description: "Extract config for a single component"
         output:
           type: string
-          required: false
+          mandatory: false
           description: "Write output to file path instead of stdout"
 
     - name: config validate
@@ -418,7 +417,7 @@ commands:
       args:
         env:
           type: string
-          required: false
+          mandatory: false
           description: "Validate a specific environment (default: all)"
 
     - name: config add-env
@@ -427,7 +426,7 @@ commands:
       args:
         env_name:
           type: string
-          required: true
+          mandatory: true
           description: "Environment name (e.g., staging, production)"
 
     - name: config diff
@@ -436,11 +435,11 @@ commands:
       args:
         env_a:
           type: string
-          required: true
+          mandatory: true
           description: "First environment to compare"
         env_b:
           type: string
-          required: true
+          mandatory: true
           description: "Second environment to compare"
 
     # contract
@@ -450,7 +449,7 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Contract component name"
 
     - name: contract validate
@@ -459,7 +458,7 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Contract component name"
 
     # database
@@ -469,11 +468,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -483,11 +482,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -497,11 +496,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -511,11 +510,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -525,11 +524,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -539,11 +538,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -553,11 +552,11 @@ commands:
       args:
         name:
           type: string
-          required: true
+          mandatory: true
           description: "Database component name"
         env:
           type: string
-          required: false
+          mandatory: false
           default: local
           description: "Target environment"
 
@@ -719,7 +718,7 @@ The command router SKILL.md must contain:
 
 | Required Section | Purpose |
 |---|---|
-| **Dispatch Table** | Maps `command` → skill or system action to invoke (e.g., `database setup` → `skills/orchestrators/database-orchestration/SKILL.md`, `local-env check-tools` → `system-run.sh local-env check-tools`) |
+| **Dispatch Table** | Maps `command` → skill or system action to invoke (e.g., `config generate` → `skills/orchestrators/config-orchestration/SKILL.md`, `database setup` → `system-run.sh database setup`, `local-env check-tools` → `system-run.sh local-env check-tools`) |
 | **Dispatch Instructions** | Explicit instructions for Claude: "Match the command against the dispatch table. Load the target skill or invoke the system command. Do NOT load unrelated skills." |
 
 Core validates the command name against `commands.available` in the registry *before* invoking the command router. The router can assume the command is valid.
@@ -1074,6 +1073,10 @@ Core's project scaffolding invokes the skills router with `phase: project-scaffo
 | `env/check-tools.ts` → `local-env/check-tools.ts` | Checks for Node.js, npm, kubectl, helm — tech-specific tool requirements |
 | `env/deploy.ts` → `local-env/deploy.ts` | Kubernetes/Helm deployment — entirely tech-specific |
 
+**Breaking change — project metadata directory rename:**
+
+`.sdd/` → `sdd/` (hidden → visible). All project metadata files (`sdd-settings.yaml`, `<namespace>-settings.yaml`, `system-logs/`) move from `.sdd/` to `sdd/`. This is a v8.0.0 breaking change. Existing projects must rename the directory. The migration path is covered by OQ-5.
+
 **Removed entirely:**
 
 | Directory | Reason |
@@ -1288,11 +1291,11 @@ All contracts and configuration files have a JSON Schema (2020-12) definition. T
     },
     "command_arg": {
       "type": "object",
-      "required": ["type", "required", "description"],
+      "required": ["type", "mandatory", "description"],
       "additionalProperties": false,
       "properties": {
         "type":        { "type": "string", "enum": ["string", "number", "boolean"] },
-        "required":    { "type": "boolean" },
+        "mandatory":   { "type": "boolean" },
         "description": { "type": "string" },
         "default":     {}
       }
@@ -1498,7 +1501,7 @@ All contracts and configuration files have a JSON Schema (2020-12) definition. T
   "properties": {
     "phase": {
       "type": "string",
-      "enum": ["project-scaffolding", "plan-generation", "implementation", "verification", "testing"]
+      "enum": ["component-discovery", "project-scaffolding", "plan-generation", "implementation", "verification", "testing"]
     },
     "component_type": {
       "type": "string",
@@ -1580,9 +1583,17 @@ How does `sdd-init` interact with tech packs?
 
 ### OQ-5: Existing Project Migration
 
-Existing SDD projects have `sdd-settings.yaml` without a `tech_packs` namespace and components defined at the top level. How do they migrate?
+Existing SDD projects have `.sdd/sdd-settings.yaml` without a `tech_packs` namespace and components defined at the top level. How do they migrate?
 
-- **a)** `sdd-init` detects the old format and auto-migrates (moves components under `tech_packs.fs-ts`)
+Migration scope (not just a namespace move):
+- Directory rename: `.sdd/` → `sdd/`
+- Drop fields: `initialized_by_plugin_version`, `updated_by_plugin_version`, `initialized_at`, `updated_at`, `project.description`
+- Simplify `sdd` section: replace plugin version fields with single `version`
+- Move top-level `components` array (with full settings) under `tech_packs.fs-ts.components` (stripped to name, type, directory only)
+- Create `sdd/fs-ts-settings.yaml` with the full component details (depends_on, capabilities, settings)
+
+Options:
+- **a)** `sdd-init` detects the old format and auto-migrates
 - **b)** A one-time `sdd-run tech-pack migrate` command
 - **c)** Core reads both old and new formats during a transition period
 
@@ -1655,9 +1666,9 @@ Skills loaded into agent subcontexts. Pre-split these were registered in `plugin
 | 24 | postgresql | db-advisor, devops |
 | 25 | helm-standards | devops |
 | 26 | cicd-standards | devops |
-| 27 | testing-standards | tester |
-| 28 | integration-testing | tester |
-| 29 | e2e-testing | tester |
+| 27 | testing-standards → **split** into integration-testing-standards (#28) and e2e-testing-standards (#29) | tester (no longer loads this directly) |
+| 28 | integration-testing → integration-testing-standards | tester |
+| 29 | e2e-testing → e2e-testing-standards | tester |
 | — | techpack-settings | api-designer, backend-dev, frontend-dev, devops, tester — **NEW**, replaces `project-settings` in agent frontmatter |
 
 #### C. Tech Pack Skills — Main Context (loaded via gateway.routeSkills)
@@ -1697,6 +1708,9 @@ These are new skills introduced by the split. They don't need "coverage" (nothin
 | help-content | documentation.help — /sdd-help tech section |
 | skills-router | Entry point for gateway.routeSkills — maps context to skills |
 | command-router | Entry point for gateway.routeCommand — maps commands to targets |
+| cicd-scaffolding | Scaffolding skill for CI/CD components. Formalizes what was previously inline scaffolding in the pre-split `scaffolding` router. |
+| integration-testing-scaffolding | Scaffolding skill for integration test suites. Formalizes what was previously inline scaffolding. |
+| e2e-testing-scaffolding | Scaffolding skill for end-to-end test suites. Formalizes what was previously inline scaffolding. |
 
 #### F. Agents (loaded via gateway.loadAgent → subagent)
 
@@ -1707,7 +1721,7 @@ All 7 agents move from `plugin/agents/` to `plugin/fullstack-typescript/agents/`
 | 39 | api-designer | techpack-settings, typescript-standards, contract-standards |
 | 40 | backend-dev | techpack-settings, typescript-standards, backend-standards, database-standards, unit-testing |
 | 41 | frontend-dev | techpack-settings, typescript-standards, frontend-standards, unit-testing |
-| 42 | tester | techpack-settings, integration-testing, e2e-testing, testing-standards |
+| 42 | tester | techpack-settings, integration-testing-standards, e2e-testing-standards |
 | 43 | reviewer | typescript-standards, backend-standards, frontend-standards, unit-testing |
 | 44 | db-advisor | postgresql, database-standards |
 | 45 | devops | techpack-settings, scaffolding, postgresql, helm-standards, cicd-standards |
@@ -1731,25 +1745,28 @@ Run each scenario and verify `sdd/system-logs/` contains the expected `gateway.*
 | # | Scenario | Trigger | Expected Log Entries |
 |---|---|---|---|
 | 1 | Component discovery | spec creation (external spec workflow) | `gateway.routeSkills`: component-discovery |
-| 2 | Feature planning | `sdd-run change create --type feature` | `gateway.routeSkills`: planning-standards, plan-feature template |
+| 2 | Feature planning | `sdd-run change create --type feature` | `gateway.routeSkills`: planning-standards |
 | 3 | Feature impl: scaffolding | plan phase 1 | `gateway.loadAgent`: devops |
 | 4 | Feature impl: contract | plan phase 2 | `gateway.loadAgent`: api-designer |
 | 5 | Feature impl: backend | plan phase 3 | `gateway.loadAgent`: backend-dev |
 | 6 | Feature impl: frontend | plan phase 4 | `gateway.loadAgent`: frontend-dev |
 | 7 | Feature impl: testing | plan phase 5 | `gateway.loadAgent`: tester |
 | 8 | Feature impl: review | plan phase 6 | `gateway.loadAgent`: reviewer + db-advisor (if DB changes) |
-| 9 | Bugfix planning | `sdd-run change create --type bugfix` | `gateway.routeSkills`: planning-standards, plan-bugfix template |
-| 10 | Refactor planning | `sdd-run change create --type refactor` | `gateway.routeSkills`: planning-standards, plan-refactor template |
+| 9 | Bugfix planning | `sdd-run change create --type bugfix` | `gateway.routeSkills`: planning-standards |
+| 10 | Refactor planning | `sdd-run change create --type refactor` | `gateway.routeSkills`: planning-standards |
 | 11 | Project init | `sdd-run init` | `gateway.routeSkills`: scaffolding (entry point), per-component scaffolding skills, project templates |
 | 12 | Config management | `sdd-run config generate` | `gateway.routeCommand`: config → config-orchestration |
 | 13 | Local env | `sdd-run local-env create` | `gateway.routeCommand`: local-env → local-env-orchestration |
-| 14 | DB passthrough | `sdd-run database setup --name main-db` | No gateway log — core system delegates to tech system CLI directly |
-| 15 | Contract passthrough | `sdd-run contract validate` | No gateway log — core system delegates to tech system CLI directly |
-| 16 | /sdd hub | `/sdd` (with active tech pack) | `gateway.routeSkills`: capabilities |
-| 17 | /sdd-help | `/sdd-help` | `gateway.routeSkills`: help-content |
+| 14 | DB management | `sdd-run fs-ts database setup --name main-db` | `gateway.routeCommand`: database setup → system CLI delegation |
+| 15 | Contract management | `sdd-run fs-ts contract validate` | `gateway.routeCommand`: contract validate → system CLI delegation |
+| 16 | /sdd hub | `/sdd` (with active tech pack) | `gateway.loadSkill`: documentation.capabilities |
+| 17 | /sdd-help | `/sdd-help` | `gateway.loadSkill`: documentation.help |
 | 18 | Scaffolding: server | component scaffolding | `gateway.routeSkills`: backend-scaffolding |
 | 19 | Scaffolding: webapp | component scaffolding | `gateway.routeSkills`: frontend-scaffolding |
 | 20 | Scaffolding: database | component scaffolding | `gateway.routeSkills`: database-scaffolding |
 | 21 | Scaffolding: contract | component scaffolding | `gateway.routeSkills`: contract-scaffolding |
 | 22 | Scaffolding: config | component scaffolding | `gateway.routeSkills`: config-scaffolding |
 | 23 | Scaffolding: helm | component scaffolding | `gateway.routeSkills`: helm-scaffolding |
+| 24 | Scaffolding: cicd | component scaffolding | `gateway.routeSkills`: cicd-scaffolding |
+| 25 | Scaffolding: integration-testing | component scaffolding | `gateway.routeSkills`: integration-testing-scaffolding |
+| 26 | Scaffolding: e2e-testing | component scaffolding | `gateway.routeSkills`: e2e-testing-scaffolding |
