@@ -20,9 +20,9 @@ created: 2026-02-23 23:00 UTC
   - Add `mode: 'git'` to `TechPackEntry.mode` union: `'internal' | 'external' | 'git'`
   - Add optional fields: `repo?: string`, `ref?: string`, `install_path?: string`
   - Remove `components` from `TechPackEntry`
-  - Add top-level `ComponentEntry` type: `{ type: string; techpack: string; directory: string }`
+  - Rename `ComponentManifest` → `ComponentEntry` with new shape: `{ type: string; techpack: string; directory: string }` (name becomes the map key, `techpack` replaces implicit nesting). Update all downstream imports (`reconcile.ts`, `validate.ts`, `sync.ts`, `process-actions.ts`).
   - Add `SettingsFile.components?: Readonly<Record<string, ComponentEntry>>`
-  - Update `settings/index.ts` re-exports: export new `ComponentEntry` type, remove `ComponentManifest` if it was only used for nested components
+  - Update `settings/index.ts` re-exports: export renamed `ComponentEntry` type
 
 ### Step 2: Update settings schema
 
@@ -133,7 +133,7 @@ created: 2026-02-23 23:00 UTC
 
 - Depends on: Step 13
 - All changes are committed on the feature branch (never merged to main)
-- Version bump with changelog entry for the settings schema changes
+- **No version bump** — bumping 7.2.0 on a throwaway branch is meaningless. The new repos create fresh manifests at 0.1.0 in Phase B.
 - All TypeScript changes, schema changes, skill changes, and techpack.yaml in one commit
 - This commit is the source of truth for the code distributed to new repos in Phase B
 
@@ -152,34 +152,38 @@ created: 2026-02-23 23:00 UTC
 ### Step 16: Populate sdd-core
 
 - Depends on: Steps 14, 15
+- **Source:** All copies below are from the **feature branch working tree** (which has all Phase A changes applied).
 - Implementation:
   - Clone `sdd-engine/sdd-core` into a temp working directory
   - Copy `plugin/core/` contents flattened into `plugin/` (i.e., `plugin/core/commands/` → `plugin/commands/`, `plugin/core/skills/` → `plugin/skills/`, `plugin/core/system/` → `plugin/system/`, `plugin/core/permissions/` → `plugin/permissions/`)
   - Create `plugin/.claude-plugin/plugin.json` — version 0.1.0, paths adjusted (no `core/` prefix): `"./commands/sdd.md"`, `"./skills/"`
   - Create `.claude-plugin/marketplace.json` — version 0.1.0, source `./plugin`, description for core-only, owner `sdd-engine`
-  - Create `package.json` for the system workspace (single workspace: `plugin/system`)
+  - Create `package.json` for the system workspace (single workspace: `plugin/system`). Build script: `tsc -p plugin/system/tsconfig.json && tsc-alias -p plugin/system/tsconfig.json`
   - Copy docs: `getting-started.md`, `commands.md`, `workflows.md`, `tutorial.md`, `external-specs.md`, `workflow-progress.md`, `logo.svg` into `docs/`
   - Create `.github/workflows/release.yml` — adapted from current `LiorCohen/sdd` workflow
   - Write fresh `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`
   - Write `CHANGELOG.md` — version 0.1.0 entry with lineage reference to `LiorCohen/sdd`
   - Create `.gitignore` and `.claudeignore` tailored for core
   - Copy `LICENSE` (MIT)
+  - **Build verification:** Run `npm install && npm run build` to confirm standalone build works. Fix any path issues before pushing.
   - Commit and push
 
 ### Step 17: Populate sdd-fullstack-typescript-techpack
 
 - Depends on: Steps 14, 15
+- **Source:** All copies below are from the **feature branch working tree**.
 - Implementation:
   - Clone `sdd-engine/sdd-fullstack-typescript-techpack` into a temp working directory
   - Copy `plugin/fullstack-typescript/` contents into `techpack/` (i.e., `plugin/fullstack-typescript/agents/` → `techpack/agents/`, etc.)
   - The `techpack.yaml` (already renamed to `techpack:` key in Step 11) goes to `techpack/techpack.yaml`
-  - Create `package.json` for the system workspace (single workspace: `techpack/system`)
+  - Create `package.json` for the system workspace (single workspace: `techpack/system`). Build script: `tsc -p techpack/system/tsconfig.json && tsc-alias -p techpack/system/tsconfig.json`
   - Copy docs: `agents.md`, `components.md`, `config-guide.md` into `docs/`
   - Create `.github/workflows/release.yml` — version-triggered release with techpack archive
   - Write fresh `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`
   - Write `CHANGELOG.md` — version 0.1.0 entry with lineage reference
   - Create `.gitignore` and `.claudeignore`
   - Copy `LICENSE` (MIT)
+  - **Build verification:** Run `npm install && npm run build` to confirm standalone build works. Fix any path issues before pushing.
   - Commit and push
 
 ### Step 18: Populate sdd-vscode-extension
