@@ -70,6 +70,7 @@
 
 ### Unprioritized
 
+- [#159](0-inbox/159/): Session management guidance — when to create new sessions vs compact
 - [#156](0-inbox/156/): VSCode status bar should show the selected workflow name
 - [#155](0-inbox/155/): Add human-code-review skill to root .claude
 - [#154](0-inbox/154/): Specs change predictor
