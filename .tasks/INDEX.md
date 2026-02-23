@@ -36,6 +36,7 @@
 
 ### High Priority
 
+- [#162](0-inbox/162/): Split SDD into sdd-engine org repos (sdd-core + sdd-fullstack-typescript-techpack)
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories
