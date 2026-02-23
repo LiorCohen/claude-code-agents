@@ -9,7 +9,7 @@
   "properties": {
     "command": {
       "type": "string",
-      "description": "Validated command name (e.g., database setup)"
+      "description": "Validated command name (e.g., component setup)"
     },
     "args": {
       "type": "object",

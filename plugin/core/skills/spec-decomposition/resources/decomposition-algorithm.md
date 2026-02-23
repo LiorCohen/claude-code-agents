@@ -16,9 +16,9 @@ Parse the markdown document to extract:
    - Pattern: `Given [context] When [action] Then [result]`
    - Also: checkbox lists under "Acceptance Criteria" headers
 
-4. **API endpoints**
-   - Pattern: `METHOD /path` (e.g., `POST /users`, `GET /orders/:id`)
-   - Group by namespace (`/users/*`, `/orders/*`, `/auth/*`)
+4. **External interfaces**
+   - Pattern: operations exposed by the component
+   - Group by domain (users, orders, auth)
 
 5. **Domain concepts**
    - Capitalized nouns that appear repeatedly
@@ -31,9 +31,9 @@ Identify potential change boundaries using these signals:
 
 **Strong Signals (high confidence):**
 - Explicit section markers (`## Feature: User Authentication`)
-- Distinct API namespaces (`/auth/*` vs `/orders/*`)
+- Distinct interface namespaces (auth vs orders)
 - Non-overlapping user roles across sections
-- Separate database entities mentioned
+- Separate persistence entities mentioned
 
 **Moderate Signals:**
 - Thematic grouping of user stories
@@ -61,9 +61,9 @@ Score each change's independence (0.0 to 1.0):
 
 ```text
 Independence Score =
-  + 0.3 if has own API endpoints
+  + 0.3 if has own external interfaces
   + 0.2 if has own data model/entities
-  + 0.2 if has own UI section/pages
+  + 0.2 if has own user-facing surface
   + 0.2 if has >= 3 acceptance criteria
   + 0.1 if has distinct user role
   - 0.2 for each hard dependency on other proposed changes
@@ -106,7 +106,7 @@ Changes should be merged when:
 
 Changes should be split when:
 - Change has > 10 acceptance criteria
-- Change has > 5 API endpoints
+- Change has > 5 external interfaces
 - Change spans multiple distinct user roles
 - Change covers multiple domains
 

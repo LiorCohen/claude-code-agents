@@ -46,7 +46,7 @@ sdd/
     │       │   ├── context.md
     │       │   ├── 01-api-contracts/
     │       │   │   └── context.md
-    │       │   └── 02-backend-service/
+    │       │   └── 02-auth-service/
     │       │       └── context.md
     │       └── 02-notifications/
     │           └── context.md

@@ -78,13 +78,13 @@ items:
     review_status: pending
     location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
   - change_id: user-auth-2
-    title: Backend Service
+    title: Auth Service
     type: feature
     spec_status: in_progress
     plan_status: pending
     impl_status: pending
     review_status: pending
-    location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
+    location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-auth-service
 ```
 
 ## workflow_state.get_current(workflow_id)
@@ -122,7 +122,7 @@ workflow_id: a1b2c3  # Required.
 **Output:**
 ```yaml
 change_id: user-auth-2
-title: Backend Service
+title: Auth Service
 type: feature
 status: pending
 previous: user-auth-1

@@ -88,7 +88,7 @@
     "component_name": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
-      "description": "Lowercase, hyphens only. Should be multi-word and domain-specific (e.g., order-service, analytics-db)."
+      "description": "Lowercase, hyphens only. Should be multi-word and domain-specific (e.g., auth-service, user-store)."
     },
     "component": {
       "type": "object",

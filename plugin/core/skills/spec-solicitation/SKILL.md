@@ -145,7 +145,7 @@ Agent: Loading context...
 
 Step 1: Context & Goal
 Based on the provided context, this appears to be about:
-- Building API endpoints for user authentication
+- Building interfaces for user authentication
 - Including login, logout, and session refresh
 
 Is that correct? (yes/no/modify)
@@ -162,12 +162,12 @@ Agent: Got it. Adding password reset to the requirements.
 ```yaml
 User: /sdd I want to continue
 
-Agent: Resuming spec solicitation for: API Contracts (user-auth-1)
+Agent: Resuming spec solicitation for: Auth Contracts (user-auth-1)
 
 Previously collected:
-  - Problem: User authentication needs API endpoints
-  - Primary user: Frontend developers
-  - Expected outcome: API for auth operations
+  - Problem: User authentication needs service interfaces
+  - Primary user: Interface consumers
+  - Expected outcome: Auth operations interface
   - Requirements: 3 collected (login, logout, refresh)
 
 Continuing from: Step 5 - Acceptance Criteria

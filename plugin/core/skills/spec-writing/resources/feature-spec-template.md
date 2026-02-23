@@ -167,7 +167,7 @@ specs/
 
 | # | Question | Answer | Source |
 |---|----------|--------|--------|
-| S1 | [Deep-dive question for backend] | [Answer] | User |
+| S1 | [Deep-dive question for component] | [Answer] | User |
 | S2 | [Follow-up] [Clarification question] | [Answer] | User |
 
 ### User Feedback & Corrections

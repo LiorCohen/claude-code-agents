@@ -13,11 +13,11 @@
     },
     "component_type": {
       "type": "string",
-      "description": "Component type key from the manifest (e.g., server, webapp)"
+      "description": "Component type key from the manifest (e.g., my-service, my-store)"
     },
     "component_name": {
       "type": "string",
-      "description": "Instance name of the component (e.g., main-server)"
+      "description": "Instance name of the component (e.g., main-service)"
     },
     "agent": {
       "type": "string",

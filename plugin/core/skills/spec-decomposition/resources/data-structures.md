@@ -13,7 +13,7 @@ source_sections: list   # section names from original spec
 complexity: string      # "small" | "medium" | "large" | "epic"
 dependencies: list      # change ids this depends on
 acceptance_criteria: list
-api_endpoints: list     # "METHOD /path" strings
+interfaces: list        # external interfaces this change exposes
 user_stories: list
 domain_concepts: list
 independence_score: float  # 0.0-1.0
@@ -55,7 +55,7 @@ epics:
         dependencies: []
         source_sections: ["## User Registration"]
         acceptance_criteria: [...]
-        api_endpoints: [...]
+        interfaces: [...]
       - id: f2
         name: authentication
         title: User Authentication
@@ -63,7 +63,7 @@ epics:
         dependencies: [f1]
         source_sections: ["## User Authentication"]
         acceptance_criteria: [...]
-        api_endpoints: [...]
+        interfaces: [...]
       - id: f3
         name: password-reset
         title: Password Reset
@@ -71,7 +71,7 @@ epics:
         dependencies: [f2]
         source_sections: ["## Password Reset"]
         acceptance_criteria: [...]
-        api_endpoints: [...]
+        interfaces: [...]
   - id: e2
     name: dashboard
     title: Dashboard
@@ -180,21 +180,21 @@ thinking:
     - "Password policy requirements not specified"
     - "Session timeout duration not defined"
   component_mapping:
-    - component: server
+    - component: component-a
       affected: true
-      reason: "Backend authentication logic"
-    - component: webapp
+      reason: "Authentication logic"
+    - component: component-b
       affected: true
-      reason: "Login UI components"
-  api_first_order:
+      reason: "Login interface components"
+  contract_first_order:
     - tier: 1
-      category: "API Contracts"
+      category: "Contracts"
       items: [f1]
     - tier: 2
-      category: "Backend Services"
+      category: "Services"
       items: [f2, f3]
     - tier: 3
-      category: "Frontend"
+      category: "User-Facing"
       items: [f4, f5]
 ```
 
@@ -202,7 +202,7 @@ thinking:
 
 ### Spec Too Small
 
-If spec has < 3 acceptance criteria AND < 2 API endpoints:
+If spec has < 3 acceptance criteria AND < 2 interfaces:
 - Set `is_decomposable: false`
 - Return single change containing all content
 - Add warning: "Spec is compact enough for single change implementation"
@@ -282,7 +282,7 @@ Output:
       complexity: medium
       dependencies: []
       acceptance_criteria: [...]
-      api_endpoints: [POST /auth/signup, POST /auth/login, DELETE /auth/logout]
+      interfaces: [signup, login, logout]
       independence_score: 0.8
     - id: c2
       name: team-management
@@ -293,7 +293,7 @@ Output:
       complexity: medium
       dependencies: [c1]
       acceptance_criteria: [...]
-      api_endpoints: [POST /teams, GET /teams/:id, POST /teams/:id/invite]
+      interfaces: [create-team, get-team, invite-member]
       independence_score: 0.6
   shared_concepts: [User, Team, Session]
   suggested_order: [c1, c2]

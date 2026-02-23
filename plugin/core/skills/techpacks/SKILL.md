@@ -29,7 +29,7 @@ Core skills invoke techpacks operations using this pattern:
 
 ```
 Invoke techpacks.readManifest for the active tech pack namespace.
-Read the `components` section to find the agent assigned to the "server" component type.
+Read the `components` section to find the agent assigned to a given component type.
 ```
 
 ```

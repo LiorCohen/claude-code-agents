@@ -24,7 +24,7 @@
         "depends_on": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Component instance names this component depends on (e.g., ['main-db', 'main-api']). Distinct from manifest depends_on which references component types."
+          "description": "Component instance names this component depends on (e.g., ['primary-store', 'main-gateway']). Distinct from manifest depends_on which references component types."
         },
         "capabilities": {
           "type": "array",

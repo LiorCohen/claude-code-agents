@@ -47,12 +47,12 @@ items:
         # Substep tracking within spec creation
         substep: null            # transformation | discovery | solicitation | writing
 
-      - id: 02-backend-service
+      - id: 02-auth-service
         change_id: user-auth-2
-        title: Backend Service
+        title: Auth Service
         type: feature
-        location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
-        context_sections: ["## Backend Logic", "## Data Model"]
+        location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-auth-service
+        context_sections: ["## Business Logic", "## Data Model"]
         depends_on: [01-api-contracts]
         spec_status: in_progress
         plan_status: pending

@@ -20,7 +20,7 @@ Verify implementation matches specification.
 
 1. Read SPEC.md
 2. Extract all acceptance criteria
-3. List API endpoints
+3. List external interfaces
 4. Note edge cases and security requirements
 
 #### Step 2: Validate Specs Traceability

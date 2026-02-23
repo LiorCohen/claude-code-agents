@@ -136,4 +136,4 @@ All operations start by reading the project's `sdd/sdd-settings.yaml` to find th
 
 **Returns:** Array of component type names in dependency order (dependencies first).
 
-**Example:** `[config, contract, database, server, webapp, deployment, integration-testing, e2e-testing, cicd]`
+**Example:** `[component-a, component-b, component-c, component-d]` (ordered by dependency — dependencies first)

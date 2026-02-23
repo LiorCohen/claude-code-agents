@@ -165,11 +165,11 @@ discovered_components:  # From component-discovery skill
    - Features depend on other features (based on concept/API references)
    - Epics depend on other epics (if any feature depends on another epic's feature)
    - **Store dependencies in decomposition output for workflow.yaml**
-6. **API-First Ordering** (topological sort with priority):
-   - API Contracts / Interfaces first
-   - Data Models / Database second
-   - Backend Services / Business Logic third
-   - Frontend Components / UI fourth
+6. **Contract-First Ordering** (topological sort with priority):
+   - Contracts / Interfaces first
+   - Data Layer / Persistence second
+   - Business Logic / Services third
+   - User-Facing Components fourth
    - Infrastructure last
 7. Assign numbers: 01, 02, 03, etc.
 

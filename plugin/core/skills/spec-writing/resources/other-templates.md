@@ -94,8 +94,8 @@ updated: YYYY-MM-DD
 ```
 
 **Note:** Product specs are typically incomplete:
-- Rich in frontend/UI details
-- Sparse on backend/API/database details
+- Rich in user-facing interface details
+- Sparse on business logic, contracts, and data layer details
 - Missing edge cases and error handling
 - Implicit assumptions not documented
 

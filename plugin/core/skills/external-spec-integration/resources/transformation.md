@@ -48,7 +48,7 @@ transformation:
 
 ## Gap Analysis
 
-Identify what's MISSING or unclear (weighted toward backend/API):
+Identify what's MISSING or unclear (weighted toward business logic and integration contracts):
 
 ```yaml
 gaps:
@@ -86,7 +86,7 @@ EXTRACTED (from spec):
 
 DERIVED (from UI descriptions):
   - 4 entities: User, Order, Product, Cart
-  - 8 API endpoints (see below)
+  - 8 interfaces (see below)
   - Authorization: users see only their own data
 
 GAPS IDENTIFIED:

@@ -31,11 +31,11 @@ When a user provides an external specification via `/sdd I want to import an ext
 **Critical asymmetry:**
 | Area | Typical Detail Level | Action Required |
 |------|---------------------|-----------------|
-| **Frontend/UI** | High | Extract and classify |
+| **User-Facing Interface** | High | Extract and classify |
 | **UX/Design** | High | Extract and classify |
-| **API/Contracts** | Low | Must be DERIVED from UI |
-| **Backend Logic** | Very Low | Must be extracted through questions |
-| **Database/Models** | Very Low | Must be discovered from UI + actions |
+| **Integration Contracts** | Low | Must be DERIVED from interface |
+| **Business Logic** | Very Low | Must be extracted through questions |
+| **Persistence/Data** | Very Low | Must be discovered from interface + actions |
 | **Non-Functional** | Absent | Must be explicitly asked |
 
 ## When to Use

@@ -201,11 +201,11 @@ components:
     // Save output for debugging
     await writeFileAsync(joinPath(testProject.path, 'claude-output.json'), result.output);
 
-    // The existing sdd/sdd-settings.yaml should still exist (migrated from .sdd/)
-    expect(projectIsFile(testProject, 'sdd', 'sdd-settings.yaml')).toBe(true);
+    // The existing .sdd/sdd-settings.yaml should still exist
+    expect(projectIsFile(testProject, '.sdd', 'sdd-settings.yaml')).toBe(true);
 
     // Settings should still contain the project name (not overwritten)
-    expect(projectFileContains(testProject, 'sdd/sdd-settings.yaml', 'test-existing-project')).toBe(true);
+    expect(projectFileContains(testProject, '.sdd/sdd-settings.yaml', 'test-existing-project')).toBe(true);
 
     console.log('✓ Existing project detected, name preserved');
     console.log('\nAll assertions passed!');

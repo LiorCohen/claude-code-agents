@@ -167,8 +167,8 @@ Error Responses:
 
 | Error Scenario | User Message | Log Level | Recovery |
 |----------------|--------------|-----------|----------|
-| Database unavailable | "Service temporarily unavailable" | ERROR | Retry with backoff |
-| Invalid input | "Validation failed: {details}" | WARN | Return 400 |
+| Dependency unavailable | "Service temporarily unavailable" | ERROR | Retry with backoff |
+| Invalid input | "Validation failed: {details}" | WARN | Return error |
 
 ## Observability
 
