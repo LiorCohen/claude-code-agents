@@ -47,5 +47,6 @@ export type {
   ReconciliationChange,
   ReconciliationWarning,
   ReconciliationResult,
+  DefaultTechPack,
 } from './reconcile';
 export { reconcileSettings } from './reconcile';

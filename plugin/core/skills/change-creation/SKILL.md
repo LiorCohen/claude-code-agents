@@ -328,9 +328,9 @@ Input:
   issue: BUG-456
   root_cause: Token expiry calculation uses seconds instead of minutes
   affected_files:
-    - src/services/auth/session.ts
-    - src/middleware/auth.ts
-  affected_components: [server]
+    - path/to/affected-file
+    - path/to/other-file
+  affected_components: [<component-type>]
 
 Output:
   spec_path: changes/2026/01/21/fix-session-timeout/SPEC.md

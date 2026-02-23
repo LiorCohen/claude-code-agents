@@ -16,6 +16,13 @@ export type ReconciliationChange = {
   readonly detail: string;
 };
 
+/** Tech pack identity for legacy component migration */
+export type DefaultTechPack = {
+  readonly name: string;
+  readonly namespace: string;
+  readonly path: string;
+};
+
 /** A warning about filesystem mismatches */
 export type ReconciliationWarning = {
   readonly component?: string;
@@ -51,7 +58,8 @@ const dateOnlyToUtc = (dateStr: string): string => `${dateStr} 00:00:00Z`;
  * Post-split, components live under `tech_packs.<namespace>.components`.
  */
 const migrateComponents = (
-  rawObj: Readonly<Record<string, unknown>>
+  rawObj: Readonly<Record<string, unknown>>,
+  defaultTechPack?: DefaultTechPack,
 ): { readonly techPacks: Readonly<Record<string, TechPackEntry>>; readonly changes: readonly ReconciliationChange[] } => {
   // Check for existing tech_packs namespace
   const rawTechPacks = rawObj.tech_packs as Readonly<Record<string, unknown>> | undefined;
@@ -73,22 +81,26 @@ const migrateComponents = (
     directory: (raw.path as string) ?? (raw.directory as string) ?? `components/${raw.name as string}`,
   }));
 
+  // Use caller-provided tech pack identity, or a generic fallback.
+  // The command handler discovers installed tech packs and passes the info.
+  const pack = defaultTechPack ?? { name: 'legacy', namespace: 'legacy', path: 'legacy' };
+
   const entry: TechPackEntry = {
-    name: 'fullstack-typescript',
-    namespace: 'fs-ts',
+    name: pack.name,
+    namespace: pack.namespace,
     version: '1.0.0',
     mode: 'internal',
-    path: 'fullstack-typescript',
+    path: pack.path,
     components,
   };
 
   return {
-    techPacks: { 'fs-ts': entry },
+    techPacks: { [pack.namespace]: entry },
     changes: [
       {
         type: 'migrated' as const,
         field: 'tech_packs',
-        detail: `Migrated ${rawComponents.length} component(s) from flat components array to tech_packs.fs-ts`,
+        detail: `Migrated ${rawComponents.length} component(s) from flat components array to tech_packs.${pack.namespace}`,
       },
     ],
   };
@@ -101,12 +113,14 @@ const migrateComponents = (
  * @param currentPluginVersion - The current plugin version string
  * @param _projectRoot - Absolute path to project root (for filesystem checks)
  * @param now - Optional Date for testing (defaults to current time)
+ * @param defaultTechPack - Tech pack identity for legacy component migration (discovered by caller)
  */
 export const reconcileSettings = (
   raw: unknown,
   currentPluginVersion: string,
   _projectRoot: string,
   now: Date = new Date(),
+  defaultTechPack?: DefaultTechPack,
 ): ReconciliationResult => {
   const rawObj = (typeof raw === 'object' && raw !== null ? raw : {}) as Readonly<Record<string, unknown>>;
   const rawSdd = (typeof rawObj.sdd === 'object' && rawObj.sdd !== null ? rawObj.sdd : {}) as Readonly<Record<string, unknown>>;
@@ -258,7 +272,7 @@ export const reconcileSettings = (
   // 3. Migrate components to tech_packs namespace
   // =========================================================================
 
-  const { techPacks, changes: componentMigrationChanges } = migrateComponents(rawObj);
+  const { techPacks, changes: componentMigrationChanges } = migrateComponents(rawObj, defaultTechPack);
 
   // =========================================================================
   // 4. Add system section if missing

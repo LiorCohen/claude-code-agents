@@ -51,8 +51,7 @@ Validating specs traceability...
 #### Step 4: Run Tests
 
 ```bash
-# Unit tests
-npm test --workspaces
+# Unit tests (runner determined by tech pack)
 
 # Integration tests (runner determined by tech pack)
 

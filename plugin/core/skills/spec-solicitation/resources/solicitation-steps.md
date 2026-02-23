@@ -70,54 +70,35 @@ Questions to ask:
 
 **DO NOT ask about which components to use** - component-discovery has already identified them. Instead, ask deep-dive questions for EACH discovered component.
 
-**Question depth should be inversely proportional to spec coverage:**
-- Backend/API/Database: ASK MANY questions (spec has little info)
-- Frontend/UI: ASK FEW questions (spec likely has answers)
+**Question depth should be inversely proportional to spec coverage.** Components whose domain is well-covered in the spec need fewer questions; components with sparse coverage need more.
 
-**For Server (if discovered):**
+**For each discovered component type**, ask deep-dive questions appropriate to that type. The tech pack's component-discovery skill provides type-specific question sets. General categories:
 
 ```text
-For each entity derived from UI:
-  - What fields does [Entity] have?
-  - Which fields are required vs optional?
-  - What validation rules apply to each field?
-
-For each user action:
-  - Who is authorized to perform this action?
-  - What validation happens before the action?
-  - What happens if validation fails?
-  - What side effects occur (emails, notifications)?
-```
-
-**For Database (if discovered):**
-
-```text
+For data/persistence components:
   - Entity attributes and types?
-  - Required indexes?
+  - Required indexes or constraints?
   - Soft or hard deletes?
   - Audit/history requirements?
-```
 
-**For API Contract (if discovered):**
+For service/logic components:
+  - Business rules and validation for each operation?
+  - Authorization requirements per action?
+  - Side effects (notifications, events)?
 
-```text
-  - Request/response schemas for each endpoint?
+For interface/contract components:
+  - Request/response schemas?
   - Error codes and messages?
-  - Authentication method?
-  - Rate limiting requirements?
-```
+  - Authentication and rate limiting?
 
-**For Webapp (if discovered):**
-
-External specs usually have good UI detail. Only ask about:
-```text
+For UI components:
   - Loading/empty/error states (if not in mockups)?
-  - Any interactions not clear from mockups?
+  - Interactions not clear from mockups?
 ```
 
-**YAGNI Principle**: Only ask about operations the UI actually requires. Do NOT assume full CRUD for every entity. If the UI only shows a list view, don't ask about Create/Update/Delete.
+**YAGNI Principle**: Only ask about operations the spec actually requires. Do NOT assume full CRUD for every entity. If the spec only shows a list view, don't ask about Create/Update/Delete.
 
-**Components Section**: When generating SPEC.md, populate the `## Components` New Components table's Settings column from the component-discovery output. Each discovered component's settings (server_type, databases, provides_contracts, etc.) must appear in this column so the implementation plan can scaffold correctly.
+**Components Section**: When generating SPEC.md, populate the `## Components` New Components table's Settings column from the component-discovery output. Each discovered component's settings must appear in this column so the implementation plan can scaffold correctly.
 
 ## Resume Behavior
 

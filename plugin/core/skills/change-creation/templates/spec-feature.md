@@ -65,7 +65,7 @@
 > How does this fit into the system? Include diagrams if helpful.
 
 ```
-[Component A] ---> [Component B] ---> [Database]
+[Component A] ---> [Component B] ---> [Component C]
        |
        v
 [External Service]
@@ -73,7 +73,7 @@
 
 ### Data Model
 
-> Database schema changes, new tables, modified columns
+> Schema changes, new entities, modified fields
 
 **New Tables:**
 
@@ -280,13 +280,13 @@ specs/
 
 | Component | Type | Settings | Purpose |
 |-----------|------|----------|---------|
-| main-server | server | server_type: api, databases: [app-db] | API backend |
+| my-component | <type> | depends_on: [other-component] | Handles business logic |
 
 ### Modified Components
 
 | Component | Changes |
 |-----------|---------|
-| web-app | Add new routes for feature |
+| existing-component | Add new capabilities for feature |
 
 ## System Analysis
 

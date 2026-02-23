@@ -36,7 +36,7 @@ Settings management and declared actions processing.
 
 ```bash
 sdd-system settings reconcile                          # Reconcile settings to latest schema
-sdd-system settings process-actions --namespace fs-ts  # Process declared actions from tech system
+sdd-system settings process-actions --namespace <ns>    # Process declared actions from tech system
 ```
 
 ### tech-pack

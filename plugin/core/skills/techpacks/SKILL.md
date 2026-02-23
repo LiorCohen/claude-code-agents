@@ -36,7 +36,7 @@ Read the `components` section to find the agent assigned to the "server" compone
 Invoke techpacks.routeSkills with:
   namespace: <active-namespace>
   phase: plan-generation
-  component_type: server
+  component_type: <type>
 ```
 
 ```

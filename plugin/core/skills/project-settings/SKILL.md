@@ -64,28 +64,20 @@ project:
   name: "my-app"
   description: "A task management SaaS application"
 
-components:
-  - name: config
-    type: config
-    path: components/config
-    settings: {}
+tech_packs:
+  <namespace>:
+    components:
+      - name: my-component
+        type: <type-from-tech-pack>
+        directory: <directory-from-tech-pack-pattern>
+        settings:
+          # Settings schema is defined by the tech pack
+          depends_on: [other-component]
 
-  - name: main-server
-    type: server
-    path: components/servers/main-server
-    settings:
-      # Settings schema is defined by the tech pack
-      depends_on: [primary-db, public-api]
-
-  - name: primary-db
-    type: database
-    path: components/databases/primary-db
-    settings: {}
-
-  - name: public-api
-    type: contract
-    path: components/contracts/public-api
-    settings: {}
+      - name: other-component
+        type: <type-from-tech-pack>
+        directory: <directory-from-tech-pack-pattern>
+        settings: {}
 ```
 
 ## Settings vs Config
@@ -96,7 +88,7 @@ components:
 | **When set** | At component creation, changeable | Per-environment |
 | **Examples** | `depends_on`, component-type-specific fields | `port: 3000`, `replicas: 3` |
 | **Affects** | What gets scaffolded | Values in scaffolded files |
-| **Stored in** | `sdd/sdd-settings.yaml` | `components/config/envs/` |
+| **Stored in** | `sdd/sdd-settings.yaml` | Config component `envs/` directory |
 
 ## Component Settings
 
@@ -217,9 +209,11 @@ project:
 # Components are added here as they are scaffolded during implementation.
 # The plan determines when scaffolding is needed for new components.
 
-components:
-  - name: config
-    type: config
-    path: components/config
-    settings: {}
+tech_packs:
+  <namespace>:
+    components:
+      - name: my-component
+        type: <type-from-tech-pack>
+        directory: <directory-from-tech-pack-pattern>
+        settings: {}
 ```

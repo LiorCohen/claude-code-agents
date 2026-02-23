@@ -18,7 +18,7 @@
     },
     "namespace": {
       "type": "string",
-      "description": "Tech pack namespace (e.g., fs-ts)"
+      "description": "Tech pack namespace (e.g., my-pack)"
     }
   }
 }

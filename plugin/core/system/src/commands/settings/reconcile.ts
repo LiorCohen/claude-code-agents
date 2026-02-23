@@ -5,8 +5,8 @@
  * older formats to the latest schema, and writes the result back.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { join, basename } from 'node:path';
 import YAML from 'yaml';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
@@ -14,7 +14,7 @@ import type { ProjectRootResult } from '@/lib/config';
 import { getPluginRoot } from '@/lib/config';
 import { readJson } from '@/lib/fs';
 import { reconcileSettings } from '@/settings/reconcile';
-import type { ReconciliationChange, ReconciliationWarning } from '@/settings/reconcile';
+import type { ReconciliationChange, ReconciliationWarning, DefaultTechPack } from '@/settings/reconcile';
 
 /** Format changes for human-readable output */
 const formatChanges = (changes: readonly ReconciliationChange[]): string => {
@@ -89,8 +89,28 @@ export const reconcile = async (
 
   const pluginVersion = pluginVersionResult.version;
 
+  // Discover installed tech pack for legacy component migration
+  const defaultTechPack: DefaultTechPack | undefined = (() => {
+    try {
+      const entries = readdirSync(pluginRoot, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory() || entry.name === 'core' || entry.name.startsWith('.')) continue;
+        const manifestPath = join(pluginRoot, entry.name, 'techpack.yaml');
+        if (existsSync(manifestPath)) {
+          const manifest = YAML.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, unknown>;
+          const ns = manifest.namespace as string | undefined;
+          const name = manifest.name as string | undefined;
+          if (ns && name) {
+            return { name, namespace: ns, path: entry.name };
+          }
+        }
+      }
+    } catch { /* no tech pack found — use generic fallback */ }
+    return undefined;
+  })();
+
   // Run reconciliation
-  const result = reconcileSettings(raw, pluginVersion, projectRoot);
+  const result = reconcileSettings(raw, pluginVersion, projectRoot, new Date(), defaultTechPack);
 
   if (!result.valid) {
     return {

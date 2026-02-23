@@ -142,9 +142,9 @@ classified_transformation:  # From external-spec-integration transformation step
   assumptions: [...]
 
 discovered_components:  # From component-discovery skill
-  - type: server
+  - type: <type-from-tech-pack>
     reason: "..."
-  - type: webapp
+  - type: <type-from-tech-pack>
     reason: "..."
 ```
 

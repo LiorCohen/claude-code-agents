@@ -215,9 +215,9 @@ sdd_version: [X.Y.Z]
 
 <!-- Read from SPEC.md ## Components section (source of truth) -->
 <!-- May reference sdd-settings.yaml for existing component details -->
-- contract
-- server
-- webapp
+- <component-type-a>
+- <component-type-b>
+- <component-type-c>
 
 ## Phases
 

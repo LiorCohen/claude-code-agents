@@ -86,14 +86,12 @@ This runs ONCE for the entire external spec (not per-item).
 
 ```yaml
 discovered_components:
-  - type: server
-    reason: "Backend for auth + analytics"
-  - type: webapp
-    reason: "Dashboard UI"
-  - type: database
-    reason: "User data persistence"
-  - type: contract
-    reason: "API definition"
+  - type: <type-from-tech-pack>
+    reason: "Handles core business logic"
+  - type: <type-from-tech-pack>
+    reason: "User-facing interface"
+  - type: <type-from-tech-pack>
+    reason: "Data persistence"
 ```
 
 ## Step 5: Present Outline to User
@@ -221,11 +219,10 @@ Reorder items for API-first implementation:
 
 ```yaml
 recommended_order:
-  1. API Contracts / Interfaces
-  2. Data Models / Database
-  3. Backend Services / Business Logic
-  4. Frontend Components / UI
-  5. Infrastructure
+  # Order determined by techpacks.dependencyOrder for the active tech pack
+  1. <component-type ordered by dependency>
+  2. <component-type ordered by dependency>
+  3. ...
 ```
 
 ## Step 7: Display Thinking Output

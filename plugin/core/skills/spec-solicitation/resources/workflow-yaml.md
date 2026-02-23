@@ -97,20 +97,10 @@ answers:
   # Components are already discovered - questions focus on HOW not WHICH
   technical_details:
     # For each discovered component, ask deep-dive questions
-    server:
-      business_rules: []
-      validation: []
-      authorization: []
-    database:
-      entities: []
-      relationships: []
-      indexes: []
-    contract:
-      endpoints: []
-      error_codes: []
-    webapp:
-      pages: []
-      state_management: null
+    # Keys are component names from discovery output
+    <component-name>:
+      # Questions vary by component type (defined by tech pack)
+      details: []
 
 # Review feedback (captured after spec/plan created)
 review_feedback: []

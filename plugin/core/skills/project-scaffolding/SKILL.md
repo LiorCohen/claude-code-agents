@@ -25,10 +25,10 @@ target_dir: /path/to/project
 ```text
 project/
 ├── sdd/
-│   └── sdd-settings.yaml     # Minimal settings (config component only)
+│   └── sdd-settings.yaml     # Minimal settings
 ├── specs/
 │   └── INDEX.md              # Empty spec registry
-├── package.json              # Workspace root (empty scripts)
+├── package.json              # Root project (from tech pack template)
 ├── README.md
 ├── CLAUDE.md
 └── .gitignore
@@ -142,7 +142,7 @@ Templates are in this skill's `templates/` directory:
 ```text
 skills/project-scaffolding/templates/
 ├── project/
-│   ├── package.json        # Root workspace package.json
+│   ├── package.json        # Root project package.json
 │   ├── README.md
 │   └── CLAUDE.md
 ├── specs/
@@ -237,27 +237,10 @@ The project scaffolding CLI:
       "dest": "."
     },
     {
-      "type": "template_dir",
-      "source": "components/config/config-scaffolding/templates",
-      "dest": "components/config"
-    },
-    {
-      "type": "template_dir",
-      "source": "components/backend/backend-scaffolding/templates",
-      "dest": "components/servers/task-service"
-    },
-    {
       "type": "write_file",
       "path": ".gitignore",
       "content": "<computed-content>",
       "if_exists": "skip"
-    },
-    {
-      "type": "package_json_scripts",
-      "scripts": {
-        "task-service:dev": "npm run dev -w @my-app/task-service",
-        "task-service:build": "npm run build -w @my-app/task-service"
-      }
     }
   ]
 }

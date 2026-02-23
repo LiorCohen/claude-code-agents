@@ -102,7 +102,7 @@ Running environment check...
 Checking project structure...
   ✓ sdd/sdd-settings.yaml exists
   ✓ specs/INDEX.md exists
-  ⚠ components/config/ missing
+  ⚠ Required components missing (per tech pack)
 
 Would you like to add missing components? (yes/no)
 ```
@@ -221,7 +221,7 @@ If this is an existing project with a version mismatch (detected in Phase 1):
 2. If valid, register in `sdd/sdd-settings.yaml` under `tech_packs`:
    ```yaml
    tech_packs:
-     fullstack-typescript:
+     <namespace>:
        path: <relative-path-to-tech-pack>
        version: <from manifest>
    ```
@@ -242,7 +242,7 @@ INVOKE techpacks.routeCommand with:
 Each tech pack defines its own required tools and verification logic. Display results per tech pack:
 
 ```
-Tech pack: fullstack-typescript
+Tech pack: <tech-pack-name>
   ✓ All prerequisites met
 ```
 
@@ -292,11 +292,11 @@ ENVIRONMENT:
 
 WHAT'S INCLUDED:
   ✓ SDD configuration (sdd/sdd-settings.yaml)
-  ✓ Config component (components/config/)
+  ✓ Initial components (per tech pack)
   ✓ Spec registry (specs/INDEX.md)
 
 TECH PACKS:
-  ✓ fullstack-typescript v1.0.0
+  ✓ <tech-pack-name> v<version>
 
 IMPORTANT: Start a new Claude session before using SDD commands.
   Settings and permissions configured during init require a session restart to take effect.

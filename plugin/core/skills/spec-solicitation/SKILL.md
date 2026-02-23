@@ -54,7 +54,7 @@ When processing a purely interactive change:
 
 ### External Specs Are Product-Oriented
 
-Even if the external spec says nothing about backend, API, databases, etc., the solicitation MUST cover all technical aspects. The solicitation adds the technical dimension that product specs lack. **However, component discovery already identifies WHICH components are needed - solicitation asks about HOW they should work, not WHICH ones to use.**
+Even if the external spec says nothing about the technical implementation, the solicitation MUST cover all technical aspects. The solicitation adds the technical dimension that product specs lack. **However, component discovery already identifies WHICH components are needed - solicitation asks about HOW they should work, not WHICH ones to use.**
 
 ### All Q&A Must Be Preserved
 
@@ -192,7 +192,7 @@ This skill uses:
 - User always has opportunity to refine, clarify, and approve
 - **DO NOT ask about tech stack** - component-discovery has already determined what's needed
 - Deep-dive questions focus on HOW components work, not WHICH components to use
-- Questions are weighted: more for backend (sparse in spec), fewer for frontend (detailed in spec)
+- Questions are weighted: more for components with sparse spec coverage, fewer for well-documented components
 - **All Q&A is captured for traceability** in Requirements Discovery section - NEVER delete
 - Multi-turn conversations are supported and captured as threaded exchanges
 - Open questions block spec approval - must be ANSWERED, ASSUMED, or DEFERRED
