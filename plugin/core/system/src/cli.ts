@@ -11,6 +11,7 @@
  *   archive       Archive file management
  *   permissions   Permission management
  *   workflow      Workflow phase gate management
+ *   tech-pack     Tech pack management
  */
 
 import { readFileSync } from 'node:fs';
@@ -30,8 +31,9 @@ import { handlePermissions } from '@/commands/permissions';
 import { handleWorkflow } from '@/commands/workflow';
 import { handleSettings } from '@/commands/settings';
 import { handleArchive } from '@/commands/archive';
+import { handleTechPack } from '@/commands/tech-pack';
 
-const NAMESPACES = ['scaffolding', 'spec', 'permissions', 'workflow', 'settings', 'archive'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'permissions', 'workflow', 'settings', 'archive', 'tech-pack'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
@@ -61,6 +63,13 @@ Namespaces:
   archive       Archive file management
     store       Archive a file or directory to sdd/archive/<type>/
 
+  tech-pack     Tech pack management
+    validate    Validate a tech pack manifest
+    list        List installed tech packs
+    info        Show tech pack details
+    install     Register a tech pack
+    remove      Unregister a tech pack
+
 Global Options:
   --json        JSON output mode
   --verbose     Verbose logging
@@ -85,6 +94,7 @@ const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   workflow: handleWorkflow,
   settings: handleSettings,
   archive: handleArchive,
+  'tech-pack': handleTechPack,
 };
 
 const showHelp = (options: GlobalOptions): CommandResult => {

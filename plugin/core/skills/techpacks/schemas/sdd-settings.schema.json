@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/sdd-settings.json",
+  "title": "SDD Project Settings",
+  "description": "Core-owned per-project configuration.",
+  "type": "object",
+  "required": ["sdd", "project"],
+  "additionalProperties": false,
+  "properties": {
+    "sdd": {
+      "type": "object",
+      "required": ["version"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" }
+      }
+    },
+    "tech_packs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/tech_pack_entry"
+      }
+    }
+  },
+  "$defs": {
+    "tech_pack_entry": {
+      "type": "object",
+      "required": ["name", "namespace", "version", "mode", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string" },
+        "namespace": { "type": "string" },
+        "version":   { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "mode":      { "type": "string", "enum": ["internal", "external"] },
+        "path":      { "type": "string", "description": "Relative to plugin root if internal" },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/component_manifest" }
+        }
+      }
+    },
+    "component_manifest": {
+      "type": "object",
+      "required": ["name", "type", "directory"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" }
+      }
+    }
+  }
+}
