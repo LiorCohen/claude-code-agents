@@ -84,16 +84,17 @@ User: /tasks spec 19
 5. Stage changes and use commit skill (e.g., "Tasks: Move #19 back to speccing")
 6. Resume solicitation
 
-**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). There is no defined end — the user decides when the spec is complete.
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Iterate as many times as needed — never rush the user toward planning. Only the user decides when the spec is complete.
 
 **All decisions in the spec:** Every change must be fully defined during speccing — exact files, exact changes, no ambiguity. Never defer decisions to planning or label anything a "planning detail." Planning builds an execution plan for changes already decided here.
 
-**Self-sufficiency check:** The spec must be self-sufficient — planning should not require further research to understand what changes to make. During solicitation, actively check for:
+**Self-sufficiency check:** After each round of user input, re-read the spec and actively check for:
 - **Gaps:** Changes referenced in acceptance criteria but missing from the Changes table (or vice versa). Scope items with no corresponding change.
 - **Contradictions:** Constraints that conflict with proposed changes. Scope "out of scope" items that overlap with listed changes.
 - **Ambiguity:** Changes described vaguely enough that two people could interpret them differently.
+If any issues are found, raise them as open questions — one at a time, resolved before moving on. Do not suggest moving to planning while open questions exist.
 
-**Open questions:** Maintain a running list. When you find a gap, contradiction, or ambiguity, add it as an open question and discuss it with the user immediately — one question at a time, resolved before moving on. All open questions must be resolved before the spec can transition to planning.
+**Never suggest planning prematurely.** Do not prompt the user to move to planning. When the user signals the spec is ready, run the validation gate. If it fails, explain what's missing and continue iterating.
 
 ---
 
