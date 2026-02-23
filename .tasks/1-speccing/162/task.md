@@ -65,7 +65,7 @@ Splitting into separate repos enables:
 - `sdd-core` gets `plugin.json` + `marketplace.json` manifests at version 0.1.0
 - Path adjustments: current `plugin/core/*` flattens to `plugin/*` in sdd-core
 - `.claude/` dev skills live ONLY in workspace, not in any public repo
-- Each repo gets its own `.gitignore` tailored to its contents
+- Each repo gets its own `.gitignore` and `.claudeignore` tailored to its contents
 - Each repo gets its own `.github/` with GitHub Actions CI/CD
 
 ### Out of scope
