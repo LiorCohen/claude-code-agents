@@ -68,6 +68,7 @@ Splitting into separate repos enables:
 - `sdd-core` gets `plugin.json` + `marketplace.json` manifests at version 0.1.0
 - Path adjustments: current `plugin/core/*` flattens to `plugin/*` in sdd-core
 - `.claude/` dev skills live ONLY in workspace, not in any public repo
+- Each repo gets its own `.gitignore` tailored to its contents
 - Each repo gets its own `.github/` with GitHub Actions CI/CD
 
 ### Out of scope
@@ -78,6 +79,7 @@ Splitting into separate repos enables:
 
 ## Constraints
 
+- All repos are MIT licensed
 - `sdd-core` is a Claude Code plugin with `.claude-plugin/marketplace.json` and `plugin/.claude-plugin/plugin.json`
 - `sdd-fullstack-typescript-techpack` is NOT a plugin — no `plugin.json`, no `marketplace.json`. It has `techpack/techpack.yaml` as its manifest.
 - `sdd-vscode-extension` is a standalone VS Code extension — published independently to the VS Code marketplace
