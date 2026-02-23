@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SDD Settings",
+  "description": "Schema for sdd/sdd-settings.yaml — the project configuration file. Component-type-specific settings validation is delegated to tech packs.",
+  "type": "object",
+  "required": ["sdd", "project", "components"],
+  "additionalProperties": false,
+  "properties": {
+    "system": {
+      "type": "object",
+      "description": "SDD CLI system settings (logging, etc.).",
+      "required": ["logging"],
+      "additionalProperties": false,
+      "properties": {
+        "logging": {
+          "type": "object",
+          "description": "Logging configuration.",
+          "required": ["enabled", "level"],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable/disable file logging."
+            },
+            "level": {
+              "type": "string",
+              "enum": ["trace", "debug", "info", "warn", "error", "fatal"],
+              "default": "info",
+              "description": "Log level."
+            }
+          }
+        }
+      }
+    },
+    "sdd": {
+      "type": "object",
+      "description": "SDD plugin metadata.",
+      "required": ["initialized_by_plugin_version", "updated_by_plugin_version", "initialized_at", "updated_at"],
+      "additionalProperties": false,
+      "properties": {
+        "initialized_by_plugin_version": {
+          "type": "string",
+          "description": "Plugin version that first created this project (immutable after init)."
+        },
+        "updated_by_plugin_version": {
+          "type": "string",
+          "description": "Plugin version that last reconciled settings."
+        },
+        "initialized_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$",
+          "description": "UTC datetime project was initialized (YYYY-MM-DD HH:MM:SSZ)."
+        },
+        "updated_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}Z$",
+          "description": "UTC datetime settings were last updated (YYYY-MM-DD HH:MM:SSZ)."
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "description": "Project metadata.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+          "description": "Project name (lowercase, hyphens, no spaces)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief project description."
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "List of project components. Component types and their settings schemas are defined by the active tech pack.",
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    }
+  },
+  "$defs": {
+    "component_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+      "description": "Lowercase, hyphens only. Should be multi-word and domain-specific (e.g., auth-service, user-store)."
+    },
+    "component": {
+      "type": "object",
+      "required": ["name", "type", "path", "settings"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/component_name" },
+        "type": {
+          "type": "string",
+          "description": "Component type as defined by the active tech pack."
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path from project root (e.g., 'components/my-component')"
+        },
+        "settings": {
+          "type": "object",
+          "description": "Component settings. Schema is defined by the tech pack for each component type."
+        }
+      }
+    }
+  }
+}

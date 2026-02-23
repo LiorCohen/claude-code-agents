@@ -9,7 +9,9 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import {
   PLUGIN_DIR,
-  SKILLS_DIR,
+  CORE_SKILLS_DIR,
+  TECH_SKILLS_DIR,
+  TECH_PACK_DIR,
   joinPath,
   fileExists,
   isDirectory,
@@ -27,7 +29,7 @@ const runApply = async (
   cwd: string,
   dryRun = false
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> => {
-  const cliPath = joinPath(PLUGIN_DIR, 'system', 'dist', 'cli.js');
+  const cliPath = joinPath(PLUGIN_DIR, 'core', 'system', 'dist', 'cli.js');
   const args = ['--enable-source-maps', cliPath, 'scaffolding', 'apply', '--spec', specPath];
   if (dryRun) args.push('--dry-run');
   return runCommand('node', args, { cwd, timeout: 60000 });
@@ -47,7 +49,7 @@ describe('Scaffolding Apply CLI', () => {
   // -- Error handling --
 
   it('rejects missing --spec argument', async () => {
-    const cliPath = joinPath(PLUGIN_DIR, 'system', 'dist', 'cli.js');
+    const cliPath = joinPath(PLUGIN_DIR, 'core', 'system', 'dist', 'cli.js');
     const result = await runCommand('node', ['--enable-source-maps', cliPath, 'scaffolding', 'apply'], {
       cwd: tmpDir,
       timeout: 30000,
@@ -99,7 +101,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [{ type: 'teleport', path: 'somewhere' }],
       })
@@ -115,7 +117,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: '/nonexistent/target',
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [],
       })
@@ -135,7 +137,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: { PROJECT_NAME: 'my-app' },
         operations: [
           {
@@ -168,7 +170,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [
           { type: 'mkdir', path: 'src/dal', gitkeep: true },
@@ -193,12 +195,12 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_PACK_DIR,
         variables: { PROJECT_NAME: 'my-app' },
         operations: [
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/package.json',
+            source: 'templates/project/package.json.tmpl',
             dest: 'package.json',
           },
         ],
@@ -223,7 +225,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: { PROJECT_NAME: 'my-app' },
         operations: [
           {
@@ -253,7 +255,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [
           {
@@ -286,7 +288,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         context: { has_databases: false },
         operations: [
@@ -318,7 +320,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         context: { has_databases: true },
         operations: [
@@ -348,7 +350,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [
           { type: 'write_file', path: 'README.md', content: 'replace this' },
@@ -371,7 +373,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [
           {
@@ -400,7 +402,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: {},
         operations: [
           { type: 'write_file', path: 'should-not-exist.txt', content: 'nope' },
@@ -427,7 +429,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: { PROJECT_NAME: 'my-app' },
         operations: [
           {
@@ -468,7 +470,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_SKILLS_DIR,
         variables: { PROJECT_NAME: 'my-app', SERVER_NAME: 'task-service' },
         context: {
           has_databases: true,
@@ -516,7 +518,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: SKILLS_DIR,
+        base_dir: TECH_PACK_DIR,
         variables: {
           PROJECT_NAME: 'my-app',
           PROJECT_DESCRIPTION: 'My application',
@@ -525,12 +527,12 @@ describe('Scaffolding Apply CLI', () => {
         operations: [
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/package.json',
+            source: 'templates/project/package.json.tmpl',
             dest: 'package.json',
           },
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/README.md',
+            source: 'templates/project/README.md.tmpl',
             dest: 'README.md',
           },
           {

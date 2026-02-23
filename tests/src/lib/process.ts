@@ -86,7 +86,7 @@ export const runCommand = async (
  * Run the scaffolding command via the sdd-system CLI.
  */
 export const runScaffolding = async (configPath: string, cwd: string): Promise<RunResult> => {
-  const cliPath = `${PLUGIN_DIR}/system/dist/cli.js`;
+  const cliPath = `${PLUGIN_DIR}/core/system/dist/cli.js`;
   return runCommand('node', ['--enable-source-maps', cliPath, 'scaffolding', 'project', '--config', configPath], {
     cwd,
     timeout: 60000,

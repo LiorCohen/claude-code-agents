@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/declared-actions-response.json",
+  "title": "Tech System Declared Actions Response",
+  "description": "Structured JSON returned by the tech system on successful command execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "result": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Tech-specific command output"
+    },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/declared_action" },
+      "description": "Declared state changes for core to execute"
+    }
+  },
+  "$defs": {
+    "declared_action": {
+      "type": "object",
+      "required": ["action"],
+      "oneOf": [
+        { "$ref": "#/$defs/register_component" },
+        { "$ref": "#/$defs/unregister_component" }
+      ]
+    },
+    "register_component": {
+      "type": "object",
+      "required": ["action", "name", "type", "directory"],
+      "additionalProperties": false,
+      "properties": {
+        "action":    { "const": "register_component" },
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" }
+      }
+    },
+    "unregister_component": {
+      "type": "object",
+      "required": ["action", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "action": { "const": "unregister_component" },
+        "name":   { "type": "string" }
+      }
+    }
+  }
+}

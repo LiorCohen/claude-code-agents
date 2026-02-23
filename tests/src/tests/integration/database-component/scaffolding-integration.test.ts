@@ -1,14 +1,14 @@
 /**
- * Database Component Scaffolding Integration Tests
+ * Project Scaffolding Integration Tests
  *
- * WHY: End-to-end scaffolding tests verify that the scaffolding script
- * actually produces working output. Unit tests on templates aren't enough -
- * we need to run the actual scaffolding to catch integration issues.
+ * WHY: End-to-end scaffolding tests verify that the core scaffolding command
+ * produces the generic project skeleton. Component-specific scaffolding is
+ * handled by tech pack systems, not the core project command.
  */
 
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import {
-  SKILLS_DIR,
+  TECH_SKILLS_DIR,
   joinPath,
   fileExists,
   isDirectory,
@@ -34,11 +34,11 @@ describe('Scaffolding Integration', () => {
   });
 
   /**
-   * WHY: This is the critical test - does scaffolding actually create
-   * the expected file structure? Failures here mean users get incomplete
-   * or broken database components.
+   * WHY: The core scaffolding project command creates the generic project
+   * skeleton — root files, spec directories, architecture overview.
+   * Component-specific scaffolding is handled separately by the tech pack.
    */
-  it('creates correct database structure', async () => {
+  it('creates generic project skeleton', async () => {
     const targetDir = joinPath(tmpDir, 'test-project');
     await mkdir(targetDir);
 
@@ -48,7 +48,7 @@ describe('Scaffolding Integration', () => {
       primary_domain: 'Testing',
       target_dir: targetDir,
       components: [{ type: 'database', name: 'database' }],
-      skills_dir: SKILLS_DIR,
+      skills_dir: TECH_SKILLS_DIR,
     };
 
     const configFile = joinPath(tmpDir, 'config.json');
@@ -58,20 +58,23 @@ describe('Scaffolding Integration', () => {
 
     expect(result.exitCode).toBe(0);
 
-    // Verify database structure (pluralized type: databases/<name>)
-    const dbDir = joinPath(targetDir, 'components', 'databases', 'database');
-    expect(fileExists(dbDir)).toBe(true);
-    expect(fileExists(joinPath(dbDir, 'package.json'))).toBe(true);
-    expect(fileExists(joinPath(dbDir, 'README.md'))).toBe(true);
-    expect(isDirectory(joinPath(dbDir, 'migrations'))).toBe(true);
-    expect(isDirectory(joinPath(dbDir, 'seeds'))).toBe(true);
-    // Note: scripts/ directory no longer created - commands use sdd-system CLI
+    // Verify generic project skeleton
+    expect(fileExists(joinPath(targetDir, '.gitignore'))).toBe(true);
+    expect(fileExists(joinPath(targetDir, '.claudeignore'))).toBe(true);
+
+    // Verify spec directories
+    expect(isDirectory(joinPath(targetDir, 'specs', 'domain', 'definitions'))).toBe(true);
+    expect(isDirectory(joinPath(targetDir, 'specs', 'domain', 'use-cases'))).toBe(true);
+    expect(isDirectory(joinPath(targetDir, 'specs', 'architecture'))).toBe(true);
+
+    // Verify architecture overview was generated
+    expect(fileExists(joinPath(targetDir, 'specs', 'architecture', 'overview.md'))).toBe(true);
   });
 
   /**
    * WHY: Variable substitution is critical for generating unique projects.
-   * If {{PROJECT_NAME}} isn't replaced, package.json will have the literal
-   * string, causing npm conflicts and confusion.
+   * If {{PROJECT_NAME}} isn't replaced, template files will have the literal
+   * string, causing confusion.
    */
   it('substitutes {{PROJECT_NAME}} in templates', async () => {
     const targetDir = joinPath(tmpDir, 'my-app');
@@ -83,7 +86,7 @@ describe('Scaffolding Integration', () => {
       primary_domain: 'Testing',
       target_dir: targetDir,
       components: [{ type: 'database', name: 'database' }],
-      skills_dir: SKILLS_DIR,
+      skills_dir: TECH_SKILLS_DIR,
     };
 
     const configFile = joinPath(tmpDir, 'config2.json');
@@ -93,11 +96,11 @@ describe('Scaffolding Integration', () => {
 
     expect(result.exitCode).toBe(0);
 
-    // Check variable substitution (pluralized type: databases/<name>)
-    const packageJson = joinPath(targetDir, 'components', 'databases', 'database', 'package.json');
-    const content = readFile(packageJson);
+    // Check variable substitution in architecture overview
+    const overview = joinPath(targetDir, 'specs', 'architecture', 'overview.md');
+    const content = readFile(overview);
 
-    expect(content).toContain('@my-app/database');
+    expect(content).toContain('my-app');
     expect(content).not.toContain('{{PROJECT_NAME}}');
   });
 });

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Component Discovery Output",
+  "description": "Output from component discovery, including discovered components.",
+  "type": "object",
+  "properties": {
+    "components": {
+      "type": "array",
+      "description": "Discovered components with their configurations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Component name identifier"
+          },
+          "type": {
+            "type": "string",
+            "description": "Component type as defined by the active tech pack"
+          },
+          "settings": {
+            "type": "object",
+            "description": "Component-specific configuration settings"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "components"
+  ]
+}

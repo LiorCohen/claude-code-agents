@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/techpack-settings.json",
+  "title": "Tech Pack Settings",
+  "description": "Tech-pack-owned per-project component configuration.",
+  "type": "object",
+  "required": ["components"],
+  "additionalProperties": false,
+  "properties": {
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component_settings" }
+    }
+  },
+  "$defs": {
+    "component_settings": {
+      "type": "object",
+      "required": ["name", "type", "directory", "depends_on"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+        "type":      { "type": "string" },
+        "directory": { "type": "string" },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Component instance names this component depends on (e.g., ['primary-store', 'main-gateway']). Distinct from manifest depends_on which references component types."
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Tech-specific settings — schema defined by the tech pack per component type"
+        }
+      }
+    }
+  }
+}

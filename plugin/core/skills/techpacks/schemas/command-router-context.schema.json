@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/command-router-context.json",
+  "title": "Command Router Context",
+  "description": "Structured context block core passes when invoking the command router.",
+  "type": "object",
+  "required": ["command", "namespace"],
+  "additionalProperties": false,
+  "properties": {
+    "command": {
+      "type": "string",
+      "description": "Validated command name (e.g., component setup)"
+    },
+    "args": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Parsed arguments matching the command's args schema"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Tech pack namespace (e.g., my-pack)"
+    }
+  }
+}

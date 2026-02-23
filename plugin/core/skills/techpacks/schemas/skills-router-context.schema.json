@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sdd.dev/schemas/skills-router-context.json",
+  "title": "Skills Router Context",
+  "description": "Structured context block core passes when invoking the skills router.",
+  "type": "object",
+  "required": ["phase"],
+  "additionalProperties": false,
+  "properties": {
+    "phase": {
+      "type": "string",
+      "enum": ["component-discovery", "project-scaffolding", "plan-generation", "implementation", "verification", "testing"]
+    },
+    "component_type": {
+      "type": "string",
+      "description": "Component type key from the manifest (e.g., my-service, my-store)"
+    },
+    "component_name": {
+      "type": "string",
+      "description": "Instance name of the component (e.g., main-service)"
+    },
+    "agent": {
+      "type": "string",
+      "description": "Agent currently active (e.g., my-agent)"
+    }
+  }
+}

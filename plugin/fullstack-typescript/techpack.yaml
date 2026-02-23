@@ -1,0 +1,351 @@
+tech_pack:
+  name: fullstack-typescript
+  namespace: fs-ts
+  description: >
+    Production-ready fullstack TypeScript stack. Node.js backends
+    with CMDO architecture, React frontends with MVVM, PostgreSQL
+    databases, OpenAPI contracts with generated types, Kubernetes
+    deployment via Helm, and CI/CD through GitHub Actions.
+  version: "1.0.0"
+  min_sdd_version: "8.0.0"
+  system_path: ./system/system-run.sh
+
+components:
+
+  config:
+    description: >
+      Centralized YAML configuration for the project. Mandatory singleton
+      that all other components read from. Generates environment-specific
+      config files from a single source of truth.
+    directory_pattern: components/config/
+    depends_on: []
+    scaffolding: skills/components/config/config-scaffolding/SKILL.md
+
+  contract:
+    description: >
+      OpenAPI 3.x specifications that define the API surface between
+      frontend and backend. Generates TypeScript types, request/response
+      validators, and API client code from the spec.
+    directory_pattern: "components/contracts/{name}/"
+    depends_on: [config]
+    scaffolding: skills/components/contract/contract-scaffolding/SKILL.md
+    agent:
+      name: api-designer
+      path: agents/api-designer.md
+
+  database:
+    description: >
+      PostgreSQL database with versioned migrations, seed data, and
+      a data access layer. Manages schema evolution through sequential
+      migration files and provides typed query functions.
+    directory_pattern: "components/databases/{name}/"
+    depends_on: [config]
+    scaffolding: skills/components/database/database-scaffolding/SKILL.md
+    agent:
+      name: db-advisor
+      path: agents/db-advisor.md
+
+  server:
+    description: >
+      Node.js/TypeScript backend following CMDO architecture
+      (Controller → Model → DAL → Orchestrator). Exposes HTTP APIs
+      defined by contracts, connects to databases, and runs
+      background workers.
+    directory_pattern: "components/servers/{name}/"
+    depends_on: [contract, config, database]
+    scaffolding: skills/components/backend/backend-scaffolding/SKILL.md
+    agent:
+      name: backend-dev
+      path: agents/backend-dev.md
+
+  webapp:
+    description: >
+      React/TypeScript frontend following MVVM architecture
+      (View → ViewModel → Model). Consumes contracts for type-safe
+      API calls via TanStack Query and renders UI with a component
+      library.
+    directory_pattern: "components/webapps/{name}/"
+    depends_on: [contract]
+    scaffolding: skills/components/frontend/frontend-scaffolding/SKILL.md
+    agent:
+      name: frontend-dev
+      path: agents/frontend-dev.md
+
+  helm:
+    description: >
+      Kubernetes Helm charts that package servers and webapps for
+      deployment. Defines services, deployments, ingress rules,
+      config maps, and secrets. Supports local dev (minikube/kind)
+      and production clusters.
+    directory_pattern: "components/helm_charts/{name}/"
+    depends_on: [server, webapp]
+    scaffolding: skills/components/helm/helm-scaffolding/SKILL.md
+    agent:
+      name: devops
+      path: agents/devops.md
+
+  integration-testing:
+    description: >
+      Integration test suites that verify component interactions
+      against real dependencies (databases, APIs). Runs via Vitest
+      with Testkube for Kubernetes-native execution.
+    directory_pattern: "components/testing/integration/{name}/"
+    depends_on: [contract, server, database, helm]
+    scaffolding: skills/components/integration-testing/integration-testing-scaffolding/SKILL.md
+    agent:
+      name: tester
+      path: agents/tester.md
+
+  e2e-testing:
+    description: >
+      End-to-end test suites that verify complete user workflows
+      through the browser. Runs via Playwright with Testkube for
+      Kubernetes-native execution against a running stack.
+    directory_pattern: "components/testing/e2e/{name}/"
+    depends_on: [server, webapp, database, helm]
+    scaffolding: skills/components/e2e-testing/e2e-testing-scaffolding/SKILL.md
+    agent:
+      name: tester
+      path: agents/tester.md
+
+  cicd:
+    description: >
+      CI/CD pipeline definitions for GitHub Actions. Automates
+      build, test, lint, and deploy workflows. Depends on Helm
+      charts for deployment stages.
+    directory_pattern: "components/cicds/{name}/"
+    depends_on: [helm]
+    scaffolding: skills/components/cicd/cicd-scaffolding/SKILL.md
+    agent:
+      name: devops
+      path: agents/devops.md
+
+commands:
+  router: skills/command-router/SKILL.md
+  available:
+
+    # config
+    - name: config generate
+      description: "Generate merged config file for a target environment"
+      user_facing: false
+      args:
+        env:
+          type: string
+          mandatory: true
+          description: "Target environment (e.g., local, staging, production)"
+        component:
+          type: string
+          mandatory: false
+          description: "Extract config for a single component"
+        output:
+          type: string
+          mandatory: false
+          description: "Write output to file path instead of stdout"
+
+    - name: config validate
+      description: "Validate config files against JSON schema"
+      user_facing: false
+      args:
+        env:
+          type: string
+          mandatory: false
+          description: "Validate a specific environment (default: all)"
+
+    - name: config add-env
+      description: "Add a new environment configuration"
+      user_facing: true
+      args:
+        env_name:
+          type: string
+          mandatory: true
+          description: "Environment name (e.g., staging, production)"
+
+    - name: config diff
+      description: "Show differences between two environment configs"
+      user_facing: true
+      args:
+        env_a:
+          type: string
+          mandatory: true
+          description: "First environment to compare"
+        env_b:
+          type: string
+          mandatory: true
+          description: "Second environment to compare"
+
+    # contract
+    - name: contract generate-types
+      description: "Generate TypeScript types from OpenAPI spec"
+      user_facing: false
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Contract component name"
+
+    - name: contract validate
+      description: "Validate OpenAPI spec for correctness"
+      user_facing: false
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Contract component name"
+
+    # database
+    - name: database setup
+      description: "Initialize database schema, run migrations, and seed"
+      user_facing: true
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database migrate
+      description: "Run pending database migrations"
+      user_facing: false
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database seed
+      description: "Populate database with seed data"
+      user_facing: false
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database reset
+      description: "Drop and recreate database from scratch"
+      user_facing: true
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database teardown
+      description: "Remove database and all associated resources"
+      user_facing: true
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database psql
+      description: "Open interactive PostgreSQL shell"
+      user_facing: true
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    - name: database port-forward
+      description: "Forward local port to database pod in Kubernetes"
+      user_facing: true
+      args:
+        name:
+          type: string
+          mandatory: true
+          description: "Database component name"
+        env:
+          type: string
+          mandatory: false
+          description: "Target environment"
+
+    # local-env
+    - name: local-env check-tools
+      description: "Verify required toolchain is installed (node, npm, kubectl, helm)"
+      user_facing: true
+
+    - name: local-env create
+      description: "Create local Kubernetes cluster for development"
+      user_facing: true
+
+    - name: local-env destroy
+      description: "Remove local Kubernetes cluster and all resources"
+      user_facing: true
+
+    - name: local-env start
+      description: "Start a stopped local Kubernetes cluster"
+      user_facing: true
+
+    - name: local-env stop
+      description: "Stop the local Kubernetes cluster without destroying it"
+      user_facing: true
+
+    - name: local-env status
+      description: "Show status of local cluster, pods, and services"
+      user_facing: true
+
+    - name: local-env restart
+      description: "Restart the local Kubernetes cluster"
+      user_facing: true
+
+    - name: local-env deploy
+      description: "Deploy application to Kubernetes via Helm charts"
+      user_facing: true
+
+    - name: local-env undeploy
+      description: "Remove deployed application from Kubernetes"
+      user_facing: true
+
+    - name: local-env forward
+      description: "Forward local ports to running services"
+      user_facing: true
+
+    - name: local-env config
+      description: "Show or update local environment configuration"
+      user_facing: true
+
+    - name: local-env infra
+      description: "Manage infrastructure components (ingress, cert-manager)"
+      user_facing: true
+
+skills:
+  router: skills/skills-router/SKILL.md
+
+lifecycle:
+  verification:
+    agent:
+      name: reviewer
+      path: agents/reviewer.md
+  testing:
+    agent:
+      name: tester
+      path: agents/tester.md
+
+documentation:
+  capabilities: skills/capabilities/SKILL.md
+  help: skills/help-content/SKILL.md

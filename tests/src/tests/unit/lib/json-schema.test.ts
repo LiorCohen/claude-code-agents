@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { join } from 'node:path';
 import { PLUGIN_DIR, runCommand } from '@/lib';
 
-const PLUGIN_SYSTEM_DIR = join(PLUGIN_DIR, 'system');
+const PLUGIN_SYSTEM_DIR = join(PLUGIN_DIR, 'core', 'system');
 
 describe('JSON Schema Lib', () => {
   describe('runtime behavior', () => {
