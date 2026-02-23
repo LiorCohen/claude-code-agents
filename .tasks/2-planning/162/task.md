@@ -2,7 +2,7 @@
 id: 162
 title: Split SDD into sdd-engine org repos
 priority: high
-status: speccing
+status: planning
 created: 2026-02-23 20:00 UTC
 depends_on: []
 blocks: []
@@ -188,11 +188,22 @@ This enables direct component lookup by name without iterating techpacks, and ma
 
 ## Documentation Split
 
-- **sdd-core `docs/`**: getting-started, commands, workflows, core concepts (methodology, lifecycle, settings)
-- **sdd-fullstack-typescript-techpack `docs/`**: agents, components, templates, TypeScript-specific standards and patterns
-- **sdd-vscode-extension `docs/`**: extension features, configuration, usage
+Every existing `docs/` file has an explicit destination:
 
-The current `docs/agents.md` and `docs/components.md` move to the techpack repo. The current `docs/getting-started.md`, `docs/commands.md`, and `docs/workflows.md` move to sdd-core.
+| File | Destination | Reason |
+|------|-------------|--------|
+| `docs/getting-started.md` | sdd-core | Core methodology tutorial |
+| `docs/commands.md` | sdd-core | Core command reference |
+| `docs/workflows.md` | sdd-core | Core workflow reference |
+| `docs/tutorial.md` | sdd-core | Core methodology walkthrough |
+| `docs/external-specs.md` | sdd-core | Core feature (external spec integration) |
+| `docs/workflow-progress.md` | sdd-core | Core workflow state tracking |
+| `docs/logo.svg` | sdd-core | Branding asset |
+| `docs/agents.md` | sdd-fullstack-typescript-techpack | Tech-stack-specific agents |
+| `docs/components.md` | sdd-fullstack-typescript-techpack | Tech-stack-specific component types |
+| `docs/config-guide.md` | sdd-fullstack-typescript-techpack | TypeScript config patterns |
+
+- **sdd-vscode-extension `docs/`**: written fresh — extension features, configuration, usage (no existing docs to move)
 
 ## Changes
 
@@ -206,11 +217,18 @@ The current `docs/agents.md` and `docs/components.md` move to the techpack repo.
 | `techpacks/SKILL.md` (in sdd-core) | Update techpacks gateway to document external techpack discovery in `sdd/.techpacks/` |
 | `plugin.json` (in sdd-core) | Version 0.1.0, commands/skills paths adjusted (no `core/` prefix) |
 | `marketplace.json` (in sdd-core) | Version 0.1.0, source `./plugin`, description updated for core-only |
-| `techpack.yaml` (in techpack repo) | Update `min_sdd_version` to reference 0.1.0 core version scheme |
+| `techpack.yaml` (in techpack repo) | Rename `tech_pack:` key → `techpack:`; update `min_sdd_version` to reference 0.1.0 core version scheme |
+| `techpack.schema.json` (in sdd-core) | Rename `tech_pack` → `techpack` in schema definition |
 | `types/settings.ts` (in sdd-core) | Rename `tech_packs` → `techpacks`; remove `components` from `TechPackEntry`; add top-level `components` map to `SettingsFile` with `techpack` back-reference |
 | `settings/schema.ts` (in sdd-core) | Update JSON schema to match new `techpacks` key, top-level `components`, and git-mode fields (`repo`, `ref`, `install_path`) |
 | `settings/reconcile.ts` (in sdd-core) | Add migration: nested `tech_packs.*.components` → top-level `components` with `techpack` field; rename `tech_packs` → `techpacks` |
 | `settings/validate.ts` (in sdd-core) | Update validation for new schema shape — top-level `components` uniqueness, `techpack` field references valid namespace |
+| `settings/sync.ts` (in sdd-core) | Rename all `tech_packs` references → `techpacks` |
+| `tech-pack/list.ts`, `tech-pack/info.ts`, `tech-pack/remove.ts` (in sdd-core) | Rename all `tech_packs` references → `techpacks` |
+| `settings/process-actions.ts` (in sdd-core) | Rename all `tech_packs` references → `techpacks` |
+| `techpacks/resources/operations.md` (in sdd-core) | Add `mode: git` branch to `resolvePath` — resolve `install_path` relative to project root |
+| Skill markdown files referencing `tech_pack`/`tech_packs` (in sdd-core) | Rename across: `techpacks/SKILL.md`, `sdd-settings.schema.json`, `project-settings/SKILL.md`, `init-orchestration/SKILL.md` |
+| `.github/workflows/release.yml` (in each public repo) | Version-triggered GitHub release workflows adapted from current `LiorCohen/sdd` release workflow |
 | `scaffolding/project.ts` (in sdd-core) | Add `sdd/.techpacks/` to generated `.gitignore` |
 
 ## Acceptance Criteria
@@ -237,6 +255,8 @@ The current `docs/agents.md` and `docs/components.md` move to the techpack repo.
 - [ ] All public repos have 0.1.0 changelog with historical lineage — **verify:** each public repo's CHANGELOG.md contains "0.1.0" and references to `LiorCohen/sdd` lineage
 - [ ] Workspace has infrastructure changelog — **verify:** `gh api repos/sdd-engine/workspace/contents/CHANGELOG.md` returns 200
 - [ ] `tech-pack install --repo --ref` checks out the specified ref — **verify:** install with `--ref v0.1.0`, run `git -C sdd/.techpacks/<namespace> log -1 --format=%D` and confirm it includes the tag
+- [ ] Gateway resolves skills/agents from a git-mode techpack — **verify:** after `tech-pack install --repo`, run `tech-pack info <namespace>` and confirm it lists components, agents, and skills from the installed techpack
+- [ ] `techpack.yaml` uses `techpack:` key (not `tech_pack:`) — **verify:** `grep '^techpack:' <techpack-repo>/techpack/techpack.yaml` matches
 - [ ] Settings file uses `techpacks` key (not `tech_packs`) — **verify:** `sdd-settings.yaml` after init contains `techpacks:` at top level
 - [ ] Components are top-level in settings — **verify:** `sdd-settings.yaml` after adding a component contains `components:` at top level with `techpack` back-reference
 - [ ] Settings reconciler migrates old format — **verify:** feed a settings file with `tech_packs` and nested `components` through reconcile, confirm output has `techpacks` and top-level `components`

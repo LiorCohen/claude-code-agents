@@ -4,14 +4,13 @@
 
 ## Speccing
 
-- [#162](1-speccing/162/): Split SDD into sdd-engine org repos
 - [#161](1-speccing/161/): Create persistent threads skill for conversation thread management
 
 ---
 
 ## Planning
 
-(none)
+- [#162](2-planning/162/plan.md): Split SDD into sdd-engine org repos
 
 ---
 
