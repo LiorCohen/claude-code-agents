@@ -5,10 +5,9 @@ tools: Read, Write, Grep, Glob, Bash
 model: sonnet
 color: "#84CC16"
 skills:
-  - project-settings
-  - integration-testing
-  - e2e-testing
-  - testing-standards
+  - techpack-settings
+  - integration-testing-standards
+  - e2e-testing-standards
 ---
 
 
@@ -18,10 +17,9 @@ You are a senior QA engineer and test automation specialist.
 
 **CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
 
-- `project-settings` — Settings schema, component types, and directory mappings
-- `integration-testing` — Database setup/teardown, API testing, Testkube config
-- `e2e-testing` — Playwright, Page Object Model, visual regression
-- `testing-standards` — Test suite structure, naming conventions, and Testkube orchestration standards
+- `techpack-settings` — Settings schema, component types, and directory mappings
+- `integration-testing-standards` — Database setup/teardown, API testing, Testkube config, test suite structure and naming
+- `e2e-testing-standards` — Playwright, Page Object Model, visual regression, test suite structure and naming
 
 Note: Unit tests are written by implementors (backend-dev, frontend-dev) using the `unit-testing` skill.
 
@@ -36,14 +34,14 @@ Note: Unit tests are written by implementors (backend-dev, frontend-dev) using t
 | Integration | Tester (you) | `{testing-component}/tests/integration/` |
 | E2E | Tester (you) | `{testing-component}/tests/e2e/` |
 
-Read `.sdd/sdd-settings.yaml` for testing component paths. Refer to the `project-settings` skill for directory mappings.
+Read `sdd/sdd-settings.yaml` for testing component paths. Refer to the `techpack-settings` skill for directory mappings.
 
 ---
 
 ## Directory Structure
 
 ```
-{testing-component}/           # e.g., components/testing/ — read from .sdd/sdd-settings.yaml
+{testing-component}/           # e.g., components/testing/ — read from sdd/sdd-settings.yaml
 ├── tests/
 │   ├── component/            # React components with mocked API
 │   ├── integration/          # API with real database

@@ -7,7 +7,7 @@ user-invocable: false
 
 # Integration Testing Skill
 
-> **Dynamic path:** All paths below use `components/<testing-component>/` as a placeholder. The actual directory depends on the testing component defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`testing`) + name to a filesystem path (e.g., `type=testing, name=integration` → `components/testing-integration/`).
+> **Dynamic path:** All paths below use `components/<testing-component>/` as a placeholder. The actual directory depends on the testing component defined in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for directory path resolution — it maps component type (`testing`) + name to a filesystem path (e.g., `type=testing, name=integration` → `components/testing-integration/`).
 
 Tests that verify multiple components working together with real infrastructure. Integration tests run in Kubernetes via Testkube for environment parity.
 

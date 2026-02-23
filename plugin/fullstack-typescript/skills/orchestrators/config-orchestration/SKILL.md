@@ -69,7 +69,7 @@ Generate a merged config file for a target environment.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh config generate --env <env> [--component <name>] [--output <path>]
+<plugin-root>/fullstack-typescript/system/system-run.sh config generate --env <env> [--component <name>] [--output <path>]
 ```
 
 ---
@@ -92,7 +92,7 @@ Validate config files against schemas.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh config validate [--env <env>]
+<plugin-root>/fullstack-typescript/system/system-run.sh config validate [--env <env>]
 ```
 
 ---
@@ -116,7 +116,7 @@ Show differences between two environments.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh config diff <env1> <env2>
+<plugin-root>/fullstack-typescript/system/system-run.sh config diff <env1> <env2>
 ```
 
 ---
@@ -139,7 +139,7 @@ Add a new environment directory.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh config add-env <env-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh config add-env <env-name>
 ```
 
 ---

@@ -10,7 +10,7 @@ Creates database component structure for PostgreSQL-based projects.
 
 ## What It Creates
 
-The directory path depends on the component name as defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`database`) + name to a filesystem path (e.g., `type=database, name=app-db` → `components/databases/app-db/`). Database components support multiple instances (e.g., `database-app-db/`, `database-analytics-db/`).
+The directory path depends on the component name as defined in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for directory path resolution — it maps component type (`database`) + name to a filesystem path (e.g., `type=database, name=app-db` → `components/databases/app-db/`). Database components support multiple instances (e.g., `database-app-db/`, `database-analytics-db/`).
 
 ```text
 components/database[-<name>]/
@@ -41,13 +41,13 @@ Use when your project needs:
 After scaffolding, database operations are performed via the system CLI:
 
 ```bash
-<plugin-root>/system/system-run.sh database setup <component-name>
-<plugin-root>/system/system-run.sh database teardown <component-name>
-<plugin-root>/system/system-run.sh database migrate <component-name>
-<plugin-root>/system/system-run.sh database seed <component-name>
-<plugin-root>/system/system-run.sh database reset <component-name>
-<plugin-root>/system/system-run.sh database port-forward <component-name>
-<plugin-root>/system/system-run.sh database psql <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database setup <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database teardown <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database migrate <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database seed <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database reset <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database port-forward <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh database psql <component-name>
 ```
 
 ## Prerequisites
@@ -163,7 +163,7 @@ export type DatabaseConfig = Readonly<{
 To scaffold a database component, build a spec and invoke the engine:
 
 ```bash
-<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables
@@ -205,6 +205,6 @@ Returns the scaffolding engine result: created files, directories, and scripts; 
 
 ## Related Skills
 
-- `project-settings` — Authoritative source for database component settings schema and directory mappings.
+- `techpack-settings` — Authoritative source for database component settings schema and directory mappings.
 - `postgresql` — Delegate to this for SQL patterns, Docker/K8s deployment, schema management, and performance tuning. Provides migration SQL templates, seed data patterns, and introspection queries.
 - `backend-scaffolding` — Generates the server component that contains the DAL layer querying this database. The server's repository layer imports database connection config and executes queries against the schema defined here.

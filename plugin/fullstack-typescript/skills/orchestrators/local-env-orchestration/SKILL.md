@@ -86,7 +86,7 @@ Options:
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env create [--name=cluster-name] [--provider=kind|minikube|docker-desktop] [--skip-infra]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env create [--name=cluster-name] [--provider=kind|minikube|docker-desktop] [--skip-infra]
 ```
 
 ### destroy
@@ -99,7 +99,7 @@ Completely removes the local cluster (not available for docker-desktop).
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env destroy [--name=cluster-name]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env destroy [--name=cluster-name]
 ```
 
 ### start / stop
@@ -113,8 +113,8 @@ Pause and resume the cluster. State is preserved when stopped.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env start [--name=cluster-name]
-<plugin-root>/system/system-run.sh env stop [--name=cluster-name]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env start [--name=cluster-name]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env stop [--name=cluster-name]
 ```
 
 ### status
@@ -127,7 +127,7 @@ Shows cluster status, node health, and deployed workloads.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env status [--name=cluster-name]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env status [--name=cluster-name]
 ```
 
 ### deploy
@@ -149,7 +149,7 @@ Options:
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env deploy [chart-name] [--namespace=<app-name>] [--skip-db] [--skip-migrate] [--exclude=name,...]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env deploy [chart-name] [--namespace=<app-name>] [--skip-db] [--skip-migrate] [--exclude=name,...]
 ```
 
 ### undeploy
@@ -162,7 +162,7 @@ Removes deployed applications (keeps infrastructure).
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env undeploy [chart-name] [--namespace=<app-name>]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env undeploy [chart-name] [--namespace=<app-name>]
 ```
 
 ### forward
@@ -175,7 +175,7 @@ Manages port forwards for local access to services.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env forward [start|stop|list] [--namespace=<app-name>]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env forward [start|stop|list] [--namespace=<app-name>]
 ```
 
 ### infra
@@ -188,7 +188,7 @@ Install or reinstall the observability infrastructure stack.
 
 **Implementation:**
 ```bash
-<plugin-root>/system/system-run.sh env infra [--reinstall]
+<plugin-root>/fullstack-typescript/system/system-run.sh local-env infra [--reinstall]
 ```
 
 ## Architecture
@@ -222,7 +222,7 @@ The telemetry namespace contains:
 
 ## Integration with Settings
 
-The deploy action reads `.sdd/sdd-settings.yaml` (delegate to the `project-settings` skill for the settings schema — it returns the project `name`, component list with types, and per-component settings) to:
+The deploy action reads `sdd/sdd-settings.yaml` (delegate to the `techpack-settings` skill for the settings schema — it returns the project `name`, component list with types, and per-component settings) to:
 1. Get the app `name` (used as the Kubernetes namespace)
 2. Find all `type: database` components to set up
 3. Find all `type: helm` components to deploy

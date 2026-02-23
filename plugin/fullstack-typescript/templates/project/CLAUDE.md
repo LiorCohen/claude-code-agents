@@ -2,7 +2,7 @@
 
 ## Tech Stack
 
-- **API Contract:** OpenAPI 3.x (path depends on contract component name in `.sdd/sdd-settings.yaml`)
+- **API Contract:** OpenAPI 3.x (path depends on contract component name in `sdd/sdd-settings.yaml`)
 - **Backend:** Node.js 20, TypeScript 5, Express (CMDO architecture)
 - **Frontend:** React 19, TypeScript 5.9, Vite (MVVM architecture)
 - **Database:** PostgreSQL 15
@@ -49,8 +49,8 @@ Config → [All layers] → Dependencies
 | Helm charts / Kubernetes | `helm-standards` |
 | CI/CD pipelines | `cicd-standards` |
 | Configuration | `config-standards` |
-| Tests (any type) | `testing-standards` |
-| Commits | `commit-standards` |
+| Integration tests | `integration-testing-standards` |
+| E2E tests | `e2e-testing-standards` |
 
 **Multiple standards apply simultaneously.** For example, backend work requires both `typescript-standards` AND `backend-standards`. Database work in a backend context requires `typescript-standards`, `backend-standards`, AND `database-standards`.
 
@@ -71,7 +71,7 @@ Config → [All layers] → Dependencies
 | `changes/` | Change specifications (features, bugfixes, refactors) |
 | `specs/` | Static domain knowledge (glossary, definitions, architecture) |
 | `components/contracts/{name}/openapi.yaml` | API contract |
-| `.sdd/sdd-settings.yaml` | Project settings (components, domains) |
+| `sdd/sdd-settings.yaml` | Project settings (components, domains) |
 
 ## Claude Code Commands
 

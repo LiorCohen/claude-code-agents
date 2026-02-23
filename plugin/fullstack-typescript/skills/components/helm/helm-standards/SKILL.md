@@ -5,16 +5,16 @@ description: Standards for Helm charts in SDD projects, including settings-drive
 
 # Helm Standards Skill
 
-Standards for Helm charts in SDD projects. Charts are generated based on component settings from `.sdd/sdd-settings.yaml`.
+Standards for Helm charts in SDD projects. Charts are generated based on component settings from `sdd/sdd-settings.yaml`.
 
 ## Skills
 
 Use the following skills for reference:
-- `project-settings` — Authoritative source for helm component settings schema, validation rules, and the chart-per-deployment pattern
+- `techpack-settings` — Authoritative source for helm component settings schema, validation rules, and the chart-per-deployment pattern
 
 ## Chart-per-Deployment Pattern
 
-Each deployment configuration gets its own helm chart. A single server can have multiple helm charts (e.g., one for API mode with ingress, one for worker mode without). Delegate to the `project-settings` skill for the complete helm settings schema — it returns `deploys` (server reference), `deploy_type` (server/webapp), `deploy_modes` (array of mode strings like `[api, worker]`), `ingress` (boolean), and `assets` (static file configuration). These settings determine which templates are included in each chart.
+Each deployment configuration gets its own helm chart. A single server can have multiple helm charts (e.g., one for API mode with ingress, one for worker mode without). Delegate to the `techpack-settings` skill for the complete helm settings schema — it returns `deploys` (server reference), `deploy_type` (server/webapp), `deploy_modes` (array of mode strings like `[api, worker]`), `ingress` (boolean), and `assets` (static file configuration). These settings determine which templates are included in each chart.
 
 ## Directory Structure
 
@@ -252,7 +252,7 @@ Config is injected into HTML at deploy time:
 
 ```bash
 # Generate config for production environment
-<plugin-root>/system/system-run.sh config generate --env production --component main-server \
+<plugin-root>/fullstack-typescript/system/system-run.sh config generate --env production --component main-server \
   --output helm-values-config.yaml
 
 # Deploy with config

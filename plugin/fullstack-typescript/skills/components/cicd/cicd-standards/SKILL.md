@@ -456,5 +456,5 @@ This skill defines no input parameters or structured output.
 ## Related Skills
 
 - `helm-standards` — Delegate to this for Kubernetes deployment targets in CD pipelines. Defines Helm chart structure, `values.yaml` patterns, and release naming that CI/CD workflows deploy to.
-- `testing-standards` — Delegate to this for test execution stages in CI. Defines test types (unit, integration, e2e), runner configuration, and Testkube patterns for in-cluster testing.
-- `commit-standards` — Delegate to this for commit message validation in CI. Defines conventional commit format that CI pipelines can enforce via pre-commit hooks or PR checks.
+- `integration-testing-standards` — Delegate to this for integration test execution stages in CI. Defines database setup, API testing, and Testkube patterns for in-cluster testing.
+- `e2e-testing-standards` — Delegate to this for E2E test execution stages in CI. Defines Playwright patterns and Testkube orchestration.

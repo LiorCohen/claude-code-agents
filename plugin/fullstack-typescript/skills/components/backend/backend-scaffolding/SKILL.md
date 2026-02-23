@@ -6,7 +6,7 @@ user-invocable: false
 
 # Backend Scaffolding Skill
 
-Creates a Node.js/TypeScript backend component following the CMDO (Config, Model, DAL, Operator) architecture. Scaffolding is driven by **component settings** defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the authoritative server settings schema — it accepts a component type (`server`) and returns the typed settings object including `server_type`, `databases`, `provides_contracts`, and framework defaults.
+Creates a Node.js/TypeScript backend component following the CMDO (Config, Model, DAL, Operator) architecture. Scaffolding is driven by **component settings** defined in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for the authoritative server settings schema — it accepts a component type (`server`) and returns the typed settings object including `server_type`, `databases`, `provides_contracts`, and framework defaults.
 
 ## When to Use
 
@@ -14,7 +14,7 @@ Use when creating server components. Supports multiple named instances (e.g., `m
 
 ## Settings-Driven Scaffolding
 
-Server components are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the complete server settings schema and defaults — it returns `server_type` (express/fastify/nestjs), `databases` (array of referenced database component names), `provides_contracts` (array of contract component names), and framework-specific configuration.
+Server components are scaffolded based on their settings in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for the complete server settings schema and defaults — it returns `server_type` (express/fastify/nestjs), `databases` (array of referenced database component names), `provides_contracts` (array of contract component names), and framework-specific configuration.
 
 ### Conditional Scaffolding Logic
 
@@ -217,7 +217,7 @@ background-worker:
 To scaffold a backend component, build a spec with context flags derived from settings and invoke the engine:
 
 ```bash
-<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables
@@ -295,7 +295,7 @@ Returns the scaffolding engine result: created files, directories, and scripts; 
 
 ## Related Skills
 
-- `project-settings` — Authoritative source for server component settings schema, defaults, and validation rules.
+- `techpack-settings` — Authoritative source for server component settings schema, defaults, and validation rules.
 - `backend-standards` — Generated server code must follow these standards. Defines CMDO architecture with handler → orchestrator → repository layering, strict layer separation, and dependency injection.
 - `typescript-standards` — Generated TypeScript files must follow these coding conventions. Defines strict typing, readonly patterns, branded types, and import standards.
 - `unit-testing` — Generated test files must follow these patterns. Defines Vitest setup, mocking strategies, and isolation conventions for backend services.

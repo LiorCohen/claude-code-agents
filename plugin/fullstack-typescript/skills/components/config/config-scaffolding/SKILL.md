@@ -6,7 +6,7 @@ user-invocable: false
 
 # Config Scaffolding Skill
 
-Scaffolds the mandatory config component for centralized configuration management. Config sections are generated based on component settings from `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the authoritative config schema — it accepts a component type (`config`) and returns the settings object including referenced components and environment variable mappings.
+Scaffolds the mandatory config component for centralized configuration management. Config sections are generated based on component settings from `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for the authoritative config schema — it accepts a component type (`config`) and returns the settings object including referenced components and environment variable mappings.
 
 ## When to Use
 
@@ -31,7 +31,7 @@ components/config/
 
 ## Settings-Driven Config Generation
 
-Config sections are generated based on component settings in `.sdd/sdd-settings.yaml`:
+Config sections are generated based on component settings in `sdd/sdd-settings.yaml`:
 
 ### Server Config Sections
 
@@ -199,7 +199,7 @@ The config component uses the engine for base template structure, but config sec
 ### Base structure via engine
 
 ```bash
-<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ```json

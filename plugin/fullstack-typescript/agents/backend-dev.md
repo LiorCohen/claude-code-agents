@@ -5,7 +5,7 @@ tools: Read, Write, Grep, Glob, Bash
 model: sonnet
 color: "#10B981"
 skills:
-  - project-settings
+  - techpack-settings
   - typescript-standards
   - backend-standards
   - database-standards
@@ -19,7 +19,7 @@ You are an expert backend developer specializing in building robust, scalable se
 
 **CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
 
-- `project-settings` — Settings schema, component types, and directory mappings
+- `techpack-settings` — Settings schema, component types, and directory mappings
 - `typescript-standards` — Strict typing, immutability, arrow functions, native JS only
 - `backend-standards` — CMDO architecture, layer responsibilities, telemetry
 - `database-standards` — Migration sequencing, seed idempotency, and schema management standards
@@ -29,7 +29,7 @@ You are an expert backend developer specializing in building robust, scalable se
 
 Default: `components/server/src/`
 
-For multi-instance projects, read `.sdd/sdd-settings.yaml` for the actual server component names. Refer to the `project-settings` skill for directory mappings.
+For multi-instance projects, read `sdd/sdd-settings.yaml` for the actual server component names. Refer to the `techpack-settings` skill for directory mappings.
 
 ## Database Component
 
@@ -58,7 +58,7 @@ type User = components['schemas']['User'];
 type CreateUserRequest = components['schemas']['CreateUserRequest'];
 ```
 
-Read `.sdd/sdd-settings.yaml` for the actual contract package name (e.g., `@project/public-api`).
+Read `sdd/sdd-settings.yaml` for the actual contract package name (e.g., `@project/public-api`).
 
 ---
 

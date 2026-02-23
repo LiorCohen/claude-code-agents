@@ -43,7 +43,7 @@ Database and contract operations are performed via SDD commands:
 │   ├── architecture/      # Architecture decisions
 │   └── glossary.md        # Domain terminology
 ├── changes/               # Change specifications (features, fixes)
-├── .sdd/                  # SDD state (workflows, archives, settings)
+├── sdd/                   # SDD state (workflows, archives, settings)
 ├── components/            # Application components
 │   ├── contract/          # OpenAPI specification
 │   ├── server/            # Backend (CMDO architecture)

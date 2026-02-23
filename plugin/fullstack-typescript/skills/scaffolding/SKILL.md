@@ -83,7 +83,7 @@ The scaffolding skill returns a declared actions response that includes:
 1. **Component entry** -- the new component's `name`, `type`, and type-specific `settings` to add to `sdd-settings.yaml`.
 2. **Dependencies** -- any `depends_on` relationships the new component declares.
 
-The calling orchestrator (typically the `change-orchestration` skill) is responsible for applying the settings update by delegating to the `project-settings` skill.
+The calling orchestrator (typically the `change-orchestration` skill) is responsible for applying the settings update by delegating to the `techpack-settings` skill.
 
 ---
 

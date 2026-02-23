@@ -7,7 +7,7 @@ user-invocable: false
 
 # E2E Testing Skill
 
-> **Dynamic path:** All paths below use `components/<testing-component>/` as a placeholder. The actual directory depends on the testing component defined in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`testing`) + name to a filesystem path (e.g., `type=testing, name=e2e` → `components/testing-e2e/`).
+> **Dynamic path:** All paths below use `components/<testing-component>/` as a placeholder. The actual directory depends on the testing component defined in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for directory path resolution — it maps component type (`testing`) + name to a filesystem path (e.g., `type=testing, name=e2e` → `components/testing-e2e/`).
 
 Full browser automation tests that verify complete user journeys. E2E tests run in Kubernetes via Testkube with Playwright.
 

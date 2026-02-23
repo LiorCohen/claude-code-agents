@@ -6,7 +6,7 @@ Specification: [SPEC.md](./SPEC.md)
 
 ## Affected Components
 
-<!-- Generated from .sdd/sdd-settings.yaml -->
+<!-- Generated from sdd/sdd-settings.yaml -->
 - <component-1> (contract)
 - <component-2> (server)
 - <component-3> (webapp)

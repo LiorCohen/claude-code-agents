@@ -5,7 +5,7 @@ tools: Read, Write, Grep, Glob, Bash
 model: sonnet
 color: "#06B6D4"
 skills:
-  - project-settings
+  - techpack-settings
   - typescript-standards
   - contract-standards
 ---
@@ -17,7 +17,7 @@ You are an API design expert. You own the API contract that both frontend and ba
 
 **CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
 
-- `project-settings` — Settings schema, component types, and directory mappings
+- `techpack-settings` — Settings schema, component types, and directory mappings
 - `typescript-standards` — Strict typing, immutability, and naming conventions
 - `contract-standards` — OpenAPI specification structure, versioning, and type generation standards
 
@@ -50,7 +50,7 @@ components/contracts/{name}/
 ## Type Generation
 
 ```bash
-<plugin-root>/system/system-run.sh contract generate-types <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh contract generate-types <component-name>
 ```
 
 This creates `generated/types.ts` inside the contract component. Server and webapp components consume these types via workspace package imports:
@@ -59,7 +59,7 @@ This creates `generated/types.ts` inside the contract component. Server and weba
 import type { components } from '@project-name/contract';
 ```
 
-For multi-instance projects, read `.sdd/sdd-settings.yaml` for actual contract package names.
+For multi-instance projects, read `sdd/sdd-settings.yaml` for actual contract package names.
 
 ## HTTP Conventions
 

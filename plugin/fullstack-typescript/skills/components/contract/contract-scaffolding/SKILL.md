@@ -14,7 +14,7 @@ Use when creating a contract component. Contract components support multiple ins
 
 ## What It Creates
 
-The directory path is `components/contracts/{name}/` based on the component name in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for directory path resolution — it maps component type (`contract`) + name to a filesystem path (e.g., `type=contract, name=customer-api` → `components/contracts/customer-api/`).
+The directory path is `components/contracts/{name}/` based on the component name in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for directory path resolution — it maps component type (`contract`) + name to a filesystem path (e.g., `type=contract, name=customer-api` → `components/contracts/customer-api/`).
 
 ```text
 components/contracts/{name}/
@@ -40,8 +40,8 @@ Note: Health check endpoints (`/health`, `/readiness`, `/liveness`) are NOT defi
 The contract component generates TypeScript types from the OpenAPI spec via the system CLI:
 
 ```bash
-<plugin-root>/system/system-run.sh contract generate-types <component-name>
-<plugin-root>/system/system-run.sh contract validate <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh contract generate-types <component-name>
+<plugin-root>/fullstack-typescript/system/system-run.sh contract validate <component-name>
 ```
 
 This creates `generated/api-types.ts` inside the contract component. The contract is published as a workspace package — server and webapp components consume types by declaring a workspace dependency and importing:
@@ -78,7 +78,7 @@ skills/components/contract/contract-scaffolding/templates/
 To scaffold a contract component, build a spec and invoke the engine:
 
 ```bash
-<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables
@@ -125,7 +125,7 @@ Returns the scaffolding engine result: created files, directories, and scripts; 
 
 ## Related Skills
 
-- `project-settings` — Authoritative source for contract component settings schema and directory mappings.
+- `techpack-settings` — Authoritative source for contract component settings schema and directory mappings.
 - `typescript-standards` — Generated TypeScript types must follow these coding conventions. Defines strict typing, readonly patterns, and import standards.
 
 ## Integration with Other Components

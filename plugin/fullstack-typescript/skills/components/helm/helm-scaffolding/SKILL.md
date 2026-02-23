@@ -6,12 +6,12 @@ user-invocable: false
 
 # Helm Scaffolding Skill
 
-Scaffolds Helm charts for deploying SDD components to Kubernetes. Charts are generated based on component settings from `.sdd/sdd-settings.yaml`.
+Scaffolds Helm charts for deploying SDD components to Kubernetes. Charts are generated based on component settings from `sdd/sdd-settings.yaml`.
 
 ## Skills
 
 Use the following skills for reference:
-- `project-settings` — Authoritative source for helm component settings schema (deploys, deploy_type, deploy_modes, ingress, assets)
+- `techpack-settings` — Authoritative source for helm component settings schema (deploys, deploy_type, deploy_modes, ingress, assets)
 
 ## When to Use
 
@@ -19,7 +19,7 @@ Use when creating Helm chart components. Creates Helm charts that integrate with
 
 ## Settings-Driven Scaffolding
 
-Helm charts are scaffolded based on their settings in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the complete helm settings schema and defaults — it returns `deploys` (server reference), `deploy_type`, `deploy_modes` (array of mode strings), `ingress` (boolean), and `assets` (static file configuration).
+Helm charts are scaffolded based on their settings in `sdd/sdd-settings.yaml`. Delegate to the `techpack-settings` skill for the complete helm settings schema and defaults — it returns `deploys` (server reference), `deploy_type`, `deploy_modes` (array of mode strings), `ingress` (boolean), and `assets` (static file configuration).
 
 ### Template Selection Logic
 
@@ -184,7 +184,7 @@ The ConfigMap is mounted in deployments and `SDD_CONFIG_PATH` is set automatical
 Deployment workflow:
 ```bash
 # Generate merged config
-<plugin-root>/system/system-run.sh config generate --env production --component main-server \
+<plugin-root>/fullstack-typescript/system/system-run.sh config generate --env production --component main-server \
   --output production-config.yaml
 
 # Deploy with config
@@ -219,7 +219,7 @@ Cluster-level observability (Victoria Metrics, Victoria Logs) is set up separate
 To scaffold a Helm chart, build a spec with context flags derived from helm + server settings and invoke the engine:
 
 ```bash
-<plugin-root>/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

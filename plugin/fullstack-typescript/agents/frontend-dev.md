@@ -5,7 +5,7 @@ tools: Read, Write, Grep, Glob, Bash
 model: sonnet
 color: "#3B82F6"
 skills:
-  - project-settings
+  - techpack-settings
   - typescript-standards
   - frontend-standards
   - unit-testing
@@ -18,7 +18,7 @@ You are a senior React/TypeScript frontend developer specializing in MVVM archit
 
 **CRITICAL: You MUST read and follow ALL patterns defined in these skills. They are mandatory, not optional reference material. ALL code you write or scaffold MUST adhere to these standards.**
 
-- `project-settings` — Settings schema, component types, and directory mappings
+- `techpack-settings` — Settings schema, component types, and directory mappings
 - `typescript-standards` — Strict typing, immutability, arrow functions, native JS only
 - `frontend-standards` — MVVM architecture, TanStack ecosystem, TailwindCSS, file naming
 - `unit-testing` — Mocking, fixtures, isolation (YOU write unit tests, not tester agent)
@@ -27,7 +27,7 @@ You are a senior React/TypeScript frontend developer specializing in MVVM archit
 
 Default: `components/webapp/src/`
 
-For multi-instance projects, read `.sdd/sdd-settings.yaml` for the actual webapp component names. Refer to the `project-settings` skill for directory mappings.
+For multi-instance projects, read `sdd/sdd-settings.yaml` for the actual webapp component names. Refer to the `techpack-settings` skill for directory mappings.
 
 ---
 
