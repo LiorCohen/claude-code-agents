@@ -1,12 +1,12 @@
 ---
 name: project-settings
-description: Manage project settings in .sdd/sdd-settings.yaml including component settings that drive scaffolding.
+description: Manage project settings in sdd/sdd-settings.yaml including component settings that drive scaffolding.
 user-invocable: false
 ---
 
 # Project Settings
 
-Single source of truth for the `.sdd/sdd-settings.yaml` schema, component settings, validation rules, and directory mappings. All other skills, agents, and commands MUST reference this skill rather than duplicating settings knowledge inline.
+Single source of truth for the `sdd/sdd-settings.yaml` schema, component settings, validation rules, and directory mappings. Component types and their settings schemas are defined by the active tech pack — invoke `techpacks.listComponents` and `techpacks.routeSkills` rather than hardcoding type-specific knowledge.
 
 ---
 
@@ -193,27 +193,13 @@ CI/CD component has no settings. Structure is driven by the cicd-standards skill
 
 ## Directory Structure
 
-Components are organized by type:
-
-| Type | Directory |
-|------|-----------|
-| server | `components/servers/<name>/` |
-| webapp | `components/webapps/<name>/` |
-| helm | `components/helm_charts/<name>/` |
-| database | `components/databases/<name>/` |
-| contract | `components/contracts/<name>/` |
-| testing | `components/testing/<name>/` |
-| cicd | `components/cicds/<name>/` |
-| config | `components/config/` (singleton) |
+Component directory patterns are defined in the tech pack manifest under `components.<type>.directory_pattern`. Invoke `techpacks.listComponents` to get the directory pattern for each component type. Do NOT hardcode type→directory mappings.
 
 ## Validation Rules
 
-- **Config mandatory singleton**: Every project must have exactly one config component
-- **Database references**: `databases` must reference existing database components
-- **Contract references**: `provides_contracts`, `consumes_contracts`, `contracts` must reference existing contract components
-- **Helm references**: `deploys` must reference component with `helm: true`
-- **Hybrid modes**: If `server_type: hybrid`, `modes` must have 2+ entries
-- **Deploy modes**: `deploy_modes` must be subset of server's available modes
+- **Config mandatory singleton**: Every project must have exactly one config component (if the tech pack defines a `config` component type)
+- **Component references**: Cross-references between components (e.g., `depends_on`) must reference existing component instances
+- **Tech-pack-specific validation**: Additional validation rules are provided by the tech pack. Invoke `techpacks.routeSkills(phase: implementation)` for component-type-specific settings schemas.
 
 ## Operations
 

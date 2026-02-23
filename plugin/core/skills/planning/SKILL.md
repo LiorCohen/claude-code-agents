@@ -127,38 +127,19 @@ If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, t
 ### Generation Algorithm
 
 1. **Read required components** from SPEC.md `## Components` section
-2. **Reference existing components** from `.sdd/sdd-settings.yaml` for details
+2. **Reference existing components** from `sdd/sdd-settings.yaml` for details
 3. **Check for new components:** If SPEC.md `## Components` lists new components not yet in `sdd-settings.yaml`, prepend a "Phase 1: Component Scaffolding" phase and shift subsequent phase numbers. If all components already exist, omit the scaffolding phase. This applies to all change types (feature, refactor).
-4. **Order by dependency graph:**
-   ```text
-   config ──────┐
-                │
-   contract ────┼──→ server (includes DB) ──→ helm
-                │           │
-                │           ↓
-                └───────→ webapp
-   ```
-5. **Assign agents and standards** based on component + change nature:
-
-| Component | Primary Agent | Standards | Notes |
-|-----------|---------------|-----------|-------|
-| contract | api-designer | `typescript-standards`, `contract-standards` | API design and OpenAPI updates |
-| server | backend-dev | `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | Backend implementation + DB (TDD) |
-| webapp | frontend-dev | `typescript-standards`, `frontend-standards`, `unit-testing` | Frontend implementation (TDD) |
-| helm | devops | `helm-standards`, `cicd-standards` | Deployment and infrastructure |
-| config | contextual | Depends on agent assigned | backend-dev, frontend-dev, or devops based on what config affects |
-
-6. **Add final phases:**
-   - `tester` for integration/E2E testing
-   - `reviewer` (+ `db-advisor` if DB changes)
+4. **Order by dependency graph:** Invoke `techpacks.dependencyOrder` for the active tech pack namespace to get the topological order of component types. Use this order for phase sequencing.
+5. **Assign agents and standards:** Invoke `techpacks.readManifest` and read `components.<type>.agent` for each affected component type. For standards, invoke `techpacks.routeSkills(phase: plan-generation, component_type: <type>)` — the skills router returns the relevant standards for each component.
+6. **Add final phases:** Read `lifecycle.testing.agent` and `lifecycle.verification.agent` from the manifest for the testing and review phases.
 
 ### Testing Strategy
 
 | Test Type | When | Agent |
 |-----------|------|-------|
-| Unit tests | During implementation (TDD) | backend-dev, frontend-dev |
-| Integration tests | After all implementation phases | tester |
-| E2E tests | After all implementation phases | tester |
+| Unit tests | During implementation (TDD) | Component's assigned agent (from manifest) |
+| Integration tests | After all implementation phases | `lifecycle.testing.agent` from manifest |
+| E2E tests | After all implementation phases | `lifecycle.testing.agent` from manifest |
 
 ## Phase Structure
 
@@ -245,8 +226,8 @@ sdd_version: [X.Y.Z]
 
 <!-- INCLUDE Phase 1 ONLY if SPEC.md lists new components not in sdd-settings.yaml. OMIT entirely if all components already exist. -->
 ### Phase 1: Component Scaffolding (if new components)
-**Agent:** `devops`
-**Standards:** `scaffolding`, component-specific scaffolding skills (e.g., `backend-scaffolding`, `frontend-scaffolding`)
+**Agent:** Read the agent assigned to the scaffolding-related component type from the manifest. For infrastructure components, use the agent from `components.helm.agent` or similar.
+**Standards:** Invoke `techpacks.routeSkills(phase: project-scaffolding)` to load scaffolding standards.
 
 **Outcome:** New component directories and boilerplate created, `sdd-settings.yaml` updated
 
@@ -254,51 +235,32 @@ sdd_version: [X.Y.Z]
 - Component directories scaffolded per SPEC.md Components section
 - sdd-settings.yaml updated with new component entries
 
-### Phase 2: API Contract
-**Agent:** `api-designer`
-**Component:** contract
-**Standards:** `typescript-standards`, `contract-standards`
+### Phase N: [Component Implementation]
 
-**Outcome:** API contracts defined per SPEC.md
+<!-- Repeat for each affected component in dependency order. Read agent and standards from manifest. -->
 
-**Deliverables:**
-- Updated OpenAPI spec with Spectral validation passing
-- Generated TypeScript types
+**Agent:** Read `components.<type>.agent` from the tech pack manifest via `techpacks.readManifest`.
+**Component:** `<component-type>`
+**Standards:** Invoke `techpacks.routeSkills(phase: implementation, component_type: <type>)` to load relevant standards.
 
-### Phase 3: Backend Implementation
-**Agent:** `backend-dev`
-**Component:** server
-**Standards:** `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing`
-
-**Outcome:** Backend functionality complete per SPEC.md following CMDO architecture
+**Outcome:** Component functionality complete per SPEC.md
 
 **Deliverables:**
-- Working API endpoints
-- Unit tests passing
+- Implementation matching spec requirements
+- Unit tests passing (if applicable)
 
-### Phase 4: Frontend Implementation
-**Agent:** `frontend-dev`
-**Component:** webapp
-**Standards:** `typescript-standards`, `frontend-standards`, `unit-testing`
-
-**Outcome:** Frontend functionality complete per SPEC.md following MVVM architecture
-
-**Deliverables:**
-- Working UI
-- Unit tests passing
-
-### Phase 5: Integration & E2E Testing
-**Agent:** `tester`
-**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
+### Phase N+1: Integration & E2E Testing
+**Agent:** Read `lifecycle.testing.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: testing)`.
 
 **Outcome:** All integration and E2E tests passing
 
 **Deliverables:**
 - Test suites passing
 
-### Phase 6: Review
-**Agent:** `reviewer`, `db-advisor` (if DB changes)
-**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
+### Phase N+2: Review
+**Agent:** Read `lifecycle.verification.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: verification)`.
 
 **Outcome:** Implementation verified against SPEC.md and standards
 
@@ -356,8 +318,8 @@ sdd_version: [X.Y.Z]
 ## Phases
 
 ### Phase 1: Investigation
-**Agent:** `backend-dev` or `frontend-dev` (based on component)
-**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards` | frontend: `typescript-standards`, `frontend-standards` -->
+**Agent:** Read `components.<type>.agent` from the tech pack manifest via `techpacks.readManifest` (based on affected component type).
+**Standards:** Invoke `techpacks.routeSkills(phase: implementation, component_type: <type>)`.
 
 **Outcome:** Root cause identified and documented in SPEC.md
 
@@ -366,8 +328,8 @@ sdd_version: [X.Y.Z]
 - Clear reproduction steps
 
 ### Phase 2: Implementation
-**Agent:** `backend-dev` or `frontend-dev` (based on component)
-**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
+**Agent:** Read `components.<type>.agent` from the tech pack manifest via `techpacks.readManifest`.
+**Standards:** Invoke `techpacks.routeSkills(phase: implementation, component_type: <type>)`.
 
 **Outcome:** Bug fixed with regression test per SPEC.md
 
@@ -376,8 +338,8 @@ sdd_version: [X.Y.Z]
 - Regression test passing
 
 ### Phase 3: Integration Testing
-**Agent:** `tester`
-**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
+**Agent:** Read `lifecycle.testing.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: testing)`.
 
 **Outcome:** All tests passing, no regressions
 
@@ -385,8 +347,8 @@ sdd_version: [X.Y.Z]
 - All tests passing
 
 ### Phase 4: Review
-**Agent:** `reviewer`
-**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
+**Agent:** Read `lifecycle.verification.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: verification)`.
 
 **Outcome:** Fix verified against SPEC.md acceptance criteria and standards
 
@@ -436,8 +398,8 @@ sdd_version: [X.Y.Z]
 ## Phases
 
 ### Phase 1: Preparation
-**Agent:** `backend-dev` or `frontend-dev` (based on component)
-**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
+**Agent:** Read `components.<type>.agent` from the tech pack manifest via `techpacks.readManifest` (based on affected component type).
+**Standards:** Invoke `techpacks.routeSkills(phase: implementation, component_type: <type>)`.
 
 **Outcome:** Test coverage verified, affected areas documented per SPEC.md
 
@@ -446,8 +408,8 @@ sdd_version: [X.Y.Z]
 - Affected area documentation
 
 ### Phase 2: Implementation
-**Agent:** `backend-dev` or `frontend-dev` (based on component)
-**Standards:** <!-- backend: `typescript-standards`, `backend-standards`, `database-standards`, `unit-testing` | frontend: `typescript-standards`, `frontend-standards`, `unit-testing` -->
+**Agent:** Read `components.<type>.agent` from the tech pack manifest via `techpacks.readManifest`.
+**Standards:** Invoke `techpacks.routeSkills(phase: implementation, component_type: <type>)`.
 
 **Outcome:** Refactoring complete per SPEC.md following component standards, all tests passing
 
@@ -456,8 +418,8 @@ sdd_version: [X.Y.Z]
 - All existing tests passing
 
 ### Phase 3: Integration Testing
-**Agent:** `tester`
-**Standards:** `testing-standards`, `integration-testing`, `e2e-testing`
+**Agent:** Read `lifecycle.testing.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: testing)`.
 
 **Outcome:** No behavior changes, all tests passing
 
@@ -466,8 +428,8 @@ sdd_version: [X.Y.Z]
 - No behavior changes verified
 
 ### Phase 4: Review
-**Agent:** `reviewer`
-**Standards:** `typescript-standards`, `backend-standards`, `frontend-standards`, `unit-testing`
+**Agent:** Read `lifecycle.verification.agent` from the manifest.
+**Standards:** Invoke `techpacks.routeSkills(phase: verification)`.
 
 **Outcome:** Refactoring goals verified, no regressions, standards compliance confirmed
 

@@ -63,21 +63,12 @@ testkube run testsuite e2e-tests --watch
 
 #### Step 5: Verify Implementation Against Standards
 
-For each component type affected by the change, verify the implementation follows the corresponding standards skill:
+For each component type affected by the change, verify the implementation follows the corresponding standards. Load standards via the tech pack:
 
-| Component Type | Standards Skill | Key Checks |
-|----------------|-----------------|------------|
-| Backend (server) | `backend-standards` | CMDO architecture, handler→orchestrator→repository layering, dependency injection |
-| Frontend (webapp) | `frontend-standards` | MVVM architecture, TanStack patterns, component structure |
-| Contract | (OpenAPI spec) | Spec matches requirements, endpoints are complete |
-| Database | `postgresql` | Migration conventions, schema matches spec |
-| All TypeScript | `typescript-standards` | Strict typing, readonly patterns, import conventions |
-| All Tests | `unit-testing` | Vitest patterns, isolation, mocking conventions |
-
-For each affected component:
-1. Read the relevant standards skill
-2. Review the implementation against the standards
-3. Flag any violations in the verification report
+1. Invoke `techpacks.routeSkills(phase: verification, component_type: <type>)` for each affected component type — this loads the relevant standards into context
+2. Read `lifecycle.verification.agent` from the manifest to determine the reviewer agent
+3. Review the implementation against the loaded standards
+4. Flag any violations in the verification report
 
 #### Step 6: Generate Report
 
@@ -106,9 +97,7 @@ For each affected component:
 ### Standards Compliance
 | Standard | Status | Notes |
 |----------|--------|-------|
-| backend-standards | PASS | CMDO architecture followed |
-| typescript-standards | PASS | Strict typing, readonly patterns |
-| unit-testing | PASS | Vitest patterns, proper isolation |
+| [standards loaded via techpacks.routeSkills] | PASS/FAIL | Details |
 
 ### Verdict: PASS
 ```

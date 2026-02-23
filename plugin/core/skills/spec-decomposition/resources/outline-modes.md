@@ -170,7 +170,7 @@ discovered_components:  # From component-discovery skill
    - Data Models / Database second
    - Backend Services / Business Logic third
    - Frontend Components / UI fourth
-   - Infrastructure / DevOps last
+   - Infrastructure last
 7. Assign numbers: 01, 02, 03, etc.
 
 **Numbering Rules:**

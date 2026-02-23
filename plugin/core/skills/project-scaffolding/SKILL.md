@@ -265,7 +265,4 @@ The project scaffolding CLI:
 
 ## Related Skills
 
-- **config-scaffolding** — Generates the config component for centralized configuration. Accepts component settings from `sdd-settings.yaml` and produces `config.yaml`, validation schemas, and TypeScript types.
-- **backend-scaffolding** — Generates server/backend components with CMDO architecture. Accepts component name and settings; produces the directory structure with handlers, orchestrators, and repositories.
-- **frontend-scaffolding** — Generates webapp components with MVVM architecture. Accepts component name and settings; produces the directory structure with views, view-models, and TanStack integration.
-- **database-scaffolding** — Generates PostgreSQL database components. Accepts component name and settings; produces the directory structure with migrations, seeds, and management scripts.
+Component scaffolding skills are provided by the active tech pack. Invoke `techpacks.routeSkills(phase: project-scaffolding)` to load the tech-specific scaffolding orchestration skill. For each component type, the manifest's `components.<type>.scaffolding` field points to the scaffolding skill. Use `techpacks.resolvePath` to get absolute paths for template directories passed to the scaffolding engine.

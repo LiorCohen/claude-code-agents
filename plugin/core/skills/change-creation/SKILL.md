@@ -145,30 +145,11 @@ Create `changes/YYYY/MM/DD/<name>/PLAN.md` using dynamic phase generation.
 
 #### Phase Generation Algorithm
 
-1. **Read project components** from `.sdd/sdd-settings.yaml`
+1. **Read project components** from `sdd/sdd-settings.yaml`
 2. **Filter to affected components** (from SPEC.md `affected_components`)
-3. **Order by dependency graph:**
-   ```text
-   config ──────┐
-                │
-   contract ────┼──→ server (includes DB) ──→ helm
-                │           │
-                │           ↓
-                └───────→ webapp
-   ```
-4. **Assign agents** based on component type:
-
-| Component Type | Agent | Notes |
-|----------------|-------|-------|
-| contract | api-designer | API design and OpenAPI updates |
-| server | backend-dev | Backend implementation + DB (TDD) |
-| webapp | frontend-dev | Frontend implementation (TDD) |
-| helm | devops | Deployment and infrastructure |
-| config | contextual | Depends on what config affects |
-
-5. **Add final phases:**
-   - `tester` for integration/E2E testing
-   - `reviewer` (+ `db-advisor` if DB changes)
+3. **Order by dependency graph:** Invoke `techpacks.dependencyOrder` for the active tech pack to get the topological order of component types. Filter to only affected components while preserving dependency order.
+4. **Assign agents:** Invoke `techpacks.readManifest` and read `components.<type>.agent` for each affected component type. For standards, invoke `techpacks.routeSkills(phase: plan-generation, component_type: <type>)`.
+5. **Add final phases:** Read `lifecycle.testing.agent` and `lifecycle.verification.agent` from the manifest.
 
 #### Plan Frontmatter
 

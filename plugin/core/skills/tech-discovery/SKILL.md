@@ -115,22 +115,11 @@ Component settings from this output (server_type, databases, provides_contracts,
 ## Skills
 
 Use the following skills for reference:
-- `project-settings` — Authoritative source for component settings schema, types, defaults, validation rules, and directory mappings
+- `techpacks` — Gateway for all tech-pack interactions. Use `techpacks.listComponents` to get available component types and `techpacks.routeSkills(phase: component-discovery)` to load tech-specific discovery knowledge.
 
 ## Available Components
 
-The Scaffolding Skill column shows which skill handles scaffolding for each component type. These are informational references — this skill does not invoke them.
-
-| Component | Description | Scaffolding Skill | Multi-Instance |
-|-----------|-------------|-------------------|----------------|
-| `config` | YAML configuration (MANDATORY) | `config-scaffolding` | No (singleton) |
-| `contract` | OpenAPI specification | `contract-scaffolding` | Yes |
-| `server` | Node.js backend (CMDO pattern) | `backend-scaffolding` | Yes |
-| `webapp` | React frontend (MVVM pattern) | `frontend-scaffolding` | Yes |
-| `database` | PostgreSQL migrations/seeds | `database-scaffolding` | Yes |
-| `helm` | Kubernetes Helm charts | `helm-scaffolding` | Yes |
-| `testing` | Testkube test setup | (inline) | Yes |
-| `cicd` | GitHub Actions workflows | (inline) | Yes |
+Invoke `techpacks.listComponents` for the active tech pack namespace to get the full list of available component types, their descriptions, directory patterns, and whether they support multiple instances. Do NOT hardcode component types — the tech pack manifest is the source of truth.
 
 ## Workflow
 
@@ -138,16 +127,7 @@ The Scaffolding Skill column shows which skill handles scaffolding for each comp
 
 Map discovered information to technical needs:
 
-| Discovery Element | Technical Implication | Settings Impact |
-|-------------------|----------------------|-----------------|
-| Multiple user types with different UIs | Consider separate webapps | Each webapp has `contracts` |
-| Data persistence mentioned | Database component | Server has `databases` |
-| Background processing | Worker server | `server_type: worker` or `hybrid` |
-| Scheduled jobs | Cron server | `server_type: cron` or `hybrid` |
-| API/backend workflows | Server with contract | `provides_contracts` |
-| Calling external APIs | | `consumes_contracts` |
-| External HTTP access | Ingress needed | `ingress: true` |
-| Internal service only | No ingress | `ingress: false` |
+Map discovered information to component types from the tech pack. Use `techpacks.routeSkills(phase: component-discovery)` to load the tech-specific discovery knowledge that maps requirements to component types and settings.
 
 ### Step 2: Present Recommendation with Settings
 

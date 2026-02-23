@@ -19,7 +19,7 @@ Invoked by `sdd-run.md` with no arguments.
 ## Flow
 
 1. Read the installed plugin version from `<plugin-root>/.claude-plugin/plugin.json` → `version` field
-2. Check if `.sdd/sdd-settings.yaml` exists in the current directory
+2. Check if `sdd/sdd-settings.yaml` exists in the current directory
 3. If it exists, read the project plugin version from `sdd.updated_by_plugin_version` (with fallback to legacy `sdd.plugin_version` for pre-reconciliation files)
 4. Optionally read `sdd.initialized_by_plugin_version` for context (the version that first created the project)
 5. Compare versions using semver:

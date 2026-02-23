@@ -225,7 +225,7 @@ recommended_order:
   2. Data Models / Database
   3. Backend Services / Business Logic
   4. Frontend Components / UI
-  5. Infrastructure / DevOps
+  5. Infrastructure
 ```
 
 ## Step 7: Display Thinking Output
