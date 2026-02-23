@@ -4,7 +4,7 @@
 
 ## Speccing
 
-- [#162](1-speccing/162/): Split SDD into sdd-engine org repos (sdd-core + sdd-fullstack-typescript-techpack)
+- [#162](1-speccing/162/): Split SDD into sdd-engine org repos
 - [#161](1-speccing/161/): Create persistent threads skill for conversation thread management
 
 ---
