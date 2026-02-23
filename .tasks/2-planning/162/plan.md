@@ -13,7 +13,7 @@ created: 2026-02-23 23:00 UTC
 
 ### Step 1: Rename `tech_packs` → `techpacks` in types + settings index (foundation)
 
-- Files: `plugin/core/system/src/types/settings.ts`, `plugin/core/system/src/settings/index.ts`
+- Files: `plugin/core/system/src/types/settings.ts`, `plugin/core/system/src/types/index.ts`, `plugin/core/system/src/settings/index.ts`
 - Why first: Every other settings file imports from here. Changing the type shape first means TypeScript will flag every downstream file that needs updating.
 - Implementation:
   - Rename `SettingsFile.tech_packs` → `SettingsFile.techpacks`
@@ -22,6 +22,7 @@ created: 2026-02-23 23:00 UTC
   - Remove `components` from `TechPackEntry`
   - Rename `ComponentManifest` → `ComponentEntry` with new shape: `{ type: string; techpack: string; directory: string }` (name becomes the map key, `techpack` replaces implicit nesting). Update all downstream imports (`reconcile.ts`, `validate.ts`, `sync.ts`, `process-actions.ts`).
   - Add `SettingsFile.components?: Readonly<Record<string, ComponentEntry>>`
+  - Update `types/index.ts` re-export: rename `ComponentManifest` → `ComponentEntry` (line 6 exports it by name from `./settings`)
   - Update `settings/index.ts` re-exports: export renamed `ComponentEntry` type
 
 ### Step 2: Update settings schema
@@ -60,7 +61,12 @@ created: 2026-02-23 23:00 UTC
 - Files: `plugin/core/system/src/settings/sync.ts`
 - Depends on: Step 1
 - Implementation:
-  - Rename all `settings.tech_packs` → `settings.techpacks` (3 occurrences)
+  - Rename all `settings.tech_packs` → `settings.techpacks` (lines 27, 74, 75)
+  - Rename import: `ComponentManifest` → `ComponentEntry`
+  - Rewrite `collectComponents()` (line 26-27): read from `settings.components` (top-level `Record<string, ComponentEntry>`) instead of iterating `tp.components`. Return entries with name reconstructed from map key (e.g., `Object.entries(settings.components ?? {}).map(([name, c]) => ({ name, ...c }))`)
+  - Update `SettingsDiff` type (lines 11-21): replace `ComponentManifest` with a display type that includes `name` (reconstructed from the map key during diffing). The added/removed/modified arrays need `name` for `formatSyncPreview`.
+  - Update `diffSettings()` (lines 32-86): build Maps from top-level `components` entries instead of `collectComponents()` flatMap. Key format `${c.type}:${name}` (name from map key, not property).
+  - Update `formatSyncPreview()` (lines 92-121): uses `c.name`, `c.type`, `c.directory` — these still work if the display type includes name from the map key
 
 ### Step 6: Update tech-pack commands + handler + schema
 
@@ -68,9 +74,9 @@ created: 2026-02-23 23:00 UTC
 - Depends on: Step 1
 - Implementation:
   - **install.ts**: Rename `manifest['tech_pack']` → `manifest['techpack']`, `settings['tech_packs']` → `settings['techpacks']`. Add `--repo` and `--ref` flags. Add git clone flow: clone to `.tmp/`, checkout ref, read manifest, validate, move to namespace dir, register with `mode: 'git'` and `install_path`. Add no-args mode: read settings, iterate `mode: git` entries, clone missing ones.
-  - **info.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`, `manifest['tech_pack']` → `manifest['techpack']`. Add `mode: 'git'` branch to `resolveTechPackDir()` — resolve `install_path` relative to project root.
-  - **list.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`, `data: { tech_packs: ... }` → `data: { techpacks: ... }`
-  - **remove.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`
+  - **info.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`, `manifest['tech_pack']` → `manifest['techpack']`. Update local `TechPackEntry` type (lines 17-23) to add `install_path?: string`, `repo?: string`, `ref?: string`. Add `mode: 'git'` branch to `resolveTechPackDir()` — resolve `install_path` relative to project root using `join(projectRoot, entry.install_path)`.
+  - **list.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`, `data: { tech_packs: ... }` → `data: { techpacks: ... }`. Update local `TechPackEntry` type (lines 16-22) to add `install_path?: string`, `repo?: string`, `ref?: string`.
+  - **remove.ts**: Rename `settings['tech_packs']` → `settings['techpacks']`. Update component count check (line 54): instead of `entry.components?.length`, look up components from top-level `settings['components']` map, filtering where `component.techpack === namespace`. Remove `components` from local `TechPackEntry` type (line 24). Update line 66: write back to `settings['techpacks']`.
   - **validate.ts**: Rename `manifest['tech_pack']` → `manifest['techpack']` (reads manifest key for name/namespace/system_path validation)
   - **handler.ts**: Add routing for new install modes — `--repo` triggers git clone flow, no args triggers reinstall-all flow. Currently rejects install without `--path`; must add `--repo` as alternate entry point and no-args as third entry point.
   - **schema.ts**: Add `repo` (string, optional) and `ref` (string, optional) to the install command's argument schema. These are mutually exclusive with `--path` (git mode vs local mode).
@@ -134,7 +140,8 @@ created: 2026-02-23 23:00 UTC
 - Depends on: Step 13
 - This is the **final version** of the monolithic plugin. Proper versioning and changelog required.
 - Version bump (discuss type with user — MAJOR is likely since the settings schema is a breaking change: `tech_packs` → `techpacks`, nested components → top-level)
-- Changelog entry covering: settings rename, `mode: git` support, top-level components, scaffolding `.techpacks/` gitignore
+- Changelog entry in `changelog/v{N}.md` covering: settings rename, `mode: git` support, top-level components, scaffolding `.techpacks/` gitignore
+- Update `changelog/README.md` with a new summary paragraph and version table row for the final major version
 - All TypeScript changes, schema changes, skill changes, and techpack.yaml committed
 - Merge feature branch to main
 - **Never push to remote** — `LiorCohen/sdd` remote stays untouched
@@ -159,7 +166,7 @@ created: 2026-02-23 23:00 UTC
 - Implementation:
   - Clone `sdd-engine/sdd-core` into a temp working directory
   - Copy `plugin/core/` contents flattened into `plugin/` (i.e., `plugin/core/commands/` → `plugin/commands/`, `plugin/core/skills/` → `plugin/skills/`, `plugin/core/system/` → `plugin/system/`, `plugin/core/permissions/` → `plugin/permissions/`)
-  - Create `plugin/.claude-plugin/plugin.json` — version 0.1.0, paths adjusted (no `core/` prefix): `"./commands/sdd.md"`, `"./skills/"`
+  - Create `plugin/.claude-plugin/plugin.json` — version 0.1.0, paths adjusted (no `core/` prefix): commands `["./commands/sdd.md", "./commands/sdd-run.md", "./commands/sdd-help.md"]`, skills `["./skills/"]`
   - Create `.claude-plugin/marketplace.json` — version 0.1.0, source `./plugin`, description for core-only, owner `sdd-engine`
   - Create `package.json` for the system workspace (single workspace: `plugin/system`). Build script: `tsc -p plugin/system/tsconfig.json && tsc-alias -p plugin/system/tsconfig.json`
   - Copy docs: `getting-started.md`, `commands.md`, `workflows.md`, `tutorial.md`, `external-specs.md`, `workflow-progress.md`, `logo.svg` into `docs/`
