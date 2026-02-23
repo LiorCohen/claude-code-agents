@@ -199,7 +199,7 @@ The config component uses the engine for base template structure, but config sec
 ### Base structure via engine
 
 ```bash
-<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/fullstack-typescript/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ```json

@@ -113,8 +113,12 @@ const SUBSTITUTABLE_EXTENSIONS: ReadonlySet<string> = new Set([
 ]);
 
 /** Check whether a file's extension supports variable substitution. */
-export const isSubstitutableFile = (filePath: string): boolean =>
-  SUBSTITUTABLE_EXTENSIONS.has(path.extname(filePath).toLowerCase());
+export const isSubstitutableFile = (filePath: string): boolean => {
+  const ext = path.extname(filePath).toLowerCase();
+  // .tmpl files are always substitutable (strip .tmpl to check the real extension too)
+  if (ext === '.tmpl') return true;
+  return SUBSTITUTABLE_EXTENSIONS.has(ext);
+};
 
 /** Replace `{{VAR}}` placeholders in content with values from variables map. */
 export const substituteVariables = (

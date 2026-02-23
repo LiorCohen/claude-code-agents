@@ -6,10 +6,7 @@
  * backward-compatible format accepted after reconciliation.
  */
 
-import { existsSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import type { SettingsFile, ComponentType, LogLevel } from '@/types';
-import { generateComponentPath } from './sync';
+import type { SettingsFile, LogLevel, TechPackEntry, ComponentManifest } from '@/types';
 import { validateSettings } from './validate';
 
 /** A single change made during reconciliation */
@@ -48,23 +45,72 @@ const isDateOnly = (value: string): boolean =>
 const dateOnlyToUtc = (dateStr: string): string => `${dateStr} 00:00:00Z`;
 
 /**
+ * Migrate legacy components array to tech_packs namespace.
+ *
+ * Pre-split settings had a flat `components` array at root.
+ * Post-split, components live under `tech_packs.<namespace>.components`.
+ */
+const migrateComponents = (
+  rawObj: Readonly<Record<string, unknown>>
+): { readonly techPacks: Readonly<Record<string, TechPackEntry>>; readonly changes: readonly ReconciliationChange[] } => {
+  // Check for existing tech_packs namespace
+  const rawTechPacks = rawObj.tech_packs as Readonly<Record<string, unknown>> | undefined;
+  if (rawTechPacks && typeof rawTechPacks === 'object') {
+    // Already in new format — pass through
+    return { techPacks: rawTechPacks as unknown as Readonly<Record<string, TechPackEntry>>, changes: [] };
+  }
+
+  // Migrate from legacy flat components array
+  const rawComponents = Array.isArray(rawObj.components) ? rawObj.components as readonly Readonly<Record<string, unknown>>[] : [];
+  if (rawComponents.length === 0) {
+    return { techPacks: {}, changes: [] };
+  }
+
+  // Convert legacy components to ComponentManifest entries
+  const components: readonly ComponentManifest[] = rawComponents.map((raw) => ({
+    name: (raw.name as string) ?? 'unknown',
+    type: (raw.type as string) ?? 'unknown',
+    directory: (raw.path as string) ?? (raw.directory as string) ?? `components/${raw.name as string}`,
+  }));
+
+  const entry: TechPackEntry = {
+    name: 'fullstack-typescript',
+    namespace: 'fs-ts',
+    version: '1.0.0',
+    mode: 'internal',
+    path: 'fullstack-typescript',
+    components,
+  };
+
+  return {
+    techPacks: { 'fs-ts': entry },
+    changes: [
+      {
+        type: 'migrated' as const,
+        field: 'tech_packs',
+        detail: `Migrated ${rawComponents.length} component(s) from flat components array to tech_packs.fs-ts`,
+      },
+    ],
+  };
+};
+
+/**
  * Reconcile raw parsed YAML into a valid SettingsFile conforming to the latest schema.
  *
  * @param raw - Raw parsed YAML (unknown shape from YAML.parse)
  * @param currentPluginVersion - The current plugin version string
- * @param projectRoot - Absolute path to project root (for filesystem checks)
+ * @param _projectRoot - Absolute path to project root (for filesystem checks)
  * @param now - Optional Date for testing (defaults to current time)
  */
 export const reconcileSettings = (
   raw: unknown,
   currentPluginVersion: string,
-  projectRoot: string,
+  _projectRoot: string,
   now: Date = new Date(),
 ): ReconciliationResult => {
   const rawObj = (typeof raw === 'object' && raw !== null ? raw : {}) as Readonly<Record<string, unknown>>;
   const rawSdd = (typeof rawObj.sdd === 'object' && rawObj.sdd !== null ? rawObj.sdd : {}) as Readonly<Record<string, unknown>>;
   const rawProject = (typeof rawObj.project === 'object' && rawObj.project !== null ? rawObj.project : {}) as Readonly<Record<string, unknown>>;
-  const rawComponents = Array.isArray(rawObj.components) ? rawObj.components as readonly Readonly<Record<string, unknown>>[] : [];
   const rawSystem = typeof rawObj.system === 'object' && rawObj.system !== null ? rawObj.system as Readonly<Record<string, unknown>> : undefined;
 
   const nowUtc = formatUtcDatetime(now);
@@ -209,71 +255,10 @@ export const reconcileSettings = (
   ];
 
   // =========================================================================
-  // 3. Reconcile components — add missing path fields
+  // 3. Migrate components to tech_packs namespace
   // =========================================================================
 
-  const { reconciledComponents, componentChanges } = rawComponents.reduce<{
-    readonly reconciledComponents: readonly {
-      readonly name: string;
-      readonly type: ComponentType;
-      readonly path: string;
-      readonly settings: Readonly<Record<string, unknown>>;
-    }[];
-    readonly componentChanges: readonly ReconciliationChange[];
-  }>(
-    (acc, rawComp) => {
-      const compName = rawComp.name as string;
-      const compType = rawComp.type as ComponentType;
-      const compPath = rawComp.path as string | undefined;
-      const compSettings = rawComp.settings as Readonly<Record<string, unknown>> | undefined;
-
-      const { path, pathChanges } = compPath
-        ? { path: compPath, pathChanges: [] as readonly ReconciliationChange[] }
-        : (() => {
-            const flatPath = `components/${compName}`;
-            const flatAbsolute = join(projectRoot, flatPath);
-
-            if (existsSync(flatAbsolute) && statSync(flatAbsolute).isDirectory()) {
-              return {
-                path: flatPath,
-                pathChanges: [
-                  {
-                    type: 'added' as const,
-                    field: `components[${compName}].path`,
-                    detail: `Inferred flat path from filesystem: "${flatPath}"`,
-                  },
-                ],
-              };
-            }
-
-            const generatedPath = generateComponentPath(compType, compName);
-            return {
-              path: generatedPath,
-              pathChanges: [
-                {
-                  type: 'added' as const,
-                  field: `components[${compName}].path`,
-                  detail: `Generated type-based path: "${generatedPath}"`,
-                },
-              ],
-            };
-          })();
-
-      return {
-        reconciledComponents: [
-          ...acc.reconciledComponents,
-          {
-            name: compName,
-            type: compType,
-            path,
-            settings: compSettings ?? {},
-          },
-        ],
-        componentChanges: [...acc.componentChanges, ...pathChanges],
-      };
-    },
-    { reconciledComponents: [], componentChanges: [] }
-  );
+  const { techPacks, changes: componentMigrationChanges } = migrateComponents(rawObj);
 
   // =========================================================================
   // 4. Add system section if missing
@@ -338,7 +323,7 @@ export const reconcileSettings = (
     ...updatedAtChanges,
     ...removedFieldChanges,
     ...deprecatedProjectChanges,
-    ...componentChanges,
+    ...componentMigrationChanges,
     ...systemChanges,
   ];
 
@@ -350,78 +335,28 @@ export const reconcileSettings = (
       updated_at: updatedAt,
     },
     project,
-    components: reconciledComponents as unknown as SettingsFile['components'],
+    tech_packs: Object.keys(techPacks).length > 0 ? techPacks : undefined,
     system,
   };
 
   // =========================================================================
-  // 6. Directory structure mismatch detection
-  // =========================================================================
-
-  // Check component paths that don't exist on disk
-  const pathWarnings: readonly ReconciliationWarning[] = reconciledComponents
-    .filter((comp) => !existsSync(join(projectRoot, comp.path)))
-    .map((comp) => ({
-      component: comp.name,
-      message: `Component path "${comp.path}" does not exist on disk`,
-    }));
-
-  // Check for untracked component directories
-  const componentsDir = join(projectRoot, 'components');
-  const untrackedWarnings: readonly ReconciliationWarning[] =
-    existsSync(componentsDir) && statSync(componentsDir).isDirectory()
-      ? (() => {
-          const trackedPaths: ReadonlySet<string> = new Set(reconciledComponents.map((c) => c.path));
-          const topLevelDirs = readdirSync(componentsDir).filter((entry) => {
-            const entryPath = join(componentsDir, entry);
-            return statSync(entryPath).isDirectory();
-          });
-
-          return topLevelDirs.flatMap((dirName) => {
-            const flatPath = `components/${dirName}`;
-            if (trackedPaths.has(flatPath)) {
-              return [];
-            }
-
-            const subDirs = readdirSync(join(componentsDir, dirName)).filter((entry) => {
-              const entryPath = join(componentsDir, dirName, entry);
-              return statSync(entryPath).isDirectory();
-            });
-
-            const subDirWarnings: readonly ReconciliationWarning[] = subDirs
-              .filter((subDir) => !trackedPaths.has(`components/${dirName}/${subDir}`))
-              .map((subDir) => ({
-                message: `Directory "components/${dirName}/${subDir}" exists on disk but is not tracked in sdd-settings.yaml`,
-              }));
-
-            const flatWarning: readonly ReconciliationWarning[] =
-              subDirs.length === 0 && !trackedPaths.has(flatPath)
-                ? [{ message: `Directory "${flatPath}" exists on disk but is not tracked in sdd-settings.yaml` }]
-                : [];
-
-            return [...subDirWarnings, ...flatWarning];
-          });
-        })()
-      : [];
-
-  const warnings: readonly ReconciliationWarning[] = [...pathWarnings, ...untrackedWarnings];
-
-  // =========================================================================
-  // 7. Validate reconciled result
+  // 6. Validate reconciled result
   // =========================================================================
 
   const validation = validateSettings(settings);
   const validationErrors = validation.errors.map((e) => {
     const prefix = e.component
       ? `[${e.component}${e.field ? `.${e.field}` : ''}]`
-      : '';
+      : e.field
+        ? `[${e.field}]`
+        : '';
     return `${prefix} ${e.message}`.trim();
   });
 
   return {
     settings,
     changes,
-    warnings,
+    warnings: [],
     valid: validation.valid,
     validationErrors,
   };

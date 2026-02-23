@@ -163,7 +163,7 @@ export type DatabaseConfig = Readonly<{
 To scaffold a database component, build a spec and invoke the engine:
 
 ```bash
-<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/fullstack-typescript/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

@@ -200,7 +200,7 @@ describe('Scaffolding Apply CLI', () => {
         operations: [
           {
             type: 'template_file',
-            source: 'templates/project/package.json',
+            source: 'templates/project/package.json.tmpl',
             dest: 'package.json',
           },
         ],
@@ -527,12 +527,12 @@ describe('Scaffolding Apply CLI', () => {
         operations: [
           {
             type: 'template_file',
-            source: 'templates/project/package.json',
+            source: 'templates/project/package.json.tmpl',
             dest: 'package.json',
           },
           {
             type: 'template_file',
-            source: 'templates/project/README.md',
+            source: 'templates/project/README.md.tmpl',
             dest: 'README.md',
           },
           {

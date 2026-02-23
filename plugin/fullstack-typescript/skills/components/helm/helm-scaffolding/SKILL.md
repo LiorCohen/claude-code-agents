@@ -219,7 +219,7 @@ Cluster-level observability (Victoria Metrics, Victoria Logs) is set up separate
 To scaffold a Helm chart, build a spec with context flags derived from helm + server settings and invoke the engine:
 
 ```bash
-<plugin-root>/core/system/system-run.sh scaffolding apply --spec spec.json
+<plugin-root>/fullstack-typescript/system/system-run.sh scaffolding apply --spec spec.json
 ```
 
 ### Variables

@@ -203,17 +203,17 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
   const projectTemplateOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'template_file',
-      source: path.join(techPackTemplatesDir, 'project/README.md'),
+      source: path.join(techPackTemplatesDir, 'project/README.md.tmpl'),
       dest: 'README.md',
     },
     {
       type: 'template_file',
-      source: path.join(techPackTemplatesDir, 'project/CLAUDE.md'),
+      source: path.join(techPackTemplatesDir, 'project/CLAUDE.md.tmpl'),
       dest: 'CLAUDE.md',
     },
     {
       type: 'template_file',
-      source: path.join(techPackTemplatesDir, 'project/package.json'),
+      source: path.join(techPackTemplatesDir, 'project/package.json.tmpl'),
       dest: 'package.json',
     },
   ];

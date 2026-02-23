@@ -2,7 +2,8 @@
  * Settings namespace command handler.
  *
  * Commands:
- *   reconcile   Reconcile settings to latest plugin schema
+ *   reconcile        Reconcile settings to latest plugin schema
+ *   process-actions  Process declared actions from tech system
  */
 
 import type { CommandResult, GlobalOptions } from '@/lib/args';
@@ -29,6 +30,11 @@ export const handleSettings = async (
     case 'reconcile': {
       const { reconcile } = await import('./reconcile');
       return reconcile(args, options);
+    }
+
+    case 'process-actions': {
+      const { processActions } = await import('./process-actions');
+      return processActions(args, options);
     }
 
     default:

@@ -1,6 +1,6 @@
-# SDD System CLI
+# SDD Core System CLI
 
-Unified command-line tool for SDD plugin operations.
+Command-line tool for core SDD methodology operations.
 
 ## Usage
 
@@ -30,36 +30,65 @@ sdd-system spec index --changes-dir changes/ # Generate changes/INDEX.md
 sdd-system spec snapshot --specs-dir specs/ # Generate SNAPSHOT.md
 ```
 
-### database
+### settings
 
-Database component operations (for scaffolded database components).
+Settings management and declared actions processing.
 
 ```bash
-sdd-system database setup <name>         # Deploy PostgreSQL to k8s
-sdd-system database teardown <name>      # Remove PostgreSQL
-sdd-system database migrate <name>       # Run migrations
-sdd-system database seed <name>          # Seed database
-sdd-system database reset <name>         # Full reset
-sdd-system database port-forward <name>  # Port forward to local
-sdd-system database psql <name>          # Open psql shell
+sdd-system settings reconcile                          # Reconcile settings to latest schema
+sdd-system settings process-actions --namespace fs-ts  # Process declared actions from tech system
 ```
 
-### contract
+### tech-pack
 
-Contract component operations.
+Tech pack management.
 
 ```bash
-sdd-system contract generate-types <name>  # Generate TS types from OpenAPI
-sdd-system contract validate <name>        # Validate OpenAPI spec
+sdd-system tech-pack validate <path>   # Validate tech pack manifest
+sdd-system tech-pack list              # List installed tech packs
+sdd-system tech-pack info <namespace>  # Show tech pack details
+sdd-system tech-pack install <path>    # Register a tech pack
+sdd-system tech-pack remove <ns>       # Unregister a tech pack
 ```
 
-### hook
+### agent
 
-Hook handlers (called by hook-runner.sh, not typically invoked directly).
+Agent metadata extraction.
 
 ```bash
-sdd-system hook validate-write   # PreToolUse: auto-approve/block writes
-sdd-system hook prompt-commit    # PostToolUse: commit prompts
+sdd-system agent frontmatter <path>   # Extract structured metadata from agent .md file
+```
+
+### log
+
+Structured logging.
+
+```bash
+sdd-system log write --level info --message "Operation completed"   # Write structured log entry
+```
+
+### archive
+
+Archive file management.
+
+```bash
+sdd-system archive store --type spec --path changes/old/   # Archive files
+```
+
+### permissions
+
+Permission management.
+
+```bash
+sdd-system permissions configure   # Merge SDD recommended permissions
+```
+
+### workflow
+
+Workflow phase gate management.
+
+```bash
+sdd-system workflow check-gate --target impl   # Check prerequisites for phase advance
 ```
 
 ## Global Options
@@ -84,11 +113,12 @@ npm run dev -- <command>
 ## Architecture
 
 ```
-plugin/system/
+plugin/core/system/
 ├── src/                    # TypeScript source
 │   ├── cli.ts              # Main entry point
 │   ├── commands/           # Command handlers by namespace
 │   ├── lib/                # Shared utilities
+│   ├── settings/           # Settings schema, validation, sync, reconciliation
 │   └── types/              # Type definitions
 ├── dist/                   # Compiled JS (not committed)
 ├── package.json

@@ -1,6 +1,6 @@
 import type { CommandSchema } from '@/lib/schema-validator';
 
-export const ACTIONS = ['reconcile'] as const;
+export const ACTIONS = ['reconcile', 'process-actions'] as const;
 type Action = (typeof ACTIONS)[number];
 
 export const schema: CommandSchema = {

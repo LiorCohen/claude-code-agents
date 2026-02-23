@@ -62,7 +62,8 @@ Namespaces:
     check-gate  Check if prerequisites are met to advance to target phase
 
   settings      Settings management
-    reconcile   Reconcile settings to latest plugin schema
+    reconcile       Reconcile settings to latest plugin schema
+    process-actions Process declared actions from tech system
 
   archive       Archive file management
     store       Archive a file or directory to sdd/archive/<type>/
