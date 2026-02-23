@@ -49,8 +49,9 @@ Splitting into separate repos enables:
 
 - Create 3 public repos + 1 private workspace repo under `sdd-engine`
 - Each public repo gets its own README.md, CLAUDE.md, CONTRIBUTING.md, and `docs/` directory (fresh, repo-specific, up-to-date)
-- Each repo maintains its own version and CHANGELOG.md independently
-- All repos start at version 0.1.0 with a changelog that includes historical lineage from `LiorCohen/sdd`
+- Each public repo maintains its own version and CHANGELOG.md independently
+- All public repos start at version 0.1.0 with a changelog that includes historical lineage from `LiorCohen/sdd`
+- Workspace has no version — it maintains an infrastructure changelog for its own changes
 - Workspace repo inherits:
   - `.claude/` skills (commit, tasks, critic, standards, etc.)
   - `.tasks/` with full task history
@@ -66,7 +67,7 @@ Splitting into separate repos enables:
 - Path adjustments: current `plugin/core/*` flattens to `plugin/*` in sdd-core
 - `.claude/` dev skills live ONLY in workspace, not in any public repo
 - Each repo gets its own `.gitignore` and `.claudeignore` tailored to its contents
-- Each repo gets its own `.github/` with GitHub Actions CI/CD
+- Each public repo gets its own `.github/` with GitHub Actions CI/CD
 
 ### Out of scope
 
@@ -85,13 +86,14 @@ Splitting into separate repos enables:
 - Techpacks are installed into `sdd/.techpacks/<namespace>/` which is gitignored in user projects
 - `sdd-settings.yaml` records registered techpacks (like `package.json` records deps) — this file IS committed
 - `tech-pack install` (no args) reads `sdd-settings.yaml` and clones all registered techpacks — like `npm install` with no args
-- All repos start at version 0.1.0
+- All public repos start at version 0.1.0; workspace is unversioned
 - The `min_sdd_version` field in `techpack.yaml` should reference the new core version scheme
 - Each repo's README, CLAUDE.md, and CONTRIBUTING.md must be written fresh and accurate for that repo — not copied verbatim from `LiorCohen/sdd`
 - Each repo handles its own build — no cross-repo npm workspaces
-- Each repo maintains its own version and changelog independently
+- Each public repo maintains its own version and changelog independently; workspace maintains an infrastructure changelog only
 - `.tasks/`, `.critic/`, `.temp/`, and `.claude/` exist ONLY in workspace — public repos do not have these directories
 - Public repos have `CLAUDE.md` and `CONTRIBUTING.md` at root for contributor guidance, but no dev skill suite
+- Workspace `.claude/` skills must be adapted for multi-repo structure (code lives in `repos/<name>/`, not at workspace root)
 
 ## Changes
 
@@ -100,7 +102,7 @@ Splitting into separate repos enables:
 | **sdd-engine/sdd-core** | New public repo: `plugin/core/` flattened to `plugin/`, `docs/` for user-facing documentation, plus `plugin.json`, `marketplace.json`, README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
 | **sdd-engine/sdd-fullstack-typescript-techpack** | New public repo: `plugin/fullstack-typescript/` under `techpack/`, `docs/` for techpack-specific documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
 | **sdd-engine/sdd-vscode-extension** | New public repo: `vscode-extension/` contents, `docs/` for extension documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md |
-| **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, CLAUDE.md, multi-repo management skill, `repos/` gitignored |
+| **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, README.md, CLAUDE.md, CHANGELOG.md (infra-only), multi-repo management skill, `repos/` gitignored |
 | `tech-pack/install.ts` (in sdd-core) | Add `--repo` flag for git clone to `sdd/.techpacks/<namespace>/`; add no-args mode to reinstall all from settings |
 | `techpacks/SKILL.md` (in sdd-core) | Update techpacks gateway to document external techpack discovery in `sdd/.techpacks/` |
 | `plugin.json` (in sdd-core) | Version 0.1.0, commands/skills paths adjusted (no `core/` prefix) |
@@ -126,5 +128,8 @@ Splitting into separate repos enables:
 - [ ] workspace has multi-repo management skill — **verify:** `gh api repos/sdd-engine/workspace/contents/.claude/skills --jq '.[].name'` includes a repo management skill
 - [ ] `tech-pack install --repo` clones into `sdd/.techpacks/` — **verify:** run install against the techpack repo URL in a test project, confirm `sdd/.techpacks/fullstack-typescript/techpack/techpack.yaml` exists
 - [ ] `tech-pack install` (no args) reinstalls from settings — **verify:** delete `sdd/.techpacks/`, run `tech-pack install`, confirm techpacks restored
-- [ ] All repos have 0.1.0 changelog with historical lineage — **verify:** each repo's CHANGELOG.md contains "0.1.0" and references to `LiorCohen/sdd` lineage
+- [ ] Every public repo has LICENSE — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do gh api repos/sdd-engine/$repo/contents/LICENSE --jq '.name'; done`
+- [ ] Every public repo has `.github/` CI/CD — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do gh api repos/sdd-engine/$repo/contents/.github --jq '.[0].name'; done`
+- [ ] All public repos have 0.1.0 changelog with historical lineage — **verify:** each public repo's CHANGELOG.md contains "0.1.0" and references to `LiorCohen/sdd` lineage
+- [ ] Workspace has infrastructure changelog — **verify:** `gh api repos/sdd-engine/workspace/contents/CHANGELOG.md` returns 200
 - [ ] `LiorCohen/sdd` is unchanged — **verify:** `git -C /Users/lior/Work/Dev/sdd log -1 --format=%H` matches the commit hash before this task started
