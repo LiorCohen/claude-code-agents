@@ -50,12 +50,12 @@ Maps `component_type` to the standards skills that apply during `implementation`
 | `helm-standards` | `skills/components/helm/helm-standards/SKILL.md` |
 | `config-standards` | `skills/components/config/config-standards/SKILL.md` |
 | `cicd-standards` | `skills/components/cicd/cicd-standards/SKILL.md` |
-| `integration-testing-standards` | `skills/components/integration-testing/integration-testing/SKILL.md` |
-| `e2e-testing-standards` | `skills/components/e2e-testing/e2e-testing/SKILL.md` |
+| `integration-testing-standards` | `skills/components/integration-testing/integration-testing-standards/SKILL.md` |
+| `e2e-testing-standards` | `skills/components/e2e-testing/e2e-testing-standards/SKILL.md` |
 | `typescript-standards` | `skills/typescript-standards/SKILL.md` |
 | `unit-testing` | `skills/unit-testing/SKILL.md` |
 | `component-discovery` | `skills/component-discovery/SKILL.md` |
-| `scaffolding` | `skills/project-scaffolding/SKILL.md` |
+| `scaffolding` | `skills/scaffolding/SKILL.md` |
 | `planning-standards` | `skills/planning-standards/SKILL.md` |
 
 ---
