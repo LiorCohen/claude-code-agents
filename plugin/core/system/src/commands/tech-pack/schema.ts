@@ -22,6 +22,16 @@ export const schema: CommandSchema = {
       description: 'Tech pack namespace (for info/remove)',
       minLength: 1,
     },
+    repo: {
+      type: 'string',
+      description: 'Git repository URL (for install)',
+      minLength: 1,
+    },
+    ref: {
+      type: 'string',
+      description: 'Git ref to checkout — tag, branch, or commit SHA (for install)',
+      minLength: 1,
+    },
   },
   required: ['action'],
 } as const;
@@ -30,4 +40,6 @@ export type TechPackArgs = {
   readonly action: Action;
   readonly path?: string;
   readonly namespace?: string;
+  readonly repo?: string;
+  readonly ref?: string;
 };

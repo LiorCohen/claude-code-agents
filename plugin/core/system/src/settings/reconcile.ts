@@ -52,37 +52,85 @@ const isDateOnly = (value: string): boolean =>
 const dateOnlyToUtc = (dateStr: string): string => `${dateStr} 00:00:00Z`;
 
 /**
- * Migrate legacy components array to tech_packs namespace.
+ * Migrate tech packs and components to the latest format.
  *
- * Pre-split settings had a flat `components` array at root.
- * Post-split, components live under `tech_packs.<namespace>.components`.
+ * Handles three migration paths:
+ * 1. Legacy flat `components` array at root → techpacks + top-level components
+ * 2. Old `tech_packs` key with nested `components` → `techpacks` + top-level `components`
+ * 3. Already-migrated `techpacks` key → pass through
  */
-const migrateComponents = (
+const migrateTechPacksAndComponents = (
   rawObj: Readonly<Record<string, unknown>>,
   defaultTechPack?: DefaultTechPack,
-): { readonly techPacks: Readonly<Record<string, TechPackEntry>>; readonly changes: readonly ReconciliationChange[] } => {
-  // Check for existing tech_packs namespace
-  const rawTechPacks = rawObj.tech_packs as Readonly<Record<string, unknown>> | undefined;
-  if (rawTechPacks && typeof rawTechPacks === 'object') {
-    // Already in new format — pass through
-    return { techPacks: rawTechPacks as unknown as Readonly<Record<string, TechPackEntry>>, changes: [] };
+): {
+  readonly techPacks: Readonly<Record<string, TechPackEntry>>;
+  readonly components: Readonly<Record<string, ComponentManifest>>;
+  readonly changes: readonly ReconciliationChange[];
+} => {
+  // Path 3: Already in new format (techpacks key exists)
+  const rawTechpacks = rawObj.techpacks as Readonly<Record<string, unknown>> | undefined;
+  if (rawTechpacks && typeof rawTechpacks === 'object') {
+    const rawComponents = rawObj.components as Readonly<Record<string, ComponentManifest>> | undefined;
+    return {
+      techPacks: rawTechpacks as unknown as Readonly<Record<string, TechPackEntry>>,
+      components: rawComponents && typeof rawComponents === 'object' ? rawComponents : {},
+      changes: [],
+    };
   }
 
-  // Migrate from legacy flat components array
+  // Path 2: Old tech_packs key with nested components
+  const rawTechPacksOld = rawObj.tech_packs as Readonly<Record<string, Record<string, unknown>>> | undefined;
+  if (rawTechPacksOld && typeof rawTechPacksOld === 'object') {
+    const changes: ReconciliationChange[] = [
+      { type: 'migrated', field: 'techpacks', detail: 'Renamed tech_packs → techpacks' },
+    ];
+
+    // Extract nested components into top-level map
+    const topLevelComponents: Record<string, ComponentManifest> = {};
+    const migratedTechPacks: Record<string, TechPackEntry> = {};
+
+    for (const [ns, entry] of Object.entries(rawTechPacksOld)) {
+      const nestedComponents = Array.isArray(entry.components)
+        ? entry.components as readonly Readonly<Record<string, unknown>>[]
+        : [];
+
+      // Build tech pack entry without components
+      migratedTechPacks[ns] = {
+        name: (entry.name as string) ?? ns,
+        namespace: (entry.namespace as string) ?? ns,
+        version: (entry.version as string) ?? '1.0.0',
+        mode: (entry.mode as TechPackEntry['mode']) ?? 'internal',
+        path: (entry.path as string) ?? ns,
+      };
+
+      // Move nested components to top-level
+      for (const comp of nestedComponents) {
+        const name = comp.name as string;
+        topLevelComponents[name] = {
+          type: (comp.type as string) ?? 'unknown',
+          techpack: ns,
+          directory: (comp.directory as string) ?? `components/${name}`,
+        };
+      }
+
+      if (nestedComponents.length > 0) {
+        changes.push({
+          type: 'migrated',
+          field: 'components',
+          detail: `Extracted ${nestedComponents.length} component(s) from techpacks.${ns}.components to top-level components`,
+        });
+      }
+    }
+
+    return { techPacks: migratedTechPacks, components: topLevelComponents, changes };
+  }
+
+  // Path 1: Legacy flat components array at root
   const rawComponents = Array.isArray(rawObj.components) ? rawObj.components as readonly Readonly<Record<string, unknown>>[] : [];
   if (rawComponents.length === 0) {
-    return { techPacks: {}, changes: [] };
+    return { techPacks: {}, components: {}, changes: [] };
   }
 
-  // Convert legacy components to ComponentManifest entries
-  const components: readonly ComponentManifest[] = rawComponents.map((raw) => ({
-    name: (raw.name as string) ?? 'unknown',
-    type: (raw.type as string) ?? 'unknown',
-    directory: (raw.path as string) ?? (raw.directory as string) ?? `components/${raw.name as string}`,
-  }));
-
-  // Use caller-provided tech pack identity, or a generic fallback.
-  // The command handler discovers installed tech packs and passes the info.
   const pack = defaultTechPack ?? { name: 'legacy', namespace: 'legacy', path: 'legacy' };
 
   const entry: TechPackEntry = {
@@ -91,16 +139,26 @@ const migrateComponents = (
     version: '1.0.0',
     mode: 'internal',
     path: pack.path,
-    components,
   };
+
+  const topLevelComponents: Record<string, ComponentManifest> = {};
+  for (const raw of rawComponents) {
+    const name = (raw.name as string) ?? 'unknown';
+    topLevelComponents[name] = {
+      type: (raw.type as string) ?? 'unknown',
+      techpack: pack.namespace,
+      directory: (raw.path as string) ?? (raw.directory as string) ?? `components/${name}`,
+    };
+  }
 
   return {
     techPacks: { [pack.namespace]: entry },
+    components: topLevelComponents,
     changes: [
       {
-        type: 'migrated' as const,
-        field: 'tech_packs',
-        detail: `Migrated ${rawComponents.length} component(s) from flat components array to tech_packs.${pack.namespace}`,
+        type: 'migrated',
+        field: 'techpacks',
+        detail: `Migrated ${rawComponents.length} component(s) from flat components array to techpacks.${pack.namespace} + top-level components`,
       },
     ],
   };
@@ -269,10 +327,10 @@ export const reconcileSettings = (
   ];
 
   // =========================================================================
-  // 3. Migrate components to tech_packs namespace
+  // 3. Migrate tech packs and components
   // =========================================================================
 
-  const { techPacks, changes: componentMigrationChanges } = migrateComponents(rawObj, defaultTechPack);
+  const { techPacks, components, changes: componentMigrationChanges } = migrateTechPacksAndComponents(rawObj, defaultTechPack);
 
   // =========================================================================
   // 4. Add system section if missing
@@ -349,7 +407,8 @@ export const reconcileSettings = (
       updated_at: updatedAt,
     },
     project,
-    tech_packs: Object.keys(techPacks).length > 0 ? techPacks : undefined,
+    techpacks: Object.keys(techPacks).length > 0 ? techPacks : undefined,
+    components: Object.keys(components).length > 0 ? components : undefined,
     system,
   };
 

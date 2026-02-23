@@ -20,12 +20,18 @@ type TechPackEntry = {
   readonly version: string;
   readonly mode: string;
   readonly path: string;
+  readonly install_path?: string;
+  readonly repo?: string;
+  readonly ref?: string;
 };
 
 /** Resolve the absolute path to a tech pack directory. */
-const resolveTechPackDir = (entry: TechPackEntry): string => {
+const resolveTechPackDir = (entry: TechPackEntry, projectRoot: string): string => {
   if (entry.mode === 'internal') {
     return join(getPluginRoot(), entry.path);
+  }
+  if (entry.mode === 'git' && entry.install_path) {
+    return join(projectRoot, entry.install_path);
   }
   return path.resolve(entry.path);
 };
@@ -49,7 +55,7 @@ export const techPackInfo = async (namespace: string): Promise<CommandResult> =>
 
   const content = await readText(settingsPath);
   const settings = YAML.parse(content) as Record<string, unknown>;
-  const techPacks = (settings['tech_packs'] as Record<string, TechPackEntry> | undefined) ?? {};
+  const techPacks = (settings['techpacks'] as Record<string, TechPackEntry> | undefined) ?? {};
 
   const entry = techPacks[namespace];
   if (!entry) {
@@ -57,7 +63,7 @@ export const techPackInfo = async (namespace: string): Promise<CommandResult> =>
   }
 
   // Read the manifest
-  const techPackDir = resolveTechPackDir(entry);
+  const techPackDir = resolveTechPackDir(entry, projectRoot);
   const manifestPath = join(techPackDir, 'techpack.yaml');
   if (!(await exists(manifestPath))) {
     return { success: false, error: `techpack.yaml not found at ${manifestPath}` };
@@ -66,7 +72,7 @@ export const techPackInfo = async (namespace: string): Promise<CommandResult> =>
   const manifestContent = await readText(manifestPath);
   const manifest = YAML.parse(manifestContent) as Record<string, unknown>;
 
-  const techPack = manifest['tech_pack'] as Record<string, unknown>;
+  const techPack = manifest['techpack'] as Record<string, unknown>;
   const components = manifest['components'] as Record<string, Record<string, unknown>> | undefined;
   const commands = manifest['commands'] as Record<string, unknown> | undefined;
   const lifecycle = manifest['lifecycle'] as Record<string, unknown> | undefined;

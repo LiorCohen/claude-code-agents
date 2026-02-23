@@ -2,7 +2,7 @@
  * JSON Schema for core settings validation.
  *
  * Core validates the base settings structure only: SDD metadata, project metadata,
- * tech_packs namespace, and minimal component manifest (name, type, directory).
+ * techpacks namespace, and component manifest (type, techpack, directory).
  * Tech-specific component settings are validated by each tech pack.
  */
 
@@ -53,25 +53,24 @@ const projectMetadataSchema: JsonSchema = {
   additionalProperties: false,
 };
 
-/** JSON Schema for a component manifest entry (core-level: name, type, directory only) */
+/** JSON Schema for a component manifest entry (top-level: type, techpack, directory) */
 const componentManifestSchema: JsonSchema = {
   type: 'object',
   properties: {
-    name: {
-      type: 'string',
-      pattern: '^[a-z][a-z0-9-]*[a-z0-9]$',
-      description: 'Component name (lowercase, hyphens)',
-    },
     type: {
       type: 'string',
       description: 'Component type (defined by tech pack)',
+    },
+    techpack: {
+      type: 'string',
+      description: 'Namespace of the tech pack this component belongs to',
     },
     directory: {
       type: 'string',
       description: 'Relative path from project root',
     },
   },
-  required: ['name', 'type', 'directory'],
+  required: ['type', 'techpack', 'directory'],
   additionalProperties: false,
 };
 
@@ -82,14 +81,13 @@ const techPackEntrySchema: JsonSchema = {
     name: { type: 'string' },
     namespace: { type: 'string' },
     version: { type: 'string' },
-    mode: { type: 'string', enum: ['internal', 'external'] },
+    mode: { type: 'string', enum: ['internal', 'external', 'git'] },
     path: { type: 'string' },
-    components: {
-      type: 'array',
-      items: componentManifestSchema,
-    },
+    repo: { type: 'string', description: 'Git clone URL (mode: git only)' },
+    ref: { type: 'string', description: 'Git ref to checkout (mode: git only)' },
+    install_path: { type: 'string', description: 'Path relative to project root (mode: git only)' },
   },
-  required: ['name', 'namespace', 'version', 'mode', 'path', 'components'],
+  required: ['name', 'namespace', 'version', 'mode'],
   additionalProperties: false,
 };
 
@@ -132,10 +130,15 @@ export const settingsFileSchema: JsonSchema = {
   properties: {
     sdd: sddMetadataSchema,
     project: projectMetadataSchema,
-    tech_packs: {
+    techpacks: {
       type: 'object',
       additionalProperties: techPackEntrySchema,
       description: 'Installed tech packs keyed by namespace',
+    },
+    components: {
+      type: 'object',
+      additionalProperties: componentManifestSchema,
+      description: 'Registered components keyed by name',
     },
     system: systemSettingsSchema,
   },

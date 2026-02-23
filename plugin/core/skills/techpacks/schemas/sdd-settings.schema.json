@@ -23,37 +23,42 @@
         "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" }
       }
     },
-    "tech_packs": {
+    "techpacks": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/tech_pack_entry"
+        "$ref": "#/$defs/techpack_entry"
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/component_manifest"
       }
     }
   },
   "$defs": {
-    "tech_pack_entry": {
+    "techpack_entry": {
       "type": "object",
-      "required": ["name", "namespace", "version", "mode", "path"],
+      "required": ["name", "namespace", "version", "mode"],
       "additionalProperties": false,
       "properties": {
-        "name":      { "type": "string" },
-        "namespace": { "type": "string" },
-        "version":   { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-        "mode":      { "type": "string", "enum": ["internal", "external"] },
-        "path":      { "type": "string", "description": "Relative to plugin root if internal" },
-        "components": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/component_manifest" }
-        }
+        "name":         { "type": "string" },
+        "namespace":    { "type": "string" },
+        "version":      { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "mode":         { "type": "string", "enum": ["internal", "external", "git"] },
+        "path":         { "type": "string", "description": "Relative to plugin root if internal, absolute if external" },
+        "repo":         { "type": "string", "description": "Git clone URL (mode: git only)" },
+        "ref":          { "type": "string", "description": "Git ref to checkout (mode: git only)" },
+        "install_path": { "type": "string", "description": "Path relative to project root (mode: git only)" }
       }
     },
     "component_manifest": {
       "type": "object",
-      "required": ["name", "type", "directory"],
+      "required": ["type", "techpack", "directory"],
       "additionalProperties": false,
       "properties": {
-        "name":      { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
         "type":      { "type": "string" },
+        "techpack":  { "type": "string", "description": "Namespace of the tech pack this component belongs to" },
         "directory": { "type": "string" }
       }
     }

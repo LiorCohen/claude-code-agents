@@ -49,9 +49,9 @@ const validatePaths = async (
   const paths: Array<{ readonly field: string; readonly relativePath: string }> = [];
 
   // system_path
-  const techPack = manifest['tech_pack'] as Record<string, unknown> | undefined;
+  const techPack = manifest['techpack'] as Record<string, unknown> | undefined;
   if (techPack?.['system_path']) {
-    paths.push({ field: 'tech_pack.system_path', relativePath: techPack['system_path'] as string });
+    paths.push({ field: 'techpack.system_path', relativePath: techPack['system_path'] as string });
   }
 
   // Component paths
@@ -211,7 +211,7 @@ export const validateTechPack = async (techPackPath: string): Promise<CommandRes
 
   // Combine results
   const allErrors = [...schemaErrors, ...pathErrors, ...dagErrors];
-  const techPack = manifest['tech_pack'] as Record<string, unknown> | undefined;
+  const techPack = manifest['techpack'] as Record<string, unknown> | undefined;
   const name = (techPack?.['name'] as string) ?? 'unknown';
   const namespace = (techPack?.['namespace'] as string) ?? 'unknown';
 

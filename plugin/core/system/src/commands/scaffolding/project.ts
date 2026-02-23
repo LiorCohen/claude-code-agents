@@ -59,7 +59,7 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     {
       type: 'write_file',
       path: '.gitignore',
-      content: 'node_modules/\n.env\n.DS_Store\ndist/\n*.log\n',
+      content: 'node_modules/\n.env\n.DS_Store\ndist/\n*.log\nsdd/.techpacks/\n',
     },
     {
       type: 'write_file',

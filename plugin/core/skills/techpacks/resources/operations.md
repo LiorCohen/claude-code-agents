@@ -2,20 +2,23 @@
 
 ## Common Preamble
 
-All operations start by reading the project's `sdd/sdd-settings.yaml` to find the tech pack entry. For internal tech packs (`mode: internal`), resolve the `path` relative to the plugin root directory (via `getPluginRoot()`). For external tech packs, the path is absolute.
+All operations start by reading the project's `sdd/sdd-settings.yaml` to find the tech pack entry. Path resolution depends on mode:
+- `mode: internal` — resolve `path` relative to the plugin root directory (via `getPluginRoot()`)
+- `mode: external` — `path` is absolute
+- `mode: git` — resolve `install_path` relative to the project root
 
 ## 1. readManifest(namespace)
 
 **Purpose:** Parse and return the full validated `techpack.yaml`.
 
 **Steps:**
-1. Read the tech pack entry from `sdd-settings.yaml` under `tech_packs.<namespace>`
+1. Read the tech pack entry from `sdd-settings.yaml` under `techpacks.<namespace>`
 2. Resolve the tech pack directory path
 3. Read `techpack.yaml` from the resolved directory
 4. Parse YAML content
 5. Return the full manifest as a structured object
 
-**Returns:** The parsed manifest with sections: `tech_pack`, `components`, `commands`, `skills`, `lifecycle`, `documentation`.
+**Returns:** The parsed manifest with sections: `techpack`, `components`, `commands`, `skills`, `lifecycle`, `documentation`.
 
 **Logging:** `system-run.sh log write --level info --source techpacks.readManifest --message "Read manifest for <namespace>"`
 

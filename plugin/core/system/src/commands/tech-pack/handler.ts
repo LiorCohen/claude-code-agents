@@ -5,7 +5,7 @@
  *   validate  Validate a tech pack manifest
  *   list      List installed tech packs
  *   info      Show tech pack details
- *   install   Register a tech pack
+ *   install   Register a tech pack (--path, --repo, or no args)
  *   remove    Unregister a tech pack
  */
 
@@ -22,8 +22,10 @@ export const handleTechPack = async (
   const { named } = parseNamedArgs(args);
   const techPackPath = named['path'];
   const namespace = named['namespace'];
+  const repo = named['repo'];
+  const ref = named['ref'];
 
-  const validation = validateArgs<TechPackArgs>({ action, path: techPackPath, namespace }, schema);
+  const validation = validateArgs<TechPackArgs>({ action, path: techPackPath, namespace, repo, ref }, schema);
 
   if (!validation.valid) {
     return {
@@ -57,11 +59,21 @@ export const handleTechPack = async (
     }
 
     case 'install': {
-      if (!validatedArgs.path) {
-        return { success: false, error: 'Missing --path argument for install' };
+      // Three install modes:
+      // 1. --repo: git clone install
+      // 2. --path: local directory install
+      // 3. No args: reinstall all from settings
+      if (validatedArgs.repo) {
+        const { installTechPackFromRepo } = await import('./install');
+        return installTechPackFromRepo(validatedArgs.repo, validatedArgs.ref);
       }
-      const { installTechPack } = await import('./install');
-      return installTechPack(validatedArgs.path);
+      if (validatedArgs.path) {
+        const { installTechPack } = await import('./install');
+        return installTechPack(validatedArgs.path);
+      }
+      // No args mode — reinstall all from settings
+      const { installAllFromSettings } = await import('./install');
+      return installAllFromSettings();
     }
 
     case 'remove': {

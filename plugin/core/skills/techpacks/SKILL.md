@@ -51,16 +51,30 @@ Invoke techpacks.loadAgent with:
 Read `sdd/sdd-settings.yaml` (or `.sdd/sdd-settings.yaml`) to find active tech packs:
 
 ```yaml
-tech_packs:
+techpacks:
   <namespace>:
     name: <tech-pack-name>
     namespace: <namespace>
     version: "1.0.0"
-    mode: internal
+    mode: internal           # or external, git
     path: <tech-pack-directory>
 ```
 
 For internal tech packs, resolve `path` relative to the plugin root directory.
+For git-mode tech packs, resolve `install_path` relative to the project root.
+
+```yaml
+# Git-mode example:
+techpacks:
+  my-pack:
+    name: my-pack
+    namespace: my-pack
+    version: "1.0.0"
+    mode: git
+    repo: https://github.com/org/my-pack.git
+    ref: v1.0.0
+    install_path: sdd/.techpacks/my-pack/techpack
+```
 
 ## Enforcement Rules
 

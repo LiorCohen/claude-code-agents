@@ -5,8 +5,8 @@
  * Reads actions from stdin (JSON array) and applies them to sdd-settings.yaml.
  *
  * Supported actions:
- *   - register_component: adds a component to tech_packs.<namespace>.components
- *   - unregister_component: removes a component from tech_packs.<namespace>.components
+ *   - register_component: adds a component to the top-level components map
+ *   - unregister_component: removes a component from the top-level components map
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -15,7 +15,7 @@ import YAML from 'yaml';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
 import type { ProjectRootResult } from '@/lib/config';
-import type { SettingsFile, TechPackEntry, ComponentManifest } from '@/types';
+import type { SettingsFile, ComponentManifest } from '@/types';
 
 /** A declared action from the tech system */
 type RegisterComponentAction = {
@@ -60,93 +60,78 @@ const isValidAction = (obj: unknown): obj is DeclaredAction => {
   return false;
 };
 
-/** Apply register_component action */
+/** Apply register_component action to the top-level components map */
 const applyRegister = (
-  techPack: TechPackEntry,
-  action: RegisterComponentAction
-): { readonly entry: TechPackEntry; readonly result: ActionResult } => {
-  const existing = techPack.components.find(
-    (c) => c.name === action.name && c.type === action.type
-  );
+  components: Record<string, ComponentManifest>,
+  namespace: string,
+  action: RegisterComponentAction,
+): ActionResult => {
+  const existing = components[action.name];
 
   if (existing) {
     // Update directory if changed
-    if (existing.directory === action.directory) {
+    if (existing.directory === action.directory && existing.type === action.type) {
       return {
-        entry: techPack,
-        result: {
-          action: 'register_component',
-          name: action.name,
-          success: true,
-          detail: `Component "${action.name}" (${action.type}) already registered`,
-        },
-      };
-    }
-
-    const updatedComponents: readonly ComponentManifest[] = techPack.components.map((c) =>
-      c.name === action.name && c.type === action.type
-        ? { ...c, directory: action.directory }
-        : c
-    );
-
-    return {
-      entry: { ...techPack, components: updatedComponents },
-      result: {
         action: 'register_component',
         name: action.name,
         success: true,
-        detail: `Updated directory for "${action.name}" (${action.type}) to "${action.directory}"`,
-      },
+        detail: `Component "${action.name}" (${action.type}) already registered`,
+      };
+    }
+
+    components[action.name] = {
+      type: action.type,
+      techpack: namespace,
+      directory: action.directory,
+    };
+
+    return {
+      action: 'register_component',
+      name: action.name,
+      success: true,
+      detail: `Updated "${action.name}" (${action.type}) at "${action.directory}"`,
     };
   }
 
   // Add new component
-  const newComponent: ComponentManifest = {
-    name: action.name,
+  components[action.name] = {
     type: action.type,
+    techpack: namespace,
     directory: action.directory,
   };
 
   return {
-    entry: { ...techPack, components: [...techPack.components, newComponent] },
-    result: {
-      action: 'register_component',
-      name: action.name,
-      success: true,
-      detail: `Registered "${action.name}" (${action.type}) at "${action.directory}"`,
-    },
+    action: 'register_component',
+    name: action.name,
+    success: true,
+    detail: `Registered "${action.name}" (${action.type}) at "${action.directory}"`,
   };
 };
 
-/** Apply unregister_component action */
+/** Apply unregister_component action from the top-level components map */
 const applyUnregister = (
-  techPack: TechPackEntry,
-  action: UnregisterComponentAction
-): { readonly entry: TechPackEntry; readonly result: ActionResult } => {
-  const existing = techPack.components.find((c) => c.name === action.name);
+  components: Record<string, ComponentManifest>,
+  action: UnregisterComponentAction,
+): ActionResult => {
+  const existing = components[action.name];
 
   if (!existing) {
     return {
-      entry: techPack,
-      result: {
-        action: 'unregister_component',
-        name: action.name,
-        success: true,
-        detail: `Component "${action.name}" not found (already removed)`,
-      },
-    };
-  }
-
-  const filteredComponents = techPack.components.filter((c) => c.name !== action.name);
-
-  return {
-    entry: { ...techPack, components: filteredComponents },
-    result: {
       action: 'unregister_component',
       name: action.name,
       success: true,
-      detail: `Unregistered "${action.name}" (${existing.type})`,
-    },
+      detail: `Component "${action.name}" not found (already removed)`,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  delete components[action.name];
+
+  return {
+    action: 'unregister_component',
+    name: action.name,
+    success: true,
+    detail: `Unregistered "${action.name}" (${existing.type})`,
   };
 };
 
@@ -228,37 +213,33 @@ export const processActions = async (
 
   const settings = YAML.parse(rawContentResult.content) as SettingsFile;
 
-  // Get or create tech pack entry
-  const techPacks = { ...(settings.tech_packs ?? {}) };
-  const existingEntry = techPacks[namespace];
-
-  if (!existingEntry) {
+  // Verify tech pack namespace exists
+  const techPacks = settings.techpacks ?? {};
+  if (!techPacks[namespace]) {
     return {
       success: false,
       error: `Tech pack namespace "${namespace}" not found in settings. Install the tech pack first.`,
     };
   }
 
+  // Get the mutable components map
+  const components: Record<string, ComponentManifest> = { ...(settings.components ?? {}) };
+
   // Process actions sequentially
-  let currentEntry: TechPackEntry = existingEntry;
   const results: ActionResult[] = [];
 
   for (const action of actions) {
     if (action.action === 'register_component') {
-      const { entry, result } = applyRegister(currentEntry, action);
-      currentEntry = entry;
-      results.push(result);
+      results.push(applyRegister(components, namespace, action));
     } else {
-      const { entry, result } = applyUnregister(currentEntry, action);
-      currentEntry = entry;
-      results.push(result);
+      results.push(applyUnregister(components, action));
     }
   }
 
   // Write updated settings
   const updatedSettings: SettingsFile = {
     ...settings,
-    tech_packs: { ...techPacks, [namespace]: currentEntry },
+    components: Object.keys(components).length > 0 ? components : undefined,
   };
 
   // Preserve header comments

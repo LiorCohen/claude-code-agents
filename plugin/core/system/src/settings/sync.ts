@@ -7,10 +7,13 @@
 
 import type { SettingsFile, ComponentManifest } from '@/types';
 
+/** Component with name (reconstructed from map key) for diff display */
+type NamedComponent = ComponentManifest & { readonly name: string };
+
 /** Diff between old and new settings */
 export type SettingsDiff = {
-  readonly addedComponents: readonly ComponentManifest[];
-  readonly removedComponents: readonly ComponentManifest[];
+  readonly addedComponents: readonly NamedComponent[];
+  readonly removedComponents: readonly NamedComponent[];
   readonly modifiedComponents: readonly {
     readonly name: string;
     readonly type: string;
@@ -21,10 +24,10 @@ export type SettingsDiff = {
 };
 
 /**
- * Collect all components from all tech packs in a settings file.
+ * Collect all components from the top-level components map, with name from key.
  */
-const collectComponents = (settings: SettingsFile): readonly ComponentManifest[] =>
-  Object.values(settings.tech_packs ?? {}).flatMap((tp) => tp.components);
+const collectComponents = (settings: SettingsFile): readonly NamedComponent[] =>
+  Object.entries(settings.components ?? {}).map(([name, c]) => ({ name, ...c }));
 
 /**
  * Compare two settings files and return the differences.
@@ -36,10 +39,10 @@ export const diffSettings = (
   const oldComponents = collectComponents(oldSettings);
   const newComponents = collectComponents(newSettings);
 
-  const oldByKey: ReadonlyMap<string, ComponentManifest> = new Map(
+  const oldByKey: ReadonlyMap<string, NamedComponent> = new Map(
     oldComponents.map((c) => [`${c.type}:${c.name}`, c])
   );
-  const newByKey: ReadonlyMap<string, ComponentManifest> = new Map(
+  const newByKey: ReadonlyMap<string, NamedComponent> = new Map(
     newComponents.map((c) => [`${c.type}:${c.name}`, c])
   );
 
@@ -71,8 +74,8 @@ export const diffSettings = (
     );
 
   // Tech pack changes
-  const oldTechPacks = new Set(Object.keys(oldSettings.tech_packs ?? {}));
-  const newTechPacks = new Set(Object.keys(newSettings.tech_packs ?? {}));
+  const oldTechPacks = new Set(Object.keys(oldSettings.techpacks ?? {}));
+  const newTechPacks = new Set(Object.keys(newSettings.techpacks ?? {}));
 
   const addedTechPacks = [...newTechPacks].filter((ns) => !oldTechPacks.has(ns));
   const removedTechPacks = [...oldTechPacks].filter((ns) => !newTechPacks.has(ns));

@@ -64,20 +64,24 @@ project:
   name: "my-app"
   description: "A task management SaaS application"
 
-tech_packs:
+techpacks:
   <namespace>:
-    components:
-      - name: my-component
-        type: <type-from-tech-pack>
-        directory: <directory-from-tech-pack-pattern>
-        settings:
-          # Settings schema is defined by the tech pack
-          depends_on: [other-component]
+    name: <tech-pack-name>
+    namespace: <namespace>
+    version: "1.0.0"
+    mode: internal  # or external, git
+    path: <tech-pack-directory>
 
-      - name: other-component
-        type: <type-from-tech-pack>
-        directory: <directory-from-tech-pack-pattern>
-        settings: {}
+components:
+  my-component:
+    type: <type-from-tech-pack>
+    techpack: <namespace>
+    directory: <directory-from-tech-pack-pattern>
+
+  other-component:
+    type: <type-from-tech-pack>
+    techpack: <namespace>
+    directory: <directory-from-tech-pack-pattern>
 ```
 
 ## Settings vs Config
@@ -206,14 +210,19 @@ sdd:
 project:
   name: "{{PROJECT_NAME}}"
 
-# Components are added here as they are scaffolded during implementation.
-# The plan determines when scaffolding is needed for new components.
+# Tech packs and components are added here during init and implementation.
 
-tech_packs:
+techpacks:
   <namespace>:
-    components:
-      - name: my-component
-        type: <type-from-tech-pack>
-        directory: <directory-from-tech-pack-pattern>
-        settings: {}
+    name: <tech-pack-name>
+    namespace: <namespace>
+    version: "1.0.0"
+    mode: internal
+    path: <tech-pack-directory>
+
+components:
+  my-component:
+    type: <type-from-tech-pack>
+    techpack: <namespace>
+    directory: <directory-from-tech-pack-pattern>
 ```

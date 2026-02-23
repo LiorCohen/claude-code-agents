@@ -4,10 +4,10 @@
   "title": "Tech Pack Manifest",
   "description": "Declares everything a tech pack offers to the SDD core.",
   "type": "object",
-  "required": ["tech_pack", "components", "commands", "skills"],
+  "required": ["techpack", "components", "commands", "skills"],
   "additionalProperties": false,
   "properties": {
-    "tech_pack": {
+    "techpack": {
       "type": "object",
       "required": ["name", "namespace", "description", "version", "min_sdd_version", "system_path"],
       "additionalProperties": false,

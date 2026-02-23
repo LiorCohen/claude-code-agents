@@ -2,7 +2,7 @@
  * Settings validation functions.
  *
  * Validates the base settings structure: project metadata, SDD metadata,
- * tech pack entries, and component manifest entries (name, type, directory).
+ * tech pack entries, and top-level component manifest entries (type, techpack, directory).
  * Tech-specific component settings are validated by each tech pack.
  */
 
@@ -23,57 +23,6 @@ export type SettingsValidationResult = {
 };
 
 /**
- * Validate component naming conventions.
- */
-const validateNaming = (
-  components: readonly ComponentManifest[]
-): readonly SettingsValidationError[] => {
-  const namePattern = /^[a-z][a-z0-9-]*[a-z0-9]$/;
-
-  const basicErrors = components.flatMap((component) => {
-    const patternError: readonly SettingsValidationError[] =
-      component.name.length > 1 && !namePattern.test(component.name)
-        ? [
-            {
-              component: component.name,
-              message: 'Invalid name format. Names must be lowercase, start with a letter, and use hyphens only (not underscores).',
-            },
-          ]
-        : [];
-
-    return patternError;
-  });
-
-  // Check for duplicate names within same type
-  const duplicateErrors = components.reduce<{
-    readonly seen: ReadonlyMap<string, readonly string[]>;
-    readonly errors: readonly SettingsValidationError[];
-  }>(
-    (acc, component) => {
-      const existing = acc.seen.get(component.type) ?? [];
-      const isDuplicate = existing.includes(component.name);
-      const newErrors: readonly SettingsValidationError[] = isDuplicate
-        ? [
-            ...acc.errors,
-            {
-              component: component.name,
-              message: `Duplicate ${component.type} component name: "${component.name}"`,
-            },
-          ]
-        : acc.errors;
-      const newSeen = new Map([
-        ...acc.seen,
-        [component.type, [...existing, component.name]],
-      ]);
-      return { seen: newSeen, errors: newErrors };
-    },
-    { seen: new Map<string, readonly string[]>(), errors: [] }
-  ).errors;
-
-  return [...basicErrors, ...duplicateErrors];
-};
-
-/**
  * Validate tech pack entries.
  */
 const validateTechPacks = (
@@ -86,42 +35,112 @@ const validateTechPacks = (
 
     if (entry.namespace !== key) {
       errors.push({
-        field: `tech_packs.${key}.namespace`,
+        field: `techpacks.${key}.namespace`,
         message: `Tech pack namespace "${entry.namespace}" does not match key "${key}"`,
       });
     }
 
     if (!entry.name) {
       errors.push({
-        field: `tech_packs.${key}.name`,
+        field: `techpacks.${key}.name`,
         message: 'Tech pack name is required',
       });
     }
 
     if (!entry.version) {
       errors.push({
-        field: `tech_packs.${key}.version`,
+        field: `techpacks.${key}.version`,
         message: 'Tech pack version is required',
       });
     }
 
-    if (!entry.mode || (entry.mode !== 'internal' && entry.mode !== 'external')) {
+    if (!entry.mode || (entry.mode !== 'internal' && entry.mode !== 'external' && entry.mode !== 'git')) {
       errors.push({
-        field: `tech_packs.${key}.mode`,
-        message: 'Tech pack mode must be "internal" or "external"',
+        field: `techpacks.${key}.mode`,
+        message: 'Tech pack mode must be "internal", "external", or "git"',
       });
     }
 
-    if (!entry.path) {
+    // path is required for internal/external, install_path for git
+    if (entry.mode === 'git') {
+      if (!entry.install_path) {
+        errors.push({
+          field: `techpacks.${key}.install_path`,
+          message: 'install_path is required for git mode tech packs',
+        });
+      }
+      if (!entry.repo) {
+        errors.push({
+          field: `techpacks.${key}.repo`,
+          message: 'repo is required for git mode tech packs',
+        });
+      }
+    } else if (!entry.path) {
       errors.push({
-        field: `tech_packs.${key}.path`,
+        field: `techpacks.${key}.path`,
         message: 'Tech pack path is required',
       });
     }
 
-    // Validate component entries within the tech pack
-    const componentErrors = validateNaming(entry.components);
-    return [...errors, ...componentErrors];
+    return errors;
+  });
+};
+
+/**
+ * Validate top-level components map.
+ */
+const validateComponents = (
+  components: Readonly<Record<string, ComponentManifest>> | undefined,
+  techPacks: Readonly<Record<string, TechPackEntry>> | undefined
+): readonly SettingsValidationError[] => {
+  if (!components) return [];
+
+  const namePattern = /^[a-z][a-z0-9-]*[a-z0-9]$/;
+
+  return Object.entries(components).flatMap(([name, component]) => {
+    const errors: SettingsValidationError[] = [];
+
+    // Validate name format
+    if (name.length > 1 && !namePattern.test(name)) {
+      errors.push({
+        component: name,
+        message: 'Invalid name format. Names must be lowercase, start with a letter, and use hyphens only (not underscores).',
+      });
+    }
+
+    // Validate techpack back-reference
+    if (!component.techpack) {
+      errors.push({
+        component: name,
+        field: 'techpack',
+        message: 'Component must reference a tech pack namespace',
+      });
+    } else if (techPacks && !techPacks[component.techpack]) {
+      errors.push({
+        component: name,
+        field: 'techpack',
+        message: `Component references nonexistent tech pack namespace "${component.techpack}"`,
+      });
+    }
+
+    // Validate required fields
+    if (!component.type) {
+      errors.push({
+        component: name,
+        field: 'type',
+        message: 'Component type is required',
+      });
+    }
+
+    if (!component.directory) {
+      errors.push({
+        component: name,
+        field: 'directory',
+        message: 'Component directory is required',
+      });
+    }
+
+    return errors;
   });
 };
 
@@ -139,27 +158,27 @@ export const validateSettings = (
   }
 
   // Validate tech pack entries
-  const techPackErrors = validateTechPacks(settings.tech_packs);
+  const techPackErrors = validateTechPacks(settings.techpacks);
 
-  // Validate all components across all tech packs
-  const allComponents = Object.values(settings.tech_packs ?? {}).flatMap((tp) => tp.components);
+  // Validate top-level components
+  const componentErrors = validateComponents(settings.components, settings.techpacks);
 
-  // Check for directory collisions across all tech packs
+  // Check for directory collisions across all components
   const directoryMap = new Map<string, string>();
   const directoryErrors: SettingsValidationError[] = [];
-  for (const comp of allComponents) {
+  for (const [name, comp] of Object.entries(settings.components ?? {})) {
     const existing = directoryMap.get(comp.directory);
-    if (existing && existing !== comp.name) {
+    if (existing && existing !== name) {
       directoryErrors.push({
-        component: comp.name,
+        component: name,
         field: 'directory',
         message: `Directory "${comp.directory}" collides with component "${existing}"`,
       });
     }
-    directoryMap.set(comp.directory, comp.name);
+    directoryMap.set(comp.directory, name);
   }
 
-  const allErrors = [...errors, ...techPackErrors, ...directoryErrors];
+  const allErrors = [...errors, ...techPackErrors, ...componentErrors, ...directoryErrors];
 
   return {
     valid: allErrors.length === 0,

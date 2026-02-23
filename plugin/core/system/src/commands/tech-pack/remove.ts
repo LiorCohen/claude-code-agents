@@ -21,7 +21,12 @@ type TechPackEntry = {
   readonly version: string;
   readonly mode: string;
   readonly path: string;
-  readonly components?: ReadonlyArray<{ readonly name: string; readonly type: string }>;
+};
+
+type ComponentEntry = {
+  readonly type: string;
+  readonly techpack: string;
+  readonly directory: string;
 };
 
 export const removeTechPack = async (namespace: string): Promise<CommandResult> => {
@@ -43,15 +48,17 @@ export const removeTechPack = async (namespace: string): Promise<CommandResult> 
 
   const settingsContent = await readText(settingsPath);
   const settings = YAML.parse(settingsContent) as Record<string, unknown>;
-  const techPacks = (settings['tech_packs'] as Record<string, TechPackEntry>) ?? {};
+  const techPacks = (settings['techpacks'] as Record<string, TechPackEntry>) ?? {};
 
   const entry = techPacks[namespace];
   if (!entry) {
     return { success: false, error: `Tech pack "${namespace}" is not installed` };
   }
 
-  // Warn about configured components
-  const componentCount = entry.components?.length ?? 0;
+  // Count components belonging to this tech pack from top-level components map
+  const components = (settings['components'] as Record<string, ComponentEntry>) ?? {};
+  const componentCount = Object.values(components).filter((c) => c.techpack === namespace).length;
+
   const warnings: string[] = [];
   if (componentCount > 0) {
     warnings.push(
@@ -63,7 +70,7 @@ export const removeTechPack = async (namespace: string): Promise<CommandResult> 
   // Remove from settings
   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   delete (techPacks as Record<string, unknown>)[namespace];
-  settings['tech_packs'] = techPacks;
+  settings['techpacks'] = techPacks;
 
   await writeFile(settingsPath, YAML.stringify(settings), 'utf-8');
 

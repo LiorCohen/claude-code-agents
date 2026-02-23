@@ -1,4 +1,4 @@
-tech_pack:
+techpack:
   name: fullstack-typescript
   namespace: fs-ts
   description: >
@@ -7,7 +7,7 @@ tech_pack:
     databases, OpenAPI contracts with generated types, Kubernetes
     deployment via Helm, and CI/CD through GitHub Actions.
   version: "1.0.0"
-  min_sdd_version: "8.0.0"
+  min_sdd_version: "0.1.0"
   system_path: ./system/system-run.sh
 
 components:

@@ -19,6 +19,9 @@ type TechPackEntry = {
   readonly version: string;
   readonly mode: string;
   readonly path: string;
+  readonly install_path?: string;
+  readonly repo?: string;
+  readonly ref?: string;
 };
 
 export const listTechPacks = async (): Promise<CommandResult> => {
@@ -41,14 +44,14 @@ export const listTechPacks = async (): Promise<CommandResult> => {
   const content = await readText(settingsPath);
   const settings = YAML.parse(content) as Record<string, unknown>;
 
-  const techPacks = (settings['tech_packs'] as Record<string, TechPackEntry> | undefined) ?? {};
+  const techPacks = (settings['techpacks'] as Record<string, TechPackEntry> | undefined) ?? {};
   const entries = Object.values(techPacks);
 
   if (entries.length === 0) {
     return {
       success: true,
       message: 'No tech packs installed',
-      data: { tech_packs: [] },
+      data: { techpacks: [] },
     };
   }
 
@@ -59,6 +62,6 @@ export const listTechPacks = async (): Promise<CommandResult> => {
   return {
     success: true,
     message: `Installed tech packs:\n${lines.join('\n')}`,
-    data: { tech_packs: entries },
+    data: { techpacks: entries },
   };
 };

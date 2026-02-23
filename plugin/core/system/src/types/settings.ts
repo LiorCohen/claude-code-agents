@@ -36,15 +36,21 @@ export type TechPackEntry = {
   readonly name: string;
   readonly namespace: string;
   readonly version: string;
-  readonly mode: 'internal' | 'external';
+  readonly mode: 'internal' | 'external' | 'git';
   readonly path: string;
-  readonly components: readonly ComponentManifest[];
+  /** Git clone URL (mode: git only) */
+  readonly repo?: string;
+  /** Git ref to checkout — tag, branch, or commit SHA (mode: git only) */
+  readonly ref?: string;
+  /** Path relative to project root (mode: git only) */
+  readonly install_path?: string;
 }
 
-/** Minimal component entry in core settings (name, type, directory only) */
+/** A component registered in the top-level components map of sdd-settings.yaml */
 export type ComponentManifest = {
-  readonly name: string;
   readonly type: string;
+  /** Namespace of the tech pack this component belongs to */
+  readonly techpack: string;
   readonly directory: string;
 }
 
@@ -76,6 +82,7 @@ export type ProjectMetadata = {
 export type SettingsFile = {
   readonly sdd: SddMetadata;
   readonly project: ProjectMetadata;
-  readonly tech_packs?: Readonly<Record<string, TechPackEntry>>;
+  readonly techpacks?: Readonly<Record<string, TechPackEntry>>;
+  readonly components?: Readonly<Record<string, ComponentManifest>>;
   readonly system?: SystemSettings;
 }

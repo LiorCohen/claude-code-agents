@@ -218,9 +218,9 @@ If this is an existing project with a version mismatch (detected in Phase 1):
 **Auto-register internal tech packs.** Scan `<plugin-root>/` for directories containing `techpack.yaml`. For each found:
 
 1. Validate the manifest: `<plugin-root>/core/system/system-run.sh tech-pack validate <tech-pack-path> --json`
-2. If valid, register in `sdd/sdd-settings.yaml` under `tech_packs`:
+2. If valid, register in `sdd/sdd-settings.yaml` under `techpacks`:
    ```yaml
-   tech_packs:
+   techpacks:
      <namespace>:
        path: <relative-path-to-tech-pack>
        version: <from manifest>
