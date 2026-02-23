@@ -134,9 +134,16 @@ Moves a task from inbox (or back from planning) to speccing, then interactively 
 
 **From planning (back-transition for substantial rework):** Move folder back to `1-speccing/`, update status to `speccing`, update INDEX.md, commit. Then resume solicitation.
 
-**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. There is no defined end — the user decides when the spec is complete.
+**Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). There is no defined end — the user decides when the spec is complete.
 
 **All decisions in the spec:** Every change must be fully defined during speccing — exact files, exact changes, no ambiguity. Never defer decisions to planning or label anything a "planning detail." Planning builds an execution plan for changes already decided here.
+
+**Self-sufficiency check:** The spec must be self-sufficient — planning should not require further research to understand what changes to make. During solicitation, actively check for:
+- **Gaps:** Changes referenced in acceptance criteria but missing from the Changes table (or vice versa). Scope items with no corresponding change.
+- **Contradictions:** Constraints that conflict with proposed changes. Scope "out of scope" items that overlap with listed changes.
+- **Ambiguity:** Changes described vaguely enough that two people could interpret them differently.
+
+**Open questions:** Maintain a running list. When you find a gap, contradiction, or ambiguity, add it as an open question and discuss it with the user immediately — one question at a time, resolved before moving on. All open questions must be resolved before the spec can transition to planning.
 
 Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
@@ -150,7 +157,13 @@ Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
 **Precondition:** Task must be in `speccing` status. If not, refuse with: "Task #<id> must be specced before planning. Use `/tasks spec <id>` first."
 
-**Speccing validation gate:** Before transitioning, verify task.md has all 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) with meaningful content — not trivial one-liners or placeholders. Pay special attention to Acceptance Criteria: every criterion must have an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms." If any section is missing or insufficient, refuse with details.
+**Speccing validation gate:** Before transitioning, verify:
+1. All 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria) have meaningful content — not trivial one-liners or placeholders.
+2. Every acceptance criterion has an external verification method (a command, test, grep, or observable output) — not just "Claude reads the file and confirms."
+3. **Self-sufficiency:** The spec requires no further research to understand what changes to make. Every change is fully defined — exact files, exact behavior, no TBD items.
+4. **Internal consistency:** No contradictions between sections (e.g., scope vs. changes, constraints vs. changes). Every acceptance criterion maps to a change; every change maps to an acceptance criterion.
+5. **No open questions remain.**
+If any check fails, refuse with details.
 
 **Critic exit gate:** Invoke `/critic` to validate spec quality before transitioning.
 
