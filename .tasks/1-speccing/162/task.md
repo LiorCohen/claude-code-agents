@@ -57,17 +57,20 @@ Splitting into separate repos enables:
   - `.tasks/` with full task history
   - `.critic/` learned feedback
   - `changelog/` detailed history (v1.md–v7.md) from `LiorCohen/sdd`
-  - `tests/` from current repo
-  - Multi-repo management skill for commits, changelogs, and worktrees across repos
+  - `tests/` from current repo (public repos do NOT have tests — all tests live in workspace only)
+  - Existing `tasks` and `commit` skills adapted for multi-repo structure (code lives in `repos/<name>/`, skills must handle repo selection and cross-repo operations)
 - Workspace `repos/` directory is gitignored — each public repo is cloned there independently
 - Each repo handles its own build independently (no workspace-level npm workspaces)
-- Update `tech-pack install` to support `--repo <url>` for git clone into `sdd/.techpacks/`
+- Update `tech-pack install` to support `--repo <url> [--ref <ref>]` for git clone into `sdd/.techpacks/`
 - Update `tech-pack install` (no args) to reinstall all techpacks from `sdd-settings.yaml`
 - `sdd-core` gets `plugin.json` + `marketplace.json` manifests at version 0.1.0
 - Path adjustments: current `plugin/core/*` flattens to `plugin/*` in sdd-core
 - `.claude/` dev skills live ONLY in workspace, not in any public repo
 - Each repo gets its own `.gitignore` and `.claudeignore` tailored to its contents
-- Each public repo gets its own `.github/` with GitHub Actions CI/CD
+- Each public repo gets its own `.github/` with GitHub Actions CI/CD:
+  - **sdd-core**: `release.yml` — version-triggered GitHub release with plugin archive (adapted from current `LiorCohen/sdd` release workflow)
+  - **sdd-fullstack-typescript-techpack**: `release.yml` — version-triggered GitHub release with techpack archive
+  - **sdd-vscode-extension**: `release.yml` — version-triggered GitHub release
 
 ### Out of scope
 
@@ -83,8 +86,8 @@ Splitting into separate repos enables:
 - `sdd-vscode-extension` is a standalone VS Code extension — published independently to the VS Code marketplace
 - `workspace` is private — contains dev skills, task management, and critic feedback, not shipped to users
 - `workspace/repos/` is gitignored — each repo inside is an independent git clone
-- Techpacks are installed into `sdd/.techpacks/<namespace>/` which is gitignored in user projects
-- `sdd-settings.yaml` records registered techpacks (like `package.json` records deps) — this file IS committed
+- Techpacks are installed into `sdd/.techpacks/<namespace>/` which is gitignored in user projects — the `scaffolding project` command must add `sdd/.techpacks/` to the project's `.gitignore`
+- `sdd-settings.yaml` records registered techpacks under `techpacks:` and project components under `components:` — this file IS committed
 - `tech-pack install` (no args) reads `sdd-settings.yaml` and clones all registered techpacks — like `npm install` with no args
 - All public repos start at version 0.1.0; workspace is unversioned
 - The `min_sdd_version` field in `techpack.yaml` should reference the new core version scheme
@@ -97,32 +100,35 @@ Splitting into separate repos enables:
 
 ## Tech-Pack Install Behavior
 
-### `tech-pack install --repo <url>`
+### `tech-pack install --repo <url> [--ref <ref>]`
 
-1. Clone `<url>` into `sdd/.techpacks/<namespace>/` (namespace extracted from `techpack/techpack.yaml` after clone)
-2. Read `techpack/techpack.yaml` from the cloned repo to get name, namespace, version
-3. Validate the manifest via `validateTechPack()`
-4. Register in `sdd-settings.yaml` with a new `mode: git` schema:
+1. Clone `<url>` into a temporary directory under `sdd/.techpacks/.tmp/`
+2. If `--ref` provided, checkout that ref (`git checkout <ref>`)
+3. Read `techpack/techpack.yaml` from the clone to get name, namespace, version
+4. Validate the manifest via `validateTechPack()`
+5. Move the clone from `.tmp/` to `sdd/.techpacks/<namespace>/`
+6. Register in `sdd-settings.yaml` with a new `mode: git` schema:
 
 ```yaml
-tech_packs:
+techpacks:
   <namespace>:
     name: <name>
     namespace: <namespace>
     version: "1.0.0"
     mode: git
     repo: <git-url>
-    path: sdd/.techpacks/<namespace>/techpack
-    components: []
+    ref: v1.0.0
+    install_path: sdd/.techpacks/<namespace>/techpack
 ```
 
-The `path` points to the `techpack/` subdirectory inside the cloned repo (where `techpack.yaml` lives), not the clone root. This keeps the path contract identical to `mode: external` — the gateway always reads `techpack.yaml` from the `path` directory.
+- `install_path` points to the `techpack/` subdirectory inside the cloned repo (where `techpack.yaml` lives), not the clone root. This keeps the path contract identical to `mode: external` — the gateway always reads `techpack.yaml` from the `install_path` directory.
+- `ref` is any valid git ref — tag, branch, or commit SHA. After cloning, the install command checks out this ref. If omitted, the repo's default branch is used.
 
 ### `tech-pack install` (no args)
 
 1. Read `sdd-settings.yaml`
 2. For each entry with `mode: git`:
-   - If `sdd/.techpacks/<namespace>/` does not exist → `git clone <repo>` into it
+   - If `sdd/.techpacks/<namespace>/` does not exist → `git clone <repo>` into it, then `git checkout <ref>` if `ref` is set
    - If it already exists → skip (no automatic pull — explicit `tech-pack update` is a future concern)
 3. Entries with `mode: internal` or `mode: external` → skip (already resolved)
 4. Validate all git-mode techpacks after clone
@@ -134,17 +140,51 @@ The gateway currently supports two modes:
 - `mode: external` — path is absolute
 
 Add support for:
-- `mode: git` — path resolved relative to project root (e.g., `sdd/.techpacks/<namespace>/techpack`)
+- `mode: git` — `install_path` resolved relative to project root (e.g., `sdd/.techpacks/<namespace>/techpack`)
 
 The `resolvePath()` operation must branch on mode to resolve correctly.
 
 ### `sdd-settings.yaml` schema changes
 
-The `tech_packs` entry gains two optional fields for git mode:
+**Rename `tech_packs` → `techpacks`** throughout the schema and codebase. The underscore form is removed.
+
+The `techpacks` entry gains three optional fields for git mode:
 - `repo` (string) — git clone URL, present only when `mode: git`
+- `ref` (string) — git ref to checkout (tag, branch, or commit SHA), present only when `mode: git`. Optional — omit to use the repo's default branch.
 - `mode` gains a third valid value: `git` (in addition to `internal` and `external`)
 
-The `path` field for `mode: git` is relative to project root (not absolute, not relative to plugin root).
+The `path` field is renamed to `install_path` for `mode: git` entries. It is relative to project root (not absolute, not relative to plugin root). Existing `mode: internal` and `mode: external` entries continue to use `path` with their current semantics.
+
+**Move `components` out of techpack entries into a top-level `components` object.** Each component is keyed by its name (globally unique, enforced by the validator) and carries a `techpack` field pointing back to the namespace.
+
+Before (nested):
+```yaml
+techpacks:
+  fs-ts:
+    components:
+      - name: my-api
+        type: server
+        directory: components/server/my-api
+```
+
+After (top-level):
+```yaml
+techpacks:
+  fs-ts:
+    name: fullstack-typescript
+    namespace: fs-ts
+    version: "1.0.0"
+    mode: internal
+    path: fullstack-typescript
+
+components:
+  my-api:
+    type: server
+    techpack: fs-ts
+    directory: components/server/my-api
+```
+
+This enables direct component lookup by name without iterating techpacks, and makes cross-techpack dependencies natural. The reconciler must migrate the old nested format to the new top-level format.
 
 ## Documentation Split
 
@@ -161,12 +201,17 @@ The current `docs/agents.md` and `docs/components.md` move to the techpack repo.
 | **sdd-engine/sdd-core** | New public repo: `plugin/core/` flattened to `plugin/`, `docs/` for user-facing documentation, plus `plugin.json`, `marketplace.json`, README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
 | **sdd-engine/sdd-fullstack-typescript-techpack** | New public repo: `plugin/fullstack-typescript/` under `techpack/`, `docs/` for techpack-specific documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
 | **sdd-engine/sdd-vscode-extension** | New public repo: `vscode-extension/` contents, `docs/` for extension documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md |
-| **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, README.md, CLAUDE.md, CHANGELOG.md (infra-only), multi-repo management skill, `repos/` gitignored |
-| `tech-pack/install.ts` (in sdd-core) | Add `--repo` flag for git clone to `sdd/.techpacks/<namespace>/`; add no-args mode to reinstall all from settings |
+| **sdd-engine/workspace** | New private repo: `.claude/` skills (tasks + commit adapted for multi-repo), `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, README.md, CLAUDE.md, CHANGELOG.md (infra-only), `repos/` gitignored |
+| `tech-pack/install.ts` (in sdd-core) | Add `--repo` and `--ref` flags for git clone to `sdd/.techpacks/<namespace>/`; add no-args mode to reinstall all from settings |
 | `techpacks/SKILL.md` (in sdd-core) | Update techpacks gateway to document external techpack discovery in `sdd/.techpacks/` |
 | `plugin.json` (in sdd-core) | Version 0.1.0, commands/skills paths adjusted (no `core/` prefix) |
 | `marketplace.json` (in sdd-core) | Version 0.1.0, source `./plugin`, description updated for core-only |
 | `techpack.yaml` (in techpack repo) | Update `min_sdd_version` to reference 0.1.0 core version scheme |
+| `types/settings.ts` (in sdd-core) | Rename `tech_packs` → `techpacks`; remove `components` from `TechPackEntry`; add top-level `components` map to `SettingsFile` with `techpack` back-reference |
+| `settings/schema.ts` (in sdd-core) | Update JSON schema to match new `techpacks` key, top-level `components`, and git-mode fields (`repo`, `ref`, `install_path`) |
+| `settings/reconcile.ts` (in sdd-core) | Add migration: nested `tech_packs.*.components` → top-level `components` with `techpack` field; rename `tech_packs` → `techpacks` |
+| `settings/validate.ts` (in sdd-core) | Update validation for new schema shape — top-level `components` uniqueness, `techpack` field references valid namespace |
+| `scaffolding/project.ts` (in sdd-core) | Add `sdd/.techpacks/` to generated `.gitignore` |
 
 ## Acceptance Criteria
 
@@ -184,11 +229,16 @@ The current `docs/agents.md` and `docs/components.md` move to the techpack repo.
 - [ ] workspace has `.claude/` skills and `.tasks/` — **verify:** `gh api repos/sdd-engine/workspace/contents/.claude --jq '.[].name'` lists skill directories
 - [ ] workspace has `.tasks/` with full history — **verify:** `gh api repos/sdd-engine/workspace/contents/.tasks --jq '.[].name'` includes INDEX.md and status directories
 - [ ] workspace has `.critic/` — **verify:** `gh api repos/sdd-engine/workspace/contents/.critic --jq '.[].name'` returns entries
-- [ ] workspace has multi-repo management skill — **verify:** `gh api repos/sdd-engine/workspace/contents/.claude/skills --jq '.[].name'` includes a repo management skill
+- [ ] workspace `tasks` and `commit` skills are adapted for multi-repo — **verify:** `gh api repos/sdd-engine/workspace/contents/.claude/skills --jq '.[].name'` includes `tasks` and `commit` directories
 - [ ] `tech-pack install --repo` clones into `sdd/.techpacks/` — **verify:** run install against the techpack repo URL in a test project, confirm `sdd/.techpacks/fullstack-typescript/techpack/techpack.yaml` exists
 - [ ] `tech-pack install` (no args) reinstalls from settings — **verify:** delete `sdd/.techpacks/`, run `tech-pack install`, confirm techpacks restored
 - [ ] Every public repo has LICENSE — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do gh api repos/sdd-engine/$repo/contents/LICENSE --jq '.name'; done`
 - [ ] Every public repo has `.github/` CI/CD — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do gh api repos/sdd-engine/$repo/contents/.github --jq '.[0].name'; done`
 - [ ] All public repos have 0.1.0 changelog with historical lineage — **verify:** each public repo's CHANGELOG.md contains "0.1.0" and references to `LiorCohen/sdd` lineage
 - [ ] Workspace has infrastructure changelog — **verify:** `gh api repos/sdd-engine/workspace/contents/CHANGELOG.md` returns 200
+- [ ] `tech-pack install --repo --ref` checks out the specified ref — **verify:** install with `--ref v0.1.0`, run `git -C sdd/.techpacks/<namespace> log -1 --format=%D` and confirm it includes the tag
+- [ ] Settings file uses `techpacks` key (not `tech_packs`) — **verify:** `sdd-settings.yaml` after init contains `techpacks:` at top level
+- [ ] Components are top-level in settings — **verify:** `sdd-settings.yaml` after adding a component contains `components:` at top level with `techpack` back-reference
+- [ ] Settings reconciler migrates old format — **verify:** feed a settings file with `tech_packs` and nested `components` through reconcile, confirm output has `techpacks` and top-level `components`
+- [ ] `scaffolding project` adds `sdd/.techpacks/` to `.gitignore` — **verify:** scaffold a new project, confirm `.gitignore` contains `sdd/.techpacks/`
 - [ ] `LiorCohen/sdd` is unchanged — **verify:** `git -C /Users/lior/Work/Dev/sdd log -1 --format=%H` matches the commit hash before this task started
