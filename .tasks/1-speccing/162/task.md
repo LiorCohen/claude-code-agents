@@ -12,16 +12,15 @@ blocks: []
 
 ## Description
 
-Create five repositories under the `sdd-engine` GitHub organization, splitting the current monolithic `LiorCohen/sdd` repo into independently distributable packages:
+Create four repositories under the `sdd-engine` GitHub organization, splitting the current monolithic `LiorCohen/sdd` repo into independently distributable packages:
 
 **Public repos:**
-- **`sdd-engine/sdd-core`** — the core SDD plugin (commands, skills, system CLI, permissions). Installable as a Claude Code plugin via marketplace.
+- **`sdd-engine/sdd-core`** — the core SDD plugin (commands, skills, system CLI, permissions, documentation). Installable as a Claude Code plugin via marketplace.
 - **`sdd-engine/sdd-fullstack-typescript-techpack`** — the fullstack TypeScript tech pack (agents, skills, templates, system CLI, techpack.yaml). NOT a plugin — installed by core's `tech-pack install` command.
 - **`sdd-engine/sdd-vscode-extension`** — the VS Code extension for SDD project status and workflow visibility.
-- **`sdd-engine/docs`** — user-facing documentation (getting started, commands, workflows, agents, components).
 
 **Private repo:**
-- **`sdd-engine/workspace`** — development workspace. Contains all dev-time skills (`.claude/`), task management (`.tasks/` with full history from `LiorCohen/sdd`), critic feedback (`.critic/`), and a `repos/` directory (gitignored) where the four public repos are cloned for local development.
+- **`sdd-engine/workspace`** — development workspace. Contains all dev-time skills (`.claude/`), task management (`.tasks/` with full history from `LiorCohen/sdd`), critic feedback (`.critic/`), and a `repos/` directory (gitignored) where the three public repos are cloned for local development.
 
 The existing `LiorCohen/sdd` repository remains as-is for users already on the current monolithic structure.
 
@@ -34,7 +33,6 @@ The monolithic plugin bundles core methodology with a specific tech stack (fulls
 - Users who want SDD with a different stack (Python, Go, etc.) must take the TypeScript tech pack too
 - Techpack authors can't iterate independently of core
 - The VS Code extension has its own release cadence (marketplace publishing) unrelated to plugin versions
-- Documentation updates shouldn't require changes to the plugin repo
 - The plugin can't grow its ecosystem — every new stack requires changes to the core repo
 
 Splitting into separate repos enables:
@@ -43,15 +41,14 @@ Splitting into separate repos enables:
 - Cleaner installation: install core plugin, then install the techpack(s) you need
 - `sdd/.techpacks/` as a gitignored dependency directory (like `node_modules`) with `sdd-settings.yaml` as the manifest
 - VS Code extension published independently to the marketplace
-- Documentation maintained and versioned separately
 - Private workspace keeps dev tooling (skills, tasks, critic) out of public repos
 
 ## Scope
 
 ### In scope
 
-- Create 4 public repos + 1 private workspace repo under `sdd-engine`
-- Each public repo gets its own README.md, CLAUDE.md, and CONTRIBUTING.md (fresh, repo-specific, up-to-date)
+- Create 3 public repos + 1 private workspace repo under `sdd-engine`
+- Each public repo gets its own README.md, CLAUDE.md, CONTRIBUTING.md, and `docs/` directory (fresh, repo-specific, up-to-date)
 - Each repo maintains its own version and CHANGELOG.md independently
 - All repos start at version 0.1.0 with a changelog that includes historical lineage from `LiorCohen/sdd`
 - Workspace repo inherits:
@@ -83,7 +80,6 @@ Splitting into separate repos enables:
 - `sdd-core` is a Claude Code plugin with `.claude-plugin/marketplace.json` and `plugin/.claude-plugin/plugin.json`
 - `sdd-fullstack-typescript-techpack` is NOT a plugin — no `plugin.json`, no `marketplace.json`. It has `techpack/techpack.yaml` as its manifest.
 - `sdd-vscode-extension` is a standalone VS Code extension — published independently to the VS Code marketplace
-- `docs` is a standalone documentation repo — no plugin manifests, no code
 - `workspace` is private — contains dev skills, task management, and critic feedback, not shipped to users
 - `workspace/repos/` is gitignored — each repo inside is an independent git clone
 - Techpacks are installed into `sdd/.techpacks/<namespace>/` which is gitignored in user projects
@@ -101,10 +97,9 @@ Splitting into separate repos enables:
 
 | File/Area | Change |
 |-----------|--------|
-| **sdd-engine/sdd-core** | New public repo: `plugin/core/` flattened to `plugin/`, plus `plugin.json`, `marketplace.json`, README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
-| **sdd-engine/sdd-fullstack-typescript-techpack** | New public repo: `plugin/fullstack-typescript/` under `techpack/`, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
-| **sdd-engine/sdd-vscode-extension** | New public repo: `vscode-extension/` contents, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md |
-| **sdd-engine/docs** | New public repo: `docs/` contents, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE |
+| **sdd-engine/sdd-core** | New public repo: `plugin/core/` flattened to `plugin/`, `docs/` for user-facing documentation, plus `plugin.json`, `marketplace.json`, README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
+| **sdd-engine/sdd-fullstack-typescript-techpack** | New public repo: `plugin/fullstack-typescript/` under `techpack/`, `docs/` for techpack-specific documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
+| **sdd-engine/sdd-vscode-extension** | New public repo: `vscode-extension/` contents, `docs/` for extension documentation, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md |
 | **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, CLAUDE.md, multi-repo management skill, `repos/` gitignored |
 | `tech-pack/install.ts` (in sdd-core) | Add `--repo` flag for git clone to `sdd/.techpacks/<namespace>/`; add no-args mode to reinstall all from settings |
 | `techpacks/SKILL.md` (in sdd-core) | Update techpacks gateway to document external techpack discovery in `sdd/.techpacks/` |
@@ -117,9 +112,9 @@ Splitting into separate repos enables:
 - [ ] `sdd-engine/sdd-core` repo exists and is public — **verify:** `gh repo view sdd-engine/sdd-core --json visibility --jq '.visibility'` returns `PUBLIC`
 - [ ] `sdd-engine/sdd-fullstack-typescript-techpack` repo exists and is public — **verify:** `gh repo view sdd-engine/sdd-fullstack-typescript-techpack --json visibility --jq '.visibility'` returns `PUBLIC`
 - [ ] `sdd-engine/sdd-vscode-extension` repo exists and is public — **verify:** `gh repo view sdd-engine/sdd-vscode-extension --json visibility --jq '.visibility'` returns `PUBLIC`
-- [ ] `sdd-engine/docs` repo exists and is public — **verify:** `gh repo view sdd-engine/docs --json visibility --jq '.visibility'` returns `PUBLIC`
 - [ ] `sdd-engine/workspace` repo exists and is private — **verify:** `gh repo view sdd-engine/workspace --json visibility --jq '.visibility'` returns `PRIVATE`
-- [ ] Every public repo has README.md, CLAUDE.md, and CONTRIBUTING.md — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension docs; do for f in README.md CLAUDE.md CONTRIBUTING.md; do gh api repos/sdd-engine/$repo/contents/$f --jq '.name'; done; done`
+- [ ] Every public repo has README.md, CLAUDE.md, and CONTRIBUTING.md — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do for f in README.md CLAUDE.md CONTRIBUTING.md; do gh api repos/sdd-engine/$repo/contents/$f --jq '.name'; done; done`
+- [ ] Each public repo has its own `docs/` directory — **verify:** `for repo in sdd-core sdd-fullstack-typescript-techpack sdd-vscode-extension; do gh api repos/sdd-engine/$repo/contents/docs --jq '.[0].name'; done`
 - [ ] sdd-core has valid plugin manifest — **verify:** `gh api repos/sdd-engine/sdd-core/contents/plugin/.claude-plugin/plugin.json` returns JSON with `version: "0.1.0"`
 - [ ] sdd-core has marketplace manifest — **verify:** `gh api repos/sdd-engine/sdd-core/contents/.claude-plugin/marketplace.json` returns JSON with `version: "0.1.0"`
 - [ ] techpack repo has techpack.yaml under `techpack/` — **verify:** `gh api repos/sdd-engine/sdd-fullstack-typescript-techpack/contents/techpack/techpack.yaml` returns 200
