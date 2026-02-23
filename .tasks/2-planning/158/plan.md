@@ -15,7 +15,7 @@ The solution: split into `plugin/core/` (methodology) and `plugin/fullstack-type
 
 ### OQ-1: CLI Build Architecture → (b) Duplicate shared subset
 
-Each system CLI is fully self-contained with its own `package.json`, `tsconfig.json`, and build step. The tech system copies the ~500-line subset of shared utilities it needs (`lib/args.ts`, `lib/fs.ts`, `lib/logger.ts`, `lib/config.ts`). Core-only utilities (`lib/spec-utils.ts`, `lib/frontmatter.ts`, `lib/schema-validator.ts`) stay only in core.
+Each system CLI is fully self-contained with its own `package.json`, `tsconfig.json`, and build step. The tech system copies the ~500-line subset of shared utilities it needs (`lib/args.ts`, `lib/fs.ts`, `lib/logger.ts`, `lib/config.ts`, `lib/json-schema.ts`, `lib/index.ts`). Core-only utilities (`lib/spec-utils.ts`, `lib/frontmatter.ts`, `lib/schema-validator.ts`) stay only in core.
 
 Rationale: The spec requires "Tech system NEVER calls core system — it is fully self-contained." Duplication is simpler than an npm workspace with a shared package, avoids cross-system build dependencies, and the shared surface is small. Can be extracted to a shared package later if duplication becomes a maintenance burden.
 
@@ -33,7 +33,7 @@ During `sdd-run init`, core auto-discovers and registers all internal tech packs
 
 ### OQ-5: Migration → (a) sdd-init auto-detects and migrates
 
-When `sdd-run init` detects an existing `.sdd/` directory (old format), it auto-migrates: renames `.sdd/` → `sdd/`, restructures `sdd-settings.yaml` to add the `tech_packs` namespace, strips removed fields, and creates `sdd/fs-ts-settings.yaml` with the full component details. The `settings reconcile` system command handles the schema migration.
+When `sdd-run init` detects an existing `.sdd/` directory (old format), it auto-migrates: renames `.sdd/` → `sdd/`, restructures `sdd-settings.yaml` to add the `tech_packs` namespace, strips removed fields, and creates `sdd/fs-ts-settings.yaml` with the full component details. The `settings reconcile` system command handles the schema migration (this fulfills the spec's `sdd-migrate` requirement — migration is built into `settings reconcile` rather than a separate command).
 
 ## Files to Modify
 
@@ -75,9 +75,9 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `plugin/skills/domain-population/` | `plugin/core/skills/domain-population/` |
 | `plugin/skills/external-spec-integration/` | `plugin/core/skills/external-spec-integration/` |
 | `plugin/skills/planning/` | `plugin/core/skills/planning/` |
-| `plugin/skills/project-scaffolding/` | `plugin/core/skills/project-scaffolding/` |
+| `plugin/skills/project-scaffolding/` | `plugin/core/skills/project-scaffolding/` (`templates/project/` moves to tech pack in Phase 7 step 10) |
 | `plugin/skills/project-settings/` | `plugin/core/skills/project-settings/` |
-| `plugin/skills/scaffolding/` → eliminated (split) | See Phase 3 |
+| `plugin/skills/scaffolding/` → eliminated (split) | See Phase 1 step 7 (deletion) + Phase 7 step 8 (tech pack replacement) |
 | `plugin/skills/spec-decomposition/` | `plugin/core/skills/spec-decomposition/` |
 | `plugin/skills/spec-index/` | `plugin/core/skills/spec-index/` |
 | `plugin/skills/spec-solicitation/` | `plugin/core/skills/spec-solicitation/` |
@@ -88,13 +88,18 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `plugin/skills/orchestrators/version-orchestration/` | `plugin/core/skills/orchestrators/version-orchestration/` |
 | `plugin/system/src/commands/archive/` (4 files) | `plugin/core/system/src/commands/archive/` |
 | `plugin/system/src/commands/permissions/` (4 files) | `plugin/core/system/src/commands/permissions/` |
-| `plugin/system/src/commands/scaffolding/` (7 files) | `plugin/core/system/src/commands/scaffolding/` |
+| `plugin/system/src/commands/scaffolding/` (8 files, incl. scaffold-spec.schema.json) | `plugin/core/system/src/commands/scaffolding/` |
 | `plugin/system/src/commands/settings/` (4 files) | `plugin/core/system/src/commands/settings/` |
 | `plugin/system/src/commands/spec/` (6 files) | `plugin/core/system/src/commands/spec/` |
 | `plugin/system/src/commands/workflow/` (4 files) | `plugin/core/system/src/commands/workflow/` |
 | `plugin/system/src/lib/` (9 files) | `plugin/core/system/src/lib/` |
 | `plugin/system/src/types/` (6 files) | `plugin/core/system/src/types/` (with modifications) |
 | `plugin/system/src/settings/` (7 files) | `plugin/core/system/src/settings/` (with modifications) |
+| `plugin/system/src/cli.ts` | `plugin/core/system/src/cli.ts` (with modifications — see Table E) |
+| `plugin/system/package.json` | `plugin/core/system/package.json` (basis for Phase 2 step 1 modifications) |
+| `plugin/system/tsconfig.json` | `plugin/core/system/tsconfig.json` (basis for Phase 2 step 2 modifications) |
+| `plugin/system/.gitignore` | `plugin/core/system/.gitignore` (also copied to tech system in Phase 2) |
+| `plugin/system/README.md` | `plugin/core/system/README.md` |
 | `plugin/system/system-run.sh` | `plugin/core/system/system-run.sh` |
 
 ### C. Files deleted
@@ -104,6 +109,7 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `plugin/hooks/` (4 files) | Hook system removed — superseded by Claude Code's native permissions |
 | `plugin/system/src/commands/hook/` (5 files) | Hook system command removed |
 | `plugin/skills/scaffolding/` | Split: generic engine stays in core system CLI, tech-specific orchestration moves to tech pack `scaffolding` skill |
+| `plugin/skills/testing-standards/` | Split into two new skills: `integration-testing-standards` and `e2e-testing-standards` in tech pack (see Table D + Phase 7 step 9) |
 | `tests/src/tests/unit/hooks/prompt-commit-after-write.test.ts` | Tests the hook system which is deleted — test must be removed |
 
 ### D. Files created (new)
@@ -153,8 +159,8 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `plugin/core/skills/project-scaffolding/SKILL.md` | Remove 8 tech-specific skill references. Delegates to tech pack for component scaffolding and templates via `techpacks.routeSkills(phase: project-scaffolding)`. Core keeps `templates/specs/` (SNAPSHOT.md, glossary.md), `templates/changes/` (INDEX.md), and `schemas/` — these are methodology artifacts, not tech-specific |
 | `plugin/core/skills/project-settings/SKILL.md` | Remove 22 tech-specific references. Remove type→directory mapping. Core owns settings mechanism (read/write), types come from manifest |
 | `plugin/core/skills/orchestrators/init-orchestration/SKILL.md` | Remove 6 tech refs (Node.js tool checks). Delegate prerequisite verification to tech pack via `techpacks.routeCommand` |
-| `plugin/core/skills/orchestrators/change-orchestration/verification.md` | Replace hardcoded standards references (backend-standards, frontend-standards, typescript-standards, CMDO, MVVM, TanStack patterns) with `techpacks.routeSkills(phase: verification)` lookups. 11 tech refs on lines 70-74, 109 |
-| `plugin/core/skills/orchestrators/change-orchestration/implementation.md` | Replace hardcoded `api-designer` agent reference (line 79) with `techpacks.readManifest` lookup |
+| `plugin/core/skills/orchestrators/change-orchestration/verification.md` | Replace hardcoded standards references (backend-standards, frontend-standards, typescript-standards, CMDO, MVVM, TanStack on lines 70-74, 109) with `techpacks.routeSkills(phase: verification)`. Add `techpacks.loadAgent` for the reviewer agent — read `lifecycle.verification.agent` from manifest. 11 tech refs total |
+| `plugin/core/skills/orchestrators/change-orchestration/implementation.md` | Replace hardcoded `api-designer` agent reference (line 79) with `techpacks.loadAgent` for the component's agent — read `components.*.agent` from manifest via `techpacks.readManifest`. Add `techpacks.routeSkills(phase: implementation)` for standards loading |
 | `plugin/core/skills/external-spec-integration/resources/workflow-steps.md` | Replace "Infrastructure / DevOps" (line 228) with "Infrastructure" |
 | `plugin/core/skills/spec-decomposition/resources/outline-modes.md` | Replace "Infrastructure / DevOps last" (line 173) with "Infrastructure last" |
 | `plugin/core/system/src/cli.ts` | Remove tech command imports (database, contract, config, env, hook). Add tech-pack namespace routing via manifest. Add agent, log, tech-pack command handlers |
@@ -163,6 +169,7 @@ This task touches ~340 source files (verified: `find plugin/ -not -path "*/dist/
 | `plugin/fullstack-typescript/agents/*.md` (7 files) | Update frontmatter: `project-settings` → `techpack-settings`, `scaffolding` → tech pack `scaffolding`. Remove `testing-standards` from tester, replace with `integration-testing-standards` + `e2e-testing-standards` |
 | `plugin/fullstack-typescript/skills/components/cicd/cicd-standards/SKILL.md` | Remove `commit-standards` cross-references |
 | `tests/src/lib/paths.ts` | Split `SKILLS_DIR` into `CORE_SKILLS_DIR` and `TECH_SKILLS_DIR` — 21 references across 4 test files |
+| `tests/src/lib/index.ts` | Update barrel re-export: replace `SKILLS_DIR` with `CORE_SKILLS_DIR` and `TECH_SKILLS_DIR` |
 | `tests/src/lib/process.ts` | Update `PLUGIN_DIR/system/dist/cli.js` to support both core and tech system CLI paths |
 | `tests/src/tests/unit/lib/json-schema.test.ts` | Update `PLUGIN_SYSTEM_DIR` → `plugin/core/system` |
 | `tests/src/tests/unit/commands/archive/store.test.ts` | Update system dir → `plugin/core/system` |
@@ -249,16 +256,16 @@ Add agent frontmatter extraction, structured logging, and tech-pack routing to c
 
 Rewrite core skills to read from manifest instead of hardcoding tech-specific names.
 
-1. Create `techpacks` skill (`plugin/core/skills/techpacks/SKILL.md`) — the single gateway with all 8 typed operations, enforcement rules, attribution and logging instructions. Split into SKILL.md (gateway contract, operation signatures, enforcement rules) + `resources/operations.md` (detailed operation implementations) to stay under 500-line skill file limit
+1. Create `techpacks` skill (`plugin/core/skills/techpacks/SKILL.md`) — the single gateway with all 8 typed operations (`readManifest`, `resolvePath`, `loadSkill`, `loadAgent`, `routeCommand`, `routeSkills`, `listComponents`, `dependencyOrder`), enforcement rules, attribution and logging instructions. Split into SKILL.md (gateway contract, operation signatures, enforcement rules) + `resources/operations.md` (detailed operation implementations) to stay under 500-line skill file limit
 2. Modify `planning/SKILL.md` — replace hardcoded agent assignment tables with `techpacks.readManifest` lookups. Replace inline standards with `techpacks.routeSkills(phase: plan-generation)`
 3. Modify `change-creation/SKILL.md` — replace hardcoded dependency graph with `techpacks.dependencyOrder`. Replace agent names with manifest lookups. Split plan templates: generic skeleton stays in core, tech-specific templates (CMDO/MVVM/TailwindCSS references) move to tech pack `templates/plans/`
 4. Rewrite `tech-discovery/SKILL.md` — core keeps the discovery framework (process, questioning approach). All component types, descriptions, and discovery question sets loaded via `techpacks.routeSkills(phase: component-discovery)`
-5. Modify `project-scaffolding/SKILL.md` — delegates to tech pack for component scaffolding and project template stack-specific sections via `techpacks.routeSkills(phase: project-scaffolding)`. Core keeps its `templates/specs/` (SNAPSHOT.md, glossary.md), `templates/changes/` (INDEX.md), and `schemas/` — these are methodology artifacts. Tech pack contributes `templates/project/` (CLAUDE.md, README.md, package.json)
+5. Modify `project-scaffolding/SKILL.md` — delegates to tech pack for component scaffolding and project template stack-specific sections via `techpacks.routeSkills(phase: project-scaffolding)`. Use `techpacks.resolvePath` to resolve tech pack template paths to absolute paths for the scaffolding engine. Core keeps its `templates/specs/` (SNAPSHOT.md, glossary.md), `templates/changes/` (INDEX.md), and `schemas/` — these are methodology artifacts. Tech pack contributes `templates/project/` (CLAUDE.md, README.md, package.json)
 6. Modify `project-settings/SKILL.md` — remove type→directory mapping and component type definitions. Core owns the settings mechanism only; types come from `techpacks.readManifest`
 7. Modify `init-orchestration/SKILL.md` — remove Node.js tool checks. Delegate prerequisite verification via `techpacks.routeCommand`. Auto-register internal tech packs
 8. Modify change-orchestration sub-files:
-   - `verification.md` — replace hardcoded standards references (backend-standards, frontend-standards, typescript-standards, CMDO, MVVM, TanStack on lines 70-74, 109) with `techpacks.routeSkills(phase: verification)` lookups
-   - `implementation.md` — replace hardcoded `api-designer` agent reference (line 79) with `techpacks.readManifest` lookup for `components.contract.agent`
+   - `verification.md` — replace hardcoded standards references (backend-standards, frontend-standards, typescript-standards, CMDO, MVVM, TanStack on lines 70-74, 109) with `techpacks.routeSkills(phase: verification)`. Add `techpacks.loadAgent` to spawn the reviewer agent — read `lifecycle.verification.agent` from manifest
+   - `implementation.md` — replace hardcoded `api-designer` agent reference (line 79) with `techpacks.loadAgent` — read `components.*.agent` from manifest via `techpacks.readManifest`. Add `techpacks.routeSkills(phase: implementation)` for standards loading
    - `creation.md`, `management.md`, `planning.md`, `spec-review.md` — no tech refs, no changes needed
 9. Strip minor tech refs from `external-spec-integration/resources/workflow-steps.md` and `spec-decomposition/resources/outline-modes.md`
 
@@ -285,6 +292,10 @@ Create the skills that the tech pack needs to fulfill the manifest contract.
 9. Move `testing-standards` → split into `integration-testing-standards/SKILL.md` and `e2e-testing-standards/SKILL.md` under respective component directories
 10. Move project templates to `templates/project/` (CLAUDE.md, README.md, package.json)
 11. Move plan templates to `templates/plans/` (plan-feature.md, plan-bugfix.md, plan-refactor.md, plan-epic.md)
+12. Create 3 new component scaffolding skills (formalizing what was previously inline in the pre-split `scaffolding` router):
+    - `components/cicd/cicd-scaffolding/SKILL.md` — CI/CD pipeline scaffolding (GitHub Actions)
+    - `components/integration-testing/integration-testing-scaffolding/SKILL.md` — integration test suite scaffolding
+    - `components/e2e-testing/e2e-testing-scaffolding/SKILL.md` — e2e test suite scaffolding
 
 ### Phase 8: Agent + Tech Skill Updates
 
@@ -323,6 +334,7 @@ Update the plugin manifest and run all acceptance criteria.
    - `npm run build:plugin` succeeds
    - `npm run typecheck:plugin` passes
    - `npm test` passes
+   - Run the 26 scenarios from the Scenario Verification Checklist (task.md) and verify `sdd/system-logs/` contains the expected `techpacks.*` log entries for each (AC-13)
 3. Create `plugin/fullstack-typescript/README.md` documenting the tech pack
 
 ## Dependencies
