@@ -11,7 +11,6 @@
     "./core/commands/sdd-help.md"
   ],
   "skills": [
-    "./core/skills/",
-    "./core/skills/orchestrators/"
+    "./core/skills/"
   ]
 }

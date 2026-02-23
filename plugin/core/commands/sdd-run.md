@@ -118,12 +118,11 @@ Confirm? (yes/no)
 
 ### `change` — Manage the full change lifecycle
 
-Route to the change-orchestration skill:
+Read and follow `./core/skills/orchestrators/change-orchestration/SKILL.md` with:
 
 ```yaml
-INVOKE change-orchestration skill with:
-  action: <action>
-  args: <remaining args>
+action: <action>
+args: <remaining args>
 ```
 
 **Actions:** `create`, `status`, `continue`, `list`, `approve spec`, `approve plan`, `plan`, `implement`, `verify`, `review`, `answer`, `assume`, `regress`, `request-changes`
@@ -136,11 +135,7 @@ INVOKE change-orchestration skill with:
 
 ### `init` — Initialize or upgrade an SDD project
 
-Route to the init-orchestration skill:
-
-```yaml
-INVOKE init-orchestration skill
-```
+Read and follow `./core/skills/orchestrators/init-orchestration/SKILL.md`.
 
 No arguments — runs the full 7-phase workflow.
 
@@ -190,11 +185,7 @@ EXAMPLE:
 
 ### `version` — Show installed and project plugin versions
 
-Route to the version-orchestration skill:
-
-```yaml
-INVOKE version-orchestration skill
-```
+Read and follow `./core/skills/orchestrators/version-orchestration/SKILL.md`.
 
 No arguments — displays version info.
 
@@ -227,7 +218,7 @@ To display available tech pack namespaces in the help output, read `commands.ava
 
 The following namespaces are used internally by other skills and should not be invoked directly by users. They are NOT shown in the help output:
 
-- `scaffolding` - Used by init-orchestration for project setup
+- `scaffolding` - Used by `./core/skills/orchestrators/init-orchestration/` for project setup
 - `spec` - Used for spec validation, indexing, and snapshots
 - `settings` - Used internally by the `project-settings` skill
 - `workflow` - Workflow state management
