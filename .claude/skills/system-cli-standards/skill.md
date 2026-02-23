@@ -11,15 +11,26 @@ Standards for all plugin prompt files (skills, agents, commands) that invoke or 
 
 ## Canonical Invocation
 
-The one correct way to call the CLI from a prompt file:
+The plugin has **two** system CLIs — one for core SDD operations and one for tech-pack-specific operations. Each has its own `system-run.sh`:
 
 ```bash
-<plugin-root>/system/system-run.sh <namespace> <action> [args] [options]
+# Core SDD operations (spec, scaffolding, workflow, settings, permissions, archive, agent, log, tech-pack)
+<plugin-root>/core/system/system-run.sh <namespace> <action> [args] [options]
+
+# Tech pack operations (config, contract, database, local-env)
+<plugin-root>/fullstack-typescript/system/system-run.sh <namespace> <action> [args] [options]
 ```
 
 - `<plugin-root>` is a placeholder that the agent resolves from its Claude Code plugin context. It is NOT shell syntax — the agent substitutes the actual absolute path before constructing the bash command.
-- `system-run.sh` is the single entry point. It self-locates the plugin root from its own filesystem path and forwards to the compiled CLI via `exec`.
-- The system package is `private: true` with no `bin` field, so `system-run.sh` is the only valid way to invoke it.
+- Each `system-run.sh` self-locates its own system root from its filesystem path and forwards to the compiled CLI via `exec`.
+- Both system packages are `private: true` with no `bin` field, so `system-run.sh` is the only valid way to invoke each.
+
+### Which CLI to call
+
+| Namespace | CLI |
+|-----------|-----|
+| `scaffolding`, `spec`, `permissions`, `workflow`, `settings`, `archive`, `tech-pack`, `agent`, `log` | `core/system/system-run.sh` |
+| `config`, `contract`, `database`, `local-env` | `fullstack-typescript/system/system-run.sh` |
 
 ---
 
@@ -138,7 +149,7 @@ This is a strict one-way dependency. The CLI is a standalone tool that knows not
 
 ### Plugin boundary
 
-All plugin prompt files (`plugin/skills/`, `plugin/commands/`, `plugin/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin prompt file.
+All plugin prompt files (`plugin/core/skills/`, `plugin/core/commands/`, `plugin/fullstack-typescript/skills/`, `plugin/fullstack-typescript/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin prompt file.
 
 ---
 
@@ -178,7 +189,7 @@ Before adding a new CLI command, verify:
 
 Every `system-run.sh <namespace> <action>` reference in a prompt file must correspond to a command that actually exists in the CLI registry. Prompt files must not reference nonexistent namespace/action pairs.
 
-**Source of truth:** Each namespace has a `schema.ts` at `plugin/system/src/commands/<namespace>/schema.ts` exporting an `ACTIONS` array. This is the authoritative list of valid actions per namespace.
+**Source of truth:** Each namespace has a `schema.ts` in its respective system package — `plugin/core/system/src/commands/<namespace>/schema.ts` for core namespaces, or `plugin/fullstack-typescript/system/src/commands/<namespace>/schema.ts` for tech pack namespaces. Each exports an `ACTIONS` array as the authoritative list of valid actions per namespace.
 
 **Enforcement:** The `cli-invocation-audit.test.ts` test scans all `.md` files under `plugin/` for `system-run.sh <namespace> <action>` patterns and validates each pair against the CLI's actual command registry. This test runs as part of `npm test`.
 
@@ -194,8 +205,8 @@ Every `system-run.sh <namespace> <action>` reference in a prompt file must corre
 
 **Use Opus model for audits** — thoroughness matters more than speed here.
 
-1. Read every file in `plugin/skills/`, `plugin/agents/`, and `plugin/commands/`
-2. Also read scaffolded templates in `plugin/skills/*/templates/`
+1. Read every file in `plugin/core/skills/`, `plugin/core/commands/`, `plugin/fullstack-typescript/skills/`, and `plugin/fullstack-typescript/agents/`
+2. Also read scaffolded templates in `plugin/core/skills/*/templates/` and `plugin/fullstack-typescript/skills/*/templates/`
 3. For each file, check:
    - **Invocation correctness**: All CLI references use the canonical `system-run.sh` invocation
    - **Authority violations**: Prompts performing deterministic operations that belong in the CLI (e.g., YAML/JSON parsing, file generation, schema validation, path resolution). These are candidates for new CLI commands.
@@ -206,14 +217,14 @@ Every `system-run.sh <namespace> <action>` reference in a prompt file must corre
 5. Write report to `.temp/system-cli-audit-<datetime>.md`
 6. Ask the user if they want to turn the audit into a task. If yes, **copy the report file into the task directory** (e.g., `.tasks/0-inbox/116/audit-<datetime>.md`) and reference it from `task.md` — do NOT inline the full report into `task.md`
 
-**Note:** `plugin/system/README.md` is the CLI's own documentation and is out of scope for prompt file audits.
+**Note:** `plugin/core/system/README.md` and `plugin/fullstack-typescript/system/README.md` are the CLIs' own documentation and are out of scope for prompt file audits.
 
 ### TypeScript standards audit
 
-Audit the `plugin/system/` TypeScript source code against the `typescript-standards` skill.
+Audit the `plugin/core/system/` and `plugin/fullstack-typescript/system/` TypeScript source code against the `typescript-standards` skill.
 
 1. Load the `typescript-standards` skill — use its full Summary Checklist as the audit criteria
-2. Read every `.ts` file in `plugin/system/src/` (recursively)
+2. Read every `.ts` file in `plugin/core/system/src/` and `plugin/fullstack-typescript/system/src/` (recursively)
 3. For each file, check every item in the typescript-standards Summary Checklist
 4. Record every finding with exact file path, line number, and the specific standard violated
 5. Append results to the same `.temp/system-cli-audit-<datetime>.md` report (under a separate "TypeScript Standards" heading), or write a standalone `.temp/typescript-audit-<datetime>.md` if running independently

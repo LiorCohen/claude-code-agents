@@ -5,13 +5,13 @@ description: Standards for authoring SDD plugin commands — frontmatter, user i
 
 # Commands Standards
 
-Standards for every command in `plugin/commands/`. Apply when creating or reviewing plugin commands.
+Standards for every command in the plugin. Apply when creating or reviewing plugin commands.
 
 ---
 
 ## Scope
 
-This standard applies to commands shipped with the SDD plugin — all `.md` files found in `plugin/commands/`. It does not apply to the repo's own `.claude/skills/`.
+This standard applies to commands shipped with the SDD plugin — all `.md` files found in `plugin/core/commands/`. It does not apply to the repo's own `.claude/skills/`.
 
 ---
 
@@ -71,7 +71,7 @@ A command must be fully understandable on its own. An LLM reading a single comma
 4. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the command explicitly documents it as a precondition. If the command requires files to exist (e.g., `.sdd/sdd-settings.yaml`), state that as a precondition.
 5. **Define your own terms** — If the command introduces domain-specific vocabulary, define it on first use. Don't define terms that belong to skills — delegate instead.
 6. **Complete examples** — Every example must be understandable without external context. Include the arguments, expected output, and any state changes.
-7. **Plugin boundary** — Plugin commands (`plugin/commands/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin command.
+7. **Plugin boundary** — Plugin commands (`plugin/core/commands/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin command.
 
 ---
 
@@ -145,7 +145,7 @@ INVOKE <skill-name>.<method> with:
 
 1. **Every INVOKE must specify inputs** — List every parameter the skill or agent receives. Use `<angle brackets>` for dynamic values and plain text for literals.
 2. **Document expected output** — After the INVOKE, state what the command expects back (e.g., "Returns `workflow_id` for tracking."). The reader should know the shape of the result without reading the skill.
-3. **Only invoke skills and agents that exist** — Every skill name in the command must correspond to an actual `SKILL.md` somewhere under `plugin/skills/` (scan recursively). Every agent name must correspond to an `.md` file in `plugin/agents/`. Referencing nonexistent skills or agents creates silent failures.
+3. **Only invoke skills and agents that exist** — Every skill name in the command must correspond to an actual `SKILL.md` somewhere under `plugin/core/skills/` or `plugin/fullstack-typescript/skills/` (scan recursively). Every agent name must correspond to an `.md` file in `plugin/fullstack-typescript/agents/`. Referencing nonexistent skills or agents creates silent failures.
 4. **Invocations are sequential within a flow** — Document invocations in the order they execute. If an invocation depends on a previous result, show the data flow explicitly (e.g., `workflow_id: <from step 3>`).
 5. **No inline skill logic** — If you find yourself writing the steps a skill performs inside the command, you're duplicating. Replace with an INVOKE and a one-line summary of what the skill returns.
 
@@ -414,8 +414,8 @@ Use when creating or reviewing a plugin command:
 - [ ] Multi-action commands have a summary table before action detail sections
 - [ ] Each action has: Usage, Arguments (if any), Flow, Output
 - [ ] Every INVOKE specifies inputs and documents expected output
-- [ ] Invoked skills exist in `plugin/skills/` (recursive scan by `name` frontmatter)
-- [ ] Invoked agents exist in `plugin/agents/` (match filename without `.md`)
+- [ ] Invoked skills exist in `plugin/core/skills/` or `plugin/fullstack-typescript/skills/` (recursive scan by `name` frontmatter)
+- [ ] Invoked agents exist in `plugin/fullstack-typescript/agents/` (match filename without `.md`)
 - [ ] No duplicated skill/agent logic — commands orchestrate, they don't implement
 - [ ] No cross-command file references
 - [ ] Every user interaction point shows the exact prompt and options
@@ -434,13 +434,13 @@ Use when creating or reviewing a plugin command:
 
 ## Audit Procedure
 
-Run this audit against all plugin commands to produce a fresh violations report. Find every `.md` file in `plugin/commands/`, then check each command against the categories below.
+Run this audit against all plugin commands to produce a fresh violations report. Find every `.md` file in `plugin/core/commands/`, then check each command against the categories below.
 
 ### What to check per command
 
 For each command file, check every item in the **Checklist** section above. Additionally:
 
-1. **Skill/agent existence** — For every INVOKE directive, verify the referenced skill has a `SKILL.md` somewhere under `plugin/skills/` (glob recursively, match on the `name` frontmatter field). For agent references, verify a matching `.md` file exists in `plugin/agents/`.
+1. **Skill/agent existence** — For every INVOKE directive, verify the referenced skill has a `SKILL.md` somewhere under `plugin/core/skills/` or `plugin/fullstack-typescript/skills/` (glob recursively, match on the `name` frontmatter field). For agent references, verify a matching `.md` file exists in `plugin/fullstack-typescript/agents/`.
 2. **INVOKE completeness** — Every INVOKE must list its input parameters. Flag any INVOKE that says only "invoke skill-name" without specifying what data is passed.
 3. **Output consistency** — Compare formatting patterns across all commands. Flag any command that uses different status indicators, header styles, or next-steps formatting than the conventions documented above.
 4. **Cross-command overlap** — Check that no two commands claim the same action or duplicate the same workflow. If overlap exists, one should delegate to the other.
@@ -485,7 +485,7 @@ Produce the report with these sections:
 
 ### Report output location
 
-**Never write audit reports inside `plugin/commands/`.** The plugin folder is for shipped command files only — no reports, scratch files, or artifacts.
+**Never write audit reports inside `plugin/core/commands/`.** The plugin folder is for shipped command files only — no reports, scratch files, or artifacts.
 
 After presenting the report, **ask the user** whether to create a task to track the fixes or whether the report is temporary (e.g., for quick review or one-off investigation). If the user wants a task:
 
@@ -505,11 +505,11 @@ Ask: "Audit all plugin commands against the commands-standards skill and produce
 
 Run the audit directly (do not delegate to subagents):
 
-1. Glob for all `plugin/commands/*.md` files
+1. Glob for all `plugin/core/commands/*.md` files
 2. Read each file completely
 3. Check every item from the Checklist above, plus the additional audit-specific checks
-4. For skill existence checks, glob `plugin/skills/**/SKILL.md` (recursive) and match each referenced skill name against the `name` frontmatter field of found skills
-5. For agent existence checks, glob `plugin/agents/*.md` and match agent names against filenames
+4. For skill existence checks, glob `plugin/core/skills/**/SKILL.md` and `plugin/fullstack-typescript/skills/**/SKILL.md` (recursive) and match each referenced skill name against the `name` frontmatter field of found skills
+5. For agent existence checks, glob `plugin/fullstack-typescript/agents/*.md` and match agent names against filenames
 6. Present the report to the user
 7. Ask the user whether to create a task (via `/tasks add "Fix commands standards violations from audit report"`) or keep the report temporary
 

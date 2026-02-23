@@ -6,13 +6,13 @@ user-invocable: false
 
 # Agents Standards
 
-Standards for every agent in `plugin/agents/`. Apply when creating or reviewing plugin agents.
+Standards for every agent in the plugin. Apply when creating or reviewing plugin agents.
 
 ---
 
 ## Scope
 
-This standard applies to agents shipped with the SDD plugin — all `.md` files found in `plugin/agents/`. It does not apply to the repo's own `.claude/` configuration.
+This standard applies to agents shipped with the SDD plugin — all `.md` files found in `plugin/fullstack-typescript/agents/` (or any future tech pack's `agents/` directory). It does not apply to the repo's own `.claude/` configuration.
 
 ---
 
@@ -60,7 +60,7 @@ An agent must be fully understandable on its own. An LLM reading a single agent 
 6. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the agent explicitly documents it as a precondition. If the project may vary (multi-instance), tell the agent where to check (e.g., `.sdd/sdd-settings.yaml`).
 7. **Define your own terms** — If the agent introduces domain-specific vocabulary (e.g., "CMDO architecture"), define it on first use or delegate to a skill that defines it.
 8. **Complete examples** — Every example must be understandable without external context.
-9. **Plugin boundary** — Plugin agents (`plugin/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin agent.
+9. **Plugin boundary** — Plugin agents (`plugin/fullstack-typescript/agents/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin agent.
 
 ---
 
@@ -131,7 +131,7 @@ The bold CRITICAL line is mandatory. Without it, agents treat skills as optional
 2. **Reinforce in Rules section** — For each skill, add a corresponding "Follow all `skill-name` skill requirements" line in the agent's Rules section. Double reinforcement ensures compliance.
 3. **Brief summary per skill** — After the skill name, include a short phrase describing what the agent uses it for. The reader should understand the role of each skill without loading it.
 4. **Don't duplicate skill content** — Never copy rules, patterns, or checklists from a skill into the agent. The agent loads the skill at runtime.
-5. **Only reference skills that exist** — Every skill name in the agent must correspond to an actual `SKILL.md` somewhere under `plugin/skills/` (scan recursively — skills may be nested, e.g. `plugin/skills/components/backend/backend-standards/`). Referencing nonexistent skills creates silent failures — the agent will have no standards to follow.
+5. **Only reference skills that exist** — Every skill name in the agent must correspond to an actual `SKILL.md` somewhere under the plugin's skill directories (`plugin/core/skills/` and `plugin/fullstack-typescript/skills/`, scanning recursively — skills may be nested, e.g. `plugin/fullstack-typescript/skills/components/backend/backend-standards/`). Referencing nonexistent skills creates silent failures — the agent will have no standards to follow.
 
 ---
 
@@ -154,7 +154,7 @@ An agent becomes stale when the skills, tools, or architecture it references hav
 
 During audit (see Audit Procedure below), check each agent against:
 
-1. **Skill existence** — Does every referenced skill have a `SKILL.md` somewhere under `plugin/skills/` (recursive scan)?
+1. **Skill existence** — Does every referenced skill have a `SKILL.md` somewhere under `plugin/core/skills/` or `plugin/fullstack-typescript/skills/` (recursive scan)?
 2. **Skill summary accuracy** — Does the one-line summary in the agent match what the skill actually does?
 3. **Working directory validity** — Does the documented working directory pattern match the current project structure conventions?
 4. **Tool consistency** — Does the `tools` list match the agent's actual needs? (Read-only agents should not have `Write`; agents that run commands need `Bash`.)
@@ -237,7 +237,7 @@ Use when creating or reviewing a plugin agent:
 - [ ] `model` is appropriate: `sonnet` for implementation, `opus` for review/advisory
 - [ ] `color` is a valid hex code, unique across agents
 - [ ] First line after frontmatter is a "You are..." role statement
-- [ ] Skills section lists only skills that exist in `plugin/skills/`
+- [ ] Skills section lists only skills that exist in `plugin/core/skills/` or `plugin/fullstack-typescript/skills/`
 - [ ] Each skill reference includes a brief summary of what the agent uses it for
 - [ ] No duplicated content from referenced skills
 - [ ] No cross-agent file references
@@ -255,13 +255,13 @@ Use when creating or reviewing a plugin agent:
 
 ## Audit Procedure
 
-Run this audit against all plugin agents to produce a fresh violations report. Find every `.md` file in `plugin/agents/`, then check each agent against the categories below.
+Run this audit against all plugin agents to produce a fresh violations report. Find every `.md` file in `plugin/fullstack-typescript/agents/` (and any future tech pack `agents/` directories), then check each agent against the categories below.
 
 ### What to check per agent
 
 For each agent file, check every item in the **Checklist** section above. Additionally:
 
-1. **Skill existence** — For every skill referenced in the agent's `## Skills` section, verify that a matching `SKILL.md` exists under `plugin/skills/` by globbing recursively (`plugin/skills/**/SKILL.md`) and matching on the skill's `name` frontmatter field. Skills may be nested in subdirectories (e.g. `plugin/skills/components/backend/backend-standards/SKILL.md`).
+1. **Skill existence** — For every skill referenced in the agent's `## Skills` section, verify that a matching `SKILL.md` exists under the plugin's skill directories by globbing recursively (`plugin/core/skills/**/SKILL.md` and `plugin/fullstack-typescript/skills/**/SKILL.md`) and matching on the skill's `name` frontmatter field. Skills may be nested in subdirectories (e.g. `plugin/fullstack-typescript/skills/components/backend/backend-standards/SKILL.md`).
 2. **User interaction scan (direct)** — Search agent content for phrases indicating user interaction: "ask the user", "confirm with", "user preference", "prompt the user", "wait for", "the user should", "check with the user". Flag any matches.
 3. **User interaction scan (transitive)** — For every skill referenced by the agent, read the skill's `SKILL.md` and search for the same user interaction phrases. A skill that assumes multi-turn conversation, presents options to a user, or waits for user responses is incompatible with agent context. Flag the skill name, the quoted phrase, and which agent loads it.
 4. **Inter-agent overlap** — Check that no two agents claim ownership of the same directory, responsibility, or domain without explicit delegation.
@@ -304,7 +304,7 @@ Produce the report with these sections:
 
 ### Report output location
 
-**Never write audit reports inside `plugin/agents/`.** The plugin folder is for shipped agent files only — no reports, scratch files, or artifacts.
+**Never write audit reports inside `plugin/fullstack-typescript/agents/`.** The plugin folder is for shipped agent files only — no reports, scratch files, or artifacts.
 
 After presenting the report, **ask the user** whether to create a task to track the fixes or whether the report is temporary (e.g., for quick review or one-off investigation). If the user wants a task:
 
@@ -324,10 +324,10 @@ Ask: "Audit all plugin agents against the agents-standards skill and produce a v
 
 Run the audit directly (do not delegate to subagents):
 
-1. Glob for all `plugin/agents/*.md` files
+1. Glob for all `plugin/fullstack-typescript/agents/*.md` files (and any future tech pack `agents/` directories)
 2. Read each file completely
 3. Check every item from the Checklist above, plus the additional audit-specific checks
-4. For skill existence checks, glob `plugin/skills/**/SKILL.md` (recursive) and match each referenced skill name against the `name` frontmatter field of found skills
+4. For skill existence checks, glob `plugin/core/skills/**/SKILL.md` and `plugin/fullstack-typescript/skills/**/SKILL.md` (recursive) and match each referenced skill name against the `name` frontmatter field of found skills
 5. Present the report to the user
 6. Ask the user whether to create a task (via `/tasks add "Fix agents standards violations from audit report"`) or keep the report temporary
 

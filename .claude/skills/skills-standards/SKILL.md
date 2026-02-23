@@ -5,13 +5,13 @@ description: Standards for authoring SDD plugin skills — frontmatter, self-con
 
 # Skills Standards
 
-Standards for every skill in `plugin/skills/`. Apply when creating or reviewing plugin skills.
+Standards for every skill in the plugin. Apply when creating or reviewing plugin skills.
 
 ---
 
 ## Scope
 
-This standard applies to skills shipped with the SDD plugin — all `SKILL.md` files found recursively under `plugin/skills/`. It does not apply to the repo's own `.claude/skills/`.
+This standard applies to skills shipped with the SDD plugin — all `SKILL.md` files found recursively under `plugin/core/skills/` and `plugin/fullstack-typescript/skills/`. It does not apply to the repo's own `.claude/skills/`.
 
 ---
 
@@ -69,7 +69,7 @@ Each skill must be fully understandable on its own. An LLM reading a single skil
 4. **No environment assumptions** — Do not assume a specific directory structure, tool version, or runtime context unless the skill explicitly documents it. If the skill requires a file to exist or a tool to be available, state that as a precondition.
 5. **Define your own terms** — If the skill introduces domain-specific vocabulary, define it on first use. Don't define terms that belong to other skills — delegate instead.
 6. **Complete examples** — Every example must be understandable without external context. Include the data shapes, field names, and structure needed to make the example self-contained.
-7. **Plugin boundary** — Plugin skills (`plugin/skills/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin skill.
+7. **Plugin boundary** — Plugin skills (`plugin/core/skills/` and `plugin/fullstack-typescript/skills/`) have no runtime access to anything outside `plugin/`. Never reference `.claude/`, `.tasks/`, or root-level files from within a plugin skill.
 
 ### Cross-references
 
@@ -117,7 +117,7 @@ Every skill that accepts parameters or produces structured output must define th
 ### File layout
 
 ```text
-plugin/skills/my-skill/
+plugin/<layer>/skills/my-skill/     # <layer> = core/ or fullstack-typescript/
 ├── SKILL.md
 └── schemas/
     ├── input.schema.json       # What this skill accepts
@@ -416,7 +416,7 @@ This skill defines no input parameters or structured output.
 
 ## Audit Procedure
 
-Run this audit against all plugin skills to produce a fresh violations report. Recursively find every `SKILL.md` under `plugin/skills/`, then check each skill against the categories below.
+Run this audit against all plugin skills to produce a fresh violations report. Recursively find every `SKILL.md` under `plugin/core/skills/` and `plugin/fullstack-typescript/skills/`, then check each skill against the categories below.
 
 ### What to check per skill
 
@@ -466,7 +466,7 @@ Produce the report with these sections:
 
 ### Report output location
 
-**Never write audit reports inside `plugin/skills/`.** The plugin folder is for shipped skill files only — no reports, scratch files, or artifacts.
+**Never write audit reports inside `plugin/core/skills/` or `plugin/fullstack-typescript/skills/`.** The plugin folder is for shipped skill files only — no reports, scratch files, or artifacts.
 
 After presenting the report, **ask the user** whether to create a task to track the fixes or whether the report is temporary (e.g., for quick review or one-off investigation). If the user wants a task:
 
@@ -486,7 +486,7 @@ Ask: "Audit all plugin skills against the skills-standards skill and produce a v
 
 Run the audit directly (do not delegate to subagents):
 
-1. Glob for all `plugin/skills/**/SKILL.md` files
+1. Glob for all `plugin/core/skills/**/SKILL.md` and `plugin/fullstack-typescript/skills/**/SKILL.md` files
 2. Read each file completely
 3. Check every item from the Checklist above, plus the additional audit-specific checks
 4. Present the report to the user

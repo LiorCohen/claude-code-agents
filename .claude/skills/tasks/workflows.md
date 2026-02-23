@@ -249,7 +249,7 @@ When the user requests a detailed change report, **expand** the existing `change
 
 **Rules:**
 - One section per changed file, numbered sequentially
-- Each heading is a clickable markdown link to the file (e.g., `[plugin/system/src/cli.ts](plugin/system/src/cli.ts)`)
+- Each heading is a clickable markdown link to the file (e.g., `[plugin/core/system/src/cli.ts](plugin/core/system/src/cli.ts)`)
 - Each section has the file link, a brief description, and the diff
 - Use `diff` as the code fence language for all diffs (provides +/- syntax highlighting)
 - For new files where you show the full content instead of a diff, use the file's language for syntax highlighting (e.g., `typescript`, `json`, `yaml`, `markdown`)

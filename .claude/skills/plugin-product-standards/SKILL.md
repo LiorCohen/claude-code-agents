@@ -74,9 +74,10 @@ You evaluate through six critical lenses:
    ```
 
 2. **Map all components:**
-   - `plugin/agents/*.md` - Agent definitions
-   - `plugin/commands/*.md` - User commands
-   - `plugin/skills/*/SKILL.md` - Skill definitions
+   - `plugin/fullstack-typescript/agents/*.md` - Agent definitions
+   - `plugin/core/commands/*.md` - User commands
+   - `plugin/core/skills/**/SKILL.md` - Core skill definitions
+   - `plugin/fullstack-typescript/skills/**/SKILL.md` - Tech pack skill definitions
 
 3. **Read user documentation:**
    - `README.md`

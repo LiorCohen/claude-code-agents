@@ -22,12 +22,12 @@ Run `git status` and `git diff` to understand:
 
 ### Step 1.5: Build Verification
 
-**When to run:** If any changed files are under `plugin/system/` (TypeScript source).
+**When to run:** If any changed files are under `plugin/core/system/` or `plugin/fullstack-typescript/system/` (TypeScript source).
 
 Run `npm run typecheck:plugin` and verify it passes. If there are type errors, fix them before proceeding — never commit code that doesn't compile.
 
 **Skip conditions:**
-- No changes under `plugin/system/`
+- No changes under `plugin/core/system/` or `plugin/fullstack-typescript/system/`
 - Changes are only to `.md` files, `.tasks/`, or non-TypeScript files
 
 ### Step 2: Version Check
@@ -38,13 +38,15 @@ For each affected plugin, check if version bump is needed:
 
 | Directory/File | Description |
 |----------------|-------------|
-| `plugin/agents/` | All agent `.md` files |
-| `plugin/commands/` | All command `.md` files |
-| `plugin/skills/` | All skill `.md` files |
-| `plugin/templates/` | All template files |
-| `plugin/system/` | CLI system source files |
+| `plugin/core/commands/` | All command `.md` files |
+| `plugin/core/skills/` | All core skill `.md` files |
+| `plugin/core/system/` | Core CLI system source files |
+| `plugin/core/permissions/` | Permission configuration |
+| `plugin/fullstack-typescript/agents/` | All agent `.md` files |
+| `plugin/fullstack-typescript/skills/` | All tech pack skill `.md` files |
+| `plugin/fullstack-typescript/system/` | Tech pack CLI system source files |
+| `plugin/fullstack-typescript/templates/` | All template files |
 | `plugin/.claude-plugin/` | Plugin manifest |
-| `plugin/CLAUDE.md` | Plugin guidance for Claude |
 
 **Files That Do NOT Require Version Bump (Marketplace-Level):**
 
@@ -80,9 +82,6 @@ If changes affect `plugin/.claude-plugin/plugin.json` or `.claude-plugin/marketp
 # Verify versions match
 jq -r '.version' plugin/.claude-plugin/plugin.json
 jq -r '.plugins[0].version' .claude-plugin/marketplace.json
-
-# Verify paths start with ./
-jq -r '.hooks // empty' plugin/.claude-plugin/plugin.json | grep -E '^\./' || echo "ERROR: hooks path invalid"
 ```
 
 **Skip conditions:**
@@ -230,7 +229,7 @@ User: /commit
 Agent: Analyzing changes...
 
 Found changes in:
-- plugin/agents/backend-dev.md
+- plugin/fullstack-typescript/agents/backend-dev.md
 
 Detected plugin: plugin (current version: 1.10.19)
 
@@ -274,7 +273,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ---
 
 Files to commit:
-- plugin/agents/backend-dev.md
+- plugin/fullstack-typescript/agents/backend-dev.md
 - plugin/.claude-plugin/plugin.json
 - changelog/v1.md
 - .claude-plugin/marketplace.json

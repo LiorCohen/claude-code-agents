@@ -76,17 +76,15 @@ All component paths must be relative to plugin root and start with `./`:
 
 | Field | Example |
 |-------|---------|
-| `hooks` | `"./hooks/hooks.json"` |
-| `commands` | `"./custom/commands/"` |
-| `agents` | `"./agents/"` |
-| `skills` | `"./skills/"` |
+| `commands` | `["./core/commands/sdd.md"]` |
+| `skills` | `["./core/skills/"]` |
 | `mcpServers` | `"./.mcp.json"` |
 | `lspServers` | `"./.lsp.json"` |
 | `outputStyles` | `"./styles/"` |
 
 ```bash
-# Check hooks path starts with ./
-jq -r '.hooks // empty' plugin/.claude-plugin/plugin.json | grep -E '^\./' || echo "ERROR: hooks path must start with ./"
+# Check all command paths start with ./
+jq -r '.commands[]? // empty' plugin/.claude-plugin/plugin.json | while read -r p; do echo "$p" | grep -qE '^\./' || echo "ERROR: command path must start with ./: $p"; done
 ```
 
 ### 5. Referenced Files Exist
@@ -94,9 +92,15 @@ jq -r '.hooks // empty' plugin/.claude-plugin/plugin.json | grep -E '^\./' || ec
 Verify files referenced by paths actually exist:
 
 ```bash
-# Check hooks file exists
-HOOKS=$(jq -r '.hooks // empty' plugin/.claude-plugin/plugin.json)
-[ -n "$HOOKS" ] && [ -f "plugin/${HOOKS#./}" ] && echo "OK: hooks" || echo "ERROR: hooks file not found"
+# Check command files exist
+jq -r '.commands[]? // empty' plugin/.claude-plugin/plugin.json | while read -r p; do
+  [ -f "plugin/${p#./}" ] || [ -d "plugin/${p#./}" ] && echo "OK: $p" || echo "ERROR: not found: plugin/${p#./}"
+done
+
+# Check skill directories exist
+jq -r '.skills[]? // empty' plugin/.claude-plugin/plugin.json | while read -r p; do
+  [ -d "plugin/${p#./}" ] && echo "OK: $p" || echo "ERROR: not found: plugin/${p#./}"
+done
 ```
 
 ### 6. Source Directory Exists
@@ -153,13 +157,19 @@ M=$(jq -r '.plugins[0].version // "none"' .claude-plugin/marketplace.json)
 
 # 4. Paths start with ./
 echo -n "4. Path format: "
-H=$(jq -r '.hooks // ""' plugin/.claude-plugin/plugin.json)
-[ -z "$H" ] || [[ "$H" == ./* ]] && echo "OK" || echo "FAIL (hooks=$H)"
+FAIL=0
+for p in $(jq -r '.commands[]?, .skills[]?' plugin/.claude-plugin/plugin.json 2>/dev/null); do
+  [[ "$p" == ./* ]] || { echo "FAIL ($p)"; FAIL=1; break; }
+done
+[ $FAIL -eq 0 ] && echo "OK"
 
 # 5. Referenced files exist
 echo -n "5. Files exist: "
-H=$(jq -r '.hooks // ""' plugin/.claude-plugin/plugin.json)
-[ -z "$H" ] || [ -f "plugin/${H#./}" ] && echo "OK" || echo "FAIL (missing: plugin/${H#./})"
+FAIL=0
+for p in $(jq -r '.commands[]?, .skills[]?' plugin/.claude-plugin/plugin.json 2>/dev/null); do
+  [ -f "plugin/${p#./}" ] || [ -d "plugin/${p#./}" ] || { echo "FAIL (missing: plugin/${p#./})"; FAIL=1; break; }
+done
+[ $FAIL -eq 0 ] && echo "OK"
 
 # 6. Source directory exists
 echo -n "6. Source exists: "
@@ -199,10 +209,13 @@ echo "=== Done ==="
   "repository": "https://github.com/user/plugin",
   "license": "MIT",
   "keywords": ["keyword1"],
-  "commands": "./custom/commands/",
-  "agents": "./agents/",
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
+  "commands": [                    // Array of command paths
+    "./core/commands/sdd.md",
+    "./core/commands/sdd-run.md"
+  ],
+  "skills": [                      // Array of skill directory paths
+    "./core/skills/"
+  ],
   "mcpServers": "./.mcp.json",
   "lspServers": "./.lsp.json",
   "outputStyles": "./styles/"
@@ -235,12 +248,12 @@ echo "=== Done ==="
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
-| `hooks path must start with ./` | Path relative to wrong directory | Change `../hooks/` to `./hooks/` |
+| `command path must start with ./` | Path relative to wrong directory | Ensure all paths in `commands` array start with `./` |
 | `version mismatch` | Forgot to update both files | Run version bump script or update both |
 | `source directory not found` | Wrong source path | Verify `./plugin` exists |
 | `invalid name format` | Spaces or uppercase in name | Use kebab-case: `my-plugin` |
 | `path traversal detected` | Using `../` in paths | Keep all paths within plugin root |
-| `hooks file not found` | Typo or missing file | Create hooks file or remove from manifest |
+| `referenced file not found` | Typo or missing file | Verify path exists under `plugin/` |
 
 ---
 
