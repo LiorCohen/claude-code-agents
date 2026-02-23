@@ -261,4 +261,4 @@ Every existing `docs/` file has an explicit destination:
 - [ ] Components are top-level in settings — **verify:** `sdd-settings.yaml` after adding a component contains `components:` at top level with `techpack` back-reference
 - [ ] Settings reconciler migrates old format — **verify:** feed a settings file with `tech_packs` and nested `components` through reconcile, confirm output has `techpacks` and top-level `components`
 - [ ] `scaffolding project` adds `sdd/.techpacks/` to `.gitignore` — **verify:** scaffold a new project, confirm `.gitignore` contains `sdd/.techpacks/`
-- [ ] `LiorCohen/sdd` is unchanged — **verify:** `git -C /Users/lior/Work/Dev/sdd log -1 --format=%H` matches the commit hash before this task started
+- [ ] `LiorCohen/sdd` remote is unchanged — **verify:** `git -C /Users/lior/Work/Dev/sdd log origin/main..HEAD --oneline` shows the final version bump and repo-split commits (local only, never pushed)

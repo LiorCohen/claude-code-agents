@@ -7,7 +7,7 @@ created: 2026-02-23 23:00 UTC
 
 ## Strategy
 
-**Two-phase approach:** Make all plugin code changes on the **feature branch** in the existing `LiorCohen/sdd` codebase (Phase A), where we can build, typecheck, and test. Then create the new repos and distribute the changed code into them (Phase B). The feature branch is **never merged back to main** — `LiorCohen/sdd` main stays unchanged (per AC). The branch is a working copy used to develop and validate the code before it lands in the new repos.
+**Two-phase approach:** Make all plugin code changes on a **feature branch** in the existing `LiorCohen/sdd` codebase (Phase A), where we can build, typecheck, and test. Merge to main with a proper version bump and changelog — this is the **final version** of the monolithic plugin. **Never push to remote** — `LiorCohen/sdd` remote stays at its current state. Then create the new repos and distribute the code from main into them (Phase B).
 
 ## Execution Order
 
@@ -129,13 +129,16 @@ created: 2026-02-23 23:00 UTC
 - Run `npm test` — fix any failures from the rename and schema changes
 - This validates the reconciler migration path and the settings validation logic
 
-### Step 14: Commit all code changes (on feature branch)
+### Step 14: Commit, version bump, and merge to main
 
 - Depends on: Step 13
-- All changes are committed on the feature branch (never merged to main)
-- **No version bump** — bumping 7.2.0 on a throwaway branch is meaningless. The new repos create fresh manifests at 0.1.0 in Phase B.
-- All TypeScript changes, schema changes, skill changes, and techpack.yaml in one commit
-- This commit is the source of truth for the code distributed to new repos in Phase B
+- This is the **final version** of the monolithic plugin. Proper versioning and changelog required.
+- Version bump (discuss type with user — MAJOR is likely since the settings schema is a breaking change: `tech_packs` → `techpacks`, nested components → top-level)
+- Changelog entry covering: settings rename, `mode: git` support, top-level components, scaffolding `.techpacks/` gitignore
+- All TypeScript changes, schema changes, skill changes, and techpack.yaml committed
+- Merge feature branch to main
+- **Never push to remote** — `LiorCohen/sdd` remote stays untouched
+- Phase B sources code from the merged main branch (local only)
 
 ---
 
@@ -152,7 +155,7 @@ created: 2026-02-23 23:00 UTC
 ### Step 16: Populate sdd-core
 
 - Depends on: Steps 14, 15
-- **Source:** All copies below are from the **feature branch working tree** (which has all Phase A changes applied).
+- **Source:** All copies below are from the **merged main branch** (which has all Phase A changes applied).
 - Implementation:
   - Clone `sdd-engine/sdd-core` into a temp working directory
   - Copy `plugin/core/` contents flattened into `plugin/` (i.e., `plugin/core/commands/` → `plugin/commands/`, `plugin/core/skills/` → `plugin/skills/`, `plugin/core/system/` → `plugin/system/`, `plugin/core/permissions/` → `plugin/permissions/`)
@@ -171,7 +174,7 @@ created: 2026-02-23 23:00 UTC
 ### Step 17: Populate sdd-fullstack-typescript-techpack
 
 - Depends on: Steps 14, 15
-- **Source:** All copies below are from the **feature branch working tree**.
+- **Source:** All copies below are from the **merged main branch**.
 - Implementation:
   - Clone `sdd-engine/sdd-fullstack-typescript-techpack` into a temp working directory
   - Copy `plugin/fullstack-typescript/` contents into `techpack/` (i.e., `plugin/fullstack-typescript/agents/` → `techpack/agents/`, etc.)
@@ -282,4 +285,4 @@ All acceptance criteria from the spec, executed in order:
 - [ ] Reconciler migrates old format successfully
 - [ ] `scaffolding project` generates `.gitignore` with `sdd/.techpacks/`
 - [ ] `techpack.yaml` uses `techpack:` key (not `tech_pack:`)
-- [ ] `LiorCohen/sdd` commit hash unchanged
+- [ ] `LiorCohen/sdd` main has final version bump and changelog (local only — remote unchanged)
