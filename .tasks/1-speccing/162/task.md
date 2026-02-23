@@ -95,6 +95,65 @@ Splitting into separate repos enables:
 - Public repos have `CLAUDE.md` and `CONTRIBUTING.md` at root for contributor guidance, but no dev skill suite
 - Workspace `.claude/` skills must be adapted for multi-repo structure (code lives in `repos/<name>/`, not at workspace root)
 
+## Tech-Pack Install Behavior
+
+### `tech-pack install --repo <url>`
+
+1. Clone `<url>` into `sdd/.techpacks/<namespace>/` (namespace extracted from `techpack/techpack.yaml` after clone)
+2. Read `techpack/techpack.yaml` from the cloned repo to get name, namespace, version
+3. Validate the manifest via `validateTechPack()`
+4. Register in `sdd-settings.yaml` with a new `mode: git` schema:
+
+```yaml
+tech_packs:
+  <namespace>:
+    name: <name>
+    namespace: <namespace>
+    version: "1.0.0"
+    mode: git
+    repo: <git-url>
+    path: sdd/.techpacks/<namespace>/techpack
+    components: []
+```
+
+The `path` points to the `techpack/` subdirectory inside the cloned repo (where `techpack.yaml` lives), not the clone root. This keeps the path contract identical to `mode: external` — the gateway always reads `techpack.yaml` from the `path` directory.
+
+### `tech-pack install` (no args)
+
+1. Read `sdd-settings.yaml`
+2. For each entry with `mode: git`:
+   - If `sdd/.techpacks/<namespace>/` does not exist → `git clone <repo>` into it
+   - If it already exists → skip (no automatic pull — explicit `tech-pack update` is a future concern)
+3. Entries with `mode: internal` or `mode: external` → skip (already resolved)
+4. Validate all git-mode techpacks after clone
+
+### Techpacks gateway update
+
+The gateway currently supports two modes:
+- `mode: internal` — path resolved relative to plugin root directory
+- `mode: external` — path is absolute
+
+Add support for:
+- `mode: git` — path resolved relative to project root (e.g., `sdd/.techpacks/<namespace>/techpack`)
+
+The `resolvePath()` operation must branch on mode to resolve correctly.
+
+### `sdd-settings.yaml` schema changes
+
+The `tech_packs` entry gains two optional fields for git mode:
+- `repo` (string) — git clone URL, present only when `mode: git`
+- `mode` gains a third valid value: `git` (in addition to `internal` and `external`)
+
+The `path` field for `mode: git` is relative to project root (not absolute, not relative to plugin root).
+
+## Documentation Split
+
+- **sdd-core `docs/`**: getting-started, commands, workflows, core concepts (methodology, lifecycle, settings)
+- **sdd-fullstack-typescript-techpack `docs/`**: agents, components, templates, TypeScript-specific standards and patterns
+- **sdd-vscode-extension `docs/`**: extension features, configuration, usage
+
+The current `docs/agents.md` and `docs/components.md` move to the techpack repo. The current `docs/getting-started.md`, `docs/commands.md`, and `docs/workflows.md` move to sdd-core.
+
 ## Changes
 
 | File/Area | Change |
