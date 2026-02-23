@@ -280,6 +280,9 @@ All acceptance criteria from the spec, executed in order:
 - [ ] `tech-pack install --repo --ref` checks out specified ref
 - [ ] `tech-pack info` resolves git-mode techpack paths
 - [ ] All public repos have LICENSE and `.github/` CI/CD
+- [ ] All public repos have 0.1.0 changelog with historical lineage reference to `LiorCohen/sdd`
+- [ ] Workspace has infrastructure changelog (CHANGELOG.md exists)
+- [ ] Workspace `tasks` and `commit` skills are adapted for multi-repo (`repos/<name>/` awareness)
 - [ ] Settings uses `techpacks` key
 - [ ] Components are top-level in settings with `techpack` back-reference
 - [ ] Reconciler migrates old format successfully
