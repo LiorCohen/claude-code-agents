@@ -170,7 +170,7 @@ domain_model:
     - term: Authentication
       definition: "Process of verifying user identity"
     - term: Token
-      definition: "JWT credential for session management"
+      definition: "Credential for session management"
   bounded_contexts:
     - name: Identity
       entities: [User, Session, Token]

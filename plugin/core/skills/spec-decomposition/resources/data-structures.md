@@ -18,7 +18,7 @@ user_stories: list
 domain_concepts: list
 independence_score: float  # 0.0-1.0
 requires_epic: boolean  # true if complexity is "epic"
-components_affected: list  # ["contract", "server", "webapp", ...]
+components_affected: list  # component names from tech pack manifest
 ```
 
 ## DecompositionResult
@@ -123,11 +123,11 @@ dependency_graph:
 
 # Components mapping (from discovered_components or derived)
 components_per_item:
-  f1: [server, database, contract]
-  f2: [server, contract, webapp]
-  f3: [server, contract, webapp]
-  f4: [server, webapp]
-  f5: [webapp]
+  f1: [component-a, component-b, component-c]
+  f2: [component-a, component-c, component-d]
+  f3: [component-a, component-c, component-d]
+  f4: [component-a, component-d]
+  f5: [component-d]
 
 # Transformation data (passed through for context files)
 transformation_data:
@@ -154,7 +154,7 @@ thinking:
       - term: Authentication
         definition: "Process of verifying user identity"
       - term: Token
-        definition: "JWT credential for session management"
+        definition: "Credential for session management"
     bounded_contexts:
       - name: Identity
         entities: [User, Session, Token]

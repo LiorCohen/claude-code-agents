@@ -168,7 +168,7 @@ Go back to an earlier phase (e.g., from planning back to spec).
 ```
 Regressing [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) to spec phase...
 
-Reason: Need to add OAuth support
+Reason: Need to add additional auth method
 
 Archived:
   [PLAN.md](sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md) → [sdd/archive/...](sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md)
@@ -181,7 +181,7 @@ Dependent items flagged for re-review:
   [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) (Authentication) - depends on user-auth-1
 
 NEXT STEPS:
-  Edit [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md) to add OAuth requirements
+  Edit [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md) to add auth requirements
   Then: /sdd I want to approve the spec
 ```
 

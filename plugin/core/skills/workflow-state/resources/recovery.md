@@ -43,7 +43,7 @@ When work is archived during regression:
 change_id: user-auth-1
 from_phase: implement
 to_phase: spec
-reason: "Need to add OAuth support"
+reason: "Need to add additional auth method"
 timestamp: 2026-02-05T14:30:00Z
 git_branch: feature/task-85-external-spec
 git_commit: abc123def  # Last commit before regression

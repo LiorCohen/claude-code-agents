@@ -54,7 +54,7 @@ Co-Authored-By: SDD Plugin vX.Y.Z
 ```text
 Add user-auth: Implement login and registration flow, bump to 1.2.0
 
-- JWT-based authentication with refresh tokens
+- Token-based authentication with refresh tokens
 - Registration with email verification
 - Password reset flow
 - Session management utilities
@@ -135,13 +135,13 @@ The detailed description in the commit message should be **identical** to the ch
 
 ```text
 # Commit message body:
-- JWT-based authentication with refresh tokens
+- Token-based authentication with refresh tokens
 - Registration with email verification
 - Password reset flow
 
 # Changelog entry body (same content):
 - **[user-auth]**: Implement login and registration flow
-  - JWT-based authentication with refresh tokens
+  - Token-based authentication with refresh tokens
   - Registration with email verification
   - Password reset flow
 ```

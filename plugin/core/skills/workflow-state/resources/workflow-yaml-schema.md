@@ -109,7 +109,7 @@ When a phase regression occurs, track it:
 regression:
   from_phase: implement
   to_phase: spec
-  reason: "Need to add OAuth support"
+  reason: "Need to add additional auth method"
   timestamp: 2026-02-05T14:30:00Z
   preserved_work:
     - path: sdd/archive/workflow-regressions/20260205-1430-02-auth-impl/

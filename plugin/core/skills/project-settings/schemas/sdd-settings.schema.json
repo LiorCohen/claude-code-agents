@@ -102,7 +102,7 @@
         },
         "path": {
           "type": "string",
-          "description": "Relative path from project root (e.g., 'components/servers/api-server')"
+          "description": "Relative path from project root (e.g., 'components/my-component')"
         },
         "settings": {
           "type": "object",

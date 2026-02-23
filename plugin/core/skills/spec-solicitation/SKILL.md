@@ -145,7 +145,7 @@ Agent: Loading context...
 
 Step 1: Context & Goal
 Based on the provided context, this appears to be about:
-- Building REST API endpoints for user authentication
+- Building API endpoints for user authentication
 - Including login, logout, and session refresh
 
 Is that correct? (yes/no/modify)
@@ -167,7 +167,7 @@ Agent: Resuming spec solicitation for: API Contracts (user-auth-1)
 Previously collected:
   - Problem: User authentication needs API endpoints
   - Primary user: Frontend developers
-  - Expected outcome: REST API for auth operations
+  - Expected outcome: API for auth operations
   - Requirements: 3 collected (login, logout, refresh)
 
 Continuing from: Step 5 - Acceptance Criteria
@@ -175,7 +175,7 @@ Continuing from: Step 5 - Acceptance Criteria
 For the requirement "Users can login with email and password":
 What acceptance criteria should we have? (Given/When/Then format)
 
-User: Given valid credentials, when user submits login form, then they receive a JWT token
+User: Given valid credentials, when user submits login form, then they receive a session token
 
 [... continues ...]
 ```

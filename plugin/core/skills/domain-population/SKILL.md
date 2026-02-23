@@ -23,7 +23,7 @@ During implementation, this skill:
 
 ## Usage
 
-This skill uses a TypeScript script for deterministic file creation:
+This skill uses the system CLI for deterministic file creation:
 
 ```bash
 cat << 'EOF' | <plugin-root>/system/system-run.sh scaffolding domain --config -
@@ -205,7 +205,7 @@ Updated SNAPSHOT with product overview
 
 ## Notes
 
-- Uses TypeScript for deterministic file creation
+- Uses system CLI for deterministic file creation
 - Preserves existing content in glossary and SNAPSHOT (appends/merges)
 - Creates slugified filenames (lowercase, hyphens)
 - All files are stubs meant to be filled in later

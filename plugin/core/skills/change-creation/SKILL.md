@@ -300,10 +300,10 @@ Input:
   description: Allow users to sign up, sign in, and manage sessions
   domain: Identity
   issue: PROJ-123
-  affected_components: [contract, server, webapp]
+  affected_components: [component-a, component-b, component-c]
   glossary_terms:
     - term: Session Token
-      definition: JWT token representing an authenticated user session
+      definition: Credential representing an authenticated user session
       action: add
   domain_definitions:
     - file: session.md

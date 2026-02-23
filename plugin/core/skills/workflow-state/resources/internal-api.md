@@ -249,7 +249,7 @@ Regress an item to an earlier phase. Archives discarded work.
 ```yaml
 change_id: user-auth-1
 to_phase: spec | plan
-reason: "Need to add OAuth support"
+reason: "Need to add additional auth method"
 ```
 
 **Output:**

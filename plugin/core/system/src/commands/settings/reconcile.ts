@@ -6,7 +6,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, basename } from 'node:path';
+import { join } from 'node:path';
 import YAML from 'yaml';
 import type { CommandResult, GlobalOptions } from '@/lib/args';
 import { findProjectRoot } from '@/lib/config';
