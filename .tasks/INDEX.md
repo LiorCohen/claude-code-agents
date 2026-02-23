@@ -4,6 +4,7 @@
 
 ## Speccing
 
+- [#162](1-speccing/162/): Split SDD into sdd-engine org repos (sdd-core + sdd-fullstack-typescript-techpack)
 - [#161](1-speccing/161/): Create persistent threads skill for conversation thread management
 
 ---
@@ -36,7 +37,6 @@
 
 ### High Priority
 
-- [#162](0-inbox/162/): Split SDD into sdd-engine org repos (sdd-core + sdd-fullstack-typescript-techpack)
 - [#148](0-inbox/148/): Implicit /sdd invocation: make Jarvis behavior ambient without explicit command
 - [#140](0-inbox/140/): Template-to-code drift detection for scaffolded components
 - [#137](0-inbox/137/): Split system CLI commands into internal and public categories

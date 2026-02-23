@@ -2,7 +2,7 @@
 id: 162
 title: Split SDD into sdd-engine org repos (sdd-core + sdd-fullstack-typescript-techpack)
 priority: high
-status: inbox
+status: speccing
 created: 2026-02-23 20:00 UTC
 depends_on: []
 blocks: []
