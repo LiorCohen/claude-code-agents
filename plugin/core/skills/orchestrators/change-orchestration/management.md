@@ -16,7 +16,7 @@ Show current workflow state and all change IDs.
 
 ### Flow
 
-1. Read all workflows from `.sdd/workflows/`
+1. Read all workflows from `sdd/workflows/`
 2. If `<change-id>` provided, show details for that specific change
 3. Otherwise, for each workflow, display:
    - Workflow ID and source
@@ -38,10 +38,10 @@ Current: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) (Re
 
 ITEMS:
   user-auth-1  Registration         spec_review    [changes/...](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
-  user-auth-2  Authentication       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
-  user-auth-3  Password Reset       pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
-  user-auth-4  Analytics            pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
-  user-auth-5  Settings             pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-2  Authentication       pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-3  Password Reset       pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-4  Analytics            pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/...)
+  user-auth-5  Settings             pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/...)
 
 NEXT ACTION:
   Review spec at: [SPEC.md](changes/2026/02/05/a1b2c3-user-auth/01-registration/SPEC.md)
@@ -75,8 +75,8 @@ List all changes in the specified workflow (or all workflows if multiple exist).
 ID        TITLE                 TYPE      STATUS         LOCATION
 ───────── ───────────────────── ───────── ────────────── ─────────────────────────
 user-auth-1    Registration          feature   spec_review    [changes/...](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
-user-auth-2    Authentication        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/02-authentication/)
-user-auth-3    Password Reset        feature   pending        [.sdd/workflows/...](.sdd/workflows/a1b2c3-user-auth/drafts/03-password-reset/)
+user-auth-2    Authentication        feature   pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/02-authentication/)
+user-auth-3    Password Reset        feature   pending        [sdd/workflows/...](sdd/workflows/a1b2c3-user-auth/drafts/03-password-reset/)
 
 Dependencies:
   [user-auth-2](changes/2026/02/05/a1b2c3-user-auth/02-authentication/) depends on: [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/)
@@ -97,7 +97,7 @@ Resume current workflow from persisted state.
 
 ### Flow
 
-1. Read workflow state from `.sdd/workflows/`
+1. Read workflow state from `sdd/workflows/`
 2. Find current item (or specified change-id)
 3. Based on status, take appropriate action:
 
@@ -171,7 +171,7 @@ Regressing [user-auth-1](changes/2026/02/05/a1b2c3-user-auth/01-registration/) t
 Reason: Need to add OAuth support
 
 Archived:
-  [PLAN.md](.sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md) → [.sdd/archive/...](.sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md)
+  [PLAN.md](sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md) → [sdd/archive/...](sdd/archive/workflow-regressions/20260205-1200-user-auth-1-impl/PLAN.md)
 
 Status changes:
   spec_status: approved → needs_rereview

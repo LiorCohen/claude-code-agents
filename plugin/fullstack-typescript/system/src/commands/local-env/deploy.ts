@@ -90,7 +90,11 @@ export const deploy = async (
   }
   const projectRoot = rootResult.path;
 
-  const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  // Try sdd/ first, fall back to .sdd/ for legacy projects
+  let settingsPath = path.join(projectRoot, 'sdd', 'sdd-settings.yaml');
+  if (!fs.existsSync(settingsPath)) {
+    settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  }
   const helmChartsDir = path.join(projectRoot, 'components', 'helm_charts');
 
   try {
@@ -98,7 +102,7 @@ export const deploy = async (
     if (!fs.existsSync(settingsPath)) {
       return {
         success: false,
-        error: 'No .sdd/sdd-settings.yaml found. Is this an SDD project?',
+        error: 'No sdd/sdd-settings.yaml found. Is this an SDD project?',
       };
     }
 

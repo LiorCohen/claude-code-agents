@@ -1,6 +1,6 @@
 ---
 name: workflow-state
-description: Internal skill for managing workflow lifecycle state in .sdd/workflows/. Provides session-independent, resumable workflow tracking.
+description: Internal skill for managing workflow lifecycle state in sdd/workflows/. Provides session-independent, resumable workflow tracking.
 user-invocable: false
 ---
 
@@ -8,13 +8,13 @@ user-invocable: false
 
 ## Purpose
 
-Manages `.sdd/workflows/<id>-<name>/` state - tracking where each item is in the solicitation → review → approval → implementation lifecycle.
+Manages `sdd/workflows/<id>-<name>/` state - tracking where each item is in the solicitation → review → approval → implementation lifecycle.
 
 This is **process state management**, not project task management.
 
 ## Core Principle: Zero Session Context
 
-**ALL workflow state is persisted in `.sdd/` files.** A new session must be able to resume with ZERO knowledge of what happened before:
+**ALL workflow state is persisted in `sdd/` files.** A new session must be able to resume with ZERO knowledge of what happened before:
 - No conversation history
 - No in-memory state
 - No assumptions
@@ -24,7 +24,7 @@ Read the files, know the state. This enables aggressive context compaction and a
 ## Directory Structure
 
 ```text
-.sdd/
+sdd/
 ├── sdd-settings.yaml
 ├── archive/
 │   ├── external-specs/         # External specs archived here (read-only)
@@ -144,13 +144,13 @@ Change IDs are derived from the workflow name:
 - When item is marked `complete`:
   - Remove from `workflow.yaml` items array
 - When all items complete:
-  - Delete entire `.sdd/workflows/<id>-<name>/` directory including `workflow.yaml`
+  - Delete entire `sdd/workflows/<id>-<name>/` directory including `workflow.yaml`
 - Completed items remain in `changes/` permanently (that's the source of truth)
 
 ## INDEX.md Handling
 
 - `changes/INDEX.md` is updated when items move to `changes/` directory
-- No separate INDEX.md in `.sdd/workflows/` - workflow.yaml is the source of truth
+- No separate INDEX.md in `sdd/workflows/` - workflow.yaml is the source of truth
 - `workflow_state.ready_for_review()` updates `changes/INDEX.md` with new entry
 
 ## Consumers

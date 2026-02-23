@@ -24,25 +24,25 @@ Returns success status, file path, and current component configurations.
 
 ## Purpose
 
-Manage the `.sdd/sdd-settings.yaml` file that stores project configuration and component settings. Component settings are structural decisions that drive scaffolding, config initialization, and deployment.
+Manage the `sdd/sdd-settings.yaml` file that stores project configuration and component settings. Component settings are structural decisions that drive scaffolding, config initialization, and deployment.
 
 ## File Location
 
-Settings file: `.sdd/sdd-settings.yaml` (git-tracked)
+Settings file: `sdd/sdd-settings.yaml` (git-tracked)
 
-The `.sdd/` directory contains all SDD metadata. Create this directory if it doesn't exist.
+The `sdd/` directory contains all SDD metadata. Create this directory if it doesn't exist.
 
 ## Migration from Legacy Location
 
 If `sdd-settings.yaml` exists at project root (legacy location):
-1. Create `.sdd/` directory
-2. Move `sdd-settings.yaml` to `.sdd/sdd-settings.yaml`
+1. Create `sdd/` directory
+2. Move `sdd-settings.yaml` to `sdd/sdd-settings.yaml`
 3. Delete the root file
 4. Commit the change
 
 Quick migration command:
 ```bash
-mkdir -p .sdd && mv sdd-settings.yaml .sdd/ && git add -A && git commit -m "Migrate sdd-settings.yaml to .sdd/"
+mkdir -p sdd && mv sdd-settings.yaml sdd/ && git add -A && git commit -m "Migrate sdd-settings.yaml to sdd/"
 ```
 
 ## Schema
@@ -119,7 +119,7 @@ components:
 | **When set** | At component creation, changeable | Per-environment |
 | **Examples** | `databases`, `provides_contracts`, `server_type` | `port: 3000`, `replicas: 3` |
 | **Affects** | What gets scaffolded | Values in scaffolded files |
-| **Stored in** | `.sdd/sdd-settings.yaml` | `components/config/envs/` |
+| **Stored in** | `sdd/sdd-settings.yaml` | `components/config/envs/` |
 
 ## Component Settings by Type
 
@@ -268,7 +268,7 @@ Get the actual directory names for all components.
 
 ## Minimal Template
 
-Template for initializing a new `.sdd/sdd-settings.yaml`:
+Template for initializing a new `sdd/sdd-settings.yaml`:
 
 ```yaml
 # ============================================================================

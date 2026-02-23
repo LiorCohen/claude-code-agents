@@ -14,7 +14,7 @@ The CLI handles datetime-prefix naming (`yyyymmdd-HHmm-lowercased-original-name.
 
 **For directories**, the same command works — the CLI detects directory sources and copies all files preserving structure, returning `is_directory: true` and `file_count`.
 
-Display the result: `"Archived to: .sdd/archive/external-specs/20260205-1430-feature-spec.md"`
+Display the result: `"Archived to: sdd/archive/external-specs/20260205-1430-feature-spec.md"`
 
 **IMPORTANT**: This is the ONLY copy. The archived spec is read-only and for audit trail only.
 

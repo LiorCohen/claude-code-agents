@@ -38,13 +38,17 @@ export const undeploy = async (
     return { success: false, error: 'Could not find project root (no package.json found)' };
   }
   const projectRoot = rootResult.path;
-  const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  // Try sdd/ first, fall back to .sdd/ for legacy projects
+  let settingsPath = path.join(projectRoot, 'sdd', 'sdd-settings.yaml');
+  if (!fs.existsSync(settingsPath)) {
+    settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  }
 
   try {
     if (!fs.existsSync(settingsPath)) {
       return {
         success: false,
-        error: 'No .sdd/sdd-settings.yaml found. Is this an SDD project?',
+        error: 'No sdd/sdd-settings.yaml found. Is this an SDD project?',
       };
     }
 

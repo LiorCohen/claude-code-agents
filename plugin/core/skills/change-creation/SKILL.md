@@ -37,7 +37,7 @@ Implementation simply executes these specifications.
 ### Dynamic Phase Generation
 
 Plans are generated dynamically based on:
-1. Project components from `.sdd/sdd-settings.yaml` (delegate to the `project-settings` skill for the settings schema — it returns the component list with `name`, `type`, and type-specific settings)
+1. Project components from `sdd/sdd-settings.yaml` (delegate to the `project-settings` skill for the settings schema — it returns the component list with `name`, `type`, and type-specific settings)
 2. Which components are affected by the change
 3. Dependency order between components
 4. Contextual agent assignment
@@ -77,7 +77,7 @@ Returns paths to created SPEC.md and PLAN.md files, and whether the index was up
 ### Step 3: Read Plugin Version and Settings
 
 1. Read SDD plugin version from `.claude-plugin/plugin.json`
-2. Read project components from `.sdd/sdd-settings.yaml`
+2. Read project components from `sdd/sdd-settings.yaml`
 3. Identify affected components (from input or infer from description)
 
 ### Step 4: Create Change Directory
@@ -217,7 +217,7 @@ Epics group multiple feature-type changes under a single goal. The creation work
 
 ### Workflow Tracking
 
-Epics are tracked in `.sdd/workflows/<id>-<name>/workflow.yaml`:
+Epics are tracked in `sdd/workflows/<id>-<name>/workflow.yaml`:
 
 ```yaml
 items:
@@ -343,5 +343,5 @@ Output:
 - If change directory already exists: Warn and ask for confirmation to overwrite
 - If INDEX.md doesn't exist: Create it with basic structure
 - If plugin.json can't be read: Use "unknown" for sdd_version and warn
-- If .sdd/sdd-settings.yaml can't be read: Use default component assumptions and warn
+- If sdd/sdd-settings.yaml can't be read: Use default component assumptions and warn
 - If invalid type provided: Return error with valid options

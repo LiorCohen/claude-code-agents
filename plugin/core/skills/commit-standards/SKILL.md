@@ -152,7 +152,7 @@ The detailed description in the commit message should be **identical** to the ch
 
 ### Project Version Location
 
-The project version is stored in `.sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the version location and format — it returns the `version` field from the project settings root, following semver (`MAJOR.MINOR.PATCH`).
+The project version is stored in `sdd/sdd-settings.yaml`. Delegate to the `project-settings` skill for the version location and format — it returns the `version` field from the project settings root, following semver (`MAJOR.MINOR.PATCH`).
 
 ### Semver
 
@@ -254,7 +254,7 @@ git log origin/main..HEAD --oneline
 Before committing, verify:
 
 ```text
-[ ] Version in .sdd/sdd-settings.yaml updated (if version bump needed)
+[ ] Version in sdd/sdd-settings.yaml updated (if version bump needed)
 [ ] Changelog entry in changelog/vN.md
 [ ] Commit body matches changelog body
 [ ] All related files staged

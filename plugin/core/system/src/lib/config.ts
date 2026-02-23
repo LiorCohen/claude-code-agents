@@ -6,7 +6,7 @@ import * as path from 'node:path';
 import { readJson, exists } from './fs';
 
 /**
- * SDD project configuration from .sdd/sdd-settings.yaml or package.json.
+ * SDD project configuration from sdd/sdd-settings.yaml or package.json.
  */
 export type SddConfig = {
   readonly projectName: string;
@@ -69,8 +69,8 @@ export const loadProjectConfig = async (targetDir: string): Promise<ConfigResult
 };
 
 /**
- * Find the project root by looking for package.json or .sdd/sdd-settings.yaml.
- * Checks .sdd/sdd-settings.yaml first (new location), then falls back to legacy root location.
+ * Find the project root by looking for package.json or sdd/sdd-settings.yaml.
+ * Checks sdd/ first, then .sdd/ (legacy), then falls back to root-level sdd-settings.yaml.
  */
 export type ProjectRootResult =
   | { readonly found: true; readonly path: string }
@@ -83,19 +83,29 @@ export const findProjectRoot = async (startDir: string = process.cwd()): Promise
     if (dir === root) return { found: false };
 
     const packageJsonPath = path.join(dir, 'package.json');
-    const sddSettingsPath = path.join(dir, '.sdd', 'sdd-settings.yaml');
-    const legacySettingsPath = path.join(dir, 'sdd-settings.yaml');
+    const sddSettingsPath = path.join(dir, 'sdd', 'sdd-settings.yaml');
+    const legacySddSettingsPath = path.join(dir, '.sdd', 'sdd-settings.yaml');
+    const legacyRootSettingsPath = path.join(dir, 'sdd-settings.yaml');
 
-    // Check package.json or new .sdd/ location
+    // Check package.json or sdd/ location
     if ((await exists(packageJsonPath)) || (await exists(sddSettingsPath))) {
       return { found: true, path: dir };
     }
 
+    // Legacy fallback: .sdd/ directory (old hidden directory convention)
+    if (await exists(legacySddSettingsPath)) {
+      console.warn(
+        '[SDD] Deprecation warning: .sdd/ directory is deprecated. ' +
+          'Rename to sdd/: mv .sdd sdd'
+      );
+      return { found: true, path: dir };
+    }
+
     // Legacy fallback: sdd-settings.yaml at project root
-    if (await exists(legacySettingsPath)) {
+    if (await exists(legacyRootSettingsPath)) {
       console.warn(
         '[SDD] Deprecation warning: sdd-settings.yaml at project root is deprecated. ' +
-          'Move it to .sdd/sdd-settings.yaml: mkdir -p .sdd && mv sdd-settings.yaml .sdd/'
+          'Move it to sdd/sdd-settings.yaml: mkdir -p sdd && mv sdd-settings.yaml sdd/'
       );
       return { found: true, path: dir };
     }

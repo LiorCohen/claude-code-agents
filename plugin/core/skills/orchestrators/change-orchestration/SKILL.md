@@ -48,7 +48,7 @@ Before dispatching any action, perform these common checks:
 ### Change ID Lookup
 
 For actions that require a `<change-id>`:
-1. Read `.sdd/workflows/` to find the workflow containing that change
+1. Read `sdd/workflows/` to find the workflow containing that change
 2. Validate the change exists
 3. If not found: `Error: Change '<change-id>' not found. Run /sdd-run change list to see all changes.`
 

@@ -51,7 +51,7 @@ items:
         change_id: user-auth-2
         title: Backend Service
         type: feature
-        location: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
+        location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
         context_sections: ["## Backend Logic", "## Data Model"]
         depends_on: [01-api-contracts]
         spec_status: in_progress
@@ -112,7 +112,7 @@ regression:
   reason: "Need to add OAuth support"
   timestamp: 2026-02-05T14:30:00Z
   preserved_work:
-    - path: .sdd/archive/workflow-regressions/20260205-1430-02-auth-impl/
+    - path: sdd/archive/workflow-regressions/20260205-1430-02-auth-impl/
       type: implementation
       description: "Partial password auth implementation"
 ```

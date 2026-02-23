@@ -45,7 +45,11 @@ export const config = async (
   }
   const projectRoot = rootResult.path;
 
-  const settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  // Try sdd/ first, fall back to .sdd/ for legacy projects
+  let settingsPath = path.join(projectRoot, 'sdd', 'sdd-settings.yaml');
+  if (!fs.existsSync(settingsPath)) {
+    settingsPath = path.join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  }
   const localEnvDir = path.join(projectRoot, 'components', 'config', 'envs', 'local');
   const localConfigPath = path.join(localEnvDir, 'config.yaml');
 
@@ -53,7 +57,7 @@ export const config = async (
     if (!fs.existsSync(settingsPath)) {
       return {
         success: false,
-        error: 'No .sdd/sdd-settings.yaml found. Is this an SDD project?',
+        error: 'No sdd/sdd-settings.yaml found. Is this an SDD project?',
       };
     }
 

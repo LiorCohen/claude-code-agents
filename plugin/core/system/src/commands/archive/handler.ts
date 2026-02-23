@@ -2,7 +2,7 @@
  * Archive namespace command handler.
  *
  * Commands:
- *   store   Archive a file or directory to .sdd/archive/<type>/
+ *   store   Archive a file or directory to sdd/archive/<type>/
  */
 
 import type { CommandResult, GlobalOptions } from '@/lib/args';

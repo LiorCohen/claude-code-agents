@@ -140,8 +140,16 @@ type LoadLoggingConfigResult =
  */
 const loadLoggingConfig = (): LoadLoggingConfigResult => {
   try {
-    const settingsPath = join(process.cwd(), 'sdd', 'sdd-settings.yaml');
-    const content = readFileSync(settingsPath, 'utf-8');
+    // Try sdd/ first, fall back to .sdd/ for legacy projects
+    const cwd = process.cwd();
+    let settingsPath = join(cwd, 'sdd', 'sdd-settings.yaml');
+    let content: string;
+    try {
+      content = readFileSync(settingsPath, 'utf-8');
+    } catch {
+      settingsPath = join(cwd, '.sdd', 'sdd-settings.yaml');
+      content = readFileSync(settingsPath, 'utf-8');
+    }
     const raw: unknown = YAML.parse(content);
     if (typeof raw !== 'object' || raw === null) return { loaded: false };
     const rawObj = raw as Readonly<Record<string, unknown>>;

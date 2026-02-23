@@ -393,7 +393,7 @@ const systemSettingsSchema: JsonSchema = {
 export const settingsFileSchema: JsonSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   title: 'SDD Settings File',
-  description: 'Schema for .sdd/sdd-settings.yaml',
+  description: 'Schema for sdd/sdd-settings.yaml',
   type: 'object',
   properties: {
     sdd: sddMetadataSchema,

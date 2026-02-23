@@ -2,7 +2,7 @@
  * Logging utilities for the CLI.
  */
 
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import pino from 'pino';
 import type { GlobalOptions } from './args';
@@ -103,7 +103,7 @@ export type FileLoggerResult =
   | { readonly created: false };
 
 /**
- * Create a pino file logger instance that writes to .sdd/system-logs/.
+ * Create a pino file logger instance that writes to sdd/system-logs/.
  *
  * This logger is INDEPENDENT of console output. Console output is user-facing
  * and remains completely unchanged. File logging is for system audit/debug.
@@ -124,7 +124,10 @@ export const createFileLogger = (
 
     // Use provided projectRoot or fallback to process.cwd()
     const projectRoot = options.projectRoot ?? process.cwd();
-    const logDir = join(projectRoot, '.sdd', 'system-logs');
+    // Use sdd/ directory, fall back to .sdd/ for legacy projects
+    const sddDir = join(projectRoot, 'sdd');
+    const logRoot = existsSync(sddDir) ? sddDir : join(projectRoot, '.sdd');
+    const logDir = join(logRoot, 'system-logs');
     mkdirSync(logDir, { recursive: true });
 
     // Create log file path

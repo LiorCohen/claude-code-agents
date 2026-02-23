@@ -20,12 +20,12 @@ name: user-auth  # Required. Lowercase alphanumeric + hyphens, 3-50 chars.
 ```yaml
 workflow_id: a1b2c3
 workflow_name: user-auth
-workflow_path: .sdd/workflows/a1b2c3-user-auth/
-workflow_yaml_path: .sdd/workflows/a1b2c3-user-auth/workflow.yaml
+workflow_path: sdd/workflows/a1b2c3-user-auth/
+workflow_yaml_path: sdd/workflows/a1b2c3-user-auth/workflow.yaml
 ```
 
 **Side Effects:**
-- Creates `.sdd/workflows/<id>-<name>/` directory
+- Creates `sdd/workflows/<id>-<name>/` directory
 - Creates `workflow.yaml` with initial state (includes `name` field)
 - Creates `drafts/` subdirectory
 - Creates checkpoint commit: `checkpoint: workflow <id> (<name>) created`
@@ -48,7 +48,7 @@ depends_on: []
 **Output:**
 ```yaml
 change_id: user-auth-1  # Derived from workflow name + sequence
-location: .sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts
+location: sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts
 ```
 
 **Side Effects:**
@@ -84,7 +84,7 @@ items:
     plan_status: pending
     impl_status: pending
     review_status: pending
-    location: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
+    location: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/02-backend-service
 ```
 
 ## workflow_state.get_current(workflow_id)
@@ -107,7 +107,7 @@ impl_status: pending
 review_status: pending
 substep: null
 location: changes/2026/02/05/a1b2c3-user-auth/01-api-contracts
-context_path: .sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/01-api-contracts/context.md
+context_path: sdd/workflows/a1b2c3-user-auth/drafts/01-user-management/01-api-contracts/context.md
 ```
 
 ## workflow_state.advance(workflow_id)
@@ -257,7 +257,7 @@ reason: "Need to add OAuth support"
 success: true
 from_phase: implement
 to_phase: spec
-archived_to: .sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/
+archived_to: sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/
 cascade_effects:
   - change_id: user-auth-2
     current_spec_status: approved
@@ -348,7 +348,7 @@ sequence_number: 1  # NN- prefix within workflow
 
 **Side Effects:**
 - Determines next sequence number within workflow
-- Moves item folder from `.sdd/workflows/<id>-<name>/drafts/` to `changes/YYYY/MM/DD/<id>-<name>/NN-slug/`
+- Moves item folder from `sdd/workflows/<id>-<name>/drafts/` to `changes/YYYY/MM/DD/<id>-<name>/NN-slug/`
 - Updates `workflow.yaml` with new location
 - Updates `changes/INDEX.md` with new entry
 - Sets `spec_status` to `ready_for_review`
@@ -391,7 +391,7 @@ change_id: user-auth-1
 - Updates `progress` aggregates (reviewed count)
 - Removes entry from `workflow.yaml` items array (keeps manifest lean)
 - Updates `INDEX.md` to show completion
-- If all items complete: deletes entire `.sdd/workflows/<id>-<name>/` directory
+- If all items complete: deletes entire `sdd/workflows/<id>-<name>/` directory
 - Creates checkpoint commit: `checkpoint: <change_id> complete`
 
 ## workflow_state.revise_decomposition(revision)
@@ -418,7 +418,7 @@ affected_items:
     action: preserved_as_target
   - change_id: user-auth-3
     action: archived
-    archive_path: .sdd/archive/revised-specs/20260205-1430-a1b2c3-user-auth-03-password-reset/
+    archive_path: sdd/archive/revised-specs/20260205-1430-a1b2c3-user-auth-03-password-reset/
 rereviews_needed:
   - change_id: user-auth-4
     reason: "Dependency on merged item"
@@ -442,14 +442,14 @@ Create checkpoint commit on feature branch.
 ```yaml
 message: "checkpoint: user-auth-1 spec created"
 files:
-  - .sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts/SPEC.md
-  - .sdd/workflows/a1b2c3-user-auth/workflow.yaml
+  - sdd/workflows/a1b2c3-user-auth/drafts/01-api-contracts/SPEC.md
+  - sdd/workflows/a1b2c3-user-auth/workflow.yaml
 ```
 
 **Behavior:**
 - Uses `--no-verify` to skip hooks
 - No-op if on main/master branch
-- Only stages workflow-related files (`.sdd/`, `changes/`, implementation files)
+- Only stages workflow-related files (`sdd/`, `changes/`, implementation files)
 
 ## Backward Compatibility
 

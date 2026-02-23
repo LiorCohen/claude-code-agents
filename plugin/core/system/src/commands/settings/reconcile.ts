@@ -1,7 +1,7 @@
 /**
  * Settings reconcile action.
  *
- * Reads .sdd/sdd-settings.yaml, runs reconciliation to migrate
+ * Reads sdd/sdd-settings.yaml, runs reconciliation to migrate
  * older formats to the latest schema, and writes the result back.
  */
 
@@ -44,17 +44,23 @@ export const reconcile = async (
   // Find project root
   const projectRootResult: ProjectRootResult = await findProjectRoot();
   if (!projectRootResult.found) {
-    return { success: false, error: 'Not in an SDD project (no .sdd/ or package.json found)' };
+    return { success: false, error: 'Not in an SDD project (no sdd/ or package.json found)' };
   }
   const projectRoot = projectRootResult.path;
 
-  // Read settings file
-  const settingsPath = join(projectRoot, '.sdd', 'sdd-settings.yaml');
+  // Read settings file (try sdd/ first, fall back to .sdd/ for legacy projects)
+  const settingsPath = join(projectRoot, 'sdd', 'sdd-settings.yaml');
+  const legacySettingsPath = join(projectRoot, '.sdd', 'sdd-settings.yaml');
   const rawContentResult = (() => {
     try {
-      return { ok: true as const, content: readFileSync(settingsPath, 'utf-8') };
+      return { ok: true as const, content: readFileSync(settingsPath, 'utf-8'), path: settingsPath };
     } catch {
-      return { ok: false as const };
+      // Fall back to legacy .sdd/ location
+      try {
+        return { ok: true as const, content: readFileSync(legacySettingsPath, 'utf-8'), path: legacySettingsPath };
+      } catch {
+        return { ok: false as const, path: settingsPath };
+      }
     }
   })();
 
@@ -98,9 +104,9 @@ export const reconcile = async (
   const headerMatch = rawContent.match(/^((?:#[^\n]*\n)*)/);
   const headerComments = headerMatch?.[1] ?? '';
 
-  // Write reconciled settings back
+  // Write reconciled settings back (to the same path it was read from)
   const newYaml = YAML.stringify(result.settings, { lineWidth: 120 });
-  writeFileSync(settingsPath, headerComments + newYaml);
+  writeFileSync(rawContentResult.path, headerComments + newYaml);
 
   // Format output
   if (options.json) {

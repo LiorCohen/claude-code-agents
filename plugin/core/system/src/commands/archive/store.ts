@@ -1,7 +1,7 @@
 /**
  * Archive store action.
  *
- * Copies a file or directory to .sdd/archive/<type>/ with a datetime-prefix
+ * Copies a file or directory to sdd/archive/<type>/ with a datetime-prefix
  * and lowercased filename.
  */
 
@@ -58,11 +58,15 @@ export const storeArchive = async (source: string, archiveType: ArchiveType, roo
   if (!projectRoot) {
     return {
       success: false,
-      error: 'Project root not found (no package.json or .sdd/ directory)',
+      error: 'Project root not found (no package.json or sdd/ directory)',
     };
   }
   const typeDir = ARCHIVE_TYPE_DIRS[archiveType];
-  const archiveBase = joinPath(projectRoot, '.sdd', 'archive', typeDir);
+  // Use sdd/ directory, fall back to .sdd/ for legacy projects
+  const sddDir = joinPath(projectRoot, 'sdd');
+  const legacySddDir = joinPath(projectRoot, '.sdd');
+  const archiveRoot = (await exists(sddDir)) ? sddDir : legacySddDir;
+  const archiveBase = joinPath(archiveRoot, 'archive', typeDir);
   const prefix = datetimePrefix();
 
   const sourceIsDir = await isDirectory(sourcePath);

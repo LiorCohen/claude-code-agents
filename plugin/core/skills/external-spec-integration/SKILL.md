@@ -11,11 +11,11 @@ Processes external specification files into the SDD workflow structure. Transfor
 ## Purpose
 
 When a user provides an external specification via `/sdd I want to import an external spec`:
-- Archive the external spec to `.sdd/archive/external-specs/` (single copy, yyyymmdd-HHmm-filename format)
+- Archive the external spec to `sdd/archive/external-specs/` (single copy, yyyymmdd-HHmm-filename format)
 - **TRANSFORM** the spec: classify information, identify gaps, ask clarifying questions
 - **DISCOVER** required components through targeted questions
 - **DECOMPOSE** into workflow items with classified context
-- Create workflow items with context in `.sdd/workflows/<id>-<name>/`
+- Create workflow items with context in `sdd/workflows/<id>-<name>/`
 - **DO NOT** create SPEC.md or PLAN.md files - those are created interactively
 
 **CRITICAL: External specs are product specs (WHAT/WHY). This skill transforms them into tech spec context (HOW) before decomposition.**
@@ -56,7 +56,7 @@ Returns archived spec path, workflow ID, hierarchical flag, and list of created 
 
 ## Workflow Overview
 
-1. **Archive** external spec to `.sdd/archive/external-specs/` via system CLI
+1. **Archive** external spec to `sdd/archive/external-specs/` via system CLI
 2. **Detect large specs** (>15K tokens) and chunk if needed
 3. **Transform** product spec: classify information, identify gaps, ask clarifying questions
 4. **Discover components** via component-discovery skill (once for entire spec)
@@ -78,7 +78,7 @@ For detailed guidance, read these on-demand:
 | Before | After |
 |--------|-------|
 | Created SPEC.md + PLAN.md immediately | Creates workflow items with context only |
-| Archived to `archive/` | Archives to `.sdd/archive/external-specs/` |
+| Archived to `archive/` | Archives to `sdd/archive/external-specs/` |
 | No domain analysis | Comprehensive thinking step with domain extraction |
 | No transformation | **NEW: Transformation classifies and identifies gaps** |
 | No component discovery | **NEW: Component discovery before decomposition** |
@@ -99,7 +99,7 @@ Trigger: `/sdd I want to import an external spec` command.
 
 | Step | Action | Output |
 |------|--------|--------|
-| 1 | Archive External Spec | `.sdd/archive/external-specs/...` |
+| 1 | Archive External Spec | `sdd/archive/external-specs/...` |
 | 2 | Detect Large Specs | Size estimation, chunking plan |
 | 3 | Transformation | Classification, gaps, clarifications |
 | 4 | Component Discovery | Components list (not applied) |

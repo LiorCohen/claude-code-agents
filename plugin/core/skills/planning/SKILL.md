@@ -117,7 +117,7 @@ Plans are generated dynamically based on the SPEC.md's Components section.
 
 The planning skill:
 1. Reads the `## Components` section from SPEC.md
-2. May read `.sdd/sdd-settings.yaml` for existing component details (delegate to the `project-settings` skill for the settings schema — it returns typed component objects with `name`, `type`, and type-specific `settings` like `server_type`, `databases`, `provides_contracts`)
+2. May read `sdd/sdd-settings.yaml` for existing component details (delegate to the `project-settings` skill for the settings schema — it returns typed component objects with `name`, `type`, and type-specific `settings` like `server_type`, `databases`, `provides_contracts`)
 3. Does NOT ask about tech stack or which components to use
 
 If SPEC.md says a component is needed but it's not in `sdd-settings.yaml` yet, that's expected - the component will be created during implementation.

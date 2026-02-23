@@ -32,14 +32,14 @@ Checkpoints are created automatically on workflow state changes:
 | review | impl | `/sdd I want to request changes` | Implementation needs changes |
 | review | spec | `/sdd I want to go back to the spec phase` | Major revision needed |
 
-Regression archives discarded work to `.sdd/archive/workflow-regressions/`.
+Regression archives discarded work to `sdd/archive/workflow-regressions/`.
 
 ## Regression Archive Structure
 
 When work is archived during regression:
 
 ```yaml
-# .sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/metadata.yaml
+# sdd/archive/workflow-regressions/20260205-1430-user-auth-1-impl/metadata.yaml
 change_id: user-auth-1
 from_phase: implement
 to_phase: spec

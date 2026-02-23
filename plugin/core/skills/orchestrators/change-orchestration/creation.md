@@ -138,7 +138,7 @@ Use the system CLI to archive:
 ```
 
 ```
-Archived external spec to: [.sdd/archive/external-specs/20260205-1430-feature-spec.md](.sdd/archive/external-specs/20260205-1430-feature-spec.md)
+Archived external spec to: [sdd/archive/external-specs/20260205-1430-feature-spec.md](sdd/archive/external-specs/20260205-1430-feature-spec.md)
 (This is read-only - for audit trail only)
 ```
 
