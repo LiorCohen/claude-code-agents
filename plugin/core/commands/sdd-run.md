@@ -33,15 +33,14 @@ SDD Run — Explicit command interface
 USAGE:
   /sdd-run <namespace> <action> [args] [options]
 
-NAMESPACES:
+CORE NAMESPACES:
   change        Manage the full change lifecycle (create, approve, implement, verify)
   init          Initialize or upgrade an SDD project
-  local-env     Manage local Kubernetes development environments
-  database      Manage PostgreSQL databases across environments
-  contract      Validate OpenAPI specifications
-  config        Manage project configuration across environments
   permissions   Configure Claude Code permissions for SDD
   version       Show installed and project plugin versions
+
+TECH PACK NAMESPACES:
+  (Loaded from active tech packs — run /sdd-run help for current list)
 
 GLOBAL OPTIONS:
   --json        Output in JSON format
@@ -51,9 +50,6 @@ GLOBAL OPTIONS:
 EXAMPLES:
   /sdd-run change create --type feature --name user-auth
   /sdd-run init
-  /sdd-run local-env create
-  /sdd-run database setup my-db --env local
-  /sdd-run config generate --env production
   /sdd-run version
 
 TIP: Use /sdd for guided, context-aware assistance.
@@ -75,9 +71,11 @@ Validate that sufficient arguments are provided. If not, display the namespace-s
 2. **Namespace provided, action missing** → show that namespace's sub-help
 3. **Namespace + action provided, required args missing** → show action-specific help
 
-For **orchestrated namespaces** (change, init, config, version, local-env), the orchestrator skill handles insufficient arguments — INVOKE the skill and let it display its own sub-help.
+For **core orchestrated namespaces** (change, init, version), the orchestrator skill handles insufficient arguments — INVOKE the skill and let it display its own sub-help.
 
-For **pass-through namespaces** (database, contract, permissions), validate arguments **before** calling `system-run.sh`. Display the sub-help blocks defined in each namespace section below.
+For **core pass-through namespaces** (permissions), validate arguments **before** calling `system-run.sh`. Display the sub-help blocks defined in each namespace section below.
+
+For **tech pack namespaces** (any namespace not recognized as core), route to the tech pack command router — it handles its own argument validation and sub-help.
 
 ### Destructive Action Confirmation
 
@@ -90,17 +88,14 @@ Some actions destroy data, remove deployments, or reset progress. These **must n
 | `🔴 destructive` | Irreversible data loss or removal | Warning + explicit "yes" confirmation |
 | `🟡 caution` | Overwrites data or resets progress, but recoverable | Warning + confirmation |
 
-**Destructive actions:**
+**Destructive actions (core):**
 
 | Namespace | Action | Level | What it affects |
 |-----------|--------|-------|-----------------|
-| `database` | `teardown` | 🔴 | Removes PostgreSQL deployment and all its data from k8s |
-| `database` | `reset` | 🔴 | Tears down, rebuilds, and re-seeds — all existing data is lost |
-| `database` | `seed` | 🟡 | Runs seed SQL files — typically TRUNCATE tables before inserting |
-| `local-env` | `destroy` | 🔴 | Deletes the entire local k8s cluster and all workloads |
-| `local-env` | `undeploy` | 🟡 | Removes deployed applications from the cluster (infra persists) |
 | `change` | `regress` | 🟡 | Rolls workflow back to an earlier phase — plan or implementation work is archived but progress is reset |
 | `change` | `request-changes` | 🟡 | Resets implementation status from complete to in-progress, requiring rework |
+
+Tech packs may define additional destructive actions. The tech pack's command router provides its own destructive action table.
 
 **Warning format:**
 
@@ -147,171 +142,11 @@ Route to the init-orchestration skill:
 INVOKE init-orchestration skill
 ```
 
-No arguments — runs the full 6-phase workflow.
+No arguments — runs the full 7-phase workflow.
 
 **When to use:** You're starting a new project from scratch, or you've upgraded the plugin and need to reconcile settings with the new version.
 
-**Scenario:** You create a new directory for your project, open Claude Code, and run `/sdd-run init`. It detects the project name, verifies your environment (tools, permissions), scaffolds the minimal config structure, and commits. On an existing project after a plugin upgrade, it detects the version mismatch, reconciles settings, and reports what changed.
-
----
-
-### `local-env` — Manage local Kubernetes development environments
-
-Route to the local-env-orchestration skill:
-
-```yaml
-INVOKE local-env-orchestration skill with:
-  action: <action>
-  args: <remaining args>
-```
-
-**Actions:** `create`, `destroy`, `start`, `stop`, `status`, `deploy`, `undeploy`, `forward`, `infra`
-
-**When to use:** You need a local k8s cluster to test your application stack — databases, services, helm charts — as they'd run in production, but on your machine.
-
-**Scenario:** You're ready to test your server with its database and dependencies. You create a cluster (`local-env create`), deploy everything (`local-env deploy`), then set up port forwards (`local-env forward start`) so your locally-running service can reach the in-cluster database. When done for the day, you stop the cluster (`local-env stop`) and resume tomorrow (`local-env start`).
-
----
-
-### `database` — Manage PostgreSQL databases across environments
-
-Pass-through to system CLI:
-
-```bash
-<plugin-root>/system/system-run.sh database <action> <component> [--env <env>] [args]
-```
-
-**Actions:** `setup`, `teardown`, `migrate`, `seed`, `reset`, `port-forward`, `psql`
-
-**When to use:** You need to set up, migrate, seed, reset, or connect to a database. The `--env` flag specifies which environment's database you're targeting.
-
-**Scenario:** You've added a new migration file. You run `database migrate my-db --env local` to apply it locally. To verify the seed data, you open a shell with `database psql my-db --env local`. Before a demo, you reset everything clean with `database reset my-db --env local`. To debug a staging issue, you port-forward the staging database: `database port-forward my-db --env staging`.
-
-#### Sub-help: no action provided
-
-When invoked as `/sdd-run database` without an action, display:
-
-```
-/sdd-run database — Manage PostgreSQL databases
-
-USAGE:
-  /sdd-run database <action> <component> [--env <env>] [options]
-
-ACTIONS:
-  setup         Deploy PostgreSQL to local k8s cluster
-  teardown      Remove PostgreSQL deployment from k8s          🔴 destructive
-  migrate       Run all pending database migrations
-  seed          Seed database with initial data                🟡 caution
-  reset         Full reset (teardown + setup + migrate + seed) 🔴 destructive
-  port-forward  Forward database port to localhost:5432
-  psql          Open interactive PostgreSQL shell
-
-REQUIRED:
-  <component>   Name of the database component (e.g., my-db)
-
-OPTIONS:
-  --env <env>   Target environment (default: local)
-
-EXAMPLES:
-  /sdd-run database setup my-db
-  /sdd-run database migrate my-db --env local
-  /sdd-run database psql my-db
-  /sdd-run database reset my-db --env staging
-```
-
-#### Sub-help: action provided but component missing
-
-When invoked as `/sdd-run database <action>` without a component name, display:
-
-```
-⚠ Missing required <component> argument.
-
-USAGE:
-  /sdd-run database <action> <component> [--env <env>]
-
-The <component> is the name of your database component as defined in
-sdd-settings.yaml (e.g., my-db, users-db, analytics-db).
-
-EXAMPLE:
-  /sdd-run database <action> my-db --env local
-```
-
-(Replace `<action>` with the actual action the user typed.)
-
----
-
-### `contract` — Validate OpenAPI specifications
-
-Pass-through to system CLI:
-
-```bash
-<plugin-root>/system/system-run.sh contract validate <component>
-```
-
-**Actions:** `validate`
-
-**When to use:** You've modified an API contract and want to verify it's valid before generating types or deploying.
-
-**Scenario:** You've added a new endpoint to your OpenAPI spec. You run `contract validate my-api` to check for schema errors, missing references, or invalid patterns before the types get generated.
-
-#### Sub-help: no action provided
-
-When invoked as `/sdd-run contract` without an action, display:
-
-```
-/sdd-run contract — Validate OpenAPI specifications
-
-USAGE:
-  /sdd-run contract <action> <component> [options]
-
-ACTIONS:
-  validate      Validate OpenAPI spec using Spectral linter
-
-REQUIRED:
-  <component>   Name of the contract component (e.g., my-api)
-
-OPTIONS:
-  --spec <path>   Override spec file path (default: components/<component>/openapi.yaml)
-
-EXAMPLES:
-  /sdd-run contract validate my-api
-  /sdd-run contract validate my-api --spec ./api.yml
-```
-
-#### Sub-help: action provided but component missing
-
-When invoked as `/sdd-run contract validate` without a component name, display:
-
-```
-⚠ Missing required <component> argument.
-
-USAGE:
-  /sdd-run contract validate <component> [--spec <path>]
-
-The <component> is the name of your contract component as defined in
-sdd-settings.yaml (e.g., my-api, internal-api).
-
-EXAMPLE:
-  /sdd-run contract validate my-api
-```
-
----
-
-### `config` — Manage project configuration across environments
-
-Route to the config-orchestration skill:
-
-```yaml
-INVOKE config-orchestration skill with:
-  operation: <operation>
-  args: <remaining args>
-```
-
-**Operations:** `generate`, `validate`, `diff`, `add-env`
-
-**When to use:** You're working with environment-specific config — generating merged configs, validating them, comparing environments, or adding new environments.
-
-**Scenario:** You've added a new service and need config for it. You add a staging environment (`config add-env staging`), generate the merged config (`config generate --env staging`), then diff it against production to verify the differences are intentional (`config diff staging production`). Before deploying, you validate all environments (`config validate`).
+**Scenario:** You create a new directory for your project, open Claude Code, and run `/sdd-run init`. It detects the project name, verifies your environment (permissions), registers tech packs, verifies tech-pack-specific prerequisites, scaffolds the minimal config structure, and commits. On an existing project after a plugin upgrade, it detects the version mismatch, reconciles settings, and reports what changed.
 
 ---
 
@@ -320,7 +155,7 @@ INVOKE config-orchestration skill with:
 Pass-through to system CLI:
 
 ```bash
-<plugin-root>/system/system-run.sh permissions configure
+<plugin-root>/core/system/system-run.sh permissions configure
 ```
 
 **Actions:** `configure`
@@ -369,28 +204,45 @@ No arguments — displays version info.
 
 ---
 
+## Tech Pack Namespace Routing (Tier 3)
+
+When a namespace is not recognized as a core namespace, route it to the active tech pack's command router:
+
+```yaml
+INVOKE techpacks.routeCommand with:
+  command: <namespace>
+  args: [<action>, <remaining args>]
+```
+
+The tech pack command router handles:
+- Argument validation and sub-help display
+- Destructive action confirmation
+- Dispatching to the appropriate tech pack skill or system CLI
+
+To display available tech pack namespaces in the help output, read `commands.available` from the tech pack manifest via `techpacks.readManifest`.
+
+---
+
 ## Internal Namespaces
 
 The following namespaces are used internally by other skills and should not be invoked directly by users. They are NOT shown in the help output:
 
 - `scaffolding` - Used by init-orchestration for project setup
 - `spec` - Used for spec validation, indexing, and snapshots
-- `hook` - Hook handlers for internal use
-- `contract generate-types` - Invoked automatically during implementation plans
 - `settings` - Used internally by the `project-settings` skill
 - `workflow` - Workflow state management
 - `archive` - Archive storage management
 
 ## Execution
 
-For pass-through namespaces (database, contract, permissions), execute:
+For core pass-through namespaces (permissions), execute:
 
 ```bash
-<plugin-root>/system/system-run.sh <namespace> <action> [args] [options]
+<plugin-root>/core/system/system-run.sh <namespace> <action> [args] [options]
 ```
 
 Where `<plugin-root>` is the plugin's absolute path, resolved by the agent from its Claude Code plugin context.
 
-For orchestrated namespaces (change, init, config, version, local-env), INVOKE the corresponding orchestrator skill which may internally call `system-run.sh`.
+For core orchestrated namespaces (change, init, version), INVOKE the corresponding orchestrator skill which may internally call `core/system/system-run.sh`.
 
-**Note:** The system CLI uses `env` as the namespace name; the `local-env` orchestrator maps `local-env` (user-facing) → `env` (system CLI).
+For tech pack namespaces, route via `techpacks.routeCommand` — the tech pack handles its own system CLI dispatch.

@@ -53,9 +53,9 @@ Read project context and suggest the most relevant next action.
 1. **Git branch** — `git branch --show-current`
    - Feature branch → active workflow, focus on that change
    - Main branch → show overview
-2. **Workflow state** — `.sdd/workflows/` directory
+2. **Workflow state** — `sdd/workflows/` directory
    - Active changes and their current phases
-3. **Project initialization state** — does `.sdd/sdd-settings.yaml` exist?
+3. **Project initialization state** — does `sdd/sdd-settings.yaml` exist?
 4. **Component settings** — what's configured in `sdd-settings.yaml`
 
 ### Multi-Workflow Handling
@@ -117,7 +117,7 @@ Interpret the natural language request and map it to a `/sdd-run` command.
 3. Explain what you understood and the command you would run
 4. Wait for confirmation before executing
 
-### Common Mappings
+### Common Mappings (Core)
 
 | User Says | Interpreted As |
 |-----------|---------------|
@@ -132,16 +132,22 @@ Interpret the natural language request and map it to a `/sdd-run` command.
 | "I want to answer an open question" | `/sdd-run change answer <change-id> ...` |
 | "I want to go back to the spec phase" | `/sdd-run change regress <change-id> --to spec` |
 | "I want to initialize a new project" | `/sdd-run init` |
-| "I want to generate config for local" | `/sdd-run config generate --env local` |
-| "I want to validate my config" | `/sdd-run config validate` |
-| "I want to compare local and production config" | `/sdd-run config diff local production` |
 | "What version am I running?" | `/sdd-run version` |
-| "I want to create a local environment" | `/sdd-run local-env create` |
-| "I want to deploy to my local environment" | `/sdd-run local-env deploy` |
 | "I want to configure permissions" | `/sdd-run permissions configure` |
-| "I want to set up my database" | `/sdd-run database setup <name> --env local` |
 | "I want to continue" | `/sdd-run change continue <change-id>` |
 | "I want to request changes" | `/sdd-run change request-changes <change-id>` |
+
+### Tech Pack Mappings
+
+Additional intent mappings are provided by active tech packs. Load them via:
+
+```yaml
+INVOKE techpacks.loadSkill with:
+  namespace: <tech-pack-namespace>
+  skill: "capabilities"
+```
+
+The capabilities skill returns tech-pack-specific intent→command mappings (e.g., database setup, config generation, local environment management).
 
 When the user's intent is ambiguous, ask for clarification before suggesting a command.
 

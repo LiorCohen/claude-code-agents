@@ -61,20 +61,16 @@ Have a product spec, PRD, or requirements doc? SDD can import it, break it into 
 
     Try: /sdd I want to import an external spec
 
-**Manage project configuration:**
-SDD handles environment-specific configuration — local, staging, production. Generate merged configs, validate them, compare environments.
+**Tech-pack-specific capabilities:**
+Active tech packs extend SDD with additional commands for infrastructure, configuration, databases, and more. To discover what's available:
 
-    Try: /sdd I want to generate config for local
+```yaml
+INVOKE techpacks.loadSkill with:
+  namespace: <tech-pack-namespace>
+  skill: "help-content"
+```
 
-**Set up local development environments:**
-Need a local Kubernetes cluster with your full application stack? SDD scaffolds clusters, deploys databases, runs migrations, and sets up port forwarding.
-
-    Try: /sdd I want to create a local environment
-
-**Manage databases:**
-Set up, migrate, seed, reset, and connect to PostgreSQL databases across environments.
-
-    Try: /sdd I want to set up my database
+The tech pack's help content describes its specific commands and capabilities.
 
 ---
 
@@ -102,14 +98,14 @@ Plans are generated automatically from the spec. You review and approve them bef
 
 ### Workflows
 
-A **workflow** tracks the state of one or more related changes. It persists to disk (`.sdd/workflows/`) so you can resume at any point — even in a new session. Workflows support:
+A **workflow** tracks the state of one or more related changes. It persists to disk (`sdd/workflows/`) so you can resume at any point — even in a new session. Workflows support:
 - Multiple changes with dependencies between them
 - Phase gating (can't implement until plan is approved)
 - Regression (go back to an earlier phase if needed)
 
 ### Component Settings
 
-SDD projects are organized into **components** — servers, frontends, databases, contracts, helm charts. Each component has **settings** that control scaffolding, configuration, and deployment. Settings live in `.sdd/sdd-settings.yaml`.
+SDD projects are organized into **components** whose types are defined by the active tech pack. Each component has **settings** that control scaffolding, configuration, and deployment. Settings live in `sdd/sdd-settings.yaml`.
 
 ### Changes
 
@@ -224,4 +220,4 @@ A: Use regression. Tell `/sdd` you want to go back to the spec phase, update the
 A: Yes. Run `/sdd I want to initialize a new project` in your existing directory. SDD detects what's already there and only adds what's missing.
 
 **Q: What languages/frameworks does SDD support?**
-A: SDD currently scaffolds Node.js/TypeScript backends, React/TypeScript frontends, PostgreSQL databases, OpenAPI contracts, and Helm charts. The spec-driven methodology works with any stack — only the scaffolding is opinionated.
+A: The SDD methodology is stack-agnostic. Tech packs provide stack-specific scaffolding, agents, and standards. The active tech pack determines which component types, languages, and frameworks are available.
