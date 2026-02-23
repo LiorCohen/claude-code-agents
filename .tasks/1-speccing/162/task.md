@@ -59,6 +59,7 @@ Splitting into separate repos enables:
   - `.tasks/` with full task history
   - `.critic/` learned feedback
   - `changelog/` detailed history (v1.md–v7.md) from `LiorCohen/sdd`
+  - `tests/` from current repo
   - Multi-repo management skill for commits, changelogs, and worktrees across repos
 - Workspace `repos/` directory is gitignored — each public repo is cloned there independently
 - Each repo handles its own build independently (no workspace-level npm workspaces)
@@ -67,12 +68,11 @@ Splitting into separate repos enables:
 - `sdd-core` gets `plugin.json` + `marketplace.json` manifests at version 0.1.0
 - Path adjustments: current `plugin/core/*` flattens to `plugin/*` in sdd-core
 - `.claude/` dev skills live ONLY in workspace, not in any public repo
+- Each repo gets its own `.github/` with GitHub Actions CI/CD
 
 ### Out of scope
 
 - Removing or deprecating `LiorCohen/sdd` — stays as-is
-- CI/CD pipelines for the new repos (future task)
-- Tests in the new repos (future task — each repo will eventually have its own tests)
 - Updating `LiorCohen/sdd` to reference the new repos
 - Creating additional techpacks for other stacks
 
@@ -103,7 +103,7 @@ Splitting into separate repos enables:
 | **sdd-engine/sdd-fullstack-typescript-techpack** | New public repo: `plugin/fullstack-typescript/` under `techpack/`, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md, `package.json` for system workspace |
 | **sdd-engine/sdd-vscode-extension** | New public repo: `vscode-extension/` contents, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE, CHANGELOG.md |
 | **sdd-engine/docs** | New public repo: `docs/` contents, plus README.md, CLAUDE.md, CONTRIBUTING.md, LICENSE |
-| **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), CLAUDE.md, multi-repo management skill, `repos/` gitignored |
+| **sdd-engine/workspace** | New private repo: `.claude/` skills, `.tasks/` (full history), `.critic/`, `changelog/` (v1–v7 detailed history), `tests/`, CLAUDE.md, multi-repo management skill, `repos/` gitignored |
 | `tech-pack/install.ts` (in sdd-core) | Add `--repo` flag for git clone to `sdd/.techpacks/<namespace>/`; add no-args mode to reinstall all from settings |
 | `techpacks/SKILL.md` (in sdd-core) | Update techpacks gateway to document external techpack discovery in `sdd/.techpacks/` |
 | `plugin.json` (in sdd-core) | Version 0.1.0, commands/skills paths adjusted (no `core/` prefix) |
