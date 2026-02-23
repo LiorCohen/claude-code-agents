@@ -198,28 +198,28 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
   ];
 
   // -- Project template files --
-  // Use absolute paths for core templates so they resolve correctly
-  // regardless of which skills_dir (core or tech pack) is set as base_dir
-  const coreSkillsDir = getSkillsDir();
+  // Project templates live in the tech pack (one level above skills_dir)
+  const techPackTemplatesDir = path.resolve(config.skills_dir, '..', 'templates');
   const projectTemplateOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'template_file',
-      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/README.md'),
+      source: path.join(techPackTemplatesDir, 'project/README.md'),
       dest: 'README.md',
     },
     {
       type: 'template_file',
-      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/CLAUDE.md'),
+      source: path.join(techPackTemplatesDir, 'project/CLAUDE.md'),
       dest: 'CLAUDE.md',
     },
     {
       type: 'template_file',
-      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/package.json'),
+      source: path.join(techPackTemplatesDir, 'project/package.json'),
       dest: 'package.json',
     },
   ];
 
-  // -- Spec files --
+  // -- Spec files (core methodology templates) --
+  const coreSkillsDir = getSkillsDir();
   const specFileOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'template_file',

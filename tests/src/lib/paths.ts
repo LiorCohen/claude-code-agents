@@ -15,4 +15,5 @@ export const REPO_ROOT = path.resolve(TESTS_ROOT_DIR, '..');
 export const PLUGIN_DIR = path.join(REPO_ROOT, 'plugin');
 export const CORE_SKILLS_DIR = path.join(PLUGIN_DIR, 'core', 'skills');
 export const TECH_SKILLS_DIR = path.join(PLUGIN_DIR, 'fullstack-typescript', 'skills');
+export const TECH_PACK_DIR = path.join(PLUGIN_DIR, 'fullstack-typescript');
 export const TEST_OUTPUT_DIR = process.env['TEST_OUTPUT_DIR'] ?? '/tmp/sdd-tests';

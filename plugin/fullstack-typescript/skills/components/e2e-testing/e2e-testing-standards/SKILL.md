@@ -1,5 +1,5 @@
 ---
-name: e2e-testing
+name: e2e-testing-standards
 description: End-to-end testing with Playwright - browser automation, visual regression, test data management.
 user-invocable: false
 ---

@@ -12,6 +12,7 @@ export {
   PLUGIN_DIR,
   CORE_SKILLS_DIR,
   TECH_SKILLS_DIR,
+  TECH_PACK_DIR,
   TEST_OUTPUT_DIR,
 } from './paths';
 

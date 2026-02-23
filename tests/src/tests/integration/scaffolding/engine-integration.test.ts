@@ -11,6 +11,7 @@ import {
   PLUGIN_DIR,
   CORE_SKILLS_DIR,
   TECH_SKILLS_DIR,
+  TECH_PACK_DIR,
   joinPath,
   fileExists,
   isDirectory,
@@ -194,12 +195,12 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: CORE_SKILLS_DIR,
+        base_dir: TECH_PACK_DIR,
         variables: { PROJECT_NAME: 'my-app' },
         operations: [
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/package.json',
+            source: 'templates/project/package.json',
             dest: 'package.json',
           },
         ],
@@ -517,7 +518,7 @@ describe('Scaffolding Apply CLI', () => {
       specPath,
       JSON.stringify({
         target_dir: targetDir,
-        base_dir: CORE_SKILLS_DIR,
+        base_dir: TECH_PACK_DIR,
         variables: {
           PROJECT_NAME: 'my-app',
           PROJECT_DESCRIPTION: 'My application',
@@ -526,12 +527,12 @@ describe('Scaffolding Apply CLI', () => {
         operations: [
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/package.json',
+            source: 'templates/project/package.json',
             dest: 'package.json',
           },
           {
             type: 'template_file',
-            source: 'project-scaffolding/templates/project/README.md',
+            source: 'templates/project/README.md',
             dest: 'README.md',
           },
           {
