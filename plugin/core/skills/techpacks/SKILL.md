@@ -34,16 +34,16 @@ Read the `components` section to find the agent assigned to the "server" compone
 
 ```
 Invoke techpacks.routeSkills with:
-  namespace: fs-ts
+  namespace: <active-namespace>
   phase: plan-generation
   component_type: server
 ```
 
 ```
 Invoke techpacks.loadAgent with:
-  namespace: fs-ts
-  agentRef: { name: "backend-dev", path: "agents/backend-dev.md" }
-  skills: ["backend-standards", "typescript-standards"]
+  namespace: <active-namespace>
+  agentRef: { name: "my-agent", path: "agents/my-agent.md" }
+  skills: ["coding-standards", "testing-standards"]
 ```
 
 ## Active Tech Packs
@@ -52,12 +52,12 @@ Read `sdd/sdd-settings.yaml` (or `.sdd/sdd-settings.yaml`) to find active tech p
 
 ```yaml
 tech_packs:
-  fs-ts:
-    name: fullstack-typescript
-    namespace: fs-ts
+  <namespace>:
+    name: <tech-pack-name>
+    namespace: <namespace>
     version: "1.0.0"
     mode: internal
-    path: fullstack-typescript
+    path: <tech-pack-directory>
 ```
 
 For internal tech packs, resolve `path` relative to the plugin root directory.

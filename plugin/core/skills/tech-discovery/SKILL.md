@@ -36,58 +36,36 @@ Schema: [`schemas/input.schema.json`](./schemas/input.schema.json)
 
 Accepts change name, type, existing components, and optionally classified requirements from external spec processing.
 
-## Discovery Questions
+## Discovery Framework
 
-### Core Discovery Questions (determine if component needed)
+### Step 1: Load Tech Pack Discovery Knowledge
 
-| Question | If Yes → Component |
-|----------|-------------------|
-| Does data need to be persisted? | **database** |
-| Are there user actions that modify data? | **server** |
-| Do external clients need to call this system? | **contract** |
-| Is there a user interface? | **webapp** |
-| Does this need to be deployed to Kubernetes? | **helm** |
+Before asking discovery questions, load the tech-specific discovery knowledge:
 
-### Component-Specific Discovery Questions
+```
+Invoke techpacks.routeSkills with:
+  namespace: <active-namespace>
+  phase: component-discovery
+```
 
-Once a component type is identified, ask deeper questions:
+This loads component types, descriptions, discovery question sets, and settings schemas from the active tech pack.
 
-#### Backend (server + database) - HIGH PRIORITY
+### Step 2: Core Discovery Questions
 
-External specs typically lack backend details. These must be DERIVED from UI descriptions + explicit questions.
+The tech pack's discovery skill provides the mapping from requirements to component types. Use the loaded question sets to:
 
-**YAGNI Principle**: Only derive operations explicitly shown in UI. Do NOT assume full CRUD.
+1. Ask high-level questions to identify which component types are needed
+2. For each identified type, ask component-specific follow-up questions
+3. Determine component settings based on answers
 
-| Category | Discovery Question | Derivation Hint |
-|----------|-------------------|-----------------|
-| **Entities** | What pieces of data need to be stored? | Look at what's DISPLAYED in UI |
-| **Relationships** | What are the relationships between data? | Look at lists, dropdowns, links |
-| **User Actions** | What user actions modify data? | Look at buttons, forms, CTAs |
-| **Action Effects** | How does each action affect data? | Only operations visible in UI |
-| **Business Rules** | What validation/constraints apply? | Often missing - verify or ask |
-| **Authorization** | Who can perform each action? | Often missing - verify or ask |
+**General discovery approach:**
+- What data needs to be persisted?
+- What user-facing interfaces are needed?
+- What external integrations are required?
+- What background processing is needed?
+- What deployment requirements exist?
 
-#### API Contract - TYPICALLY DERIVED
-
-Derive from UI + ask clarifying questions:
-
-| Category | Discovery Question |
-|----------|-------------------|
-| **Endpoints** | What operations are needed? (Only UI-visible actions) |
-| **Consumers** | Who calls this API? (webapp, mobile, external) |
-| **Error Cases** | What can go wrong? |
-
-#### Frontend (webapp) - TYPICALLY WELL-SPECIFIED
-
-External specs usually have good detail here. Extract rather than ask:
-
-| Category | Discovery Question | Where to Find |
-|----------|-------------------|---------------|
-| **Pages/Views** | What screens does the user see? | Mockups |
-| **Forms** | What data does the user input? | Form mockups |
-| **States** | Loading, empty, error states? | May be missing |
-
-### Visual Assets Prompt
+### Step 3: Visual Assets Prompt
 
 When UI/UX is involved and spec doesn't include visual assets:
 
@@ -110,7 +88,7 @@ Schema: [`schemas/output.schema.json`](./schemas/output.schema.json)
 
 Returns a list of components with names, types, and settings.
 
-Component settings from this output (server_type, databases, provides_contracts, etc.) flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
+Component settings from this output flow into the SPEC.md `## Components` section's Settings column, where they inform the scaffolding phase during implementation.
 
 ## Skills
 
@@ -125,8 +103,6 @@ Invoke `techpacks.listComponents` for the active tech pack namespace to get the 
 
 ### Step 1: Analyze Requirements
 
-Map discovered information to technical needs:
-
 Map discovered information to component types from the tech pack. Use `techpacks.routeSkills(phase: component-discovery)` to load the tech-specific discovery knowledge that maps requirements to component types and settings.
 
 ### Step 2: Present Recommendation with Settings
@@ -135,17 +111,11 @@ Map discovered information to component types from the tech pack. Use `techpacks
 Based on what you've described, I recommend:
 
 **Components:**
-- **Backend API Server** - to handle <workflows>
-  - Provides: task-api contract
-  - Uses: task-db database
-  - Mode: API server with HTTP ingress
+- **[Component Name]** - to handle <purpose>
+  - Settings: <key settings from discovery>
 
-- **Web Frontend** - for <user types>
-  - Consumes: task-api contract
-  - Deployment: Bundled assets with ingress
-
-- **Database** - to persist <entities>
-  - PostgreSQL (shared in local dev)
+- **[Component Name]** - for <purpose>
+  - Settings: <key settings from discovery>
 
 [Additional components with justification]
 
@@ -154,149 +124,21 @@ Does this match what you had in mind?
 
 ### Step 3: Handle Adjustments
 
-If user wants changes, update both components and settings:
-
-1. **Adding database to server**: Add to `databases` array
-2. **Adding contract**: Ask if provides or consumes
-3. **Enabling background processing**: Change `server_type` to `hybrid`, add `worker` to `modes`
-4. **Disabling ingress**: Set `ingress: false` on helm chart
+If the user wants changes, update both components and settings based on the tech pack's component type definitions and cross-reference rules.
 
 ### Step 4: Multiple Component Instances
 
-**For Server (if multiple processing needs):**
+Some component types support multiple instances. When the requirements suggest multiple instances of the same type (e.g., separate services for different domains), ask the user whether to consolidate or split.
 
-```text
-Should the backend be a single service or multiple?
-- Single API server
-- API + Worker (hybrid mode in one deployment)
-- Separate API and Worker servers (independent scaling)
-```
-
-If hybrid: One server with `server_type: hybrid`, `modes: [api, worker]`
-If separate: Two servers, potentially two helm charts with different `deploy_modes`
-
-**For Helm (multiple deployment configurations):**
-
-A single server can have multiple helm charts:
-- `main-server-api` with `deploy_modes: [api]` and `ingress: true`
-- `main-server-worker` with `deploy_modes: [worker]` and `ingress: false`
-
-This allows independent scaling of API and worker processes.
+The tech pack's discovery knowledge provides guidance on when to split vs consolidate for each component type.
 
 ### Step 5: Settings Validation
 
-Before returning, validate discovered configuration against the `project-settings` skill's cross-reference rules: databases referenced by servers must exist as database components, contracts must exist as contract components, helm `deploy_modes` must be valid for the server's `server_type`, and `deploys` must reference an existing server or webapp.
+Before returning, validate discovered configuration against the tech pack's cross-reference rules. Invoke `techpacks.routeSkills(phase: component-discovery)` to get the validation rules.
 
 ### Step 6: Return Configuration
 
 Return the final configuration with all settings.
-
-## Examples
-
-### Example 1: Standard Full-Stack
-
-```yaml
-components:
-  - name: config
-    type: config
-    settings: {}
-  - name: public-api
-    type: contract
-    settings:
-      visibility: internal
-  - name: app-db
-    type: database
-    settings:
-      provider: postgresql
-      dedicated: false
-  - name: main-server
-    type: server
-    settings:
-      server_type: api
-      databases: [app-db]
-      provides_contracts: [public-api]
-      consumes_contracts: []
-      helm: true
-  - name: web-app
-    type: webapp
-    settings:
-      contracts: [public-api]
-      helm: true
-  - name: main-server-api
-    type: helm
-    settings:
-      deploys: main-server
-      deploy_type: server
-      deploy_modes: [api]
-      ingress: true
-  - name: web-app-chart
-    type: helm
-    settings:
-      deploys: web-app
-      deploy_type: webapp
-      ingress: true
-      assets: bundled
-```
-
-### Example 2: Microservices with Hybrid Server
-
-```yaml
-components:
-  - name: config
-    type: config
-    settings: {}
-  - name: orders-api
-    type: contract
-    settings:
-      visibility: internal
-  - name: notifications-api
-    type: contract
-    settings:
-      visibility: internal
-  - name: orders-db
-    type: database
-    settings:
-      provider: postgresql
-      dedicated: false
-  - name: order-service
-    type: server
-    settings:
-      server_type: hybrid
-      modes: [api, worker]
-      databases: [orders-db]
-      provides_contracts: [orders-api]
-      consumes_contracts: [notifications-api]
-      helm: true
-  - name: notification-service
-    type: server
-    settings:
-      server_type: worker
-      databases: []
-      provides_contracts: [notifications-api]
-      consumes_contracts: []
-      helm: true
-  # Separate helm charts for independent scaling
-  - name: order-service-api
-    type: helm
-    settings:
-      deploys: order-service
-      deploy_type: server
-      deploy_modes: [api]
-      ingress: true
-  - name: order-service-worker
-    type: helm
-    settings:
-      deploys: order-service
-      deploy_type: server
-      deploy_modes: [worker]
-      ingress: false
-  - name: notification-service-chart
-    type: helm
-    settings:
-      deploys: notification-service
-      deploy_type: server
-      ingress: false
-```
 
 ## Notes
 
@@ -328,6 +170,5 @@ Components are actually created during **implementation phase**:
 - This skill is conversational and handles user interaction for adjustments
 - Component list is stored in context.md. During spec solicitation, the `spec-solicitation` skill populates the Components section of SPEC.md using discovered components and solicited technical details
 - Always validate settings dependencies before accepting the final configuration
-- **Config is MANDATORY**: Always include `{type: config, name: config, settings: {}}` first
 - Settings drive what gets scaffolded - they are not just metadata
 - For external specs, run ONCE before decomposition (not per-item)

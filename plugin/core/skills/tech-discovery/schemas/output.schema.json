@@ -16,15 +16,7 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "server",
-              "webapp",
-              "database",
-              "contract",
-              "helm",
-              "config"
-            ],
-            "description": "Component type classification"
+            "description": "Component type as defined by the active tech pack"
           },
           "settings": {
             "type": "object",

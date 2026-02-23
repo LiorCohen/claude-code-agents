@@ -54,11 +54,9 @@ Validating specs traceability...
 # Unit tests
 npm test --workspaces
 
-# Integration tests
-testkube run testsuite integration-tests --watch
+# Integration tests (runner determined by tech pack)
 
-# E2E tests
-testkube run testsuite e2e-tests --watch
+# E2E tests (runner determined by tech pack)
 ```
 
 #### Step 5: Verify Implementation Against Standards
@@ -66,7 +64,7 @@ testkube run testsuite e2e-tests --watch
 For each component type affected by the change, verify the implementation follows the corresponding standards. Load standards via the tech pack:
 
 1. Invoke `techpacks.routeSkills(phase: verification, component_type: <type>)` for each affected component type — this loads the relevant standards into context
-2. Read `lifecycle.verification.agent` from the manifest to determine the reviewer agent
+2. Read `lifecycle.verification.agent` from the manifest to determine the verification agent
 3. Review the implementation against the loaded standards
 4. Flag any violations in the verification report
 

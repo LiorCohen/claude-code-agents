@@ -1,8 +1,9 @@
 /**
  * Project scaffolding command.
  *
- * Creates project structure from templates with variable substitution.
- * Builds a scaffold spec and delegates to the generic engine.
+ * Creates generic project structure from templates with variable substitution.
+ * Builds a scaffold spec for core methodology files and delegates to the engine.
+ * Component-type-specific scaffolding is handled by the tech pack's system.
  *
  * Usage:
  *   sdd-system scaffolding project --config config.json
@@ -18,112 +19,15 @@ import { executeSpec } from './engine';
 import type { ScaffoldSpec, ScaffoldOperation } from './engine';
 
 /**
- * Pluralize a component type for directory naming.
- * e.g., "contract" -> "contracts", "database" -> "databases"
- */
-const pluralizeType = (type: string): string => {
-  const custom: Readonly<Record<string, string>> = {
-    helm: 'helm_charts',
-    testing: 'testing',
-  };
-  return custom[type] ?? `${type}s`;
-};
-
-/**
- * Derive the directory path for a component.
- * Format: <type>s/<name> (e.g., "contracts/public-api", "servers/main")
- */
-const componentDirName = (component: ComponentEntry): string =>
-  `${pluralizeType(component.type)}/${component.name}`;
-
-/**
- * Get all components of a specific type.
- */
-const getComponentsByType = (
-  components: readonly ComponentEntry[],
-  componentType: string
-): readonly ComponentEntry[] => components.filter((c) => c.type === componentType);
-
-/**
- * Generate per-component npm scripts.
- */
-const generateComponentScripts = (
-  components: readonly ComponentEntry[],
-  projectName: string
-): Readonly<Record<string, string>> =>
-  components.reduce<Readonly<Record<string, string>>>((scripts, component) => {
-    const workspace = `-w @${projectName}/${component.name}`;
-
-    switch (component.type) {
-      case 'contract':
-        return {
-          ...scripts,
-          [`${component.name}:generate`]: `npm run generate:types ${workspace}`,
-          [`${component.name}:validate`]: `npm run validate ${workspace}`,
-        };
-
-      case 'server':
-        return {
-          ...scripts,
-          [`${component.name}:dev`]: `npm run dev ${workspace}`,
-          [`${component.name}:build`]: `npm run build ${workspace}`,
-          [`${component.name}:start`]: `npm run start ${workspace}`,
-          [`${component.name}:test`]: `npm run test ${workspace}`,
-        };
-
-      case 'webapp':
-        return {
-          ...scripts,
-          [`${component.name}:dev`]: `npm run dev ${workspace}`,
-          [`${component.name}:build`]: `npm run build ${workspace}`,
-          [`${component.name}:preview`]: `npm run preview ${workspace}`,
-          [`${component.name}:test`]: `npm run test ${workspace}`,
-        };
-
-      case 'database':
-        return {
-          ...scripts,
-          [`${component.name}:setup`]: `npm run setup ${workspace}`,
-          [`${component.name}:teardown`]: `npm run teardown ${workspace}`,
-          [`${component.name}:migrate`]: `npm run migrate ${workspace}`,
-          [`${component.name}:seed`]: `npm run seed ${workspace}`,
-          [`${component.name}:reset`]: `npm run reset ${workspace}`,
-          [`${component.name}:port-forward`]: `npm run port-forward ${workspace}`,
-          [`${component.name}:psql`]: `npm run psql ${workspace}`,
-        };
-
-      case 'helm':
-        return {
-          ...scripts,
-          [`${component.name}:lint`]: `helm lint components/${componentDirName(component)}`,
-        };
-
-      default:
-        return scripts;
-    }
-  }, {});
-
-/**
  * Build the architecture overview content.
+ * Lists components generically — type descriptions come from the tech pack.
  */
 const buildArchitectureContent = (
   config: ScaffoldingConfig
 ): string => {
-  const typeDescriptions: Readonly<Record<string, string>> = {
-    contract: 'OpenAPI specifications and type generation',
-    server: 'Node.js/TypeScript backend with CMDO architecture',
-    webapp: 'React/TypeScript frontend with MVVM pattern',
-    database: 'PostgreSQL migrations, seeds, and management scripts',
-    helm: 'Kubernetes deployment charts',
-    testing: 'Testkube test definitions',
-    cicd: 'CI/CD workflow definitions',
-  };
-
   const componentLines = config.components.map((component) => {
-    const dirName = componentDirName(component);
     const displayName = component.name.charAt(0).toUpperCase() + component.name.slice(1);
-    const description = typeDescriptions[component.type] ?? component.type;
-    return `- **${displayName}** (\`components/${dirName}/\`): ${description}`;
+    return `- **${displayName}** (type: \`${component.type}\`)`;
   });
 
   return `# Architecture Overview
@@ -132,57 +36,24 @@ This document describes the architecture of ${config.project_name}.
 
 ## Components
 
-- **Config** (\`components/config/\`): YAML-based configuration management
 ${componentLines.join('\n')}
 `;
 };
 
 /**
- * Build CI/CD workflow content.
- */
-const CI_WORKFLOW_CONTENT = `name: CI
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install --workspaces
-
-      - name: Type check
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm run test
-
-      - name: Build
-        run: npm run build
-`;
-
-/**
  * Build a scaffold spec from the existing project config.
+ *
+ * Core handles generic project structure only:
+ * - Root files (.gitignore, .claudeignore)
+ * - Project templates (from tech pack's templates/project/)
+ * - Spec methodology files (SNAPSHOT.md, glossary.md, INDEX.md)
+ * - Directory skeleton (specs/, changes/, sdd/archive/)
+ * - Architecture overview (generic component listing)
+ *
+ * Component-specific operations (directories, templates, scripts)
+ * are handled by the tech pack via separate scaffolding commands.
  */
 const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
-  const components = config.components;
-
   // -- Root files --
   const rootFileOps: ReadonlyArray<ScaffoldOperation> = [
     {
@@ -254,7 +125,7 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     gitkeep: true,
   }));
 
-  // -- Architecture overview (computed content) --
+  // -- Architecture overview (generic component listing) --
   const architectureOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'write_file',
@@ -263,130 +134,12 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     },
   ];
 
-  // -- Config component (mandatory singleton) --
-  const configOps: ReadonlyArray<ScaffoldOperation> = [
-    {
-      type: 'template_dir',
-      source: 'components/config/config-scaffolding/templates',
-      dest: 'components/config',
-    },
-  ];
-
-  // -- Contract components --
-  const contractComponents = getComponentsByType(components, 'contract');
-  const contractOps: ReadonlyArray<ScaffoldOperation> = contractComponents.flatMap((contract) => {
-    const dirName = componentDirName(contract);
-    return [
-      {
-        type: 'template_dir' as const,
-        source: 'components/contract/contract-scaffolding/templates',
-        dest: `components/${dirName}`,
-      },
-      {
-        type: 'write_file' as const,
-        path: `components/${dirName}/.gitignore`,
-        content: 'node_modules/\ngenerated/\n',
-      },
-    ];
-  });
-
-  // -- Server components --
-  const serverComponents = getComponentsByType(components, 'server');
-  const serverOps: ReadonlyArray<ScaffoldOperation> = serverComponents.map((server) => {
-    const dirName = componentDirName(server);
-    return {
-      type: 'template_dir' as const,
-      source: 'components/backend/backend-scaffolding/templates',
-      dest: `components/${dirName}`,
-    };
-  });
-
-  // -- Webapp components --
-  const webappComponents = getComponentsByType(components, 'webapp');
-  const webappOps: ReadonlyArray<ScaffoldOperation> = webappComponents.map((webapp) => {
-    const dirName = componentDirName(webapp);
-    return {
-      type: 'template_dir' as const,
-      source: 'components/frontend/frontend-scaffolding/templates',
-      dest: `components/${dirName}`,
-    };
-  });
-
-  // -- Database components --
-  const databaseComponents = getComponentsByType(components, 'database');
-  const databaseOps: ReadonlyArray<ScaffoldOperation> = databaseComponents.flatMap((database) => {
-    const dirName = componentDirName(database);
-    return [
-      {
-        type: 'template_dir' as const,
-        source: 'components/database/database-scaffolding/templates',
-        dest: `components/${dirName}`,
-      },
-      { type: 'mkdir' as const, path: `components/${dirName}/migrations` },
-      { type: 'mkdir' as const, path: `components/${dirName}/seeds` },
-      { type: 'mkdir' as const, path: `components/${dirName}/scripts` },
-    ];
-  });
-
-  // -- Helm component directories --
-  const helmComponents = getComponentsByType(components, 'helm');
-  const helmOps: ReadonlyArray<ScaffoldOperation> = helmComponents.map((helm) => {
-    const dirName = componentDirName(helm);
-    return { type: 'mkdir' as const, path: `components/${dirName}` };
-  });
-
-  // -- Testing component directories --
-  const testingComponents = getComponentsByType(components, 'testing');
-  const testingOps: ReadonlyArray<ScaffoldOperation> = testingComponents.flatMap((testing) => {
-    const dirName = componentDirName(testing);
-    return [
-      { type: 'mkdir' as const, path: `components/${dirName}/tests/integration` },
-      { type: 'mkdir' as const, path: `components/${dirName}/tests/component` },
-      { type: 'mkdir' as const, path: `components/${dirName}/tests/e2e` },
-      { type: 'mkdir' as const, path: `components/${dirName}/testsuites` },
-    ];
-  });
-
-  // -- CI/CD components --
-  const cicdComponents = getComponentsByType(components, 'cicd');
-  const cicdOps: ReadonlyArray<ScaffoldOperation> = cicdComponents.flatMap((cicd) => {
-    const dirName = componentDirName(cicd);
-    return [
-      {
-        type: 'write_file' as const,
-        path: `components/${dirName}/ci.yaml`,
-        content: CI_WORKFLOW_CONTENT,
-      },
-      {
-        type: 'write_file' as const,
-        path: '.github/workflows/ci.yaml',
-        content: CI_WORKFLOW_CONTENT,
-      },
-    ];
-  });
-
-  // -- Component scripts (no meta-scripts) --
-  const scripts = generateComponentScripts(components, config.project_name);
-  const scriptOps: ReadonlyArray<ScaffoldOperation> =
-    Object.keys(scripts).length > 0
-      ? [{ type: 'package_json_scripts' as const, scripts }]
-      : [];
-
   const operations: ReadonlyArray<ScaffoldOperation> = [
     ...rootFileOps,
     ...projectTemplateOps,
     ...specFileOps,
     ...gitkeepOps,
     ...architectureOps,
-    ...configOps,
-    ...contractOps,
-    ...serverOps,
-    ...webappOps,
-    ...databaseOps,
-    ...helmOps,
-    ...testingOps,
-    ...cicdOps,
-    ...scriptOps,
   ];
 
   // Build variables with per-component contract package support

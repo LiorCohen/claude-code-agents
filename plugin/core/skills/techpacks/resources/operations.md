@@ -31,7 +31,7 @@ All operations start by reading the project's `sdd/sdd-settings.yaml` to find th
 
 **Returns:** Absolute file path string.
 
-**Example:** `resolvePath("fs-ts", "agents/backend-dev.md")` → `/path/to/plugin/fullstack-typescript/agents/backend-dev.md`
+**Example:** `resolvePath("my-pack", "agents/my-agent.md")` → `/path/to/plugin/my-pack/agents/my-agent.md`
 
 ## 3. loadSkill(namespace, skillPath)
 
@@ -136,4 +136,4 @@ All operations start by reading the project's `sdd/sdd-settings.yaml` to find th
 
 **Returns:** Array of component type names in dependency order (dependencies first).
 
-**Example:** `[config, contract, database, server, webapp, helm, integration-testing, e2e-testing, cicd]`
+**Example:** `[config, contract, database, server, webapp, deployment, integration-testing, e2e-testing, cicd]`

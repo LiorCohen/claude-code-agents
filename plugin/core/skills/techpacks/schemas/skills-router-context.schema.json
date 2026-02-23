@@ -21,7 +21,7 @@
     },
     "agent": {
       "type": "string",
-      "description": "Agent currently active (e.g., backend-dev)"
+      "description": "Agent currently active (e.g., my-agent)"
     }
   }
 }

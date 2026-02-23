@@ -201,8 +201,8 @@ Once comfortable with the basic flow:
 ### Advanced
 
 For power users:
-- **Component settings** — fine-tune scaffolding, databases, helm charts
-- **Local environments** — full k8s development stack on your machine
+- **Component settings** — fine-tune scaffolding and deployment options
+- **Local environments** — full development stack on your machine
 - **Direct operations** — power users discover explicit system commands naturally through `/sdd`'s cross-references
 - **Multi-change workflows** — decompose large specs into dependent changes
 

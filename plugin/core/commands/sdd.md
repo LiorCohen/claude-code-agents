@@ -159,7 +159,7 @@ When the change-id is needed but not provided, infer it from context:
 
 ### Settings Management
 
-When users describe settings changes in natural language (e.g., "I want to add a database to my server", "enable ingress on my helm chart"), delegate to the `project-settings` skill internally. Do NOT route these through `/sdd-run` — settings are managed by the skill directly.
+When users describe settings changes in natural language (e.g., "I want to add a database to my server", "enable monitoring for my deployment"), delegate to the `project-settings` skill internally. Do NOT route these through `/sdd-run` — settings are managed by the skill directly.
 
 ---
 

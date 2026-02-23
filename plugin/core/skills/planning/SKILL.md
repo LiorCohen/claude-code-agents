@@ -226,7 +226,7 @@ sdd_version: [X.Y.Z]
 
 <!-- INCLUDE Phase 1 ONLY if SPEC.md lists new components not in sdd-settings.yaml. OMIT entirely if all components already exist. -->
 ### Phase 1: Component Scaffolding (if new components)
-**Agent:** Read the agent assigned to the scaffolding-related component type from the manifest. For infrastructure components, use the agent from `components.helm.agent` or similar.
+**Agent:** Read the agent assigned to the scaffolding-related component type from the manifest via `techpacks.readManifest`. Use the `components.<type>.agent` field.
 **Standards:** Invoke `techpacks.routeSkills(phase: project-scaffolding)` to load scaffolding standards.
 
 **Outcome:** New component directories and boilerplate created, `sdd-settings.yaml` updated

@@ -6,7 +6,7 @@
  * to produce structured audit trails.
  *
  * Usage:
- *   sdd-system log write --level info --source techpacks.loadAgent --message "Loaded agent" [--data '{"agent":"backend-dev"}']
+ *   sdd-system log write --level info --source techpacks.loadAgent --message "Loaded agent" [--data '{"agent":"my-agent"}']
  */
 
 import type { CommandResult } from '@/lib/args';

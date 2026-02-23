@@ -49,14 +49,14 @@ mkdir -p sdd && mv sdd-settings.yaml sdd/ && git add -A && git commit -m "Migrat
 
 **Formal definition:** [`schemas/sdd-settings.schema.json`](./schemas/sdd-settings.schema.json) (JSON Schema Draft 2020-12)
 
-The schema defines three top-level sections: `sdd` (plugin metadata), `project` (project metadata), and `components` (list of typed components with discriminated settings). Component settings are typed per component type using `if/then` conditionals.
+The schema defines three top-level sections: `sdd` (plugin metadata), `project` (project metadata), and `components` (list of typed components with settings). Component types and their settings schemas are defined by the active tech pack.
 
 ### Example
 
 ```yaml
 sdd:
-  initialized_by_plugin_version: "6.2.1"
-  updated_by_plugin_version: "6.4.0"
+  initialized_by_plugin_version: "7.0.0"
+  updated_by_plugin_version: "7.1.0"
   initialized_at: "2026-02-07 00:00:00Z"
   updated_at: "2026-02-09 14:30:00Z"
 
@@ -74,41 +74,18 @@ components:
     type: server
     path: components/servers/main-server
     settings:
-      server_type: hybrid
-      modes: [api, worker]
-      databases: [primary-db]
-      provides_contracts: [public-api]
-      consumes_contracts: []
-      helm: true
-
-  - name: admin-dashboard
-    type: webapp
-    path: components/webapps/admin-dashboard
-    settings:
-      contracts: [public-api]
-      helm: true
-
-  - name: main-server-api
-    type: helm
-    path: components/helm_charts/main-server-api
-    settings:
-      deploys: main-server
-      deploy_type: server
-      deploy_modes: [api]
-      ingress: true
+      # Settings schema is defined by the tech pack
+      depends_on: [primary-db, public-api]
 
   - name: primary-db
     type: database
     path: components/databases/primary-db
-    settings:
-      provider: postgresql
-      dedicated: false
+    settings: {}
 
   - name: public-api
     type: contract
     path: components/contracts/public-api
-    settings:
-      visibility: internal
+    settings: {}
 ```
 
 ## Settings vs Config
@@ -117,79 +94,29 @@ components:
 |--------|----------|--------|
 | **What** | Structural capabilities | Runtime values |
 | **When set** | At component creation, changeable | Per-environment |
-| **Examples** | `databases`, `provides_contracts`, `server_type` | `port: 3000`, `replicas: 3` |
+| **Examples** | `depends_on`, component-type-specific fields | `port: 3000`, `replicas: 3` |
 | **Affects** | What gets scaffolded | Values in scaffolded files |
 | **Stored in** | `sdd/sdd-settings.yaml` | `components/config/envs/` |
 
-## Component Settings by Type
+## Component Settings
 
-### Server Settings
+Component types and their settings schemas are defined by the active tech pack. Core does not hardcode component type definitions.
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `server_type` | `api\|worker\|cron\|hybrid` | `api` | Communication pattern(s) |
-| `modes` | `(api\|worker\|cron)[]` | — | For hybrid: which modes (2+ required) |
-| `databases` | string[] | `[]` | Database components this server uses |
-| `provides_contracts` | string[] | `[]` | Contracts this server implements |
-| `consumes_contracts` | string[] | `[]` | Contracts this server calls |
-| `helm` | boolean | `true` | Whether to generate helm chart |
+To discover available component types and their settings schemas:
 
-**Impact:**
-- `server_type` → Operator lifecycle(s)
-- `databases` → DAL layer per database, config sections
-- `provides_contracts` → HTTP routes, Service in helm chart
-- `consumes_contracts` → API clients, config sections
-- `helm: false` → Skip helm chart scaffolding
+```
+Invoke techpacks.listComponents for the active tech pack namespace.
+```
 
-### Webapp Settings
+To load type-specific settings schemas during validation:
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `contracts` | string[] | `[]` | Contracts this webapp uses |
-| `helm` | boolean | `true` | Whether to generate helm chart |
+```
+Invoke techpacks.routeSkills with:
+  namespace: <active-namespace>
+  phase: implementation
+```
 
-**Impact:**
-- `contracts` → API clients, config sections
-
-### Helm Settings
-
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `deploys` | string | — | Component to deploy (required) |
-| `deploy_type` | `server\|webapp` | — | Type being deployed (required) |
-| `deploy_modes` | `(api\|worker\|cron)[]` | — | For servers: which modes |
-| `ingress` | boolean | `true` | External HTTP access |
-| `assets` | `bundled\|entrypoint` | `bundled` | For webapps: asset strategy |
-
-**Impact:**
-- `deploy_modes` → Separate deployments for multi-mode
-- `ingress` → ingress.yaml included/excluded
-- `assets` → Webapp build strategy
-
-### Database Settings
-
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `provider` | `postgresql` | `postgresql` | Database provider |
-| `dedicated` | boolean | `false` | Needs own DB server |
-
-### Contract Settings
-
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `visibility` | `public\|internal` | `internal` | External consumers allowed |
-
-### Config Settings
-
-Config component has no settings (it's a singleton).
-
-### Testing Settings
-
-Testing component has no settings. Structure is driven by testing standards skills.
-
-### CI/CD Settings
-
-CI/CD component has no settings. Structure is driven by the cicd-standards skill.
+The tech pack's `techpack-settings` skill contains the full component type definitions, settings tables per type, directory patterns, and validation rules.
 
 ## Directory Structure
 
@@ -251,7 +178,7 @@ Get the actual directory names for all components.
          │
          ▼
 ┌─────────────────┐
-│  Settings Sync  │  Changes propagate to config, Helm, etc.
+│  Settings Sync  │  Changes propagate to affected artifacts
 │  (incremental)  │  Only adds/updates, never deletes user content
 └─────────────────┘
 ```
@@ -289,13 +216,6 @@ project:
 
 # Components are added here as they are scaffolded during implementation.
 # The plan determines when scaffolding is needed for new components.
-#
-# Example after scaffolding a server:
-#   - name: my-app-server
-#     type: server
-#     path: components/servers/my-app-server
-#     settings:
-#       server_type: api
 
 components:
   - name: config
@@ -303,4 +223,3 @@ components:
     path: components/config
     settings: {}
 ```
-

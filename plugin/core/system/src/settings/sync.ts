@@ -2,7 +2,7 @@
  * Settings sync functions.
  *
  * Core-level settings diff and preview utilities.
- * Tech-specific sync logic (helm charts, config generation) lives in each tech pack.
+ * Tech-specific sync logic lives in each tech pack.
  */
 
 import type { SettingsFile, ComponentManifest } from '@/types';
