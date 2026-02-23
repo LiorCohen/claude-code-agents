@@ -12,6 +12,8 @@
  *   permissions   Permission management
  *   workflow      Workflow phase gate management
  *   tech-pack     Tech pack management
+ *   agent         Agent metadata extraction
+ *   log           Structured logging
  */
 
 import { readFileSync } from 'node:fs';
@@ -32,8 +34,10 @@ import { handleWorkflow } from '@/commands/workflow';
 import { handleSettings } from '@/commands/settings';
 import { handleArchive } from '@/commands/archive';
 import { handleTechPack } from '@/commands/tech-pack';
+import { handleAgent } from '@/commands/agent';
+import { handleLog } from '@/commands/log';
 
-const NAMESPACES = ['scaffolding', 'spec', 'permissions', 'workflow', 'settings', 'archive', 'tech-pack'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'permissions', 'workflow', 'settings', 'archive', 'tech-pack', 'agent', 'log'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
@@ -70,6 +74,12 @@ Namespaces:
     install     Register a tech pack
     remove      Unregister a tech pack
 
+  agent         Agent metadata extraction
+    frontmatter Extract structured metadata from agent .md file
+
+  log           Structured logging
+    write       Write a structured log entry to sdd/system-logs/
+
 Global Options:
   --json        JSON output mode
   --verbose     Verbose logging
@@ -95,6 +105,8 @@ const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   settings: handleSettings,
   archive: handleArchive,
   'tech-pack': handleTechPack,
+  agent: handleAgent,
+  log: handleLog,
 };
 
 const showHelp = (options: GlobalOptions): CommandResult => {
