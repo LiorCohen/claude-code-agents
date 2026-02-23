@@ -10,13 +10,13 @@
 
 ## Planning
 
-- [#162](2-planning/162/plan.md): Split SDD into sdd-engine org repos
+(none)
 
 ---
 
 ## Plan Review
 
-(none)
+- [#162](3-plan-review/162/plan.md): Split SDD into sdd-engine org repos
 
 ---
 
