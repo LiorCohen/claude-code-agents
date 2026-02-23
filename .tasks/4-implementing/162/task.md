@@ -2,7 +2,7 @@
 id: 162
 title: Split SDD into sdd-engine org repos
 priority: high
-status: plan-review
+status: implementing
 created: 2026-02-23 20:00 UTC
 depends_on: []
 blocks: []
