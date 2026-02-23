@@ -193,25 +193,28 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     {
       type: 'write_file',
       path: '.claudeignore',
-      content: '.sdd/archive/\n',
+      content: 'sdd/archive/\n',
     },
   ];
 
   // -- Project template files --
+  // Use absolute paths for core templates so they resolve correctly
+  // regardless of which skills_dir (core or tech pack) is set as base_dir
+  const coreSkillsDir = getSkillsDir();
   const projectTemplateOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/project/README.md',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/README.md'),
       dest: 'README.md',
     },
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/project/CLAUDE.md',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/CLAUDE.md'),
       dest: 'CLAUDE.md',
     },
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/project/package.json',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/project/package.json'),
       dest: 'package.json',
     },
   ];
@@ -220,17 +223,17 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
   const specFileOps: ReadonlyArray<ScaffoldOperation> = [
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/specs/SNAPSHOT.md',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/specs/SNAPSHOT.md'),
       dest: 'specs/SNAPSHOT.md',
     },
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/specs/glossary.md',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/specs/glossary.md'),
       dest: 'specs/domain/glossary.md',
     },
     {
       type: 'template_file',
-      source: 'project-scaffolding/templates/changes/INDEX.md',
+      source: path.join(coreSkillsDir, 'project-scaffolding/templates/changes/INDEX.md'),
       dest: 'changes/INDEX.md',
     },
   ];
@@ -241,9 +244,9 @@ const buildProjectSpec = (config: ScaffoldingConfig): ScaffoldSpec => {
     'specs/domain/use-cases',
     'specs/architecture',
     'changes',
-    '.sdd/archive/external-specs',
-    '.sdd/archive/revised-specs',
-    '.sdd/archive/workflow-regressions',
+    'sdd/archive/external-specs',
+    'sdd/archive/revised-specs',
+    'sdd/archive/workflow-regressions',
   ];
   const gitkeepOps: ReadonlyArray<ScaffoldOperation> = gitkeepDirs.map((dir) => ({
     type: 'mkdir' as const,

@@ -188,7 +188,7 @@ type OpResult = {
 const emptyResult: OpResult = { files: [], dirs: [], scripts: [], skipped: [], errors: [] };
 
 const resolveSource = (spec: ScaffoldSpec, relative: string): string =>
-  path.join(spec.base_dir, relative);
+  path.isAbsolute(relative) ? relative : path.join(spec.base_dir, relative);
 
 const resolveDest = (spec: ScaffoldSpec, relative: string): string =>
   path.join(spec.target_dir, relative);

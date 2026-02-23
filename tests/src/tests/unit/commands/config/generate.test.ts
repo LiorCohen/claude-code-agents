@@ -15,7 +15,7 @@ import { parse } from 'yaml';
 import { runCommand } from '@/lib';
 
 // Plugin system directory (where tsconfig.json lives for path alias resolution)
-const PLUGIN_SYSTEM_DIR = join(process.cwd(), '..', 'plugin', 'system');
+const PLUGIN_SYSTEM_DIR = join(process.cwd(), '..', 'plugin', 'fullstack-typescript', 'system');
 
 const runGenerate = async (
   args: string[],

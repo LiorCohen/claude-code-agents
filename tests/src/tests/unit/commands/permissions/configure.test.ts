@@ -11,7 +11,7 @@ import { mkdtemp, writeFile, mkdir, rmdir, fileExists, PLUGIN_DIR } from '@/lib'
 import { runCommand } from '@/lib';
 import { join } from 'node:path';
 
-const CLI_PATH = join(PLUGIN_DIR, 'system', 'dist', 'cli.js');
+const CLI_PATH = join(PLUGIN_DIR, 'core', 'system', 'dist', 'cli.js');
 
 type ConfigureResult = {
   readonly success: boolean;

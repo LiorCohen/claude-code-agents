@@ -10,7 +10,8 @@ export {
   TESTS_ROOT_DIR,
   REPO_ROOT,
   PLUGIN_DIR,
-  SKILLS_DIR,
+  CORE_SKILLS_DIR,
+  TECH_SKILLS_DIR,
   TEST_OUTPUT_DIR,
 } from './paths';
 

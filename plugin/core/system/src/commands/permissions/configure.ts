@@ -68,7 +68,7 @@ export const configurePermissions = async (): Promise<CommandResult> => {
 
   // Get plugin root to find recommended permissions
   const pluginRoot = getPluginRoot();
-  const recommendedPermissionsPath = path.join(pluginRoot, 'hooks', 'recommended-permissions.json');
+  const recommendedPermissionsPath = path.join(pluginRoot, 'permissions', 'recommended-permissions.json');
 
   // Verify recommended permissions exist
   if (!(await exists(recommendedPermissionsPath))) {

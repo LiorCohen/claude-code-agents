@@ -1,11 +1,11 @@
 {
-  "name": "@sdd/core-system",
+  "name": "@sdd/fs-ts-system",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "main": "dist/cli.js",
   "scripts": {
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json -f && cp src/commands/scaffolding/scaffold-spec.schema.json dist/commands/scaffolding/",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json -f",
     "dev": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit"
   },

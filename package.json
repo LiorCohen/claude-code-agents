@@ -1,11 +1,11 @@
 {
   "private": true,
-  "workspaces": ["plugin/system", "tests"],
+  "workspaces": ["plugin/core/system", "plugin/fullstack-typescript/system", "tests"],
   "scripts": {
     "test": "npm test -w tests",
-    "build:plugin": "npm run build -w plugin/system",
-    "typecheck:plugin": "npm run typecheck -w plugin/system",
-    "logs": "bash -c 'LOG_DIR=\".sdd/system-logs\"; if [ ! -d \"$LOG_DIR\" ]; then echo \"No logs found. The .sdd/system-logs/ directory does not exist yet.\"; echo \"Run an sdd-system command to generate logs.\"; exit 0; fi; LATEST=$(ls -t \"$LOG_DIR\"/*.log 2>/dev/null | head -n1); if [ -z \"$LATEST\" ]; then echo \"No log files found in $LOG_DIR\"; exit 0; fi; echo \"Tailing: $LATEST\"; tail -f \"$LATEST\" | npx pino-pretty'"
+    "build:plugin": "npm run build -w @sdd/core-system && npm run build -w @sdd/fs-ts-system",
+    "typecheck:plugin": "npm run typecheck -w @sdd/core-system && npm run typecheck -w @sdd/fs-ts-system",
+    "logs": "bash -c 'LOG_DIR=\"sdd/system-logs\"; if [ ! -d \"$LOG_DIR\" ]; then echo \"No logs found. The sdd/system-logs/ directory does not exist yet.\"; echo \"Run an sdd-system command to generate logs.\"; exit 0; fi; LATEST=$(ls -t \"$LOG_DIR\"/*.log 2>/dev/null | head -n1); if [ -z \"$LATEST\" ]; then echo \"No log files found in $LOG_DIR\"; exit 0; fi; echo \"Tailing: $LATEST\"; tail -f \"$LATEST\" | npx pino-pretty'"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

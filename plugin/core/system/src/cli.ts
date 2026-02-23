@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 /**
- * SDD System CLI - Unified command-line tool for SDD plugin operations.
+ * SDD Core System CLI - Command-line tool for core SDD operations.
  *
  * Usage: sdd-system <namespace> <action> [args] [options]
  *
  * Namespaces:
  *   scaffolding   Project and domain scaffolding
  *   spec          Spec validation, indexing, snapshots
- *   hook          Hook handlers (validate-write, prompt-commit)
- *   database      Database component operations
- *   contract      Contract component operations
- *   config        Config component operations
- *   env           Local environment management
  *   settings      Settings reconciliation
  *   archive       Archive file management
+ *   permissions   Permission management
+ *   workflow      Workflow phase gate management
  */
 
 import { readFileSync } from 'node:fs';
@@ -29,21 +26,16 @@ import type { LogLevel } from '@/types/settings';
 // Command imports
 import { handleSpec } from '@/commands/spec';
 import { handleScaffolding } from '@/commands/scaffolding';
-import { handleHook } from '@/commands/hook';
-import { handleDatabase } from '@/commands/database';
-import { handleContract } from '@/commands/contract';
-import { handleConfig } from '@/commands/config';
-import { handleEnvironment } from '@/commands/env';
 import { handlePermissions } from '@/commands/permissions';
 import { handleWorkflow } from '@/commands/workflow';
 import { handleSettings } from '@/commands/settings';
 import { handleArchive } from '@/commands/archive';
 
-const NAMESPACES = ['scaffolding', 'spec', 'hook', 'database', 'contract', 'config', 'env', 'permissions', 'workflow', 'settings', 'archive'] as const;
+const NAMESPACES = ['scaffolding', 'spec', 'permissions', 'workflow', 'settings', 'archive'] as const;
 type Namespace = (typeof NAMESPACES)[number];
 
 const HELP_TEXT = `
-SDD System CLI - Unified command-line tool for SDD plugin operations
+SDD Core System CLI - Command-line tool for core SDD operations
 
 Usage: sdd-system <namespace> <action> [args] [options]
 
@@ -57,43 +49,6 @@ Namespaces:
     index       Generate changes/INDEX.md
     snapshot    Create project snapshot
 
-  hook          Hook handlers (called by hook-runner.sh)
-    validate-write   PreToolUse hook: auto-approve/block writes
-    prompt-commit    PostToolUse hook: commit prompts
-
-  database      Database component operations
-    setup       Deploy PostgreSQL to k8s
-    teardown    Remove PostgreSQL from k8s
-    migrate     Run migrations
-    seed        Seed database
-    reset       Reset (teardown + setup + migrate + seed)
-    port-forward  Port forward to local
-    psql        Open psql shell
-
-  contract      Contract component operations
-    generate-types  Generate TypeScript types from OpenAPI spec
-    validate        Validate OpenAPI spec
-
-  config        Config component operations
-    generate    Generate merged config for target environment
-    validate    Validate config against schemas
-    diff        Show differences between environments
-    add-env     Add a new environment directory
-
-  env           Local environment management
-    create      Create local k8s cluster + install infra
-    destroy     Delete cluster entirely
-    start       Resume stopped cluster
-    stop        Pause cluster (preserves state)
-    restart     Restart cluster (stop + start)
-    status      Show cluster and deployment status
-    deploy      Deploy application Helm charts
-    undeploy    Remove application deployments
-    forward     Port-forward services for local access
-    config      Generate local environment config
-    infra       Install/reinstall observability stack
-    check-tools Check required development tools
-
   permissions   Permission management
     configure   Merge SDD recommended permissions into project settings
 
@@ -104,7 +59,7 @@ Namespaces:
     reconcile   Reconcile settings to latest plugin schema
 
   archive       Archive file management
-    store       Archive a file or directory to .sdd/archive/<type>/
+    store       Archive a file or directory to sdd/archive/<type>/
 
 Global Options:
   --json        JSON output mode
@@ -115,7 +70,6 @@ Examples:
   sdd-system spec validate changes/2026/01/01/feature/SPEC.md
   sdd-system spec validate --all --changes-dir changes/
   sdd-system scaffolding project --config config.json
-  sdd-system database setup my-db
 `.trim();
 
 type CommandHandler = (
@@ -127,11 +81,6 @@ type CommandHandler = (
 const COMMAND_HANDLERS: Readonly<Record<Namespace, CommandHandler>> = {
   scaffolding: handleScaffolding,
   spec: handleSpec,
-  hook: handleHook,
-  database: handleDatabase,
-  contract: handleContract,
-  config: handleConfig,
-  env: handleEnvironment,
   permissions: handlePermissions,
   workflow: handleWorkflow,
   settings: handleSettings,
@@ -163,13 +112,13 @@ type LoadLoggingConfigResult =
   | { readonly loaded: false };
 
 /**
- * Load logging config from .sdd/sdd-settings.yaml if it exists.
+ * Load logging config from sdd/sdd-settings.yaml if it exists.
  * Safely extracts system.logging without assuming the full SettingsFile shape,
  * since the file may not yet be reconciled to the latest schema.
  */
 const loadLoggingConfig = (): LoadLoggingConfigResult => {
   try {
-    const settingsPath = join(process.cwd(), '.sdd', 'sdd-settings.yaml');
+    const settingsPath = join(process.cwd(), 'sdd', 'sdd-settings.yaml');
     const content = readFileSync(settingsPath, 'utf-8');
     const raw: unknown = YAML.parse(content);
     if (typeof raw !== 'object' || raw === null) return { loaded: false };
@@ -194,7 +143,7 @@ const main = async (): Promise<number> => {
   const { namespace, action, args, options } = parseArgs(process.argv.slice(2));
   const logger = createLogger(options);
 
-  // Find project root (directory containing package.json or .sdd/)
+  // Find project root (directory containing package.json or sdd/)
   // If no project found, disable file logging to avoid polluting non-project directories
   const projectRootResult: ProjectRootResult = await findProjectRoot();
   const projectRoot = projectRootResult.found ? projectRootResult.path : undefined;

@@ -12,7 +12,7 @@ import { mkdtemp, writeFile, mkdir, readFile, fileExists, dirExists, rmdir, list
 import { join } from 'node:path';
 import { runCommand } from '@/lib';
 
-const PLUGIN_SYSTEM_DIR = join(process.cwd(), '..', 'plugin', 'system');
+const PLUGIN_SYSTEM_DIR = join(process.cwd(), '..', 'plugin', 'core', 'system');
 
 type ArchiveResult = {
   readonly success: boolean;

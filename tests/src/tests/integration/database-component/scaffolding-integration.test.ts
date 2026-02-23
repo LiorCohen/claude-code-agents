@@ -8,7 +8,7 @@
 
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import {
-  SKILLS_DIR,
+  TECH_SKILLS_DIR,
   joinPath,
   fileExists,
   isDirectory,
@@ -48,7 +48,7 @@ describe('Scaffolding Integration', () => {
       primary_domain: 'Testing',
       target_dir: targetDir,
       components: [{ type: 'database', name: 'database' }],
-      skills_dir: SKILLS_DIR,
+      skills_dir: TECH_SKILLS_DIR,
     };
 
     const configFile = joinPath(tmpDir, 'config.json');
@@ -83,7 +83,7 @@ describe('Scaffolding Integration', () => {
       primary_domain: 'Testing',
       target_dir: targetDir,
       components: [{ type: 'database', name: 'database' }],
-      skills_dir: SKILLS_DIR,
+      skills_dir: TECH_SKILLS_DIR,
     };
 
     const configFile = joinPath(tmpDir, 'config2.json');
