@@ -10,13 +10,13 @@
 
 ## Planning
 
-- [#158](2-planning/158/): Split plugin into core/ and fullstack-typescript/ subdirectories
+(none)
 
 ---
 
 ## Plan Review
 
-(none)
+- [#158](3-plan-review/158/plan.md): Split plugin into core/ and fullstack-typescript/ subdirectories
 
 ---
 
