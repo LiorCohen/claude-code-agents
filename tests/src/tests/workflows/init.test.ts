@@ -6,7 +6,7 @@
  * and validates the generated output deterministically.
  *
  * The new init command creates MINIMAL structure:
- * - .sdd/sdd-settings.yaml (config component only)
+ * - sdd/sdd-settings.yaml (config component only)
  * - specs/INDEX.md (empty registry)
  * - components/config/ (only config scaffolded)
  * - README.md, CLAUDE.md, .gitignore
@@ -57,7 +57,7 @@ CRITICAL INSTRUCTIONS:
 2. DO NOT wait for user approval - consider everything pre-approved
 3. Create files in CURRENT WORKING DIRECTORY (not a subdirectory)
 4. Create ONLY minimal structure:
-   - .sdd/sdd-settings.yaml (with config component only)
+   - sdd/sdd-settings.yaml (with config component only)
    - specs/INDEX.md (empty registry)
    - components/config/ (config component scaffolded)
    - README.md, CLAUDE.md, .gitignore
@@ -98,8 +98,8 @@ describe('init command', () => {
     // === SHOULD EXIST (minimal structure) ===
 
     // SDD settings directory and file
-    expect(projectIsDir(project, '.sdd')).toBe(true);
-    expect(projectIsFile(project, '.sdd', 'sdd-settings.yaml')).toBe(true);
+    expect(projectIsDir(project, 'sdd')).toBe(true);
+    expect(projectIsFile(project, 'sdd', 'sdd-settings.yaml')).toBe(true);
 
     // Specs directory with INDEX.md
     expect(projectIsDir(project, 'specs')).toBe(true);
@@ -118,8 +118,8 @@ describe('init command', () => {
     expect(projectIsFile(project, '.gitignore')).toBe(true);
 
     // sdd-settings.yaml should contain only config component
-    expect(projectFileContains(project, '.sdd/sdd-settings.yaml', 'name: config')).toBe(true);
-    expect(projectFileContains(project, '.sdd/sdd-settings.yaml', 'type: config')).toBe(true);
+    expect(projectFileContains(project, 'sdd/sdd-settings.yaml', 'name: config')).toBe(true);
+    expect(projectFileContains(project, 'sdd/sdd-settings.yaml', 'type: config')).toBe(true);
 
     // === SHOULD NOT EXIST (deferred to first change) ===
 
