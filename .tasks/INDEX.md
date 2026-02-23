@@ -28,7 +28,7 @@
 
 ## Reviewing
 
-- [#158](5-reviewing/158/plan.md): Split plugin into core/ and fullstack-typescript/ subdirectories
+(none)
 
 ---
 
@@ -106,6 +106,7 @@
 
 ## Complete
 
+- [#158](6-complete/158/): Split plugin into core/ and fullstack-typescript/ subdirectories ✓ (2026-02-23)
 - [#152](6-complete/152/): Workflows must have user-chosen names ✓ (2026-02-18)
 - [#151](6-complete/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE ✓ (2026-02-18)
 - [#144](6-complete/144/): Three-command structure: /sdd + /sdd-run + /sdd-help ✓ (2026-02-17)
