@@ -1,7 +1,7 @@
 ---
 id: 161
 title: Create persistent threads skill for conversation thread management
-status: inbox
+status: speccing
 created: 2026-02-23 12:00 UTC
 depends_on: []
 blocks: []

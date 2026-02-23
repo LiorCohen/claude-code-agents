@@ -4,7 +4,7 @@
 
 ## Speccing
 
-(none)
+- [#161](1-speccing/161/): Create persistent threads skill for conversation thread management
 
 ---
 
@@ -70,7 +70,6 @@
 
 ### Unprioritized
 
-- [#161](0-inbox/161/): Create persistent threads skill for conversation thread management
 - [#160](0-inbox/160/): Context window aware planning — plans must not exceed context limits during execution
 - [#159](0-inbox/159/): Session management guidance — when to create new sessions vs compact
 - [#156](0-inbox/156/): VSCode status bar should show the selected workflow name
