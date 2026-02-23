@@ -30,7 +30,7 @@ Manage the project backlog, track progress, and organize implementation plans.
 
 Each task is a folder named by its ID containing:
 - `task.md` - the task description and metadata
-- `plan.md` - the implementation plan (created during planning phase)
+- `plan.md` - the execution plan — implementation order, sequencing, and test plan (created during planning phase)
 - `changes.md` - file changes summary (generated during review or before completion)
 
 **Note:** Priority (high/medium/low) is a frontmatter field, not a directory. Tasks are organized by status in directories. In INDEX.md, priority sub-sections appear under the Inbox heading.
@@ -136,6 +136,8 @@ Moves a task from inbox (or back from planning) to speccing, then interactively 
 
 **Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. There is no defined end — the user decides when the spec is complete.
 
+**All decisions in the spec:** Every change must be fully defined during speccing — exact files, exact changes, no ambiguity. Never defer decisions to planning or label anything a "planning detail." Planning builds an execution plan for changes already decided here.
+
 Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 
 ---
@@ -159,9 +161,9 @@ Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to speccing"')`
 4. Update INDEX.md
 5. Use commit skill: `Skill(commit, args: '-m "Tasks: Move #<id> to planning"')`
 
-**Phase 2 — Plan (only after commit completes):**
-6. Research the codebase and write the actual plan content in `plan.md`
-7. If planning reveals spec gaps, update task.md directly (never plan.md) and commit as a planning-phase spec update.
+**Phase 2 — Build execution plan (only after commit completes):**
+6. Research the codebase and write the execution plan in `plan.md` — sequencing, step-by-step implementation order, and test plan for the changes already defined in the spec. Do not redefine what changes to make; that belongs in the spec.
+7. If planning reveals spec gaps (missing files, unclear changes), update task.md directly (never plan.md) and commit as a planning-phase spec update. This should be rare — a well-specced task needs no planning-phase amendments.
 
 **Critic check:** After writing the plan, invoke `/critic` for self-review before presenting the plan to the user.
 

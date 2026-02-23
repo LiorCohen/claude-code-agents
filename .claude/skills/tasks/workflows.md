@@ -86,6 +86,8 @@ User: /tasks spec 19
 
 **Solicitation:** Ask guiding questions to fill in the 6 required sections (Description, Motivation, Scope, Constraints, Changes, Acceptance Criteria). Maintain a running list of open questions. The user decides when the spec is complete — there is no defined end.
 
+**All decisions in the spec:** Every change must be fully defined during speccing — exact files, exact changes, no ambiguity. Never defer decisions to planning or label anything a "planning detail." Planning builds an execution plan for changes already decided here.
+
 ---
 
 ## Start Planning
@@ -116,8 +118,8 @@ Plan: [plan.md](.tasks/2-planning/19/plan.md)
 ```
 
 **Workflow — Phase 2 (only after the transition commit completes):**
-7. Research the codebase and write the actual plan content in `plan.md`
-8. If planning reveals spec gaps, update task.md directly (never plan.md) and commit as a planning-phase spec update.
+7. Research the codebase and write the execution plan in `plan.md` — sequencing, step-by-step implementation order, and test plan for the changes already defined in the spec. Do not redefine what changes to make; that belongs in the spec.
+8. If planning reveals spec gaps (missing files, unclear changes), update task.md directly (never plan.md) and commit as a planning-phase spec update. This should be rare — a well-specced task needs no planning-phase amendments.
 
 **IMPORTANT:** The status transition and commit MUST complete before any planning work begins. Do not start researching or writing plan content until the transition is committed.
 

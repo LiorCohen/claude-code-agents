@@ -89,6 +89,8 @@ Why this change is needed. What problem it solves. What breaks without it.
 
 ## Changes
 
+Every change must be fully defined here — exact files, exact changes, no ambiguity. Never defer decisions to planning or label anything a "planning detail." The plan builds an execution order for changes decided here.
+
 | File | Change |
 |------|--------|
 | `path/to/file.md` | What changes and why |
@@ -244,7 +246,7 @@ Added CommandResult type.
 
 ## Plan Schema
 
-Plans are stored as `plan.md` inside the task folder. They are created during the planning phase and move with the task through its lifecycle.
+Plans are stored as `plan.md` inside the task folder. They are execution plans — implementation order, sequencing, and test plan for changes already fully defined in the spec. They are created during the planning phase and move with the task through its lifecycle.
 
 ### Frontmatter Fields
 
@@ -264,30 +266,26 @@ created: 2026-01-28 10:00 UTC
 
 # Plan: Task Management Skill
 
-## Problem Summary
+## Execution Order
 
-Brief description of what problem this solves.
+Step-by-step implementation sequence. Each step references changes from the spec and describes HOW to implement them, in what order, and with what dependencies.
 
-## Files to Modify
+### Step 1: [Component/area — what to do first]
 
-| File | Changes |
-|------|---------|
-| path/to/file.ts | Description of what changes |
+- Files: `path/to/file.ts`, `path/to/other.ts`
+- Why first: no dependencies, other steps build on this
+- Implementation approach: brief strategy notes
 
-## Changes
+### Step 2: [Component/area — what to do next]
 
-### 1. [Component/Area Name]
+- Files: `path/to/file.ts`
+- Depends on: Step 1
+- Implementation approach: brief strategy notes
 
-What behavioral or functional changes are being made.
-Focus on WHAT is changing, not HOW to implement it.
+### Step 3: [Tests]
 
-### 2. [Component/Area Name]
-
-Additional changes...
-
-## Dependencies
-
-What must happen before what. List any sequencing requirements.
+- Write tests for steps 1–2
+- Depends on: Steps 1–2
 
 ## Tests
 
@@ -309,17 +307,19 @@ What must happen before what. List any sequencing requirements.
 
 ### Plan Content Guidelines
 
-**Plans focus on WHAT, not HOW:**
+**Plans are execution plans, not specs.** The spec defines WHAT changes to make. The plan defines HOW to execute them — in what order, with what dependencies, and what implementation strategy.
 
 | Include in Plans | Do NOT Include in Plans |
 |------------------|-------------------------|
-| What files/components are affected | Full code implementations |
-| What behavior is changing | Line-by-line instructions |
-| What tests verify the changes | Algorithm details |
-| Dependencies and sequencing | Specific function signatures |
-| Brief code snippets as constraints | Step-by-step coding instructions |
+| Execution order and sequencing | Re-stating what changes to make (that's the spec) |
+| Implementation strategy per step | Full code implementations |
+| Dependencies between steps | Decisions about what to change |
+| Brief code snippets as constraints | Line-by-line instructions |
+| Test plan | Algorithm details |
 
-**Tests are required:** Every plan must include an extensive list of tests. Tests define expected behavior (WHAT) and can be reviewed before implementation begins.
+**Never redefine changes.** If a plan needs to describe what's changing, the spec is incomplete — go back and update the spec, not the plan.
+
+**Tests are required:** Every plan must include an extensive list of tests. Tests define expected behavior and can be reviewed before implementation begins.
 
 ---
 

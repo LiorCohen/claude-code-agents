@@ -68,4 +68,4 @@ Any status → 7-rejected/ (if irrelevant or out of scope)
 
 **Priority** (high/medium/low) can be set at any point and only affects INDEX.md grouping (sub-sections under Inbox).
 
-Plans are created during the planning phase and move with their task folder through the lifecycle.
+Plans are execution plans created during the planning phase — they define implementation order and sequencing for changes already fully specified in the spec. They move with their task folder through the lifecycle.
