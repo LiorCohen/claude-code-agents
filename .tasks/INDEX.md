@@ -22,7 +22,7 @@
 
 ## Implementing
 
-- [#162](4-implementing/162/plan.md): Split SDD into sdd-engine org repos
+(none)
 
 ---
 
@@ -107,6 +107,7 @@
 
 ## Complete
 
+- [#162](6-complete/162/): Split SDD into sdd-engine org repos ✓ (2026-02-24)
 - [#158](6-complete/158/): Split plugin into core/ and fullstack-typescript/ subdirectories ✓ (2026-02-23)
 - [#152](6-complete/152/): Workflows must have user-chosen names ✓ (2026-02-18)
 - [#151](6-complete/151/): Add a VS Code extension for SDD that reflects project status, workflow status, and other SDD state in the IDE ✓ (2026-02-18)
